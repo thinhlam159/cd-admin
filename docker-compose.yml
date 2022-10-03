@@ -1,0 +1,30 @@
+version: '3'
+services:
+    mysql:
+        image: mysql:8.0
+        container_name: cd_admin_db
+        ports:
+            - "3322:3306"
+        environment:
+            - MYSQL_ROOT_PASSWORD=root
+        volumes:
+            - ./docker/app/mysql/setup.sql:/docker-entrypoint-initdb.d/setup.sql
+            - db_data:/var/lib/mysql
+        restart: always
+    app:
+        build: ./docker/app
+        container_name: cd_admin_app
+        volumes:
+            - ./:/var/www/html
+            - ./docker/app/hosts:/etc/apache2/sites-enabled
+            - ./docker/app/php/php.ini:/usr/local/etc/php/php.ini
+            - ./docker/app/php/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+        ports:
+            - "8032:80"
+            - "1443:443"
+        depends_on:
+            - mysql
+        restart: always
+
+volumes:
+    db_data:
