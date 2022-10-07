@@ -16,6 +16,13 @@ export default [
         },
     },
     {
+        path: '/about',
+        component: About,
+        meta: {
+            middleware: [(context) => guest(context, TYPE_USER.ADMIN)],
+        },
+    },
+    {
         path: ROUTER_PATH.ADMIN,
         component: AdminLayout,
         meta: {
