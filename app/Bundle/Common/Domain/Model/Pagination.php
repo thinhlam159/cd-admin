@@ -7,17 +7,17 @@ final class Pagination
     /**
      * @var int
      */
-    private int $totalPage;
+    private $totalPage;
 
     /**
      * @var int
      */
-    private int $perPage;
+    private $perPage;
 
     /**
      * @var int
      */
-    private int $currentPage;
+    private $currentPage;
 
     /**
      * @param int $totalPage totalPage
