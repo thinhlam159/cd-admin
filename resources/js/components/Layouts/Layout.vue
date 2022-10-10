@@ -1,7 +1,7 @@
 <template>
-  <Header :isShowHeader="isShowHeader" />
+<!--  <Header :isShowHeader="isShowHeader" />-->
   <div class="flex w-full">
-    <div class="w-[14%]">
+    <div class="w-[14%] bg-red">
       <SideBar />
     </div>
     <div class="flex-1">

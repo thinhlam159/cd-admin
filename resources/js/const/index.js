@@ -157,3 +157,21 @@ export const TYPE_USER = {
     USER: "user",
     ADMIN: "admin",
 };
+
+export const PAGE_DEFAULT = 1;
+
+export const FORM_USER_MANAGE = {
+    ORGANIZATION: "organization",
+    ADMIN: "admin",
+    MALE: "male",
+    FEMALE: "female",
+    INQUIRY: "inquiry",
+    USER: "user",
+    RESERVATION: "reservation",
+    RESERVATION_COMPENSATION_CHARGE: "reservation_compensation_charge",
+    CUSTOMER: "customer",
+    RENTAL_SPACE: "rental_space",
+    ALL: "all",
+    SUPERVISOR: "supervisor",
+    BILLING: "billing",
+};

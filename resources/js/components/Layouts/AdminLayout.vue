@@ -1,7 +1,8 @@
 <template>
     <div class="text-xs">
-        <SpinLoading v-if="isLoading" />
+<!--        <SpinLoading v-if="isLoading" />-->
         <div v-if="isShowLayout" class="">
+            <h1>123123</h1>
             <Layout>
                 <router-view />
             </Layout>
@@ -27,11 +28,13 @@ export default {
     },
     setup() {
         const store = useStore();
-        const isLoading = computed(
-            () => store.getters[`${MODULE_STORE.COMMON.NAME}/${MODULE_STORE.COMMON.GETTERS.GET_IS_LOADING}`]
-        );
-        const isShowLayout = computed(() => store.state[MODULE_STORE.AUTH.NAME].isAuthenticated);
-        return { isLoading, isShowLayout };
+        // const isLoading = computed(
+        //     () => store.getters[`${MODULE_STORE.COMMON.NAME}/${MODULE_STORE.COMMON.GETTERS.GET_IS_LOADING}`]
+        // );
+        // const isShowLayout = computed(() => store.state[MODULE_STORE.AUTH.NAME].isAuthenticated);
+        const isShowLayout = true;
+        // return { isLoading, isShowLayout };
+        return { isShowLayout };
     },
 }
 </script>
