@@ -36,12 +36,6 @@ export default {
           icon: "fa fa-clock-o",
         },
         {
-          id: 2,
-          title: this.$t("side_bar_components.reservation_list"),
-          link: ROUTER_PATH.RESERVATIONS.MANAGE,
-          icon: "fa fa-bars",
-        },
-        {
           id: 3,
           title: this.$t("side_bar_components.external_reservation"),
           link: `${ROUTER_PATH.ADMIN}/${ROUTER_PATH.EXTERNAL_RESERVATION}`,
