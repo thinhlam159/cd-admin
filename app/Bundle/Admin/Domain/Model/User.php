@@ -9,8 +9,9 @@ final class User
     private $password;
 
     /**
-     * @param UserId $userId userId
-     * @param string $userName userName
+     * @param \App\Bundle\Admin\Domain\Model\UserId $userId userId
+     * @param string $userName
+     * @param string $email
      */
     public function __construct(UserId $userId, string $userName, string $email)
     {
@@ -20,7 +21,7 @@ final class User
     }
 
     /**
-     * @return UserId
+     * @return \App\Bundle\Admin\Domain\Model\UserId
      */
     public function getUserId(): UserId
     {

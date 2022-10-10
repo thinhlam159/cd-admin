@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Bundle\Api\Admin\UserController;
 use App\Http\Controllers\Bundle\Auth\AdminAuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -28,4 +29,10 @@ Route::group([
     Route::post('/refresh', [AdminAuthController::class, 'refresh'])->middleware('auth:api');
     Route::get('/user-profile', [AdminAuthController::class, 'userProfile'])->middleware('api');
     Route::post('/change-pass', [AdminAuthController::class, 'changePassWord']);
+});
+
+Route::group([
+    'prefix' => 'admin'
+], function() {
+    Route::post('/login', [UserController::class, 'createUser']);
 });

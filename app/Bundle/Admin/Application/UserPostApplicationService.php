@@ -3,9 +3,12 @@
 namespace App\Bundle\Admin\Application;
 
 use App\Bundle\Admin\Domain\Model\IUserRepository;
-use App\Bundle\Admin\Application\UserPostCommand;
 use App\Bundle\Admin\Domain\Model\User;
 use App\Bundle\Admin\Domain\Model\UserId;
+use App\Bundle\Common\Domain\Model\TransactionException;
+use Exception;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class UserPostApplicationService
 {
@@ -26,7 +29,15 @@ class UserPostApplicationService
         );
         $user->setPassword($command->password);
 
-        $userId = $this->userRepository->create($user);
+        DB::beginTransaction();
+        try {
+            $userId = $this->userRepository->create($user);
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error($e);
+            throw new TransactionException('Add user fail!');
+        }
 
         return new UserPostResult($userId->__toString());
     }
