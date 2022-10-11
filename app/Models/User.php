@@ -24,8 +24,14 @@ class User extends Authenticatable implements JWTSubject
         'email',
         'password',
     ];
+
     protected $casts = ['id' => 'string'];
     public $incrementing = false;
+
+    public function roles()
+    {
+        return $this->belongsToMany('App\Model\Role', 'user_roles', 'user_id', 'role_id');
+    }
 
 //    /**
 //     * The attributes that should be hidden for serialization.
