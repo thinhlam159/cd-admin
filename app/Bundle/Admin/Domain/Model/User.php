@@ -1,12 +1,13 @@
 <?php
 
 namespace App\Bundle\Admin\Domain\Model;
+
 final class User
 {
-    private $userId;
-    private $userName;
-    private $email;
-    private $password;
+    private UserId $userId;
+    private string $userName;
+    private string $email;
+    private ?string $password = null;
 
     /**
      * @param \App\Bundle\Admin\Domain\Model\UserId $userId userId
@@ -45,17 +46,17 @@ final class User
     }
 
     /**
-     * @param string $password password
+     * @param string|null $password password
      * @return void
      */
-    public function setPassword(string $password): void{
+    public function setPassword(?string $password): void{
         $this->password = $password;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getPassword(): string
+    public function getPassword(): ?string
     {
         return $this->password;
     }

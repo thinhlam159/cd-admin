@@ -10,17 +10,18 @@
         "production": "mix --production"
     },
     "devDependencies": {
+        "autoprefixer": "^10.4.12",
         "axios": "^0.21",
         "laravel-mix": "^6.0.6",
         "lodash": "^4.17.19",
-        "postcss": "^8.4.17"
+        "postcss": "^8.4.17",
+        "tailwindcss": "^3.1.8"
     },
     "dependencies": {
         "moment": "^2.29.4",
         "prettier": "^2.7.1",
         "sass": "^1.55.0",
         "sass-loader": "^13.1.0",
-        "tailwindcss": "^3.1.8",
         "vue": "^3.2.40",
         "vue-axios": "^3.4.1",
         "vue-i18n": "^9.2.2",

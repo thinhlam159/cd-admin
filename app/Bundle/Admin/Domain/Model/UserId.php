@@ -15,9 +15,10 @@ class UserId
     /**
      * @param string $value value
      */
-    public function __construct($value)
+    public function __construct(string $value)
     {
-        if(!self::validate($this->value)) {
+        $this->value = $value;
+        if(!self::validate($value)) {
             throw new InvalidArgumentException("[{$value}] invalid value");
         }
     }

@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Bundle\Common\Domain\Library;
 

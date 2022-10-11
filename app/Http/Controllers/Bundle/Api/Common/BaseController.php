@@ -1,6 +1,6 @@
-<?php 
+<?php
 
-namespace App\Bundle\Api\Common;
+namespace App\Http\Controllers\Bundle\Api\Common;
 
 use App\Http\Controllers\Controller;
 

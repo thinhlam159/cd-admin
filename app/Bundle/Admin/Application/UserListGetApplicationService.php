@@ -14,10 +14,13 @@ class UserListGetApplicationService
         $this->userRepository = $userRepository;
     }
 
+    /**
+     * @param \App\Bundle\Admin\Application\UserListGetCommand $command
+     * @return \App\Bundle\Admin\Application\UserListGetResult
+     */
     public function handle(UserListGetCommand $command): UserListGetResult
     {
         [$users, $pagination] = $this->userRepository->findAll();
-
         $userResults = [];
         foreach ($users as $user) {
             $userResults[] = new UserResult(

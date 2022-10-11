@@ -5,6 +5,7 @@ namespace App\Bundle\Admin\Application;
 use App\Bundle\Admin\Domain\Model\IUserRepository;
 use App\Bundle\Admin\Domain\Model\User;
 use App\Bundle\Admin\Domain\Model\UserId;
+use App\Bundle\Common\Domain\Model\InvalidArgumentException;
 use App\Bundle\Common\Domain\Model\TransactionException;
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -21,6 +22,10 @@ class UserPostApplicationService
 
     public function handle(UserPostCommand $command): UserPostResult
     {
+        $existingEmail = $this->userRepository->checkExistingEmail($command->email);
+        if (!$existingEmail) {
+            throw new InvalidArgumentException('Existing Email!');
+        }
         $userId = UserId::newId();
         $user = new User(
             $userId,
