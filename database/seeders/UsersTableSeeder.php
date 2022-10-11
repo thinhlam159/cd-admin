@@ -15,7 +15,7 @@ class UsersTableSeeder extends Seeder
     {
         $defaults = [
             [
-                'id' => '1',
+                'id' => '01GF2WV4414C8BQS2RMYFAGPB4',
                 'email' => 'admin@cd-admin.co.vn',
                 'name' => 'admin',
                 'password' => bcrypt('dangnhap'),

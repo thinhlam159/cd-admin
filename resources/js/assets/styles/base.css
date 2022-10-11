@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+::selection {
+    color: #333;
+    background-color: yellow;
+}
+* {
+  color: #333;
+}
+.v-toast__text {
+  color: #fff;
+}
+button:active {
+  opacity: 0.6;
+}
+input[type="checkbox"],
+input[type="radio"] {
+  cursor: pointer;
+}
+

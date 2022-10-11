@@ -7,15 +7,15 @@ class PaginationResult
     /**
      * @var int
      */
-    public int $totalPage;
+    public $totalPage;
     /**
      * @var int
      */
-    public int $currentPage;
+    public $currentPage;
     /**
      * @var int
      */
-    public int $perPage;
+    public $perPage;
 
     /**
      * @param int $currentPage currentPage
