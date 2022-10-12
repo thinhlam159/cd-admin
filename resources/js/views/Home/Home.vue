@@ -1,5 +1,7 @@
 <template>
-  <div>Page Home</div>
+  <div class="flex w-max flex-grow">
+      <h1>Page Home</h1>
+  </div>
 </template>
 
 <script>

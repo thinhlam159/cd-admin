@@ -20,9 +20,9 @@ export default [
     {
         path: ROUTER_PATH.ADMIN,
         component: AdminLayout,
-        meta: {
-            middleware: [(context) => guest(context, TYPE_USER.ADMIN)],
-        },
+        // meta: {
+        //     middleware: [(context) => guest(context, TYPE_USER.ADMIN)],
+        // },
         children: [
             {
                 path: ROUTER_PATH.EMPTY,
@@ -46,6 +46,14 @@ export default [
                     },
                 ],
             },
+            {
+                path: ROUTER_PATH.PRODUCT_MANAGE,
+                component: UserManage,
+            },
+            {
+                path: ROUTER_PATH.DASHBOARD,
+                component: UserManage,
+            }
         ]
     },
 ]
