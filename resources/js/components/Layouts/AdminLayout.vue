@@ -1,10 +1,9 @@
 <template>
     <div class="text-xs">
-<!--        <SpinLoading v-if="isLoading" />-->
+        <SpinLoading v-if="isLoading" />
         <div v-if="isShowLayout" class="">
-            <h1>123123</h1>
             <Layout>
-                <router-view />
+                <router-view class="w-full"/>
             </Layout>
         </div>
         <div class="" v-else>

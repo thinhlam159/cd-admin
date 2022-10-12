@@ -1,4 +1,4 @@
-// export * from "./store/admin.js";
+export * from "./store/admin.js";
 // export * from "./store/customer.js";
 // export * from "./store/organization.js";
 // export * from "./store/reservation.js";
