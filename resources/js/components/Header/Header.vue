@@ -38,8 +38,9 @@
           </button>
         </div>
       </div>
-      <div class="cursor-pointer hover:bg-gray-300 p-1 rounded-md min-w-fit mr-2" @click="handleLogout">
-        {{ $t("header.logout") }}
+      <div class="cursor-pointer hover:bg-gray-300 p-1 rounded-md min-w-fit mr-4" @click="handleLogout">
+<!--        {{ $t("header.logout") }}-->
+        Đăng xuất
       </div>
     </div>
   </div>
@@ -72,6 +73,7 @@ export default {
 
   methods: {
     async handleLogout() {
+        console.log(123)
       try {
         await logout();
         removeToken(TYPE_USER.ADMIN);

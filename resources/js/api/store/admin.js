@@ -1,12 +1,16 @@
-import axios from "axios"
+import api from "../http-request";
+import apiConstants from "../apiConstant";
 
-const request = axios.create({
-    baseURL: '/api/admin',
-})
+//[POST] method
+export const login = async (data) =>
+    api.post(apiConstants.AUTH.LOGIN, data, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
 
-export const getListUserManagerFromApi = async function() {
-    const res = await request.get('/list-user')
-    return res.data
+export const getListUserManagerFromApi = async (page) => {
+    `${api.get(apiConstants.ADMIN.LIST_USER)}=${page}`;
 }
 
 export const addUserManager = async function() {
@@ -24,7 +28,4 @@ export const getUserDetailFromApi = async function(id) {
     return res.data
 }
 
-export const logout = async function() {
-    const res = await request.get('/list-user')
-    console.log(res)
-}
+export const logout = async (data) => api.post(apiConstants.AUTH.LOGOUT, data, {});

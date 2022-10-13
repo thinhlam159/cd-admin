@@ -1,5 +1,5 @@
 <template>
-<!--  <Header :isShowHeader="isShowHeader" />-->
+  <Header :isShowHeader="isShowHeader" />
   <div class="flex w-full min-h-screen">
     <div class="w-[14%] bg-[rgba(0,0,0,.02)]">
       <SideBar />

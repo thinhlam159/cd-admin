@@ -23,9 +23,9 @@ router.beforeEach((to, from, next) => {
     }
     const { middleware } = to.meta;
     const context = { to, from, next };
-    const publicPages = ['/login', '/register'];
+    const publicPages = ['/admin/login', '/register'];
     const authRequired = !publicPages.includes(to.path);
-    const loggedIn = localStorage.getItem('user');
+    const loggedIn = localStorage.getItem('token');
 
     if (authRequired && !loggedIn) {
         return next('/admin/login');

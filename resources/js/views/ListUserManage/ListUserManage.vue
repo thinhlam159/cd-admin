@@ -112,7 +112,7 @@ export default {
     Pagination,
   },
 
-  setup(props, context) {
+  setup() {
     const filterKey = ref({});
     const isShowSort = ref(false);
     const timeDatePicker = ref(new Date());
@@ -146,11 +146,14 @@ export default {
       try {
 
         // store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = true;
-        const response = await getListUserManagerFromApi(page);
-        pagination.value = response.pagination;
-        listUserManage.value = {
-          ...response.data,
-        };
+          console.log(123)
+          const response = await getListUserManagerFromApi(page);
+          console.log(response)
+        // pagination.value = response.pagination;
+        // listUserManage.value = {
+        //   ...response.data,
+        // };
+
 
 
         // listUserManage.value = response.data.map((item) => {
@@ -164,7 +167,7 @@ export default {
         const error = errors.message || t("common.has_error");
         toast.error(error);
       } finally {
-        // store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
+        store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
       }
     };
 
@@ -180,6 +183,7 @@ export default {
       router.push(`${ROUTER_PATH.USER_MANAGER}?page=${page}`);
     };
     getListUserManager(pageCurrent.value);
+
     return {
       filterKey,
       isShowSort,
