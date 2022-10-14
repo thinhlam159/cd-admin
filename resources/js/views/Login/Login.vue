@@ -68,10 +68,11 @@ export default {
                 form.append("email", dataLogin.value.email);
                 form.append("password", dataLogin.value.password);
                 const response = await login(form);
-                const { access_token, expires_in } = response;
+                const { access_token, expires_in, user } = response;
                 if (getToken(TYPE_USER.USER)) removeToken(TYPE_USER.USER);
                 setToken(access_token, expires_in, TYPE_USER.ADMIN);
                 store.state[MODULE_STORE.AUTH.NAME].isAuthenticated = true;
+                store.state[MODULE_STORE.AUTH.NAME].userName = user.name;
                 await router.push(ROUTER_PATH.ADMIN);
                 toast.success("Login successful!");
                 store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;

@@ -145,14 +145,12 @@ export default {
     const getListUserManager = async (page) => {
       try {
 
-        // store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = true;
-          console.log(123)
-          const response = await getListUserManagerFromApi(page);
-          console.log(response)
-        // pagination.value = response.pagination;
-        // listUserManage.value = {
-        //   ...response.data,
-        // };
+        store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = true;
+        const response = await getListUserManagerFromApi(page);
+        pagination.value = response.pagination;
+        listUserManage.value = {
+          ...response.data,
+        };
 
 
 

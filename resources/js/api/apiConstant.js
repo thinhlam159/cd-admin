@@ -6,7 +6,9 @@ export default {
     USER_MANAGER: "/auth/user-management?page",
   },
   ADMIN: {
-      LIST_USER: '/admin/list-user'
+      LIST_USER: '/admin/list-user',
+      USER_DETAIL: '/admin/user-detail',
+      UPDATE_USER: '/admin/update-user',
   }
 
   // ADMIN: "/admin/customer/user-manage",
