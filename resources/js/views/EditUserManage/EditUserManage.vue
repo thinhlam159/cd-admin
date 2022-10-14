@@ -106,7 +106,7 @@ export default {
         phone: '',
         status: true
       })
-        console.log(123)
+
       const getUserDetail = async (userId) => {
           try {
               store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = true;
