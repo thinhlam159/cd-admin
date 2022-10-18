@@ -1,10 +1,7 @@
 <template>
   <div class="bg-[e5e7eb]">
     <div class="flex justify-center items-center py-3">
-      <div class="mr-2 flex items-center">
-        <i class="fa fa-lg fa-cogs"></i>
-      </div>
-      <span class="font-bold text-2xl">CD-admin</span>
+      <span class="font-bold text-2xl">{{ userName }}</span>
     </div>
     <ul class="">
       <router-link
@@ -22,7 +19,10 @@
   </div>
 </template>
 <script>
-import { ROUTER_PATH } from "@/const";
+import {MODULE_STORE, ROUTER_PATH} from "@/const";
+import {ref} from "vue";
+import {useStore} from "vuex";
+
 export default {
   name: "SideBar",
 
@@ -140,6 +140,17 @@ export default {
       ],
     };
   },
+  setup() {
+    const userName = ref('')
+    const store = useStore()
+    const getUserName = () => {
+      userName.value = store.state[MODULE_STORE.AUTH.NAME].userName
+    }
+
+    getUserName()
+
+    return {userName}
+  }
 };
 </script>
 <style scoped>

@@ -4,18 +4,18 @@ namespace App\Bundle\Admin\Application;
 
 use App\Bundle\Common\Application\PaginationResult;
 
-class UserListGetResult
+class CustomerListGetResult
 {
-    public array $userResults;
+    public array $customerResults;
     public PaginationResult $paginationResult;
 
     /**
-     * @param UserResult[] $userResults userResults
+     * @param CustomerResult[] $customerResults customerResults
      * @param PaginationResult $paginationResult paginationResult
      */
-    public function __construct(array $userResults, PaginationResult $paginationResult)
+    public function __construct(array $customerResults, PaginationResult $paginationResult)
     {
-        $this->userResults = $userResults;
+        $this->customerResults = $customerResults;
         $this->paginationResult = $paginationResult;
     }
 }

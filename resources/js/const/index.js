@@ -72,9 +72,13 @@ export const ROUTER_PATH = {
 export const MODULE_STORE = {
     AUTH: {
         NAME: "AUTH",
-        GETTERS: {},
+        GETTERS: {
+            GET_USER_NAME: 'GET_USER_NAME',
+        },
         ACTIONS: {},
-        MUTATIONS: {},
+        MUTATIONS: {
+            SET_USER_NAME: 'SET_USER_NAME',
+        },
     },
 
     COMMON: {
@@ -113,4 +117,12 @@ export const FORM_USER_MANAGE = {
     ALL: "all",
     SUPERVISOR: "supervisor",
     BILLING: "billing",
+};
+export const STATUS_CODE = {
+    BadRequest: 400,
+    Unauthorized: 401,
+    Forbidden: 403,
+    TooManyRequests: 429,
+    ValidationFailed: 422,
+    InternalServerError: 500,
 };

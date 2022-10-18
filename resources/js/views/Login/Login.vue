@@ -2,13 +2,13 @@
     <div class="container">
         <div class="form">
             <header>Login Form</header>
-            <form @submit.prevent="handleSubmit">
+            <form @submit.prevent="handleLogin">
                 <div class="input-field">
-                    <input type="text" required>
+                    <input type="text" required v-model="dataLogin.email">
                     <label>Email or Username</label>
                 </div>
                 <div class="input-field">
-                    <input class="pswrd" type="password" required>
+                    <input class="pswrd" type="password" required v-model="dataLogin.password">
                     <span class="show">SHOW</span>
                     <label>Password</label>
                 </div>
@@ -34,13 +34,56 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, inject } from 'vue'
+import router from "@/router";
+import { isEmpty } from "lodash";
+import { login } from "@/api";
+import { useRouter, useRoute } from "vue-router";
+import { useStore } from "vuex";
+import {ROUTER_PATH, MODULE_STORE, PAGE_DEFAULT, TYPE_USER} from "@/const";
+import {getToken, removeToken, setToken} from "@/utils/authToken";
+
+
 export default {
     name: "Login",
     setup() {
-        const username = ref('')
-        const password = ref('')
         const submitted = ref(false)
+        const dataLogin = ref({})
+        const store = useStore();
+        const router = useRouter();
+        const toast = inject("$toast");
+
+        const setLoadingPage = (isLoading) => {
+            store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = isLoading
+        }
+
+        const handleLogin = async (event) => {
+            event.preventDefault();
+            if (isEmpty(dataLogin)) {
+                return;
+            }
+            try {
+                store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = true;
+                const form = new FormData();
+                form.append("email", dataLogin.value.email);
+                form.append("password", dataLogin.value.password);
+                const response = await login(form);
+                const { access_token, expires_in, user } = response;
+                if (getToken(TYPE_USER.USER)) removeToken(TYPE_USER.USER);
+                setToken(access_token, expires_in, TYPE_USER.ADMIN);
+                store.state[MODULE_STORE.AUTH.NAME].isAuthenticated = true;
+                store.state[MODULE_STORE.AUTH.NAME].userName = user.name;
+                await router.push(ROUTER_PATH.ADMIN);
+                toast.success("Login successful!");
+                store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
+            } catch (errors) {
+                const error = errors.message || errors.error || this.$t("common.has_error");
+                toast.error(error);
+                store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
+            }
+        }
+
+        return {dataLogin, handleLogin, setLoadingPage}
     }
 }
 
