@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Bundle\Api\Admin\CustomerManagementController;
 use App\Http\Controllers\Bundle\Api\Admin\UserController;
 use App\Http\Controllers\Bundle\Auth\AdminAuthController;
 use Illuminate\Http\Request;
@@ -39,4 +40,10 @@ Route::group([
     Route::get('/user-detail/{id}', [UserController::class, 'getUser'])->middleware('auth:api');
     Route::put('/update-user/{id}', [UserController::class, 'updateUser'])->middleware('auth:api');
     Route::delete('/delete-user/{id}', [UserController::class, 'deleteUser'])->middleware('auth:api');
+
+    Route::post('/create-customer', [CustomerManagementController::class, 'createCustomer'])->middleware('auth:api');
+    Route::get('/list-customer', [CustomerManagementController::class, 'getCustomers'])->middleware('auth:api');
+    Route::get('/customer-detail/{id}', [CustomerManagementController::class, 'getCustomer'])->middleware('auth:api');
+    Route::put('/update-customer/{id}', [CustomerManagementController::class, 'updateCustomer'])->middleware('auth:api');
+    Route::delete('/delete-customer/{id}', [CustomerManagementController::class, 'deleteCustomer'])->middleware('auth:api');
 });
