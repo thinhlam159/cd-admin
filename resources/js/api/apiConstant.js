@@ -10,6 +10,11 @@ export default {
       USER_DETAIL: '/admin/user-detail',
       UPDATE_USER: '/admin/update-user',
       CREATE_USER: '/admin/create-user',
+
+      LIST_CUSTOMER: 'admin/list-customer',
+      CREATE_CUSTOMER: 'admin/create-customer',
+      CUSTOMER_DETAIL: 'admin/customer-detail',
+      UPDATE_CUSTOMER: 'admin/update-customer'
   }
 
   // ADMIN: "/admin/customer/user-manage",

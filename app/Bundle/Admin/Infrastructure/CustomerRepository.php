@@ -118,17 +118,20 @@ class CustomerRepository implements ICustomerRepository
         return true;
     }
 
-
     /**
-     * @param string $email email
+     * @param string $email
+     * @param CustomerId|null $customerId
      * @return bool
      */
-    public function checkExistingEmail(string $email, customerId $customerId): bool
+    public function checkExistingEmail(string $email, ?CustomerId $customerId = null): bool
     {
         $entities = ModelCustomer::where('email' , $email)->get();
 
         if ($entities->isEmpty()) {
             return false;
+        }
+        if (is_null($customerId)) {
+            return true;
         }
 
         return !$entities->contains(ModelCustomer::find($customerId->__toString()));

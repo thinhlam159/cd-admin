@@ -42,7 +42,8 @@ class CustomerManagementController extends BaseController
             $request->customer_name,
             $request->email,
             Hash::make($request->password),
-            (int)$request->phone
+            (int)$request->phone,
+            $request->status
         );
 
         $result = $applicationService->handle($command);

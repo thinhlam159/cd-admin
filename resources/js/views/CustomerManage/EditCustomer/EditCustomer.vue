@@ -5,7 +5,7 @@
             <div class="w-full py-6 py-auto text-xl">
                 <span class="text-gray-500">Cập nhật thông tin người dùng</span>
             </div>
-            <FormKit type="form" v-model="data" @submit="handleSubmit(userId, formData)" :actions="false" submit-label="Register" :form-class="hide">
+            <FormKit type="form" v-model="data" @submit="handleSubmit(CustomerId, formData)" :actions="false" submit-label="Register" :form-class="hide">
                 <FormKit
                     type="text"
                     label="Tên"
@@ -80,13 +80,13 @@
 
 <script>
 import {ref} from "vue";
-import {useRoute, useRouter} from 'vue-router'
+import { useRoute,useRouter } from 'vue-router'
 import {MODULE_STORE, ROUTER_PATH} from "@/const";
-import {getUserDetailFromApi, updateUserProfileFormApi} from "@/api";
+import {getCustomerDetailFromApi, updateCustomerFormApi} from "@/api";
 import {useStore} from "vuex";
 
 export default {
-  name: "EditUserManage",
+  name: "EditCustomer",
   components: { },
 
   data() {
@@ -100,23 +100,24 @@ export default {
       const route = useRoute()
       const router = useRouter()
       const store = useStore()
-      const userId = ref(route.params.id)
+      const CustomerId = ref(route.params.id)
       const formData = ref({
         userName: '',
         email: '',
         phone: '',
         status: true
       })
-
-      const getUserDetail = async (userId) => {
+      const getCustomerDetail = async (userId) => {
           try {
               store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = true;
-              const response = await getUserDetailFromApi(userId);
+              const response = await getCustomerDetailFromApi(userId);
               formData.value = {
                   ...formData.value,
-                  userName: response.user_name,
+                  userName: response.customer_name,
                   email: response.email,
+                  status: response.status,
               };
+              console.log(response)
           } catch (errors) {
               const error = errors.message || this.$t("common.has_error");
               // this.$toast.error(error);
@@ -124,19 +125,19 @@ export default {
               store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
           }
       }
-      const handleSubmit = async (userId, data) => {
+      const handleSubmit = async (CustomerId, data) => {
           try {
-              const res = await updateUserProfileFormApi(userId, {
+              const res = await updateCustomerFormApi(CustomerId, {
                   user_name: data.userName,
-                  email: data.email
+                  email: data.email,
+                  status: data.status,
               })
-              const response = await getUserDetailFromApi(userId);
+              const response = await getCustomerDetailFromApi(CustomerId);
               formData.value = {
                   ...formData.value,
-                  userName: response.user_name,
+                  userName: response.customer_name,
                   email: response.email,
               };
-              router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.USER_MANAGER}`)
           } catch (errors) {
               const error = errors.message;
               // this.$toast.error(error);
@@ -146,10 +147,10 @@ export default {
 
       }
 
-      getUserDetail(userId.value)
+        getCustomerDetail(CustomerId.value)
 
       return {
-          userId,
+          CustomerId,
           formData,
           handleSubmit
       }

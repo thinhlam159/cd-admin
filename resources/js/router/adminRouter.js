@@ -7,6 +7,10 @@ import AddUserManage from "@/views/AddUserManage";
 import EditUserManage from "@/views/EditUserManage";
 import Login from "@/views/Login";
 import AdminLayout from "@/components/Layouts/AdminLayout";
+import CustomerManage from "@/views/CustomerManage";
+import ListCustomer from "@/views/CustomerManage/ListCustomer";
+import AddCustomer from "@/views/CustomerManage/AddCustomer";
+import EditCustomer from "@/views/CustomerManage/EditCustomer";
 
 export default [
     // ROUTER_ADMIN
@@ -43,6 +47,24 @@ export default [
                     {
                         path: ROUTER_PATH.EDIT_ID,
                         component: EditUserManage,
+                    },
+                ],
+            },
+            {
+                path: ROUTER_PATH.CUSTOMER_MANAGE,
+                component: CustomerManage,
+                children: [
+                    {
+                        path: ROUTER_PATH.EMPTY,
+                        component: ListCustomer,
+                    },
+                    {
+                        path: ROUTER_PATH.ADD,
+                        component: AddCustomer,
+                    },
+                    {
+                        path: ROUTER_PATH.EDIT_ID,
+                        component: EditCustomer,
                     },
                 ],
             },

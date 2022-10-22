@@ -1,16 +1,16 @@
 <template>
-<!--  <FormUserManage :edit="true" />-->
+<!--  <FormUserManage />-->
     <div class="w-full h-full relative">
         <div class="w-[650px] pt-14 h-full absolute left-20">
             <div class="w-full py-6 py-auto text-xl">
-                <span class="text-gray-500">Cập nhật thông tin người dùng</span>
+                <span class="text-gray-500">Thêm khách hàng</span>
             </div>
-            <FormKit type="form" v-model="data" @submit="handleSubmit(userId, formData)" :actions="false" submit-label="Register" :form-class="hide">
+            <FormKit type="form" @submit="handleSubmit(formData)" :actions="false" submit-label="Register" :form-class="hide">
                 <FormKit
                     type="text"
                     label="Tên"
                     name="name"
-                    placeholder="..."
+                    placeholder="Nhập tên"
                     validation="required"
                     :classes="{
                       outer: 'mb-5',
@@ -19,7 +19,7 @@
                       input: 'w-full h-10 px-3 border-none text-base text-gray-700 placeholder-gray-400',
                       help: 'text-xs text-gray-500'
                     }"
-                    v-model="formData.userName"
+                    v-model="formData.name"
                 />
                 <FormKit
                     type="text"
@@ -35,6 +35,22 @@
                       help: 'text-xs text-gray-500'
                     }"
                     v-model="formData.email"
+                />
+                <FormKit
+                    type="text"
+                    label="Mật khẩu"
+                    name="password"
+                    placeholder="password"
+                    validation="required"
+                    disabled={true}
+                    :classes="{
+                      outer: 'mb-5',
+                      label: 'block mb-1 font-bold text-sm',
+                      inner: 'max-w-md border border-gray-400 rounded-lg mb-1 overflow-hidden focus-within:border-blue-500',
+                      input: 'w-full h-10 px-3 border-none text-base text-gray-700 placeholder-gray-400',
+                      help: 'text-xs text-gray-500'
+                    }"
+                    v-model="formData.password"
                 />
                 <FormKit
                     type="text"
@@ -79,81 +95,50 @@
 </template>
 
 <script>
+// import FormUserManage from "@/components/FormUserManage";
 import {ref} from "vue";
-import {useRoute, useRouter} from 'vue-router'
-import {MODULE_STORE, ROUTER_PATH} from "@/const";
-import {getUserDetailFromApi, updateUserProfileFormApi} from "@/api";
+import {useRouter} from "vue-router";
 import {useStore} from "vuex";
+import {MODULE_STORE, ROUTER_PATH} from "@/const";
+import {createCustomerFromApi, createUserFromApi} from "@/api";
 
 export default {
-  name: "EditUserManage",
-  components: { },
-
-  data() {
-    return {};
-  },
-
-  mounted() {},
-
-  methods: {},
-    setup() {
-      const route = useRoute()
+  name: "AddCustomer",
+  components: {  },
+  setup() {
       const router = useRouter()
       const store = useStore()
-      const userId = ref(route.params.id)
       const formData = ref({
-        userName: '',
-        email: '',
-        phone: '',
-        status: true
+          name: '',
+          email: '',
+          password: '123132',
+          phone: '',
+          status: true
       })
 
-      const getUserDetail = async (userId) => {
+      const handleSubmit = async (data) => {
           try {
-              store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = true;
-              const response = await getUserDetailFromApi(userId);
-              formData.value = {
-                  ...formData.value,
-                  userName: response.user_name,
-                  email: response.email,
-              };
-          } catch (errors) {
-              const error = errors.message || this.$t("common.has_error");
-              // this.$toast.error(error);
-          } finally {
-              store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
-          }
-      }
-      const handleSubmit = async (userId, data) => {
-          try {
-              const res = await updateUserProfileFormApi(userId, {
-                  user_name: data.userName,
-                  email: data.email
+              const res = await createCustomerFromApi({
+                  customer_name: data.name,
+                  email: data.email,
+                  password: data.password,
+                  phone: data.phone,
+                  status: data.status,
               })
-              const response = await getUserDetailFromApi(userId);
-              formData.value = {
-                  ...formData.value,
-                  userName: response.user_name,
-                  email: response.email,
-              };
-              router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.USER_MANAGER}`)
+              router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.CUSTOMER_MANAGE}`)
           } catch (errors) {
               const error = errors.message;
               // this.$toast.error(error);
           } finally {
               store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
           }
-
       }
 
-      getUserDetail(userId.value)
-
       return {
-          userId,
           formData,
           handleSubmit
       }
-    }
+  }
 };
 </script>
 

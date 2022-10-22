@@ -9,12 +9,15 @@ export const login = async (data) =>
         },
     });
 
+// user manage
 export const getListUserManagerFromApi = async (page) => api.get(`${apiConstants.ADMIN.LIST_USER}?page=${page}`)
-
 export const createUserFromApi = async (data) => await api.post(apiConstants.ADMIN.CREATE_USER, data)
-
 export const updateUserProfileFormApi = async (userId, data) => api.put(`${apiConstants.ADMIN.UPDATE_USER}/${userId}`, data)
-
 export const getUserDetailFromApi = async (userId) => api.get(`${apiConstants.ADMIN.USER_DETAIL}/${userId}`)
-
 export const logout = async (data) => api.post(apiConstants.AUTH.LOGOUT, data, {})
+
+// customer manage
+export const getListCustomerFromApi = async (page) => api.get(`${apiConstants.ADMIN.LIST_CUSTOMER}?page=${page}`)
+export const createCustomerFromApi = async (data) => await api.post(apiConstants.ADMIN.CREATE_CUSTOMER, data)
+export const getCustomerDetailFromApi = async (customerId) => api.get(`${apiConstants.ADMIN.CUSTOMER_DETAIL}/${customerId}`)
+export const updateCustomerFormApi = async (userId, data) => api.put(`${apiConstants.ADMIN.UPDATE_CUSTOMER}/${userId}`, data)
