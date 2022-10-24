@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Bundle\Api\Admin;
+namespace App\Http\Controllers\Bundle\Api\Product;
 
 use App\Bundle\Admin\Application\CustomerDeleteApplicationService;
 use App\Bundle\Admin\Application\CustomerDeleteCommand;
@@ -24,31 +24,37 @@ use App\Bundle\Admin\Application\UserPutApplicationService;
 use App\Bundle\Admin\Application\UserPutCommand;
 use App\Bundle\Admin\Infrastructure\CustomerRepository;
 use App\Bundle\Admin\Infrastructure\UserRepository;
+use App\Bundle\ProductBundle\Application\ProductListGetApplicationService;
+use App\Bundle\ProductBundle\Application\ProductListGetCommand;
+use App\Bundle\ProductBundle\Application\ProductPostApplicationService;
+use App\Bundle\ProductBundle\Application\ProductPostCommand;
+use App\Bundle\ProductBundle\Infrastructure\ProductRepository;
 use App\Http\Controllers\Bundle\Api\Common\BaseController;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 
-class CustomerManagementController extends BaseController
+class ProductController extends BaseController
 {
     /**
      * @param Request $request request
      */
-    public function createCustomer(Request $request)
+    public function createProduct(Request $request)
     {
-        $customerRepository = new CustomerRepository();
-        $applicationService = new CustomerPostApplicationService($customerRepository);
+        $productRepository = new ProductRepository();
+        $applicationService = new ProductPostApplicationService($productRepository);
 
-        $command = new CustomerPostCommand(
-            $request->customer_name,
-            $request->email,
-            Hash::make($request->password),
-            (int)$request->phone,
-            $request->status
+        $command = new ProductPostCommand(
+            $request->name,
+            $request->price,
+            $request->featureImagePath,
+            $request->productContent,
+            $request->UserId,
+            $request->customerId,
         );
 
         $result = $applicationService->handle($command);
         $data = [
-            $result->customerId,
+            $result->productId,
         ];
 
         return response()->json($data, 200);
@@ -59,22 +65,22 @@ class CustomerManagementController extends BaseController
      * @return \Illuminate\Http\JsonResponse
      */
     public function getCustomers(Request $request) {
-        $customerRepository = new CustomerRepository();
-        $applicationService = new CustomerListGetApplicationService(
-            $customerRepository,
-        );
-        $command = new CustomerListGetCommand();
+        $productRepository = new ProductRepository();
+        $applicationService = new ProductListGetApplicationService($productRepository);
+
+        $command = new ProductListGetCommand();
         $result = $applicationService->handle($command);
-        $customerManageResults = $result->customerResults;
+        $productResults = $result->productResults;
         $paginationResult = $result->paginationResult;
         $data = [];
-        foreach ($customerManageResults as $customer) {
+        foreach ($productResults as $product) {
             $data[] = [
-                'user_id' => $customer->customerId,
-                'user_name' => $customer->customerName,
-                'user_email' => $customer->email,
-                'phone' => $customer->phone,
-                'status' => $customer->isActive,
+                'product_id' => $product->productId,
+                'name' => $product->name,
+                'price' => $product->price,
+                'feature_image_path' => $product->featureImagePath,
+                'user_id' => $product->userId,
+                'category_id' => $product->categoryId,
             ];
         }
         $response = [

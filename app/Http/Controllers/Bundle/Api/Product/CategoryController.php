@@ -4,31 +4,16 @@ namespace App\Http\Controllers\Bundle\Api\Product;
 
 use App\Bundle\Admin\Application\CustomerDeleteApplicationService;
 use App\Bundle\Admin\Application\CustomerDeleteCommand;
-use App\Bundle\Admin\Application\CustomerGetApplicationService;
-use App\Bundle\Admin\Application\CustomerGetCommand;
-use App\Bundle\Admin\Application\CustomerListGetApplicationService;
-use App\Bundle\Admin\Application\CustomerListGetCommand;
-use App\Bundle\Admin\Application\CustomerPostApplicationService;
-use App\Bundle\Admin\Application\CustomerPostCommand;
-use App\Bundle\Admin\Application\CustomerPutApplicationService;
-use App\Bundle\Admin\Application\CustomerPutCommand;
-use App\Bundle\Admin\Application\UserDeleteApplicationService;
-use App\Bundle\Admin\Application\UserDeleteCommand;
-use App\Bundle\Admin\Application\UserGetApplicationService;
-use App\Bundle\Admin\Application\UserGetCommand;
-use App\Bundle\Admin\Application\UserListGetApplicationService;
-use App\Bundle\Admin\Application\UserListGetCommand;
-use App\Bundle\Admin\Application\UserPostApplicationService;
-use App\Bundle\Admin\Application\UserPostCommand;
-use App\Bundle\Admin\Application\UserPutApplicationService;
-use App\Bundle\Admin\Application\UserPutCommand;
 use App\Bundle\Admin\Infrastructure\CustomerRepository;
-use App\Bundle\Admin\Infrastructure\UserRepository;
+use App\Bundle\ProductBundle\Application\CategoryGetApplicationService;
+use App\Bundle\ProductBundle\Application\CategoryGetCommand;
+use App\Bundle\ProductBundle\Application\CategoryListGetApplicationService;
+use App\Bundle\ProductBundle\Application\CategoryListGetCommand;
 use App\Bundle\ProductBundle\Application\CategoryPostApplicationService;
 use App\Bundle\ProductBundle\Application\CategoryPostCommand;
+use App\Bundle\ProductBundle\Application\CategoryPutCommand;
 use App\Bundle\ProductBundle\Infrastructure\CategoryRepository;
 use App\Http\Controllers\Bundle\Api\Common\BaseController;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 
 class CategoryController extends BaseController
@@ -59,22 +44,21 @@ class CategoryController extends BaseController
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getCategory(Request $request) {
+    public function getCategorys(Request $request) {
         $categoriesRepository = new CategoryRepository();
-        $applicationService = new CategoryPostApplicationService($categoriesRepository);
+        $applicationService = new CategoryListGetApplicationService($categoriesRepository);
 
-        $command = new CustomerListGetCommand();
+        $command = new CategoryListGetCommand();
         $result = $applicationService->handle($command);
-        $customerManageResults = $result->customerResults;
+        $categoryResults = $result->categoryResults;
         $paginationResult = $result->paginationResult;
         $data = [];
-        foreach ($customerManageResults as $customer) {
+        foreach ($categoryResults as $category) {
             $data[] = [
-                'user_id' => $customer->customerId,
-                'user_name' => $customer->customerName,
-                'user_email' => $customer->email,
-                'phone' => $customer->phone,
-                'status' => $customer->isActive,
+                'category_id' => $category->categoryId,
+                'name' => $category->name,
+                'slug' => $category->slug,
+                'parent_id' => $category->parentId,
             ];
         }
         $response = [
@@ -94,20 +78,17 @@ class CategoryController extends BaseController
      * @return \Illuminate\Http\JsonResponse
      * @throws \App\Bundle\Common\Domain\Model\RecordNotFoundException
      */
-    public function getCustomer(Request $request) {
-        $customerRepository = new CustomerRepository();
-        $applicationService = new CustomerGetApplicationService(
-            $customerRepository,
-        );
+    public function getCategory(Request $request) {
+        $categoriesRepository = new CategoryRepository();
+        $applicationService = new CategoryGetApplicationService($categoriesRepository);
 
-        $command = new CustomerGetCommand($request->id);
-        $customer = $applicationService->handle($command);
+        $command = new CategoryGetCommand($request->id);
+        $category = $applicationService->handle($command);
         $data = [
-            'customer_id' => $customer->customerId,
-            'email' => $customer->email,
-            'customer_name' => $customer->customerName,
-            'phone' => $customer->phone,
-            'status' => $customer->isActive,
+            'category_id' => $category->categoryId,
+            'email' => $category->name,
+            'slug' => $category->slug,
+            'parent_id' => $category->parentId,
         ];
 
         return response()->json($data, 200);
@@ -119,18 +100,15 @@ class CategoryController extends BaseController
      * @throws \App\Bundle\Common\Domain\Model\RecordNotFoundException
      * @throws \App\Bundle\Common\Domain\Model\TransactionException
      */
-    public function updateCustomer(Request $request) {
-        $customerRepository = new CustomerRepository();
-        $applicationService = new CustomerPutApplicationService(
-            $customerRepository,
-        );
+    public function updateCategory(Request $request) {
+        $categoriesRepository = new CategoryRepository();
+        $applicationService = new CategoryGetApplicationService($categoriesRepository);
 
-        $command = new CustomerPutCommand(
+        $command = new CategoryPutCommand(
             $request->id,
-            $request->user_name,
-            $request->email,
+            $request->category_name,
+            $request->slug,
             (int)$request->phone,
-            $request->status
         );
         $result = $applicationService->handle($command);
 

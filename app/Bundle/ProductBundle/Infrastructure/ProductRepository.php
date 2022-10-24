@@ -1,28 +1,32 @@
 <?php
 namespace App\Bundle\ProductBundle\Infrastructure;
 
-use App\Bundle\ProductBundle\Domain\Model\Category;
 use App\Bundle\ProductBundle\Domain\Model\CategoryId;
-use App\Bundle\ProductBundle\Domain\Model\ICategoryRepository;
+use App\Bundle\ProductBundle\Domain\Model\IProductRepository;
+use App\Bundle\ProductBundle\Domain\Model\Product;
+use App\Bundle\ProductBundle\Domain\Model\ProductId;
+use App\Bundle\ProductBundle\Domain\Model\UserId;
 use App\Bundle\UserBundle\Domain\Model\Pagination;
-use App\Models\Categories as ModelCategory;
+use App\Models\Product as ModelProduct;
 use PHPUnit\Framework\Exception;
 
-class CategoryRepository implements ICategoryRepository
+class ProductRepository implements IProductRepository
 {
     /**
      * @inheritDoc
      */
-    public function create(Category $category): CategoryId
+    public function create(Product $product): ProductId
     {
-        $result = ModelCategory::create([
-            'id' => $category->getCategoryId()->asString(),
-            'name' => $category->getName(),
-            'slug' => $category->getSlug(),
-            'parent_id' => $category->getParentId()->asString(),
+        $result = ModelProduct::create([
+            'id' => $product->getProductId()->asString(),
+            'name' => $product->getName(),
+            'price' => $product->getPrice(),
+            'feature_image_path' => $product->getFeatureImagePath(),
+            'user_id' => $product->getUserId()->asString(),
+            'category_id' => $product->getCategoryId()->asString(),
     	]);
 
-        return new CategoryId($result->id);
+        return new ProductId($result->id);
     }
 
     /**
@@ -30,15 +34,18 @@ class CategoryRepository implements ICategoryRepository
      */
     public function findAll(): array
     {
-        $entities = ModelCategory::all();
-        $categories = [];
+        $entities = ModelProduct::all();
+        $products = [];
 
         foreach ($entities as $entity) {
-            $categories[] = new Category(
-                new CategoryId($entity['id']),
+            $products[] = new Product(
+                new ProductId($entity['id']),
                 $entity['name'],
-                $entity['slug'],
-                new CategoryId($entity['parent_id']),
+                $entity['price'],
+                $entity['featureImagePath'],
+                $entity['content'],
+                new UserId($entity['parent_id']),
+                new CategoryId($entity['id']),
             );
         }
 
@@ -49,7 +56,7 @@ class CategoryRepository implements ICategoryRepository
         );
 
 
-        return [$categories, $pagination];
+        return [$products, $pagination];
     }
 
     /**

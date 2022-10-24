@@ -1,7 +1,8 @@
 <?php
 namespace App\Bundle\ProductBundle\Domain\Model;
 
-final class Category {
+final class Category
+{
     /**
      * @var \App\Bundle\ProductBundle\Domain\Model\CategoryId
      */

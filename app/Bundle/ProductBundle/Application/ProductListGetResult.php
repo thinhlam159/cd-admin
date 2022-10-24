@@ -4,12 +4,12 @@ namespace App\Bundle\ProductBundle\Application;
 
 use App\Bundle\Common\Application\PaginationResult;
 
-class CategoryListGetResult
+class ProductListGetResult
 {
     /**
-     * @var CategoryResult[]
+     * @var ProductResult[]
      */
-    public array $categoryResults;
+    public array $productResults;
 
     /**
      * @var PaginationResult
@@ -17,15 +17,15 @@ class CategoryListGetResult
     public PaginationResult $paginationResult;
 
     /**
-     * @param CategoryResult[] $categoryResults
+     * @param ProductResult[] $productResults
      * @param PaginationResult $paginationResult
      */
     public function __construct(
-        array $categoryResults,
+        array $productResults,
         PaginationResult $paginationResult
     )
     {
-        $this->categoryResults = $categoryResults;
+        $this->productResults = $productResults;
         $this->paginationResult = $paginationResult;
     }
 }
