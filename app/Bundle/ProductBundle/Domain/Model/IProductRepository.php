@@ -15,4 +15,16 @@ interface IProductRepository
      * @return array{Product[], Pagination}
      */
     public function findAll(): array;
+
+    /**
+     * @param ProductId $productId
+     * @return Product|null
+     */
+    public function findById(ProductId $productId): ?Product;
+
+    /**
+     * @param Product $product
+     * @return ProductId
+     */
+    public function update(Product $product): ProductId;
 }

@@ -24,6 +24,8 @@ use App\Bundle\Admin\Application\UserPutApplicationService;
 use App\Bundle\Admin\Application\UserPutCommand;
 use App\Bundle\Admin\Infrastructure\CustomerRepository;
 use App\Bundle\Admin\Infrastructure\UserRepository;
+use App\Bundle\ProductBundle\Application\ProductGetApplicationService;
+use App\Bundle\ProductBundle\Application\ProductGetCommand;
 use App\Bundle\ProductBundle\Application\ProductListGetApplicationService;
 use App\Bundle\ProductBundle\Application\ProductListGetCommand;
 use App\Bundle\ProductBundle\Application\ProductPostApplicationService;
@@ -64,7 +66,7 @@ class ProductController extends BaseController
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getCustomers(Request $request) {
+    public function getProducts(Request $request) {
         $productRepository = new ProductRepository();
         $applicationService = new ProductListGetApplicationService($productRepository);
 
@@ -100,20 +102,20 @@ class ProductController extends BaseController
      * @return \Illuminate\Http\JsonResponse
      * @throws \App\Bundle\Common\Domain\Model\RecordNotFoundException
      */
-    public function getCustomer(Request $request) {
-        $customerRepository = new CustomerRepository();
-        $applicationService = new CustomerGetApplicationService(
-            $customerRepository,
-        );
+    public function getProduct(Request $request) {
+        $productRepository = new ProductRepository();
+        $applicationService = new ProductGetApplicationService($productRepository);
 
-        $command = new CustomerGetCommand($request->id);
+        $command = new ProductGetCommand($request->id);
         $customer = $applicationService->handle($command);
         $data = [
-            'customer_id' => $customer->customerId,
-            'email' => $customer->email,
-            'customer_name' => $customer->customerName,
-            'phone' => $customer->phone,
-            'status' => $customer->isActive,
+            'product_id' => $customer->productId,
+            'name' => $customer->name,
+            'price' => $customer->price,
+            'feature_image_path' => $customer->featureImagePath,
+            'content' => $customer->content,
+            'user_id' => $customer->userId,
+            'customer_id' => $customer->categoryId,
         ];
 
         return response()->json($data, 200);
@@ -125,11 +127,9 @@ class ProductController extends BaseController
      * @throws \App\Bundle\Common\Domain\Model\RecordNotFoundException
      * @throws \App\Bundle\Common\Domain\Model\TransactionException
      */
-    public function updateCustomer(Request $request) {
-        $customerRepository = new CustomerRepository();
-        $applicationService = new CustomerPutApplicationService(
-            $customerRepository,
-        );
+    public function updateProduct(Request $request) {
+        $productRepository = new ProductRepository();
+        $applicationService = new ProductPutApplicationService($productRepository);
 
         $command = new CustomerPutCommand(
             $request->id,

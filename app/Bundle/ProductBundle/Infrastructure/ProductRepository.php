@@ -42,10 +42,10 @@ class ProductRepository implements IProductRepository
                 new ProductId($entity['id']),
                 $entity['name'],
                 $entity['price'],
-                $entity['featureImagePath'],
+                $entity['feature_image_path'],
                 $entity['content'],
-                new UserId($entity['parent_id']),
-                new CategoryId($entity['id']),
+                new UserId($entity['user_id']),
+                new CategoryId($entity['category_id']),
             );
         }
 
@@ -62,40 +62,45 @@ class ProductRepository implements IProductRepository
     /**
      * @inheritDoc
      */
-    public function findById(CategoryId $categoryId): ?Category
+    public function findById(ProductId $productId): ?Product
     {
-        $entity = ModelCategory::find($categoryId->asString());
+        $entity = ModelProduct::find($productId->asString());
 
         if (!$entity) {
             return null;
         }
 
-        return new Category(
-            new CategoryId($entity['id']),
+        return new Product(
+            $productId,
             $entity['name'],
-            $entity['slug'],
-            $entity['parent_id'],
+            $entity['price'],
+            $entity['feature_image_path'],
+            $entity['content'],
+            new UserId($entity['user_id']),
+            new CategoryId($entity['category_id']),
         );
     }
 
     /**
      * @inheritDoc
      */
-    public function update(Category $category): CategoryId
+    public function update(Product $product): ProductId
     {
-        $categoryId = $category->getCategoryId();
-        $entity = ModelCategory::find($categoryId->asString());
+        $productId = $product->getProductId();
+        $entity = ModelProduct::find($productId->asString());
 
         $data = [
-            'name' => $category->getName(),
-            'slug' => $category->getSlug(),
-            'parent_id' => $category->getParentId()->asString(),
+            'name' => $product->getName(),
+            'price' => $product->getPrice(),
+            'feature_image_path' => $product->getFeatureImagePath(),
+            'user_id' => $product->getUserId()->asString(),
+            'category_id' => $product->getCategoryId()->asString(),
         ];
         $result = $entity->update($data);
         if (!$result) {
             throw new Exception();
         }
 
-        return $categoryId;
+        return $productId;
     }
 }
