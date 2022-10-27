@@ -19,8 +19,8 @@ class CreateProductsTable extends Migration
             $table->integer('price');
             $table->string('feature_image_path')->nullable();
             $table->text('content');
-            $table->integer('user_id');
-            $table->integer('category_id');
+            $table->string('user_id');
+            $table->string('category_id');
             $table->softDeletes();
             $table->timestamps();
         });

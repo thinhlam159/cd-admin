@@ -8,7 +8,6 @@ class ProductPostCommand
     public int $price;
     public ?string $featureImagePath;
     public string $content;
-    public string $userId;
     public string $categoryId;
 
     /**
@@ -25,7 +24,6 @@ class ProductPostCommand
         $this->price = $price;
         $this->featureImagePath = $featureImagePath;
         $this->content = $content;
-        $this->userId = $userId;
         $this->categoryId = $categoryId;
     }
 }

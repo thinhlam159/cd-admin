@@ -44,7 +44,7 @@ class CategoryController extends BaseController
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getCategorys(Request $request) {
+    public function getCategories(Request $request) {
         $categoriesRepository = new CategoryRepository();
         $applicationService = new CategoryListGetApplicationService($categoriesRepository);
 

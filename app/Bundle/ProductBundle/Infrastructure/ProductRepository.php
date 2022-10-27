@@ -1,6 +1,7 @@
 <?php
 namespace App\Bundle\ProductBundle\Infrastructure;
 
+use App\Bundle\Common\Constants\PaginationConst;
 use App\Bundle\ProductBundle\Domain\Model\CategoryId;
 use App\Bundle\ProductBundle\Domain\Model\IProductRepository;
 use App\Bundle\ProductBundle\Domain\Model\Product;
@@ -34,7 +35,7 @@ class ProductRepository implements IProductRepository
      */
     public function findAll(): array
     {
-        $entities = ModelProduct::all();
+        $entities = ModelProduct::paginate(PaginationConst::PAGINATE_ROW);
         $products = [];
 
         foreach ($entities as $entity) {
@@ -54,7 +55,6 @@ class ProductRepository implements IProductRepository
             $entities->perPage(),
             $entities->currentPage()
         );
-
 
         return [$products, $pagination];
     }

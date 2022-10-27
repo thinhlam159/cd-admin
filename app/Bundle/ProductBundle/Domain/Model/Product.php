@@ -21,7 +21,7 @@ final class Product
     /**
      * @var string|null
      */
-    private string $featureImagePath;
+    private ?string $featureImagePath;
 
     /**
      * @var string
@@ -42,12 +42,20 @@ final class Product
      * @param ProductId $productId
      * @param string $name
      * @param int $price
-     * @param ?string $featureImagePath
+     * @param string|null $featureImagePath
      * @param string $content
      * @param UserId $userId
      * @param CategoryId $categoryId
      */
-    public function __construct(ProductId $productId, string $name, int $price, ?string $featureImagePath, string $content, UserId $userId, CategoryId $categoryId)
+    public function __construct(
+        ProductId $productId,
+        string $name,
+        int $price,
+        ?string $featureImagePath,
+        string $content,
+        UserId $userId,
+        CategoryId $categoryId
+    )
     {
         $this->productId = $productId;
         $this->name = $name;

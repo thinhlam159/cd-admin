@@ -12,21 +12,10 @@ use App\Bundle\Admin\Application\CustomerPostApplicationService;
 use App\Bundle\Admin\Application\CustomerPostCommand;
 use App\Bundle\Admin\Application\CustomerPutApplicationService;
 use App\Bundle\Admin\Application\CustomerPutCommand;
-use App\Bundle\Admin\Application\UserDeleteApplicationService;
-use App\Bundle\Admin\Application\UserDeleteCommand;
-use App\Bundle\Admin\Application\UserGetApplicationService;
-use App\Bundle\Admin\Application\UserGetCommand;
-use App\Bundle\Admin\Application\UserListGetApplicationService;
-use App\Bundle\Admin\Application\UserListGetCommand;
-use App\Bundle\Admin\Application\UserPostApplicationService;
-use App\Bundle\Admin\Application\UserPostCommand;
-use App\Bundle\Admin\Application\UserPutApplicationService;
-use App\Bundle\Admin\Application\UserPutCommand;
 use App\Bundle\Admin\Infrastructure\CustomerRepository;
-use App\Bundle\Admin\Infrastructure\UserRepository;
 use App\Http\Controllers\Bundle\Api\Common\BaseController;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class CustomerManagementController extends BaseController
 {
@@ -132,6 +121,7 @@ class CustomerManagementController extends BaseController
             (int)$request->phone,
             $request->status
         );
+
         $result = $applicationService->handle($command);
 
         return response()->json(['customer_id' => $result->customerId], 200);

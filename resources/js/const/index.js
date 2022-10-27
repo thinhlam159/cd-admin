@@ -20,6 +20,7 @@ export const ROUTER_PATH = {
     ROLE_MANAGE: "role-manage",
     CUSTOMER_MANAGE: "customer-manage",
     DASHBOARD: "dashboard",
+    CATEGORY_MANAGE: "category-manage",
 
 
     CONFIGURATION: "configuration",

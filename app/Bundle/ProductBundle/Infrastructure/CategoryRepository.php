@@ -1,6 +1,7 @@
 <?php
 namespace App\Bundle\ProductBundle\Infrastructure;
 
+use App\Bundle\Common\Constants\PaginationConst;
 use App\Bundle\ProductBundle\Domain\Model\Category;
 use App\Bundle\ProductBundle\Domain\Model\CategoryId;
 use App\Bundle\ProductBundle\Domain\Model\ICategoryRepository;
@@ -30,7 +31,7 @@ class CategoryRepository implements ICategoryRepository
      */
     public function findAll(): array
     {
-        $entities = ModelCategory::all();
+        $entities = ModelCategory::paginate(PaginationConst::PAGINATE_ROW);
         $categories = [];
 
         foreach ($entities as $entity) {

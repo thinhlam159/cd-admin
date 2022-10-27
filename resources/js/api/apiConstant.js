@@ -14,7 +14,17 @@ export default {
       LIST_CUSTOMER: 'admin/list-customer',
       CREATE_CUSTOMER: 'admin/create-customer',
       CUSTOMER_DETAIL: 'admin/customer-detail',
-      UPDATE_CUSTOMER: 'admin/update-customer'
+      UPDATE_CUSTOMER: 'admin/update-customer',
+
+      LIST_PRODUCT: 'admin/list-product',
+      CREATE_PRODUCT: 'admin/create-product',
+      PRODUCT_DETAIL: 'admin/product-detail',
+      UPDATE_PRODUCT: 'admin/update-product',
+
+      LIST_CATEGORY: 'admin/list-category',
+      CREATE_CATEGORY: 'admin/create-category',
+      CATEGORY_DETAIL: 'admin/category-detail',
+      UPDATE_CATEGORY: 'admin/update-category',
   }
 
   // ADMIN: "/admin/customer/user-manage",

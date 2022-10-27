@@ -88,6 +88,7 @@ class CustomerRepository implements ICustomerRepository
     public function update(Customer $customer): CustomerId
     {
         $entity = ModelCustomer::find($customer->getCustomerId()->__toString());
+
         $data = [
             'name' => $customer->getCustomerName(),
             'phone' => $customer->getPhone(),

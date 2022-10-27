@@ -11,6 +11,11 @@ import CustomerManage from "@/views/CustomerManage";
 import ListCustomer from "@/views/CustomerManage/ListCustomer";
 import AddCustomer from "@/views/CustomerManage/AddCustomer";
 import EditCustomer from "@/views/CustomerManage/EditCustomer";
+import ProductManage from "@/views/ProductManage";
+import ListProduct from "@/views/ProductManage/ListProduct";
+import AddProduct from "@/views/ProductManage/AddProduct";
+import CategoryManage from "@/views/CategoryManage";
+import ListCategory from "@/views/CategoryManage/ListCategory/ListCategory";
 
 export default [
     // ROUTER_ADMIN
@@ -70,11 +75,31 @@ export default [
             },
             {
                 path: ROUTER_PATH.PRODUCT_MANAGE,
-                component: UserManage,
+                component: ProductManage,
+                children: [
+                    {
+                        path: ROUTER_PATH.EMPTY,
+                        component: ListProduct,
+                    },
+                    {
+                        path: ROUTER_PATH.ADD,
+                        component: AddProduct,
+                    },
+                    {
+                        path: ROUTER_PATH.EDIT_ID,
+                        // component: EditProduct,
+                    },
+                ],
             },
             {
-                path: ROUTER_PATH.DASHBOARD,
-                component: UserManage,
+                path: ROUTER_PATH.CATEGORY_MANAGE,
+                component: CategoryManage,
+                children: [
+                    {
+                        path: ROUTER_PATH.EMPTY,
+                        component: ListCategory,
+                    },
+                ]
             }
         ]
     },

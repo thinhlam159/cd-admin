@@ -1,7 +1,7 @@
 <template>
   <div class="p-5">
     <div class="w-full h-8 flex justify-end">
-      <ButtonAddNew @clickBtn="handleAddUserManage" :text="addNewUser" />
+      <ButtonAddNew @clickBtn="handleAddProduct" :text="addNewUser" />
     </div>
 
 <!--    &lt;!&ndash; *********** &ndash;&gt;-->
@@ -19,17 +19,17 @@
                 id
             </th>
             <th class="border py-1 w-[20%]">
-              Tên
+              Tên danh mục
             </th>
-            <th class="border py-1 w-[20%]">
-              Email
-            </th>
-            <th class="border py-1 w-[10%]">
-              Số điên thoại
-            </th>
-            <th class="border py-1 w-[10%]">
-              Trạng thái
-            </th>
+              <th class="border py-1 w-[10%]">
+                  Slug danh mục
+              </th>
+              <th class="border py-1 w-[10%]">
+                  Danh mục cha
+              </th>
+<!--            <th class="border py-1 w-[10%]">-->
+<!--              Mô tả-->
+<!--            </th>-->
 <!--            <th class="border py-1 w-[10%]">-->
 <!--              {{ $t("list_user_manage_page.enabled_disabled") }}-->
 <!--            </th>-->
@@ -43,17 +43,18 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="item in listUserManage" :key="item.id">
-              <td class="border text-center">{{ item.user_id }}</td>
-              <td class="border text-center">{{ item.user_name }}</td>
-              <td class="border text-center">
-              <span class="text-[#337ab7] cursor-pointer break-all" @click="() => goToAdd(item.user_id)">
-                {{ item.user_email }}
-              </span>
-              </td>
-              <td class="border text-center">{{ item.phone }}</td>
-              <td class="border text-center">{{ item.status ? 'Hoạt động' : '-' }}</td>
-<!--            <td class="border text-center">{{ item.company_name }}</td>-->
+          <tr v-for="item in listCategory" :key="item.id">
+              <td class="border text-center">{{ item.category_id }}</td>
+              <td class="border text-center">{{ item.name }}</td>
+              <td class="border text-center">{{ item.slug }}</td>
+              <td class="border text-center">{{ item.parent_id }}</td>
+<!--              <td class="border text-center">-->
+<!--              <span class="text-[#337ab7] cursor-pointer break-all" @click="() => goToAdd(item.user_id)">-->
+<!--                {{ item.user_email }}-->
+<!--              </span>-->
+<!--              </td>-->
+<!--              <td class="border text-center">{{ item.phone }}</td>-->
+<!--              <td class="border text-center">{{ item.status ? 'Hoạt động' : '-' }}</td>-->
 <!--            <td class="border text-center">-->
 <!--              {{ $t(`list_user_manage_page.${item.user_type}`) }}-->
 <!--            </td>-->
@@ -70,7 +71,7 @@
 <!--            <td class="border text-center">{{ item.field9 }}</td>-->
             <td class="border text-center">
                 <div class="flex justify-center ">
-                    <ButtonEdit @clickBtn="() => goToAdd(item.user_id)" :text="editUser"/>
+                    <ButtonEdit @clickBtn="() => goToAdd(item.category_id)" :text="editUser"/>
                 </div>
             </td>
           </tr>
@@ -95,7 +96,7 @@ import ButtonAddNew from "@/components/Buttons/ButtonAddNew";
 import ButtonFilter from "@/components/Buttons/ButtonFilter";
 import ButtonDownloadCSV from "@/components/Buttons/ButtonDownloadCSV";
 import ButtonEdit from "@/components/Buttons/ButtonEdit";
-import { getListUserManagerFromApi } from "@/api";
+import {getListCategoryFromApi, getListUserManagerFromApi} from "@/api";
 import { convertDateByTimestamp } from "@/utils";
 import { ref, computed, watch, inject } from "vue";
 import { useRouter, useRoute } from "vue-router";
@@ -104,7 +105,7 @@ import Pagination from "@/components/Pagination";
 import { useI18n } from "vue-i18n";
 
 export default {
-  name: "UserManage",
+  name: "ListCategory",
   components: {
     Datepicker,
     ButtonAddNew,
@@ -118,14 +119,14 @@ export default {
     const filterKey = ref({});
     const isShowSort = ref(false);
     const timeDatePicker = ref(new Date());
-    const listUserManage = ref([]);
+    const listCategory = ref([]);
     const route = useRoute();
     const router = useRouter();
     const store = useStore();
     const { t } = useI18n();
     const toast = inject("$toast");
     const pagination = ref(null);
-    const addNewUser = "Thêm người dùng";
+    const addNewUser = "Thêm danh mục sản phẩm";
     const editUser = "Cập nhật";
 
     const pageCurrent = computed(() => {
@@ -138,19 +139,18 @@ export default {
     const handleClickSortFn = () => {
       isShowSort.value = !isShowSort.value;
     };
-    const handleAddUserManage = () => {
-      router.push(`${ROUTER_PATH.USER_MANAGER}/${ROUTER_PATH.ADD}`);
+    const handleAddCategory = () => {
+      router.push(`${ROUTER_PATH.CATEGORY_MANAGE}/${ROUTER_PATH.ADD}`);
     };
     const goToAdd = (id) => {
-      router.push(`${ROUTER_PATH.USER_MANAGER}/${ROUTER_PATH.EDIT}/` + id);
+      router.push(`${ROUTER_PATH.CATEGORY_MANAGE}/${ROUTER_PATH.EDIT}/` + id);
     };
-    const getListUserManager = async (page) => {
+    const getListCategory = async (page) => {
       try {
-
         store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = true;
-        const response = await getListUserManagerFromApi(page);
+        const response = await getListCategoryFromApi(page);
         pagination.value = response.pagination;
-        listUserManage.value = {
+          listCategory.value = {
           ...response.data,
         };
 
@@ -164,8 +164,8 @@ export default {
         //   };
         // });
       } catch (errors) {
-        const error = errors.message || t("common.has_error");
-        toast.error(error);
+        const error = errors.message;
+        // toast.error(error);
       } finally {
         store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
       }
@@ -182,17 +182,17 @@ export default {
     const handleNextPage = (page) => {
       router.push(`${ROUTER_PATH.USER_MANAGER}?page=${page}`);
     };
-    getListUserManager(pageCurrent.value);
+      getListCategory(pageCurrent.value);
 
     return {
       filterKey,
       isShowSort,
       timeDatePicker,
-      listUserManage,
+      listCategory,
       handleClickSortFn,
-      handleAddUserManage,
+      handleAddCategory,
       goToAdd,
-      getListUserManager,
+      getListCategory,
       pagination,
       handleBackPage,
       handleNextPage,

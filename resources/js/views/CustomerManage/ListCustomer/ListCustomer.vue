@@ -51,10 +51,11 @@
                 {{ item.user_email }}
               </span>
               </td>
-            <td class="border text-center">{{ item.company_name }}</td>
-            <td class="border text-center">
+              <td class="border text-center">{{ item.phone }}</td>
+              <td class="border text-center">{{ item.status ? 'Hoạt động' : '-' }}</td>
+<!--            <td class="border text-center">-->
 <!--              {{ $t(`list_user_manage_page.${item.user_type}`) }}-->
-            </td>
+<!--            </td>-->
 <!--            <td class="border text-center">-->
 <!--              <span class="text-[green]" v-if="item.user_active">{{ $t("common.effectiveness") }}</span>-->
 <!--              <span class="text-[red]" v-else>{{ $t("common.invalid") }}</span>-->

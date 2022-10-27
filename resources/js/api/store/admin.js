@@ -21,3 +21,9 @@ export const getListCustomerFromApi = async (page) => api.get(`${apiConstants.AD
 export const createCustomerFromApi = async (data) => await api.post(apiConstants.ADMIN.CREATE_CUSTOMER, data)
 export const getCustomerDetailFromApi = async (customerId) => api.get(`${apiConstants.ADMIN.CUSTOMER_DETAIL}/${customerId}`)
 export const updateCustomerFormApi = async (userId, data) => api.put(`${apiConstants.ADMIN.UPDATE_CUSTOMER}/${userId}`, data)
+
+// product manage
+export const getListProductFromApi = async (page) => api.get(`${apiConstants.ADMIN.LIST_PRODUCT}?page=${page}`)
+
+// category manage
+export const getListCategoryFromApi = async (page) => api.get(`${apiConstants.ADMIN.LIST_CATEGORY}?page=${page}`)
