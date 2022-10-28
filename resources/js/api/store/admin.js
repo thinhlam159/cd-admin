@@ -24,6 +24,11 @@ export const updateCustomerFormApi = async (userId, data) => api.put(`${apiConst
 
 // product manage
 export const getListProductFromApi = async (page) => api.get(`${apiConstants.ADMIN.LIST_PRODUCT}?page=${page}`)
+export const createProductFromApi = async (data) => await api.post(apiConstants.ADMIN.CREATE_PRODUCT, data, {
+    headers: {
+        "Content-Type": "multipart/form-data",
+    },
+})
 
 // category manage
 export const getListCategoryFromApi = async (page) => api.get(`${apiConstants.ADMIN.LIST_CATEGORY}?page=${page}`)

@@ -51,24 +51,33 @@
                     }"
                     v-model="formData.price"
                 />
-                <FormKit
-                    type="file"
-                    label="Hình ảnh"
-                    name="image"
-                    placeholder="hình ảnh"
-                    :classes="{
-                      outer: 'mb-5',
-                      label: 'block mb-1 font-bold text-sm',
-                      inner: 'max-w-md border border-gray-400 rounded-lg mb-1 overflow-hidden focus-within:border-blue-500',
-                      input: 'w-full h-10 px-3 border-none text-base text-gray-700 placeholder-gray-400',
-                      help: 'text-xs text-gray-500'
-                    }"
-                    v-model="formData.image"
-                />
+<!--                <FormKit-->
+<!--                    type="file"-->
+<!--                    label="Hình ảnh"-->
+<!--                    name="image"-->
+<!--                    placeholder="hình ảnh"-->
+<!--                    :classes="{-->
+<!--                      outer: 'mb-5',-->
+<!--                      label: 'block mb-1 font-bold text-sm',-->
+<!--                      inner: 'max-w-md border border-gray-400 rounded-lg mb-1 overflow-hidden focus-within:border-blue-500',-->
+<!--                      input: 'w-full h-10 px-3 border-none text-base text-gray-700 placeholder-gray-400',-->
+<!--                      help: 'text-xs text-gray-500'-->
+<!--                    }"-->
+<!--                    v-model="formData.image"-->
+<!--                />-->
+                <div>
+                    <input
+                        type="file"
+                        @change="onFileChanged"
+                        accept="image/*"
+                        ref="file"
+                    />
+                </div>
+                <img id="blah" :src="imageUrl" alt="your image" />
                 <FormKit
                     type="textarea"
                     label="Mô tả"
-                    name="image"
+                    name="description"
                     placeholder="Mô tả sản phẩm"
                     :classes="{
                       outer: 'mb-5',
@@ -77,7 +86,7 @@
                       input: 'w-full h-10 px-3 border-none text-base text-gray-700 placeholder-gray-400',
                       help: 'text-xs text-gray-500'
                     }"
-                    v-model="formData.image"
+                    v-model="formData.description"
                 />
                 <FormKit
                     type="submit"
@@ -99,7 +108,7 @@ import {ref} from "vue";
 import {useRouter} from "vue-router";
 import {useStore} from "vuex";
 import {MODULE_STORE, ROUTER_PATH} from "@/const";
-import {createCustomerFromApi, createUserFromApi} from "@/api";
+import {createCustomerFromApi, createProductFromApi, createUserFromApi} from "@/api";
 
 export default {
   name: "AddProduct",
@@ -112,18 +121,23 @@ export default {
           email: '',
           password: '123132',
           phone: '',
-          status: true
+          status: true,
+          image: null,
       })
+      const imageUrl = ref(null)
+      const imageBuffer = ref(null)
+      const file = ref(null)
 
       const handleSubmit = async (data) => {
           try {
-              const res = await createCustomerFromApi({
-                  customer_name: data.name,
-                  email: data.email,
-                  password: data.password,
-                  phone: data.phone,
-                  status: data.status,
-              })
+              const bodyFormData = new FormData()
+              bodyFormData.append('customer_name', data.name);
+              bodyFormData.append('email', data.email);
+              bodyFormData.append('password', data.password);
+              bodyFormData.append('phone', data.phone);
+              bodyFormData.append('status', data.status);
+              bodyFormData.append('file', imageBuffer.value);
+              const res = await createProductFromApi(bodyFormData)
               router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.CUSTOMER_MANAGE}`)
           } catch (errors) {
               const error = errors.message;
@@ -133,9 +147,26 @@ export default {
           }
       }
 
+      const onFileChanged = () => {
+          let image = file.value.files[0];
+          imageUrl.value = URL.createObjectURL(image)
+          createImage(image)
+      }
+
+      const createImage = (file) => {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+              imageBuffer.value = e.target.result
+          }
+          reader.readAsDataURL(file)
+      }
+
       return {
           formData,
-          handleSubmit
+          handleSubmit,
+          onFileChanged,
+          imageUrl,
+          file
       }
   }
 };

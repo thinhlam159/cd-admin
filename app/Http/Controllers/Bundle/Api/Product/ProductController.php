@@ -32,8 +32,12 @@ use App\Bundle\ProductBundle\Application\ProductPostApplicationService;
 use App\Bundle\ProductBundle\Application\ProductPostCommand;
 use App\Bundle\ProductBundle\Infrastructure\ProductRepository;
 use App\Http\Controllers\Bundle\Api\Common\BaseController;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\File\File;
 
 class ProductController extends BaseController
 {
@@ -44,16 +48,55 @@ class ProductController extends BaseController
     {
         $productRepository = new ProductRepository();
         $applicationService = new ProductPostApplicationService($productRepository);
+        $base64File = $request->input('file');
+        $extension = explode('/', explode(':', substr($base64File, 0, strpos($base64File, ';')))[1])[1];
+        $replace = substr($base64File, 0, strpos($base64File, ',')+1);
+        $image = str_replace($replace, '', $base64File);
+        $image = str_replace(' ', '+', $image);
+        $imageName = Str::random(10).'.'.$extension;
+        Storage::disk('public')->put($imageName, base64_decode($image));
+        $url = Storage::url($imageName);
+//dd($url);
+// decode the base64 file
+//        $fileData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $base64File));
+//        $ext = pathinfo($base64File, PATHINFO_EXTENSION);
+
+// save it to temporary dir first.
+//        $tmpFilePath = sys_get_temp_dir() . '/' . Str::uuid()->toString();
+//        file_put_contents($tmpFilePath, $fileData);
+
+// this just to help us get file info.
+//        $tmpFile = new File($tmpFilePath);
+//dd($tmpFile);
+//        $file = new UploadedFile(
+//            $tmpFile->getPathname(),
+//            $tmpFile->getFilename(),
+//            $tmpFile->getMimeType(),
+//            0,
+//            true // Mark it as test, since the file isn't from real HTTP POST.
+//        );
+//
+//        $file->store('avatars');
+//        $data = base64_decode(Storage::get('file.jpg'));
+//        dd($data);
+//        $image = base64_encode($base64File);
+//        Storage::put('file.jpg', $image);
+//        $data = base64_decode(Storage::get('file.jpg'));
+//        dd($data);
+//        Storage::put('file.jpg', $encoded_image);
+
+
+
 
         $command = new ProductPostCommand(
             $request->name,
             $request->price,
-            $request->featureImagePath,
+            $url,
             $request->productContent,
             $request->UserId,
             $request->customerId,
         );
-
+dd($command);
         $result = $applicationService->handle($command);
         $data = [
             $result->productId,
