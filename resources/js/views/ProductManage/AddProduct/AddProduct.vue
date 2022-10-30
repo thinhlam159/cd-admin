@@ -34,7 +34,8 @@
                       input: 'w-full h-10 px-3 border-none text-base text-gray-700 placeholder-gray-400',
                       help: 'text-xs text-gray-500'
                     }"
-                    v-model="formData.categories"
+                    :options="categories"
+                    v-model="formData.category"
                 />
                 <FormKit
                     type="number"
@@ -65,6 +66,9 @@
 <!--                    }"-->
 <!--                    v-model="formData.image"-->
 <!--                />-->
+                <div class="h-48 my-4">
+                    <img class="h-full w-auto .object-contain" id="blah" :src="imageUrl" alt="your image" />
+                </div>
                 <div>
                     <input
                         type="file"
@@ -73,7 +77,8 @@
                         ref="file"
                     />
                 </div>
-                <img id="blah" :src="imageUrl" alt="your image" />
+
+<!--                <img id="blah" src="http://localhost:8032/storage/images/Ux9sxW6bQp.png" alt="your image" />-->
                 <FormKit
                     type="textarea"
                     label="Mô tả"
@@ -108,7 +113,8 @@ import {ref} from "vue";
 import {useRouter} from "vue-router";
 import {useStore} from "vuex";
 import {MODULE_STORE, ROUTER_PATH} from "@/const";
-import {createCustomerFromApi, createProductFromApi, createUserFromApi} from "@/api";
+import {createCustomerFromApi, createProductFromApi, getListCategoryFromApi} from "@/api";
+import logoTimeSharing from "@/assets/images/default-thumbnail.jpg";
 
 export default {
   name: "AddProduct",
@@ -124,19 +130,21 @@ export default {
           status: true,
           image: null,
       })
-      const imageUrl = ref(null)
+      const imageUrl = ref(logoTimeSharing)
       const imageBuffer = ref(null)
       const file = ref(null)
+      const categories = ref([])
+
 
       const handleSubmit = async (data) => {
           try {
               const bodyFormData = new FormData()
-              bodyFormData.append('customer_name', data.name);
-              bodyFormData.append('email', data.email);
-              bodyFormData.append('password', data.password);
-              bodyFormData.append('phone', data.phone);
-              bodyFormData.append('status', data.status);
-              bodyFormData.append('file', imageBuffer.value);
+              bodyFormData.append('name', data.name);
+              bodyFormData.append('price', data.price);
+              bodyFormData.append('category_id', data.category);
+              bodyFormData.append('description', data.description);
+              // bodyFormData.append('file', imageBuffer.value);
+              bodyFormData.append('file', file.value.files[0]);
               const res = await createProductFromApi(bodyFormData)
               router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.CUSTOMER_MANAGE}`)
           } catch (errors) {
@@ -144,6 +152,25 @@ export default {
               // this.$toast.error(error);
           } finally {
               store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
+          }
+      }
+
+      const getListCategory = async () => {
+          try {
+              const res = await getListCategoryFromApi()
+              categories.value = res.data.reduce( (option, data) => {
+                  return [
+                      ...option,
+                      {
+                          label: data.name,
+                          value: data.category_id
+                      }
+                  ]
+              }, [])
+
+          } catch (errors) {
+              const error = errors.message;
+              console.log(error)
           }
       }
 
@@ -161,12 +188,15 @@ export default {
           reader.readAsDataURL(file)
       }
 
+      getListCategory()
+
       return {
           formData,
           handleSubmit,
           onFileChanged,
           imageUrl,
-          file
+          file,
+          categories
       }
   }
 };

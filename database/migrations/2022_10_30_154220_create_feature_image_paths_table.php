@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateProductsTable extends Migration
+class CreateFeatureImagePathsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,11 @@ class CreateProductsTable extends Migration
      */
     public function up()
     {
-        Schema::create('products', function (Blueprint $table) {
+        Schema::create('feature_image_paths', function (Blueprint $table) {
             $table->string('id')->primary();
-            $table->string('name')->unique();
-            $table->text('content');
-            $table->string('category_id');
-            $table->softDeletes();
+            $table->string('product_id');
+            $table->string('product_attribute_value_id');
+            $table->tinyInteger('is_avatar');
             $table->timestamps();
         });
     }
@@ -30,6 +29,6 @@ class CreateProductsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('products');
+        Schema::dropIfExists('feature_image_paths');
     }
 }

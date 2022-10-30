@@ -33,7 +33,6 @@ class CategoryRepository implements ICategoryRepository
     {
         $entities = ModelCategory::paginate(PaginationConst::PAGINATE_ROW);
         $categories = [];
-
         foreach ($entities as $entity) {
             $categories[] = new Category(
                 new CategoryId($entity['id']),

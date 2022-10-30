@@ -48,15 +48,17 @@ class ProductController extends BaseController
     {
         $productRepository = new ProductRepository();
         $applicationService = new ProductPostApplicationService($productRepository);
-        $base64File = $request->input('file');
+        $base64File = $request->file;
+        dd($base64File);
         $extension = explode('/', explode(':', substr($base64File, 0, strpos($base64File, ';')))[1])[1];
         $replace = substr($base64File, 0, strpos($base64File, ',')+1);
         $image = str_replace($replace, '', $base64File);
         $image = str_replace(' ', '+', $image);
-        $imageName = Str::random(10).'.'.$extension;
+        $imageName = 'images/'.Str::random(10).'.'.$extension;
         Storage::disk('public')->put($imageName, base64_decode($image));
         $url = Storage::url($imageName);
-//dd($url);
+        $path = Storage::path($imageName);
+
 // decode the base64 file
 //        $fileData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $base64File));
 //        $ext = pathinfo($base64File, PATHINFO_EXTENSION);
@@ -92,11 +94,11 @@ class ProductController extends BaseController
             $request->name,
             $request->price,
             $url,
-            $request->productContent,
-            $request->UserId,
+            $request->description,
+            auth()->id(),
             $request->customerId,
         );
-dd($command);
+//dd($command);
         $result = $applicationService->handle($command);
         $data = [
             $result->productId,
