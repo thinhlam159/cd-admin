@@ -16,6 +16,8 @@ class CreateProductAttributePricesTable extends Migration
         Schema::create('product_attribute_prices', function (Blueprint $table) {
             $table->string('id')->primary();
             $table->string('product_attribute_value_id');
+            $table->integer('price');
+            $table->string('monetary_unit');
             $table->boolean('is_current');
             $table->timestamps();
         });

@@ -49,7 +49,7 @@ class ProductController extends BaseController
         $productRepository = new ProductRepository();
         $applicationService = new ProductPostApplicationService($productRepository);
         $base64File = $request->file;
-        dd($base64File);
+
         $extension = explode('/', explode(':', substr($base64File, 0, strpos($base64File, ';')))[1])[1];
         $replace = substr($base64File, 0, strpos($base64File, ',')+1);
         $image = str_replace($replace, '', $base64File);
@@ -98,7 +98,7 @@ class ProductController extends BaseController
             auth()->id(),
             $request->customerId,
         );
-//dd($command);
+
         $result = $applicationService->handle($command);
         $data = [
             $result->productId,
