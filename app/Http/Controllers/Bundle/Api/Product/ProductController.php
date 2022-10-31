@@ -30,6 +30,9 @@ use App\Bundle\ProductBundle\Application\ProductListGetApplicationService;
 use App\Bundle\ProductBundle\Application\ProductListGetCommand;
 use App\Bundle\ProductBundle\Application\ProductPostApplicationService;
 use App\Bundle\ProductBundle\Application\ProductPostCommand;
+use App\Bundle\ProductBundle\Infrastructure\ProductAttributePriceRepository;
+use App\Bundle\ProductBundle\Infrastructure\ProductAttributeValueRepository;
+use App\Bundle\ProductBundle\Infrastructure\ProductInventoryRepository;
 use App\Bundle\ProductBundle\Infrastructure\ProductRepository;
 use App\Http\Controllers\Bundle\Api\Common\BaseController;
 use Illuminate\Http\UploadedFile;
@@ -46,8 +49,13 @@ class ProductController extends BaseController
      */
     public function createProduct(Request $request)
     {
-        $productRepository = new ProductRepository();
-        $applicationService = new ProductPostApplicationService($productRepository);
+        $applicationService = new ProductPostApplicationService(
+            new ProductRepository(),
+            new ProductAttributeValueRepository(),
+            new ProductAttributePriceRepository(),
+            new ProductInventoryRepository(),
+            new CustomerRepository()
+        );
         $base64File = $request->file;
 
         $extension = explode('/', explode(':', substr($base64File, 0, strpos($base64File, ';')))[1])[1];
@@ -88,15 +96,21 @@ class ProductController extends BaseController
 //        Storage::put('file.jpg', $encoded_image);
 
 
-
+        $isAvatar = true;
 
         $command = new ProductPostCommand(
             $request->name,
-            $request->price,
-            $url,
+            $request->code,
             $request->description,
-            auth()->id(),
-            $request->customerId,
+            $request->price,
+            $request->monetary_unit,
+            $request->category_id,
+            $request->measure_unit_id,
+            $request->product_attribute_id,
+            $request->product_attribute_value,
+            $request->product_attribute_code,
+            $path,
+            $isAvatar
         );
 
         $result = $applicationService->handle($command);

@@ -14,24 +14,14 @@ final class Product
     private string $name;
 
     /**
-     * @var int
+     * @var string
      */
-    private int $price;
-
-    /**
-     * @var string|null
-     */
-    private ?string $featureImagePath;
+    private string $code;
 
     /**
      * @var string
      */
-    private string $content;
-
-    /**
-     * @var \App\Bundle\ProductBundle\Domain\Model\UserId
-     */
-    private UserId $userId;
+    private string $description;
 
     /**
      * @var \App\Bundle\ProductBundle\Domain\Model\CategoryId
@@ -41,28 +31,16 @@ final class Product
     /**
      * @param ProductId $productId
      * @param string $name
-     * @param int $price
-     * @param string|null $featureImagePath
-     * @param string $content
-     * @param UserId $userId
+     * @param string $code
+     * @param string $description
      * @param CategoryId $categoryId
      */
-    public function __construct(
-        ProductId $productId,
-        string $name,
-        int $price,
-        ?string $featureImagePath,
-        string $content,
-        UserId $userId,
-        CategoryId $categoryId
-    )
+    public function __construct(ProductId $productId, string $name, string $code, string $description, CategoryId $categoryId)
     {
         $this->productId = $productId;
         $this->name = $name;
-        $this->price = $price;
-        $this->featureImagePath = $featureImagePath;
-        $this->content = $content;
-        $this->userId = $userId;
+        $this->code = $code;
+        $this->description = $description;
         $this->categoryId = $categoryId;
     }
 
@@ -83,35 +61,19 @@ final class Product
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getPrice(): int
+    public function getCode(): string
     {
-        return $this->price;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getFeatureImagePath(): ?string
-    {
-        return $this->featureImagePath;
+        return $this->code;
     }
 
     /**
      * @return string
      */
-    public function getContent(): string
+    public function getDescription(): string
     {
-        return $this->content;
-    }
-
-    /**
-     * @return UserId
-     */
-    public function getUserId(): UserId
-    {
-        return $this->userId;
+        return $this->description;
     }
 
     /**
