@@ -22,7 +22,7 @@ class ProductRepository implements IProductRepository
             'id' => $product->getProductId()->asString(),
             'name' => $product->getName(),
             'price' => $product->getPrice(),
-            'feature_image_path' => $product->getFeatureImagePath(),
+            'featureImagePath' => $product->getFeatureImagePath(),
             'user_id' => $product->getUserId()->asString(),
             'category_id' => $product->getCategoryId()->asString(),
     	]);
@@ -43,7 +43,7 @@ class ProductRepository implements IProductRepository
                 new ProductId($entity['id']),
                 $entity['name'],
                 $entity['price'],
-                $entity['feature_image_path'],
+                $entity['featureImagePath'],
                 $entity['content'],
                 new UserId($entity['user_id']),
                 new CategoryId($entity['category_id']),
@@ -74,7 +74,7 @@ class ProductRepository implements IProductRepository
             $productId,
             $entity['name'],
             $entity['price'],
-            $entity['feature_image_path'],
+            $entity['featureImagePath'],
             $entity['content'],
             new UserId($entity['user_id']),
             new CategoryId($entity['category_id']),
@@ -92,7 +92,7 @@ class ProductRepository implements IProductRepository
         $data = [
             'name' => $product->getName(),
             'price' => $product->getPrice(),
-            'feature_image_path' => $product->getFeatureImagePath(),
+            'featureImagePath' => $product->getFeatureImagePath(),
             'user_id' => $product->getUserId()->asString(),
             'category_id' => $product->getCategoryId()->asString(),
         ];

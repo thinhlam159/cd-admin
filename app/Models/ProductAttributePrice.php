@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class measure_unit extends Model
+class productAttributePrice extends Model
 {
     use HasFactory;
 

@@ -139,7 +139,7 @@ class ProductController extends BaseController
                 'product_id' => $product->productId,
                 'name' => $product->name,
                 'price' => $product->price,
-                'feature_image_path' => $product->featureImagePath,
+                'featureImagePath' => $product->featureImagePath,
                 'user_id' => $product->userId,
                 'category_id' => $product->categoryId,
             ];
@@ -171,7 +171,7 @@ class ProductController extends BaseController
             'product_id' => $customer->productId,
             'name' => $customer->name,
             'price' => $customer->price,
-            'feature_image_path' => $customer->featureImagePath,
+            'featureImagePath' => $customer->featureImagePath,
             'content' => $customer->content,
             'user_id' => $customer->userId,
             'customer_id' => $customer->categoryId,

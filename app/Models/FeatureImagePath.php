@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class product_attribute extends Model
+class featureImagePath extends Model
 {
     use HasFactory;
 

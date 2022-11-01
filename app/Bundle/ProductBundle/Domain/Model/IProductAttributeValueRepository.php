@@ -5,5 +5,9 @@ use App\Bundle\Common\Domain\Model\Pagination;
 
 interface IProductAttributeValueRepository
 {
-
+    /**
+     * @param ProductAttributeValue $productAttribute
+     * @return ProductAttributeValueId
+     */
+    public function create(ProductAttributeValue $productAttribute): ProductAttributeValueId;
 }
