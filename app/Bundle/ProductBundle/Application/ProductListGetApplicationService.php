@@ -11,6 +11,9 @@ use App\Bundle\Common\Domain\Model\TransactionException;
 use App\Bundle\ProductBundle\Domain\Model\Category;
 use App\Bundle\ProductBundle\Domain\Model\CategoryId;
 use App\Bundle\ProductBundle\Domain\Model\ICategoryRepository;
+use App\Bundle\ProductBundle\Domain\Model\IProductAttributePriceRepository;
+use App\Bundle\ProductBundle\Domain\Model\IProductAttributeValueRepository;
+use App\Bundle\ProductBundle\Domain\Model\IProductInventoryRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductRepository;
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -18,11 +21,51 @@ use Illuminate\Support\Facades\Log;
 
 class ProductListGetApplicationService
 {
-    private $productRepository;
+    /**
+     * @var IProductRepository
+     */
+    private IProductRepository $productRepository;
 
-    public function __construct(IProductRepository $productRepository)
+    /**
+     * @var IProductAttributeValueRepository
+     */
+    private IProductAttributeValueRepository $productAttributeValueRepository;
+
+    /**
+     * @var IProductAttributePriceRepository
+     */
+    private IProductAttributePriceRepository $productAttributePriceRepository;
+
+    /**
+     * @var IProductInventoryRepository
+     */
+    private IProductInventoryRepository $productInventoryRepository;
+
+    /**
+     * @var ICategoryRepository
+     */
+    private ICategoryRepository $categoryRepository;
+
+    /**
+     * @param IProductRepository $productRepository
+     * @param IProductAttributeValueRepository $productAttributeValueRepository
+     * @param IProductAttributePriceRepository $productAttributePriceRepository
+     * @param IProductInventoryRepository $productInventoryRepository
+     * @param ICategoryRepository $customerRepository
+     */
+    public function __construct(
+        IProductRepository $productRepository,
+        IProductAttributeValueRepository $productAttributeValueRepository,
+        IProductAttributePriceRepository $productAttributePriceRepository,
+        IProductInventoryRepository $productInventoryRepository,
+        ICategoryRepository $categoryRepository
+    )
     {
         $this->productRepository = $productRepository;
+        $this->productAttributeValueRepository = $productAttributeValueRepository;
+        $this->productAttributePriceRepository = $productAttributePriceRepository;
+        $this->productInventoryRepository = $productInventoryRepository;
+        $this->categoryRepository = $categoryRepository;
     }
 
     /**
@@ -34,16 +77,21 @@ class ProductListGetApplicationService
     public function handle(ProductListGetCommand $command): ProductListGetResult
     {
         [$products, $pagination] = $this->productRepository->findAll();
+
+
         $categoryResults = [];
         foreach ($products as $product) {
+            $category = $this->categoryRepository->findById($product->getCategoryId());
+            $productAttributeValues = $this->productAttributeValueRepository->findByProductId($product->getProductId());
+//            $productAttributePrice = $this->productAttributePriceRepository->findById($product->)
+
             $categoryResults[] = new ProductResult(
                 $product->getProductId()->asString(),
                 $product->getName(),
-                $product->getPrice(),
-                $product->getFeatureImagePath(),
+                $product->getCode(),
                 $product->getContent(),
-                $product->getUserId()->__toString(),
                 $product->getCategoryId()->__toString(),
+                $category->getName()
             );
         }
         $paginationResult = new PaginationResult(

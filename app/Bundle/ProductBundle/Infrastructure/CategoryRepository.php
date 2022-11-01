@@ -6,7 +6,7 @@ use App\Bundle\ProductBundle\Domain\Model\Category;
 use App\Bundle\ProductBundle\Domain\Model\CategoryId;
 use App\Bundle\ProductBundle\Domain\Model\ICategoryRepository;
 use App\Bundle\UserBundle\Domain\Model\Pagination;
-use App\Models\Categories as ModelCategory;
+use App\Models\Category as ModelCategory;
 use PHPUnit\Framework\Exception;
 
 class CategoryRepository implements ICategoryRepository

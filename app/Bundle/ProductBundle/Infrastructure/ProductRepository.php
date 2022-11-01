@@ -42,10 +42,8 @@ class ProductRepository implements IProductRepository
             $products[] = new Product(
                 new ProductId($entity['id']),
                 $entity['name'],
-                $entity['price'],
-                $entity['featureImagePath'],
-                $entity['content'],
-                new UserId($entity['user_id']),
+                $entity['code'],
+                $entity['description'],
                 new CategoryId($entity['category_id']),
             );
         }

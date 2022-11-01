@@ -51,8 +51,13 @@ class ProductPostApplicationService
      */
     private ICustomerRepository $customerRepository;
 
+
     /**
      * @param IProductRepository $productRepository
+     * @param IProductAttributeValueRepository $productAttributeValueRepository
+     * @param IProductAttributePriceRepository $productAttributePriceRepository
+     * @param IProductInventoryRepository $productInventoryRepository
+     * @param ICustomerRepository $customerRepository
      */
     public function __construct(
         IProductRepository $productRepository,

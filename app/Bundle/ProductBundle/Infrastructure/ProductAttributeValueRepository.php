@@ -5,10 +5,12 @@ use App\Bundle\Common\Constants\PaginationConst;
 use App\Bundle\ProductBundle\Domain\Model\CategoryId;
 use App\Bundle\ProductBundle\Domain\Model\IProductAttributeValueRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductRepository;
+use App\Bundle\ProductBundle\Domain\Model\MeasureUnitId;
 use App\Bundle\ProductBundle\Domain\Model\Product;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttribute;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributeId;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValue;
+use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValueId;
 use App\Bundle\ProductBundle\Domain\Model\ProductId;
 use App\Bundle\ProductBundle\Domain\Model\UserId;
 use App\Bundle\UserBundle\Domain\Model\Pagination;
@@ -26,10 +28,58 @@ class ProductAttributeValueRepository implements IProductAttributeValueRepositor
             'id' => $productAttributeValue->getProductAttributeValueId()->asString(),
             'product_id' => $productAttributeValue->getProductId()->asString(),
             'product_attribute_id' => $productAttributeValue->getProductAttributeId()->asString(),
-            'value' => $productAttributeValue->getParentId()->asString(),
-            'name_by_attribute' => $productAttributeValue->getParentId()->asString(),
+            'measure_unit_id' => $productAttributeValue->getMeasureUnitId()->asString(),
+            'value' => $productAttributeValue->getValue(),
+            'name_by_attribute' => $productAttributeValue->getNameByAttribute(),
         ]);
+        if (!$result) {
+            throw new \Exception();
+        }
 
-        return new CategoryId($result->id);
+        return new ProductAttributeValueId($result->id);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function findById(ProductAttributeValueId $productAttributeValueId): ?ProductAttributeValue
+    {
+        $entity = ModelProductAttributeValue::find($productAttributeValueId->asString());
+
+        if (!$entity) {
+            return null;
+        }
+
+        return new ProductAttributeValue(
+            new ProductAttributeValueId($entity['id']),
+            new ProductId($entity['id']),
+            new ProductAttributeId($entity['id']),
+            new MeasureUnitId($entity['id']),
+            $entity['value'],
+            $entity['name_by_attribute'],
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function findByProductId(ProductId $productId): array
+    {
+        $entities = ModelProductAttributeValue::find('product_id', $productId->asString());
+
+        $productAttributeValues = [];
+        foreach ($entities as $entity) {
+            $productAttributeValues[] = new ProductAttributeValue(
+                new ProductAttributeValueId($entity['id']),
+                new ProductId($entity['id']),
+                new ProductAttributeId($entity['id']),
+                new MeasureUnitId($entity['id']),
+                $entity['value'],
+                $entity['name_by_attribute'],
+            );
+        }
+
+        return $productAttributeValues;
+    }
+
 }

@@ -126,8 +126,13 @@ class ProductController extends BaseController
      * @return \Illuminate\Http\JsonResponse
      */
     public function getProducts(Request $request) {
-        $productRepository = new ProductRepository();
-        $applicationService = new ProductListGetApplicationService($productRepository);
+        $applicationService = new ProductListGetApplicationService(
+            new ProductRepository(),
+            new ProductAttributeValueRepository(),
+            new ProductAttributePriceRepository(),
+            new ProductInventoryRepository(),
+            new CustomerRepository()
+        );
 
         $command = new ProductListGetCommand();
         $result = $applicationService->handle($command);

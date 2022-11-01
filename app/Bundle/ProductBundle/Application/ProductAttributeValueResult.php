@@ -2,10 +2,11 @@
 
 namespace App\Bundle\ProductBundle\Application;
 
-class ProductResult
+class ProductAttributeValueResult
 {
+    public string $productAttributeValueId;
     public string $productId;
-    public string $name;
+    public string $productAttributeId;
     public string $code;
     public string $description;
     public string $categoryId;

@@ -10,4 +10,16 @@ interface IProductAttributeValueRepository
      * @return ProductAttributeValueId
      */
     public function create(ProductAttributeValue $productAttribute): ProductAttributeValueId;
+
+    /**
+     * @param ProductAttributeValueId $productAttributeValueId
+     * @return ProductAttributeValue|null
+     */
+    public function findById(ProductAttributeValueId $productAttributeValueId): ?ProductAttributeValue;
+
+    /**
+     * @param ProductId $productId
+     * @return ProductAttributeValue[]
+     */
+    public function findByProductId(ProductId $productId): array;
 }
