@@ -34,6 +34,16 @@ final class ProductAttributeValue
     private string $nameByAttribute;
 
     /**
+     * @var string|null
+     */
+    private ?string $productAttributeName;
+
+    /**
+     * @var string|null
+     */
+    private ?string $measureUnitName;
+
+    /**
      * @param ProductAttributeValueId $productAttributeValueId
      * @param ProductId $productId
      * @param ProductAttributeId $productAttributeId
@@ -97,5 +107,37 @@ final class ProductAttributeValue
     public function getNameByAttribute(): string
     {
         return $this->nameByAttribute;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getProductAttributeName(): ?string
+    {
+        return $this->productAttributeName;
+    }
+
+    /**
+     * @param string|null $productAttributeName
+     */
+    public function setProductAttributeName(?string $productAttributeName): void
+    {
+        $this->productAttributeName = $productAttributeName;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getMeasureUnitName(): ?string
+    {
+        return $this->measureUnitName;
+    }
+
+    /**
+     * @param string|null $measureUnitName
+     */
+    public function setMeasureUnitName(?string $measureUnitName): void
+    {
+        $this->measureUnitName = $measureUnitName;
     }
 }

@@ -21,9 +21,8 @@ class ProductRepository implements IProductRepository
         $result = ModelProduct::create([
             'id' => $product->getProductId()->asString(),
             'name' => $product->getName(),
-            'price' => $product->getPrice(),
-            'featureImagePath' => $product->getFeatureImagePath(),
-            'user_id' => $product->getUserId()->asString(),
+            'code' => $product->getCode(),
+            'description' => $product->getDescription(),
             'category_id' => $product->getCategoryId()->asString(),
     	]);
 
@@ -69,12 +68,10 @@ class ProductRepository implements IProductRepository
         }
 
         return new Product(
-            $productId,
+            new ProductId($entity['id']),
             $entity['name'],
-            $entity['price'],
-            $entity['featureImagePath'],
-            $entity['content'],
-            new UserId($entity['user_id']),
+            $entity['code'],
+            $entity['description'],
             new CategoryId($entity['category_id']),
         );
     }
@@ -88,10 +85,10 @@ class ProductRepository implements IProductRepository
         $entity = ModelProduct::find($productId->asString());
 
         $data = [
+            'id' => $product->getProductId()->asString(),
             'name' => $product->getName(),
-            'price' => $product->getPrice(),
-            'featureImagePath' => $product->getFeatureImagePath(),
-            'user_id' => $product->getUserId()->asString(),
+            'code' => $product->getCode(),
+            'description' => $product->getDescription(),
             'category_id' => $product->getCategoryId()->asString(),
         ];
         $result = $entity->update($data);

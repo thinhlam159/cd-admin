@@ -6,33 +6,36 @@ class ProductAttributeValueResult
 {
     public string $productAttributeValueId;
     public string $productId;
-    public string $productAttributeId;
-    public string $code;
-    public string $description;
-    public string $categoryId;
-    public string $categoryName;
+    public string $productAttributeName;
+    public string $productAttributeValue;
+    public string $nameByAttribute;
+    public string $measureUnit;
+    public string $productInventoryCount;
+    public string $price;
+    public string $monetaryUnit;
 
     /**
+     * @param string $productAttributeValueId
      * @param string $productId
-     * @param string $name
-     * @param string $code
-     * @param string $description
-     * @param string $categoryId
+     * @param string $productAttributeName
+     * @param string $productAttributeValue
+     * @param string $nameByAttribute
+     * @param string $measureUnit
+     * @param string $productInventoryCount
+     * @param string $price
+     * @param string $monetaryUnit
      */
-    public function __construct(
-        string $productId,
-        string $name,
-        string $code,
-        string $description,
-        string $categoryId,
-        string $categoryName,
-    )
+    public function __construct(string $productAttributeValueId, string $productId, string $productAttributeName, string $productAttributeValue, string $nameByAttribute, string $measureUnit, string $productInventoryCount, string $price, string $monetaryUnit)
     {
+        $this->productAttributeValueId = $productAttributeValueId;
         $this->productId = $productId;
-        $this->name = $name;
-        $this->code = $code;
-        $this->description = $description;
-        $this->categoryId = $categoryId;
-        $this->categoryName = $categoryName;
+        $this->productAttributeName = $productAttributeName;
+        $this->productAttributeValue = $productAttributeValue;
+        $this->nameByAttribute = $nameByAttribute;
+        $this->measureUnit = $measureUnit;
+        $this->productInventoryCount = $productInventoryCount;
+        $this->price = $price;
+        $this->monetaryUnit = $monetaryUnit;
     }
+
 }

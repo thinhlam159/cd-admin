@@ -51,7 +51,7 @@ class ProductListGetApplicationService
      * @param IProductAttributeValueRepository $productAttributeValueRepository
      * @param IProductAttributePriceRepository $productAttributePriceRepository
      * @param IProductInventoryRepository $productInventoryRepository
-     * @param ICategoryRepository $customerRepository
+     * @param ICategoryRepository $categoryRepository
      */
     public function __construct(
         IProductRepository $productRepository,
@@ -78,20 +78,36 @@ class ProductListGetApplicationService
     {
         [$products, $pagination] = $this->productRepository->findAll();
 
-
-        $categoryResults = [];
+        $productResults = [];
         foreach ($products as $product) {
             $category = $this->categoryRepository->findById($product->getCategoryId());
             $productAttributeValues = $this->productAttributeValueRepository->findByProductId($product->getProductId());
-//            $productAttributePrice = $this->productAttributePriceRepository->findById($product->)
 
-            $categoryResults[] = new ProductResult(
+
+            $productAttributeValueResults = [];
+            foreach ($productAttributeValues as $productAttributeValue) {
+                $productAttributePrice = $this->productAttributePriceRepository->findByAttributeValueId($productAttributeValue->getProductAttributeValueId());
+                $productInventory = $this->productInventoryRepository->findByProductId($productAttributePrice->getProductAttributeValueId());
+                $productAttributeValueResults[] = new ProductAttributeValueResult(
+                    $productAttributeValue->getProductAttributeValueId()->asString(),
+                    $productAttributeValue->getProductId()->asString(),
+                    $productAttributeValue->getProductAttributeName(),
+                    $productAttributeValue->getValue(),
+                    $productAttributeValue->getNameByAttribute(),
+                    $productAttributeValue->getMeasureUnitName(),
+                    $productInventory->getCount(),
+                    $productAttributePrice->getPrice(),
+                    $productAttributePrice->getMonetaryUnitType()->getValue(),
+                );
+            }
+            $productResults[] = new ProductResult(
                 $product->getProductId()->asString(),
                 $product->getName(),
                 $product->getCode(),
-                $product->getContent(),
+                $product->getDescription(),
                 $product->getCategoryId()->__toString(),
-                $category->getName()
+                $category->getName(),
+                $productAttributeValueResults
             );
         }
         $paginationResult = new PaginationResult(
@@ -101,7 +117,7 @@ class ProductListGetApplicationService
         );
 
         return new ProductListGetResult(
-            $categoryResults,
+            $productResults,
             $paginationResult
         );
     }

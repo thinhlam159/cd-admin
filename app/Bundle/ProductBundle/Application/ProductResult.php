@@ -10,6 +10,7 @@ class ProductResult
     public string $description;
     public string $categoryId;
     public string $categoryName;
+    public array $productAttributeValueResults;
 
     /**
      * @param string $productId
@@ -17,6 +18,8 @@ class ProductResult
      * @param string $code
      * @param string $description
      * @param string $categoryId
+     * @param string $categoryName
+     * @param ProductAttributeValueResult[] $productAttributeValueResults
      */
     public function __construct(
         string $productId,
@@ -25,6 +28,7 @@ class ProductResult
         string $description,
         string $categoryId,
         string $categoryName,
+        array $productAttributeValueResults
     )
     {
         $this->productId = $productId;
@@ -33,5 +37,6 @@ class ProductResult
         $this->description = $description;
         $this->categoryId = $categoryId;
         $this->categoryName = $categoryName;
+        $this->productAttributeValueResults = $productAttributeValueResults;
     }
 }

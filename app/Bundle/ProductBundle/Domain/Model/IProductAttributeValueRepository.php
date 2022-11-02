@@ -22,4 +22,10 @@ interface IProductAttributeValueRepository
      * @return ProductAttributeValue[]
      */
     public function findByProductId(ProductId $productId): array;
+
+    /**
+     * @param ProductAttributeValue $productAttributeValue
+     * @return ProductAttributeValueId
+     */
+    public function update(ProductAttributeValue $productAttributeValue): ProductAttributeValueId;
 }

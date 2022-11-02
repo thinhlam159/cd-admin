@@ -6,6 +6,7 @@ use App\Bundle\Admin\Domain\Model\ICustomerRepository;
 use App\Bundle\Common\Domain\Model\InvalidArgumentException;
 use App\Bundle\Common\Domain\Model\TransactionException;
 use App\Bundle\ProductBundle\Domain\Model\CategoryId;
+use App\Bundle\ProductBundle\Domain\Model\ICategoryRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductAttributePriceRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductAttributeValueRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductInventoryRepository;
@@ -20,6 +21,7 @@ use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValue;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValueId;
 use App\Bundle\ProductBundle\Domain\Model\ProductId;
 use App\Bundle\ProductBundle\Domain\Model\UserId;
+use App\Bundle\ProductBundle\Infrastructure\CategoryRepository;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -47,31 +49,30 @@ class ProductPostApplicationService
     private IProductInventoryRepository $productInventoryRepository;
 
     /**
-     * @var ICustomerRepository
+     * @var ICategoryRepository
      */
-    private ICustomerRepository $customerRepository;
-
+    private ICategoryRepository $categoryRepository;
 
     /**
      * @param IProductRepository $productRepository
      * @param IProductAttributeValueRepository $productAttributeValueRepository
      * @param IProductAttributePriceRepository $productAttributePriceRepository
      * @param IProductInventoryRepository $productInventoryRepository
-     * @param ICustomerRepository $customerRepository
+     * @param ICategoryRepository $customerRepository
      */
     public function __construct(
         IProductRepository $productRepository,
         IProductAttributeValueRepository $productAttributeValueRepository,
         IProductAttributePriceRepository $productAttributePriceRepository,
         IProductInventoryRepository $productInventoryRepository,
-        ICustomerRepository $customerRepository
+        ICategoryRepository $categoryRepository
     )
     {
         $this->productRepository = $productRepository;
         $this->productAttributeValueRepository = $productAttributeValueRepository;
         $this->productAttributePriceRepository = $productAttributePriceRepository;
         $this->productInventoryRepository = $productInventoryRepository;
-        $this->customerRepository = $customerRepository;
+        $this->categoryRepository = $categoryRepository;
     }
 
     /**

@@ -6,29 +6,30 @@ class ProductGetResult
 {
     public string $productId;
     public string $name;
-    public int $price;
-    public ?string $featureImagePath;
-    public string $content;
-    public string $userId;
+    public string $code;
+    public string $description;
     public string $categoryId;
+    public string $categoryName;
+    public array $productAttributeValueResults;
 
     /**
      * @param string $productId
      * @param string $name
-     * @param int $price
-     * @param string|null $featureImagePath
-     * @param string $content
-     * @param string $userId
+     * @param string $code
+     * @param string $description
      * @param string $categoryId
+     * @param string $categoryName
+     * @param array $productAttributeValueResults
      */
-    public function __construct(string $productId, string $name, int $price, ?string $featureImagePath, string $content, string $userId, string $categoryId)
+    public function __construct(string $productId, string $name, string $code, string $description, string $categoryId, string $categoryName, array $productAttributeValueResults)
     {
         $this->productId = $productId;
         $this->name = $name;
-        $this->price = $price;
-        $this->featureImagePath = $featureImagePath;
-        $this->content = $content;
-        $this->userId = $userId;
+        $this->code = $code;
+        $this->description = $description;
         $this->categoryId = $categoryId;
+        $this->categoryName = $categoryName;
+        $this->productAttributeValueResults = $productAttributeValueResults;
     }
+
 }

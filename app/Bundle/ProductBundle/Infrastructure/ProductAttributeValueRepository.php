@@ -69,7 +69,7 @@ class ProductAttributeValueRepository implements IProductAttributeValueRepositor
 
         $productAttributeValues = [];
         foreach ($entities as $entity) {
-            $productAttributeValues[] = new ProductAttributeValue(
+            $productAttributeValue = new ProductAttributeValue(
                 new ProductAttributeValueId($entity['id']),
                 new ProductId($entity['id']),
                 new ProductAttributeId($entity['id']),
@@ -77,9 +77,30 @@ class ProductAttributeValueRepository implements IProductAttributeValueRepositor
                 $entity['value'],
                 $entity['name_by_attribute'],
             );
+            $productAttributeValue->setMeasureUnitName($entity->measureUnit->name);
+            $productAttributeValue->setProductAttributeName($entity->productAttribute->name);
+
+            $productAttributeValues[] = $productAttributeValue;
         }
 
         return $productAttributeValues;
+    }
+
+    public function update(ProductAttributeValue $productAttributeValue): ProductAttributeValueId
+    {
+        $entity = ModelProductAttributeValue::find($productAttributeValue->getProductAttributeValueId()->asString());
+
+        $result = $entity->update([
+            'id' => $productAttributeValue->getProductAttributeValueId()->asString(),
+            'product_id' => $productAttributeValue->getProductId()->asString(),
+            'product_attribute_id' => $productAttributeValue->getProductAttributeId()->asString(),
+            'measure_unit_id' => $productAttributeValue->getMeasureUnitId()->asString(),
+            'value' => $productAttributeValue->getValue(),
+            'name_by_attribute' => $productAttributeValue->getNameByAttribute(),
+        ]);
+        if (!$result) {
+            if
+        }
     }
 
 }

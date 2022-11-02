@@ -30,6 +30,8 @@ use App\Bundle\ProductBundle\Application\ProductListGetApplicationService;
 use App\Bundle\ProductBundle\Application\ProductListGetCommand;
 use App\Bundle\ProductBundle\Application\ProductPostApplicationService;
 use App\Bundle\ProductBundle\Application\ProductPostCommand;
+use App\Bundle\ProductBundle\Application\ProductPutApplicationService;
+use App\Bundle\ProductBundle\Infrastructure\CategoryRepository;
 use App\Bundle\ProductBundle\Infrastructure\ProductAttributePriceRepository;
 use App\Bundle\ProductBundle\Infrastructure\ProductAttributeValueRepository;
 use App\Bundle\ProductBundle\Infrastructure\ProductInventoryRepository;
@@ -54,7 +56,7 @@ class ProductController extends BaseController
             new ProductAttributeValueRepository(),
             new ProductAttributePriceRepository(),
             new ProductInventoryRepository(),
-            new CustomerRepository()
+            new CategoryRepository()
         );
         $base64File = $request->file;
 
@@ -131,7 +133,7 @@ class ProductController extends BaseController
             new ProductAttributeValueRepository(),
             new ProductAttributePriceRepository(),
             new ProductInventoryRepository(),
-            new CustomerRepository()
+            new CategoryRepository()
         );
 
         $command = new ProductListGetCommand();
@@ -140,13 +142,27 @@ class ProductController extends BaseController
         $paginationResult = $result->paginationResult;
         $data = [];
         foreach ($productResults as $product) {
+            $productAttributeValues = [];
+            foreach ($product->productAttributeValueResults as $productAttributeValueResult) {
+                $productAttributeValues[] = [
+                    'product_attribute_value_id' => $productAttributeValueResult->productAttributeValueId,
+                    'product_attribute_name' => $productAttributeValueResult->productAttributeName,
+                    'product_attribute_value' => $productAttributeValueResult->productAttributeValue,
+                    'attribute_name' => $productAttributeValueResult->nameByAttribute,
+                    'product_inventory_count' => $productAttributeValueResult->productInventoryCount,
+                    'measure_unit' => $productAttributeValueResult->measureUnit,
+                    'price' => $productAttributeValueResult->price,
+                    'monetary_unit' => $productAttributeValueResult->monetaryUnit,
+                ];
+            }
             $data[] = [
                 'product_id' => $product->productId,
                 'name' => $product->name,
-                'price' => $product->price,
-                'featureImagePath' => $product->featureImagePath,
-                'user_id' => $product->userId,
+                'code' => $product->code,
+                'description' => $product->description,
                 'category_id' => $product->categoryId,
+                'category_name' => $product->categoryName,
+                'product_attribute_values' => $productAttributeValues
             ];
         }
         $response = [
@@ -167,19 +183,37 @@ class ProductController extends BaseController
      * @throws \App\Bundle\Common\Domain\Model\RecordNotFoundException
      */
     public function getProduct(Request $request) {
-        $productRepository = new ProductRepository();
-        $applicationService = new ProductGetApplicationService($productRepository);
+        $applicationService = new ProductGetApplicationService(
+            new ProductRepository(),
+            new ProductAttributeValueRepository(),
+            new ProductAttributePriceRepository(),
+            new ProductInventoryRepository(),
+            new CategoryRepository()
+        );
 
         $command = new ProductGetCommand($request->id);
-        $customer = $applicationService->handle($command);
-        $data = [
-            'product_id' => $customer->productId,
-            'name' => $customer->name,
-            'price' => $customer->price,
-            'featureImagePath' => $customer->featureImagePath,
-            'content' => $customer->content,
-            'user_id' => $customer->userId,
-            'customer_id' => $customer->categoryId,
+        $product = $applicationService->handle($command);
+        $productAttributeValues = [];
+        foreach ($product->productAttributeValueResults as $productAttributeValueResult) {
+            $productAttributeValues[] = [
+                'product_attribute_value_id' => $productAttributeValueResult->productAttributeValueId,
+                'product_attribute_name' => $productAttributeValueResult->productAttributeName,
+                'product_attribute_value' => $productAttributeValueResult->productAttributeValue,
+                'attribute_name' => $productAttributeValueResult->nameByAttribute,
+                'product_inventory_count' => $productAttributeValueResult->productInventoryCount,
+                'measure_unit' => $productAttributeValueResult->measureUnit,
+                'price' => $productAttributeValueResult->price,
+                'monetary_unit' => $productAttributeValueResult->monetaryUnit,
+            ];
+        }
+        $data[] = [
+            'product_id' => $product->productId,
+            'name' => $product->name,
+            'code' => $product->code,
+            'description' => $product->description,
+            'category_id' => $product->categoryId,
+            'category_name' => $product->categoryName,
+            'product_attribute_values' => $productAttributeValues
         ];
 
         return response()->json($data, 200);
@@ -192,8 +226,13 @@ class ProductController extends BaseController
      * @throws \App\Bundle\Common\Domain\Model\TransactionException
      */
     public function updateProduct(Request $request) {
-        $productRepository = new ProductRepository();
-        $applicationService = new ProductPutApplicationService($productRepository);
+        $applicationService = new ProductPutApplicationService(
+            new ProductRepository(),
+            new ProductAttributeValueRepository(),
+            new ProductAttributePriceRepository(),
+            new ProductInventoryRepository(),
+            new CategoryRepository()
+        );
 
         $command = new CustomerPutCommand(
             $request->id,
