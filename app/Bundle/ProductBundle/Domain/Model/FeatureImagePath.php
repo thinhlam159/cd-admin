@@ -24,17 +24,24 @@ final class FeatureImagePath
     private bool $isAvatar;
 
     /**
+     * @var string
+     */
+    private string $path;
+
+    /**
      * @param FeatureImagePathId $featureImagePathId
      * @param ProductId $productId
      * @param ProductAttributeValueId|null $productAttributeValueId
      * @param bool $isAvatar
+     * @param string $path
      */
-    public function __construct(FeatureImagePathId $featureImagePathId, ProductId $productId, ?ProductAttributeValueId $productAttributeValueId, bool $isAvatar)
+    public function __construct(FeatureImagePathId $featureImagePathId, ProductId $productId, ?ProductAttributeValueId $productAttributeValueId, bool $isAvatar, string $path)
     {
         $this->featureImagePathId = $featureImagePathId;
         $this->productId = $productId;
         $this->productAttributeValueId = $productAttributeValueId;
         $this->isAvatar = $isAvatar;
+        $this->path = $path;
     }
 
     /**
@@ -67,5 +74,21 @@ final class FeatureImagePath
     public function isAvatar(): bool
     {
         return $this->isAvatar;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPath(): string
+    {
+        return $this->path;
+    }
+
+    /**
+     * @param string $path
+     */
+    public function setPath(string $path): void
+    {
+        $this->path = $path;
     }
 }

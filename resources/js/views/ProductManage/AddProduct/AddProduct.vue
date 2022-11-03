@@ -5,67 +5,32 @@
             <div class="w-full py-6 py-auto text-xl">
                 <span class="text-gray-500">Thêm sản phẩm</span>
             </div>
-            <FormKit type="form" @submit="handleSubmit(formData)" :actions="false" submit-label="Register" :form-class="hide">
-                <FormKit
-                    type="text"
-                    label="Tên sản phẩm"
-                    name="name"
-                    placeholder="Nhập tên sản phẩm"
-                    validation="required"
-                    :classes="{
-                      outer: 'mb-5',
-                      label: 'block mb-1 font-bold text-sm',
-                      inner: 'max-w-md border border-gray-400 rounded-lg mb-1 overflow-hidden focus-within:border-blue-500',
-                      input: 'w-full h-10 px-3 border-none text-base text-gray-700 placeholder-gray-400',
-                      help: 'text-xs text-gray-500'
-                    }"
-                    v-model="formData.name"
-                />
-                <FormKit
-                    type="select"
-                    label="Danh mục"
-                    name="category"
-                    placeholder="Nhập giá sản phẩm"
-                    validation="number"
-                    :classes="{
-                      outer: 'mb-5',
-                      label: 'block mb-1 font-bold text-sm',
-                      inner: 'max-w-md border border-gray-400 rounded-lg mb-1 overflow-hidden focus-within:border-blue-500',
-                      input: 'w-full h-10 px-3 border-none text-base text-gray-700 placeholder-gray-400',
-                      help: 'text-xs text-gray-500'
-                    }"
-                    :options="categories"
-                    v-model="formData.category"
-                />
-                <FormKit
-                    type="number"
-                    label="Giá thành"
-                    name="price"
-                    placeholder="Nhập giá sản phẩm"
-                    validation="number"
-                    :classes="{
-                      outer: 'mb-5',
-                      label: 'block mb-1 font-bold text-sm',
-                      inner: 'max-w-md border border-gray-400 rounded-lg mb-1 overflow-hidden focus-within:border-blue-500',
-                      input: 'w-full h-10 px-3 border-none text-base text-gray-700 placeholder-gray-400',
-                      help: 'text-xs text-gray-500'
-                    }"
-                    v-model="formData.price"
-                />
-<!--                <FormKit-->
-<!--                    type="file"-->
-<!--                    label="Hình ảnh"-->
-<!--                    name="image"-->
-<!--                    placeholder="hình ảnh"-->
-<!--                    :classes="{-->
-<!--                      outer: 'mb-5',-->
-<!--                      label: 'block mb-1 font-bold text-sm',-->
-<!--                      inner: 'max-w-md border border-gray-400 rounded-lg mb-1 overflow-hidden focus-within:border-blue-500',-->
-<!--                      input: 'w-full h-10 px-3 border-none text-base text-gray-700 placeholder-gray-400',-->
-<!--                      help: 'text-xs text-gray-500'-->
-<!--                    }"-->
-<!--                    v-model="formData.image"-->
-<!--                />-->
+            <form @submit.prevent="handleSubmit(formData)">
+                <div>
+                    <label for="name" class="block mb-1 font-bold text-sm">Nhập tên sản phẩm</label>
+                    <input type="text" name="name" placeholder="Nhập tên sản phẩm" v-model="formData.name"
+                        class="w-full h-10 px-3 text-base text-gray-700 placeholder-gray-400 border border-gray-400"
+                    >
+                </div>
+                <div>
+                    <label for="code" class="block mb-1 font-bold text-sm">Mã sản phẩm</label>
+                    <input type="text" name="name" placeholder="Nhập mã sản phẩm" v-model="formData.code"
+                           class="w-full h-10 px-3 text-base text-gray-700 placeholder-gray-400 border border-gray-400"
+                    >
+                </div>
+                <div>
+                    <label for="category" class="block mb-1 font-bold text-sm">Danh Mục</label>
+                    <select name="category" class="p-3" v-model="formData.category">
+                        <option disabled value="" class="w-full h-10 px-3 text-base text-gray-700" selected>Chọn danh mục</option>
+                        <option v-for="item in categories" :value="item.id" class="w-full h-10 px-3 text-base text-gray-700">{{ item.name }}</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="price" class="block mb-1 font-bold text-sm">Giá thành</label>
+                    <input type="text" name="price" placeholder="Nhập giá sp" v-model="formData.price"
+                           class="w-full h-10 px-3 text-base text-gray-700 placeholder-gray-400 border border-gray-400"
+                    >
+                </div>
                 <div class="h-48 my-4">
                     <img class="h-full w-auto .object-contain" id="blah" :src="imageUrl" alt="your image" />
                 </div>
@@ -77,32 +42,16 @@
                         ref="file"
                     />
                 </div>
-
-<!--                <img id="blah" src="http://localhost:8032/storage/images/Ux9sxW6bQp.png" alt="your image" />-->
-                <FormKit
-                    type="textarea"
-                    label="Mô tả"
-                    name="description"
-                    placeholder="Mô tả sản phẩm"
-                    :classes="{
-                      outer: 'mb-5',
-                      label: 'block mb-1 font-bold text-sm',
-                      inner: 'max-w-md border border-gray-400 rounded-lg mb-1 overflow-hidden focus-within:border-blue-500',
-                      input: 'w-full h-10 px-3 border-none text-base text-gray-700 placeholder-gray-400',
-                      help: 'text-xs text-gray-500'
-                    }"
-                    v-model="formData.description"
-                />
-                <FormKit
-                    type="submit"
-                    label="Thêm mới"
-                    :classes="{
-                      outer: 'mb-0 mt-8',
-                      label: 'block mb-1 font-bold text-sm text-white',
-                      input: 'bg-gray-400 h-10 px-3 border-gray-50 text-base text-gray-50 rounded-md',
-                    }"
-                />
-            </FormKit>
+                <div>
+                    <label for="description" class="block mb-1 font-bold text-sm">Mô tả</label>
+                    <textarea name="price" placeholder="Nhập giá sp" v-model="formData.description"
+                              class="w-full h-10 px-3 text-base text-gray-700 placeholder-gray-400 border border-gray-400"
+                    ></textarea>
+                </div>
+                <div>
+                    <input class="w-25 h-10 mt-5 px-3 text-base text-gray-700 placeholder-gray-400 bg-green-400 cursor-pointer" type="submit" value="Thêm sp">
+                </div>
+            </form>
         </div>
     </div>
 </template>
@@ -122,18 +71,11 @@ export default {
   setup() {
       const router = useRouter()
       const store = useStore()
-      const formData = ref({
-          name: '',
-          email: '',
-          password: '123132',
-          phone: '',
-          status: true,
-          image: null,
-      })
+      const formData = ref({})
       const imageUrl = ref(logoTimeSharing)
       const imageBuffer = ref(null)
       const file = ref(null)
-      const categories = ref([])
+      const categories = ref()
 
 
       const handleSubmit = async (data) => {
@@ -141,10 +83,11 @@ export default {
               const bodyFormData = new FormData()
               bodyFormData.append('name', data.name);
               bodyFormData.append('price', data.price);
+              bodyFormData.append('code', data.code);
               bodyFormData.append('category_id', data.category);
               bodyFormData.append('description', data.description);
-              // bodyFormData.append('file', imageBuffer.value);
               bodyFormData.append('file', file.value.files[0]);
+              console.log(file.value.files[0])
               const res = await createProductFromApi(bodyFormData)
               router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.CUSTOMER_MANAGE}`)
           } catch (errors) {
@@ -162,12 +105,12 @@ export default {
                   return [
                       ...option,
                       {
-                          label: data.name,
-                          value: data.category_id
+                          name: data.name,
+                          id: data.category_id
                       }
                   ]
               }, [])
-
+              formData.value.category = res.data[0].category_id
           } catch (errors) {
               const error = errors.message;
               console.log(error)

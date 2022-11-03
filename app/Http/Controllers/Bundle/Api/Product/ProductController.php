@@ -24,6 +24,8 @@ use App\Bundle\Admin\Application\UserPutApplicationService;
 use App\Bundle\Admin\Application\UserPutCommand;
 use App\Bundle\Admin\Infrastructure\CustomerRepository;
 use App\Bundle\Admin\Infrastructure\UserRepository;
+use App\Bundle\ProductBundle\Application\ProductAttributeListGetApplicationService;
+use App\Bundle\ProductBundle\Application\ProductAttributeListGetCommand;
 use App\Bundle\ProductBundle\Application\ProductGetApplicationService;
 use App\Bundle\ProductBundle\Application\ProductGetCommand;
 use App\Bundle\ProductBundle\Application\ProductListGetApplicationService;
@@ -32,12 +34,16 @@ use App\Bundle\ProductBundle\Application\ProductPostApplicationService;
 use App\Bundle\ProductBundle\Application\ProductPostCommand;
 use App\Bundle\ProductBundle\Application\ProductPutApplicationService;
 use App\Bundle\ProductBundle\Infrastructure\CategoryRepository;
+use App\Bundle\ProductBundle\Infrastructure\FeatureImagePathRepository;
 use App\Bundle\ProductBundle\Infrastructure\ProductAttributePriceRepository;
+use App\Bundle\ProductBundle\Infrastructure\ProductAttributeRepository;
 use App\Bundle\ProductBundle\Infrastructure\ProductAttributeValueRepository;
 use App\Bundle\ProductBundle\Infrastructure\ProductInventoryRepository;
 use App\Bundle\ProductBundle\Infrastructure\ProductRepository;
 use App\Http\Controllers\Bundle\Api\Common\BaseController;
+use http\Exception\InvalidArgumentException;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -53,50 +59,15 @@ class ProductController extends BaseController
     {
         $applicationService = new ProductPostApplicationService(
             new ProductRepository(),
-            new ProductAttributeValueRepository(),
-            new ProductAttributePriceRepository(),
-            new ProductInventoryRepository(),
-            new CategoryRepository()
+            new FeatureImagePathRepository(),
         );
-        $base64File = $request->file;
 
-        $extension = explode('/', explode(':', substr($base64File, 0, strpos($base64File, ';')))[1])[1];
-        $replace = substr($base64File, 0, strpos($base64File, ',')+1);
-        $image = str_replace($replace, '', $base64File);
-        $image = str_replace(' ', '+', $image);
-        $imageName = 'images/'.Str::random(10).'.'.$extension;
-        Storage::disk('public')->put($imageName, base64_decode($image));
-        $url = Storage::url($imageName);
-        $path = Storage::path($imageName);
-
-// decode the base64 file
-//        $fileData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $base64File));
-//        $ext = pathinfo($base64File, PATHINFO_EXTENSION);
-
-// save it to temporary dir first.
-//        $tmpFilePath = sys_get_temp_dir() . '/' . Str::uuid()->toString();
-//        file_put_contents($tmpFilePath, $fileData);
-
-// this just to help us get file info.
-//        $tmpFile = new File($tmpFilePath);
-//dd($tmpFile);
-//        $file = new UploadedFile(
-//            $tmpFile->getPathname(),
-//            $tmpFile->getFilename(),
-//            $tmpFile->getMimeType(),
-//            0,
-//            true // Mark it as test, since the file isn't from real HTTP POST.
-//        );
-//
-//        $file->store('avatars');
-//        $data = base64_decode(Storage::get('file.jpg'));
-//        dd($data);
-//        $image = base64_encode($base64File);
-//        Storage::put('file.jpg', $image);
-//        $data = base64_decode(Storage::get('file.jpg'));
-//        dd($data);
-//        Storage::put('file.jpg', $encoded_image);
-
+        $file = $request->file('file');
+        if (!$file) {
+            throw new InvalidArgumentException();
+        }
+        $file->hashName();
+        $path = Storage::put('/public/'. Auth::id(), $file);
 
         $isAvatar = true;
 
@@ -104,23 +75,17 @@ class ProductController extends BaseController
             $request->name,
             $request->code,
             $request->description,
-            $request->price,
-            $request->monetary_unit,
             $request->category_id,
-            $request->measure_unit_id,
-            $request->product_attribute_id,
-            $request->product_attribute_value,
-            $request->product_attribute_code,
             $path,
             $isAvatar
         );
 
         $result = $applicationService->handle($command);
         $data = [
-            $result->productId,
+            'id' => $result->productId,
         ];
 
-        return response()->json($data, 200);
+        return response()->json(['data' => $data], 200);
     }
 
     /**
@@ -262,5 +227,30 @@ class ProductController extends BaseController
         $result = $applicationService->handle($command);
 
         return response()->json(['data' => []], 200);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \App\Bundle\Common\Domain\Model\RecordNotFoundException
+     * @throws \App\Bundle\Common\Domain\Model\TransactionException
+     */
+    public function getProductAttribute(Request $request) {
+        $applicationService = new ProductAttributeListGetApplicationService(
+            new ProductAttributeRepository()
+        );
+
+        $command = new ProductAttributeListGetCommand();
+        $result = $applicationService->handle($command);
+
+        $data = [];
+        foreach ($result->productAttributeResults as $productAttributeResult) {
+            $data[] = [
+                'id' => $productAttributeResult->productAttributeId,
+                'name' => $productAttributeResult->name,
+            ];
+        }
+
+        return response()->json(['data' => $data], 200);
     }
 }

@@ -25,8 +25,11 @@ class ProductRepository implements IProductRepository
             'description' => $product->getDescription(),
             'category_id' => $product->getCategoryId()->asString(),
     	]);
+        if (!$result) {
+            throw new \Exception();
+        }
 
-        return new ProductId($result->id);
+        return new ProductId($product->getProductId());
     }
 
     /**

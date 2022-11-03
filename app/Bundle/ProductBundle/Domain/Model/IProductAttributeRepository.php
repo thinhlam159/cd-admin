@@ -5,5 +5,8 @@ use App\Bundle\Common\Domain\Model\Pagination;
 
 interface IProductAttributeRepository
 {
-
+    /**
+     * @return ProductAttribute[]
+     */
+    public function findAll(): array;
 }

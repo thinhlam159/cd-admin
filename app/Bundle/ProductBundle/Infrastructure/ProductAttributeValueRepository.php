@@ -99,8 +99,10 @@ class ProductAttributeValueRepository implements IProductAttributeValueRepositor
             'name_by_attribute' => $productAttributeValue->getNameByAttribute(),
         ]);
         if (!$result) {
-            if
+            throw new \Exception();
         }
+
+        return $productAttributeValue->getProductAttributeValueId();
     }
 
 }
