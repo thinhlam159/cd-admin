@@ -37,5 +37,4 @@ class ProductAttributeValueResult
         $this->price = $price;
         $this->monetaryUnit = $monetaryUnit;
     }
-
 }

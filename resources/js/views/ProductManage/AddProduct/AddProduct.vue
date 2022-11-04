@@ -5,7 +5,13 @@
             <div class="w-full py-6 py-auto text-xl">
                 <span class="text-gray-500">Thêm sản phẩm</span>
             </div>
-            <FormKit type="form" @submit="handleSubmit(formData)" :actions="false" submit-label="Register" :form-class="hide">
+            <form @submit="handleSubmit(formData)">
+                <div>
+                    <label for="name" class="block mb-1 font-bold text-sm">Tên sản phẩm</label>
+                    <input type="text" name="name" placeholder="Nhập tên sản phẩm" class="w-full h-10 px-3 border-none text-base text-gray-700 placeholder-gray-400">
+                </div>
+            </form>
+            <FormKit type="form" @submit="handleSubmit(formData)" submit-label="Register" :form-class="hide">
                 <FormKit
                     type="text"
                     label="Tên sản phẩm"

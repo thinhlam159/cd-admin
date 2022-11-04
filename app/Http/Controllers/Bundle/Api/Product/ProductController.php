@@ -31,6 +31,7 @@ use App\Bundle\ProductBundle\Application\ProductListGetCommand;
 use App\Bundle\ProductBundle\Application\ProductPostApplicationService;
 use App\Bundle\ProductBundle\Application\ProductPostCommand;
 use App\Bundle\ProductBundle\Application\ProductPutApplicationService;
+use App\Bundle\ProductBundle\Application\ProductPutCommand;
 use App\Bundle\ProductBundle\Infrastructure\CategoryRepository;
 use App\Bundle\ProductBundle\Infrastructure\ProductAttributePriceRepository;
 use App\Bundle\ProductBundle\Infrastructure\ProductAttributeValueRepository;
@@ -234,16 +235,36 @@ class ProductController extends BaseController
             new CategoryRepository()
         );
 
-        $command = new CustomerPutCommand(
+        //handle image
+        $base64File = $request->file;
+        $extension = explode('/', explode(':', substr($base64File, 0, strpos($base64File, ';')))[1])[1];
+        $replace = substr($base64File, 0, strpos($base64File, ',')+1);
+        $image = str_replace($replace, '', $base64File);
+        $image = str_replace(' ', '+', $image);
+        $imageName = 'images/'.Str::random(10).'.'.$extension;
+        Storage::disk('public')->put($imageName, base64_decode($image));
+        $url = Storage::url($imageName);
+        $path = Storage::path($imageName);
+
+        $isAvatar = true;
+        $command = new ProductPutCommand(
             $request->id,
-            $request->user_name,
-            $request->email,
-            (int)$request->phone,
-            $request->status
+            $request->name,
+            $request->code,
+            $request->description,
+            $request->price,
+            $request->monetary_unit,
+            $request->category_id,
+            $request->measure_unit_id,
+            $request->product_attribute_id,
+            $request->product_attribute_value,
+            $request->product_attribute_code,
+            $path,
+            $isAvatar
         );
         $result = $applicationService->handle($command);
 
-        return response()->json(['customer_id' => $result->customerId], 200);
+        return response()->json(['product_id' => $result->productId], 200);
     }
 
     /**
@@ -252,10 +273,9 @@ class ProductController extends BaseController
      * @throws \App\Bundle\Common\Domain\Model\RecordNotFoundException
      * @throws \App\Bundle\Common\Domain\Model\TransactionException
      */
-    public function deleteCustomer(Request $request) {
-        $customerRepository = new CustomerRepository();
-        $applicationService = new CustomerDeleteApplicationService(
-            $customerRepository,
+    public function deleteProduct(Request $request) {
+        $applicationService = new ProductDeleteApplicationService(
+            new ProductRepository(),
         );
         $command = new CustomerDeleteCommand($request->id);
 

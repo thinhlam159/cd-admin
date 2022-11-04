@@ -17,4 +17,10 @@ interface IProductAttributePriceRepository
      * @return ProductAttributePrice|null
      */
     public function findByAttributeValueId(ProductAttributeValueId $productAttributeValueId): ?ProductAttributePrice;
+
+    /**
+     * @param ProductAttributePrice $productAttributePrice
+     * @return ProductAttributePriceId
+     */
+    public function update(ProductAttributePrice $productAttributePrice): ProductAttributePriceId;
 }

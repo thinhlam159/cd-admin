@@ -1,23 +1,15 @@
 <?php
 namespace App\Bundle\ProductBundle\Infrastructure;
 
-use App\Bundle\Common\Constants\PaginationConst;
-use App\Bundle\ProductBundle\Domain\Model\CategoryId;
 use App\Bundle\ProductBundle\Domain\Model\IProductAttributeValueRepository;
-use App\Bundle\ProductBundle\Domain\Model\IProductRepository;
 use App\Bundle\ProductBundle\Domain\Model\MeasureUnitId;
-use App\Bundle\ProductBundle\Domain\Model\Product;
-use App\Bundle\ProductBundle\Domain\Model\ProductAttribute;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributeId;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValue;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValueId;
 use App\Bundle\ProductBundle\Domain\Model\ProductId;
-use App\Bundle\ProductBundle\Domain\Model\UserId;
-use App\Bundle\UserBundle\Domain\Model\Pagination;
 use App\Models\ProductAttributeValue as ModelProductAttributeValue;
-use PHPUnit\Framework\Exception;
 
-class ProductAttributeValueRepository implements IProductAttributeValueRepository
+final class ProductAttributeValueRepository implements IProductAttributeValueRepository
 {
     /**
      * @inheritDoc
@@ -99,8 +91,9 @@ class ProductAttributeValueRepository implements IProductAttributeValueRepositor
             'name_by_attribute' => $productAttributeValue->getNameByAttribute(),
         ]);
         if (!$result) {
-            if
+            throw new \Exception();
         }
-    }
 
+        return $productAttributeValue->getProductAttributeValueId();
+    }
 }
