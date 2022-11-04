@@ -2,26 +2,15 @@
 
 namespace App\Bundle\ProductBundle\Application;
 
-use App\Bundle\Admin\Domain\Model\ICustomerRepository;
 use App\Bundle\Common\Domain\Model\InvalidArgumentException;
 use App\Bundle\Common\Domain\Model\TransactionException;
 use App\Bundle\ProductBundle\Domain\Model\CategoryId;
-use App\Bundle\ProductBundle\Domain\Model\ICategoryRepository;
-use App\Bundle\ProductBundle\Domain\Model\IProductAttributePriceRepository;
-use App\Bundle\ProductBundle\Domain\Model\IProductAttributeValueRepository;
-use App\Bundle\ProductBundle\Domain\Model\IProductInventoryRepository;
+use App\Bundle\ProductBundle\Domain\Model\FeatureImagePath;
+use App\Bundle\ProductBundle\Domain\Model\FeatureImagePathId;
+use App\Bundle\ProductBundle\Domain\Model\IFeatureImagePathRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductRepository;
-use App\Bundle\ProductBundle\Domain\Model\MeasureUnitId;
-use App\Bundle\ProductBundle\Domain\Model\MonetaryUnitType;
 use App\Bundle\ProductBundle\Domain\Model\Product;
-use App\Bundle\ProductBundle\Domain\Model\ProductAttributeId;
-use App\Bundle\ProductBundle\Domain\Model\ProductAttributePrice;
-use App\Bundle\ProductBundle\Domain\Model\ProductAttributePriceId;
-use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValue;
-use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValueId;
 use App\Bundle\ProductBundle\Domain\Model\ProductId;
-use App\Bundle\ProductBundle\Domain\Model\UserId;
-use App\Bundle\ProductBundle\Infrastructure\CategoryRepository;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -34,45 +23,18 @@ class ProductPostApplicationService
     private IProductRepository $productRepository;
 
     /**
-     * @var IProductAttributeValueRepository
+     * @var IFeatureImagePathRepository
      */
-    private IProductAttributeValueRepository $productAttributeValueRepository;
-
-    /**
-     * @var IProductAttributePriceRepository
-     */
-    private IProductAttributePriceRepository $productAttributePriceRepository;
-
-    /**
-     * @var IProductInventoryRepository
-     */
-    private IProductInventoryRepository $productInventoryRepository;
-
-    /**
-     * @var ICategoryRepository
-     */
-    private ICategoryRepository $categoryRepository;
+    private IFeatureImagePathRepository $featureImagePathRepository;
 
     /**
      * @param IProductRepository $productRepository
-     * @param IProductAttributeValueRepository $productAttributeValueRepository
-     * @param IProductAttributePriceRepository $productAttributePriceRepository
-     * @param IProductInventoryRepository $productInventoryRepository
-     * @param ICategoryRepository $customerRepository
+     * @param IFeatureImagePathRepository $featureImagePathRepository
      */
-    public function __construct(
-        IProductRepository $productRepository,
-        IProductAttributeValueRepository $productAttributeValueRepository,
-        IProductAttributePriceRepository $productAttributePriceRepository,
-        IProductInventoryRepository $productInventoryRepository,
-        ICategoryRepository $categoryRepository
-    )
+    public function __construct(IProductRepository $productRepository, IFeatureImagePathRepository $featureImagePathRepository)
     {
         $this->productRepository = $productRepository;
-        $this->productAttributeValueRepository = $productAttributeValueRepository;
-        $this->productAttributePriceRepository = $productAttributePriceRepository;
-        $this->productInventoryRepository = $productInventoryRepository;
-        $this->categoryRepository = $categoryRepository;
+        $this->featureImagePathRepository = $featureImagePathRepository;
     }
 
     /**
@@ -89,8 +51,6 @@ class ProductPostApplicationService
 //        }
         $productId = ProductId::newId();
         $categoryId = new CategoryId($command->categoryId);
-        $measureUnitId = new MeasureUnitId($command->measureUnitId);
-        $productAttributeId = new ProductAttributeId($command->productAttributeId);
 
         $product = new Product(
             $productId,
@@ -100,29 +60,19 @@ class ProductPostApplicationService
             $categoryId,
         );
 
-        $productAttributeValueId = ProductAttributeValueId::newId();
-        $productAttributeValue = new ProductAttributeValue(
-            $productAttributeValueId,
+        $featureImagePathId = FeatureImagePathId::newId();
+        $featureImagePath = new FeatureImagePath(
+            $featureImagePathId,
             $productId,
-            $productAttributeId,
-            $measureUnitId,
-            $command->productAttributeValue,
-            $command->productAttributeCode
+            null,
+            true,
+            $command->path
         );
 
-        $productAttributePriceId = ProductAttributePriceId::newId();
-        $productAttributePrice = new ProductAttributePrice(
-            $productAttributePriceId,
-            $productAttributeValueId,
-            $command->price,
-            MonetaryUnitType::fromValue($command->monetaryUnitId),
-            true
-        );
         DB::beginTransaction();
         try {
             $productId = $this->productRepository->create($product);
-            $productAttributeValueId = $this->productAttributeValueRepository->create($productAttributeValue);
-            $productAttributePriceId = $this->productAttributePriceRepository->create($productAttributePrice);
+            $this->featureImagePathRepository->create($featureImagePath);
             DB::commit();
         } catch (Exception $e) {
             DB::rollBack();
