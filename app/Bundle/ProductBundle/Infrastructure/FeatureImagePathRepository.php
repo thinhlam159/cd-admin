@@ -4,6 +4,7 @@ namespace App\Bundle\ProductBundle\Infrastructure;
 use App\Bundle\ProductBundle\Domain\Model\FeatureImagePath;
 use App\Bundle\ProductBundle\Domain\Model\FeatureImagePathId;
 use App\Bundle\ProductBundle\Domain\Model\IFeatureImagePathRepository;
+use App\Bundle\ProductBundle\Domain\Model\ProductId;
 use App\Models\FeatureImagePath as ModelFeatureImagePath;
 
 class FeatureImagePathRepository implements IFeatureImagePathRepository
@@ -27,5 +28,26 @@ class FeatureImagePathRepository implements IFeatureImagePathRepository
         }
 
         return $featureImagePath->getFeatureImagePathId();
+    }
+
+    public function findByProductId(ProductId $productId): ?FeatureImagePath
+    {
+        $entity = ModelFeatureImagePath::where([
+            'product_id' => $productId->asString(),
+            'product_attribute_value_id' => null,
+            'is_avatar' => true
+        ])->first();
+
+        if (!$entity) {
+            return null;
+        }
+
+        return new FeatureImagePath(
+            new FeatureImagePathId($entity['id']),
+            $productId,
+            null,
+            true,
+            $entity['path']
+        );
     }
 }

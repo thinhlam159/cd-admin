@@ -67,7 +67,7 @@ class CategoryRepository implements ICategoryRepository
             new CategoryId($entity['id']),
             $entity['name'],
             $entity['slug'],
-            $entity['parent_id'],
+            new CategoryId($entity['parent_id']),
         );
     }
 

@@ -2,28 +2,7 @@
 
 namespace App\Http\Controllers\Bundle\Api\Product;
 
-use App\Bundle\Admin\Application\CustomerDeleteApplicationService;
 use App\Bundle\Admin\Application\CustomerDeleteCommand;
-use App\Bundle\Admin\Application\CustomerGetApplicationService;
-use App\Bundle\Admin\Application\CustomerGetCommand;
-use App\Bundle\Admin\Application\CustomerListGetApplicationService;
-use App\Bundle\Admin\Application\CustomerListGetCommand;
-use App\Bundle\Admin\Application\CustomerPostApplicationService;
-use App\Bundle\Admin\Application\CustomerPostCommand;
-use App\Bundle\Admin\Application\CustomerPutApplicationService;
-use App\Bundle\Admin\Application\CustomerPutCommand;
-use App\Bundle\Admin\Application\UserDeleteApplicationService;
-use App\Bundle\Admin\Application\UserDeleteCommand;
-use App\Bundle\Admin\Application\UserGetApplicationService;
-use App\Bundle\Admin\Application\UserGetCommand;
-use App\Bundle\Admin\Application\UserListGetApplicationService;
-use App\Bundle\Admin\Application\UserListGetCommand;
-use App\Bundle\Admin\Application\UserPostApplicationService;
-use App\Bundle\Admin\Application\UserPostCommand;
-use App\Bundle\Admin\Application\UserPutApplicationService;
-use App\Bundle\Admin\Application\UserPutCommand;
-use App\Bundle\Admin\Infrastructure\CustomerRepository;
-use App\Bundle\Admin\Infrastructure\UserRepository;
 use App\Bundle\ProductBundle\Application\ProductAttributeListGetApplicationService;
 use App\Bundle\ProductBundle\Application\ProductAttributeListGetCommand;
 use App\Bundle\ProductBundle\Application\ProductGetApplicationService;
@@ -43,13 +22,10 @@ use App\Bundle\ProductBundle\Infrastructure\ProductInventoryRepository;
 use App\Bundle\ProductBundle\Infrastructure\ProductRepository;
 use App\Http\Controllers\Bundle\Api\Common\BaseController;
 use http\Exception\InvalidArgumentException;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Symfony\Component\HttpFoundation\File\File;
 
 class ProductController extends BaseController
 {
@@ -96,10 +72,8 @@ class ProductController extends BaseController
     public function getProducts(Request $request) {
         $applicationService = new ProductListGetApplicationService(
             new ProductRepository(),
-            new ProductAttributeValueRepository(),
-            new ProductAttributePriceRepository(),
-            new ProductInventoryRepository(),
-            new CategoryRepository()
+            new CategoryRepository(),
+            new FeatureImagePathRepository()
         );
 
         $command = new ProductListGetCommand();
@@ -108,19 +82,19 @@ class ProductController extends BaseController
         $paginationResult = $result->paginationResult;
         $data = [];
         foreach ($productResults as $product) {
-            $productAttributeValues = [];
-            foreach ($product->productAttributeValueResults as $productAttributeValueResult) {
-                $productAttributeValues[] = [
-                    'product_attribute_value_id' => $productAttributeValueResult->productAttributeValueId,
-                    'product_attribute_name' => $productAttributeValueResult->productAttributeName,
-                    'product_attribute_value' => $productAttributeValueResult->productAttributeValue,
-                    'attribute_name' => $productAttributeValueResult->nameByAttribute,
-                    'product_inventory_count' => $productAttributeValueResult->productInventoryCount,
-                    'measure_unit' => $productAttributeValueResult->measureUnit,
-                    'price' => $productAttributeValueResult->price,
-                    'monetary_unit' => $productAttributeValueResult->monetaryUnit,
-                ];
-            }
+//            $productAttributeValues = [];
+//            foreach ($product->productAttributeValueResults as $productAttributeValueResult) {
+//                $productAttributeValues[] = [
+//                    'product_attribute_value_id' => $productAttributeValueResult->productAttributeValueId,
+//                    'product_attribute_name' => $productAttributeValueResult->productAttributeName,
+//                    'product_attribute_value' => $productAttributeValueResult->productAttributeValue,
+//                    'attribute_name' => $productAttributeValueResult->nameByAttribute,
+//                    'product_inventory_count' => $productAttributeValueResult->productInventoryCount,
+//                    'measure_unit' => $productAttributeValueResult->measureUnit,
+//                    'price' => $productAttributeValueResult->price,
+//                    'monetary_unit' => $productAttributeValueResult->monetaryUnit,
+//                ];
+//            }
             $data[] = [
                 'product_id' => $product->productId,
                 'name' => $product->name,
@@ -128,7 +102,8 @@ class ProductController extends BaseController
                 'description' => $product->description,
                 'category_id' => $product->categoryId,
                 'category_name' => $product->categoryName,
-                'product_attribute_values' => $productAttributeValues
+                'image_path' => url($product->imagePath),
+//                'product_attribute_values' => $productAttributeValues
             ];
         }
         $response = [

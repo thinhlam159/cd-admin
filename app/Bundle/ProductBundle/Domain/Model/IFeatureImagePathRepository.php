@@ -10,4 +10,10 @@ interface IFeatureImagePathRepository
      * @return FeatureImagePathId
      */
     public function create(FeatureImagePath $featureImagePath): FeatureImagePathId;
+
+    /**
+     * @param ProductId $productId
+     * @return FeatureImagePath|null
+     */
+    public function findByProductId(ProductId $productId): ?FeatureImagePath;
 }

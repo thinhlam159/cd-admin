@@ -12,6 +12,8 @@ class Product extends Model
     use SoftDeletes;
 
     protected $guarded = [];
+    protected $casts = ['id' => 'string'];
+    public $incrementing = false;
     protected $dates = ['deleted_at'];
 
     public function productImages()

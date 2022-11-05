@@ -21,12 +21,13 @@
             <th class="border py-1 w-[20%]">
               Tên sản phẩm
             </th>
+              <th class="border py-1 w-[20%]">
+                  Mã sản phẩm
+              </th>
               <th class="border py-1 w-[10%]">
                   Danh mục
               </th>
-              <th class="border py-1 w-[10%]">
-                  Giá thành
-              </th>
+
             <th class="border py-1 w-[20%]">
               Hình ảnh
             </th>
@@ -50,9 +51,13 @@
           <tr v-for="item in listProduct" :key="item.id">
               <td class="border text-center">{{ item.product_id }}</td>
               <td class="border text-center">{{ item.name }}</td>
-              <td class="border text-center">{{ item.category_id }}</td>
-              <td class="border text-center">{{ item.price }}</td>
-              <td class="border text-center">{{ item.featureImagePath }}</td>
+              <td class="border text-center">{{ item.code }}</td>
+              <td class="border text-center">{{ item.category_name }}</td>
+              <td class="border text-center">
+                  <div class="h-16 w-20 object-contain">
+                      <img :src="item.image_path" alt="">
+                  </div>
+              </td>
               <td class="border text-center">{{ item.content }}</td>
 <!--              <td class="border text-center">-->
 <!--              <span class="text-[#337ab7] cursor-pointer break-all" @click="() => goToAdd(item.user_id)">-->

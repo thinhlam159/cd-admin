@@ -73,6 +73,7 @@ class ProductPostApplicationService
         try {
             $productId = $this->productRepository->create($product);
             $this->featureImagePathRepository->create($featureImagePath);
+
             DB::commit();
         } catch (Exception $e) {
             DB::rollBack();
