@@ -15,33 +15,36 @@
       <table class="w-full">
         <thead>
           <tr class="">
-            <th class="border py-1 w-[5%]">
+            <th rowspan="2" class="border py-1 w-[5%]">
                 id
             </th>
-            <th class="border py-1 w-[20%]">
+            <th rowspan="2" class="border py-1 w-[20%]">
               Tên sản phẩm
             </th>
-              <th class="border py-1 w-[20%]">
+              <th rowspan="2" class="border py-1 w-[20%]">
                   Mã sản phẩm
               </th>
-              <th class="border py-1 w-[10%]">
+              <th rowspan="2" class="border py-1 w-[10%]">
                   Danh mục
               </th>
 
-            <th class="border py-1 w-[20%]">
+            <th rowspan="2" class="border py-1 w-[20%]">
               Hình ảnh
             </th>
 
-            <th class="border py-1 w-[10%]">
+            <th rowspan="2" class="border py-1 w-[10%]">
               Mô tả
             </th>
+              <th colspan="3" rowspan="2" class="border py-1 w-[10%]">
+                  Loại sản phẩm
+              </th>
 <!--            <th class="border py-1 w-[10%]">-->
 <!--              {{ $t("list_user_manage_page.enabled_disabled") }}-->
 <!--            </th>-->
 <!--            <th class="border py-1 w-[10%]">-->
 <!--              {{ $t("list_user_manage_page.registered_date") }}-->
 <!--            </th>-->
-            <th class="border py-1 w-[10%]">
+            <th rowspan="2" class="border py-1 w-[10%]">
               Cập nhật
             </th>
 <!--            <th class="border py-1 w-[5%]"></th>-->
@@ -54,11 +57,11 @@
               <td class="border text-center">{{ item.code }}</td>
               <td class="border text-center">{{ item.category_name }}</td>
               <td class="border text-center">
-                  <div class="h-16 w-20 object-contain">
-                      <img :src="item.image_path" alt="">
+                  <div class="h-16 w-20 object-contain mx-auto py-1">
+                      <img class="h-full" :src="item.image_path" alt="">
                   </div>
               </td>
-              <td class="border text-center">{{ item.content }}</td>
+              <td class="border text-center">{{ item.description }}</td>
 <!--              <td class="border text-center">-->
 <!--              <span class="text-[#337ab7] cursor-pointer break-all" @click="() => goToAdd(item.user_id)">-->
 <!--                {{ item.user_email }}-->
@@ -214,4 +217,22 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+/*table {*/
+/*    border-collapse: collapse;*/
+/*    width: 100%;*/
+/*    text-align: center;*/
+/*}*/
+
+/*table, tr, td, th {*/
+/*    border: 1px solid black;*/
+/*}*/
+
+/*th {*/
+/*    vertical-align: top;*/
+/*}*/
+
+/*td:empty:after {*/
+/*    content: "\00a0"; !* HTML entity of &nbsp; *!*/
+/*}*/
+</style>

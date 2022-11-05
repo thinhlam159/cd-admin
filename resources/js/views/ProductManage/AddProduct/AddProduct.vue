@@ -89,7 +89,7 @@ export default {
               bodyFormData.append('file', file.value.files[0]);
               console.log(file.value.files[0])
               const res = await createProductFromApi(bodyFormData)
-              router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.CUSTOMER_MANAGE}`)
+              router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.PRODUCT_MANAGE}`)
           } catch (errors) {
               const error = errors.message;
               // this.$toast.error(error);

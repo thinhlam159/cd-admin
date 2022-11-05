@@ -45,6 +45,7 @@ class ProductController extends BaseController
         }
         $file->hashName();
         $path = Storage::put('/public/'. Auth::id(), $file);
+        $url = Storage::url($path);
 
         $isAvatar = true;
 
@@ -53,7 +54,7 @@ class ProductController extends BaseController
             $request->code,
             $request->description,
             $request->category_id,
-            $path,
+            $url,
             $isAvatar
         );
 
