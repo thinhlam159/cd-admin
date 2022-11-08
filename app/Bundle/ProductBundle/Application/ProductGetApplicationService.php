@@ -11,7 +11,9 @@ use App\Bundle\Common\Domain\Model\TransactionException;
 use App\Bundle\ProductBundle\Domain\Model\Category;
 use App\Bundle\ProductBundle\Domain\Model\CategoryId;
 use App\Bundle\ProductBundle\Domain\Model\ICategoryRepository;
+use App\Bundle\ProductBundle\Domain\Model\IMeasureUnitRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductAttributePriceRepository;
+use App\Bundle\ProductBundle\Domain\Model\IProductAttributeRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductAttributeValueRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductInventoryRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductRepository;
@@ -48,18 +50,32 @@ class ProductGetApplicationService
     private ICategoryRepository $categoryRepository;
 
     /**
+     * @var IProductAttributeRepository
+     */
+    private IProductAttributeRepository $productAttributeRepository;
+
+    /**
+     * @var IMeasureUnitRepository
+     */
+    private IMeasureUnitRepository $measureUnitRepository;
+
+    /**
      * @param IProductRepository $productRepository
      * @param IProductAttributeValueRepository $productAttributeValueRepository
      * @param IProductAttributePriceRepository $productAttributePriceRepository
      * @param IProductInventoryRepository $productInventoryRepository
      * @param ICategoryRepository $categoryRepository
+     * @param IProductAttributeRepository $productAttributeRepository
+     * @param IMeasureUnitRepository $measureUnitRepository
      */
     public function __construct(
         IProductRepository $productRepository,
         IProductAttributeValueRepository $productAttributeValueRepository,
         IProductAttributePriceRepository $productAttributePriceRepository,
         IProductInventoryRepository $productInventoryRepository,
-        ICategoryRepository $categoryRepository
+        ICategoryRepository $categoryRepository,
+        IProductAttributeRepository $productAttributeRepository,
+        IMeasureUnitRepository $measureUnitRepository
     )
     {
         $this->productRepository = $productRepository;
@@ -67,6 +83,8 @@ class ProductGetApplicationService
         $this->productAttributePriceRepository = $productAttributePriceRepository;
         $this->productInventoryRepository = $productInventoryRepository;
         $this->categoryRepository = $categoryRepository;
+        $this->productAttributeRepository = $productAttributeRepository;
+        $this->measureUnitRepository = $measureUnitRepository;
     }
 
     /**
@@ -88,14 +106,16 @@ class ProductGetApplicationService
         foreach ($productAttributeValues as $productAttributeValue) {
             $productAttributePrice = $this->productAttributePriceRepository->findByAttributeValueId($productAttributeValue->getProductAttributeValueId());
             $productInventory = $this->productInventoryRepository->findByProductId($productAttributePrice->getProductAttributeValueId());
+            $productAttribute = $this->productAttributeRepository->findById($productAttributeValue->getProductAttributeId());
+            $measureUnit = $this->measureUnitRepository->findById($productAttributeValue->getMeasureUnitId());
 
             $productAttributeValueResults[] = new ProductAttributeValueResult(
                 $productAttributeValue->getProductAttributeValueId()->asString(),
                 $productAttributeValue->getProductId()->asString(),
-                $productAttributeValue->getProductAttributeName(),
+                $productAttribute->getName(),
                 $productAttributeValue->getValue(),
-                $productAttributeValue->getNameByAttribute(),
-                $productAttributeValue->getMeasureUnitName(),
+                $productAttributeValue->getCode(),
+                $measureUnit->getName(),
                 $productInventory->getCount(),
                 $productAttributePrice->getPrice(),
                 $productAttributePrice->getMonetaryUnitType()->getValue(),

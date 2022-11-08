@@ -31,7 +31,7 @@ final class ProductAttributeValue
     /**
      * @var string
      */
-    private string $nameByAttribute;
+    private string $code;
 
     /**
      * @var string|null
@@ -49,16 +49,20 @@ final class ProductAttributeValue
      * @param ProductAttributeId $productAttributeId
      * @param MeasureUnitId $measureUnitId
      * @param string $value
-     * @param string $nameByAttribute
+     * @param string $code
+     * @param string|null $productAttributeName
+     * @param string|null $measureUnitName
      */
-    public function __construct(ProductAttributeValueId $productAttributeValueId, ProductId $productId, ProductAttributeId $productAttributeId, MeasureUnitId $measureUnitId, string $value, string $nameByAttribute)
+    public function __construct(ProductAttributeValueId $productAttributeValueId, ProductId $productId, ProductAttributeId $productAttributeId, MeasureUnitId $measureUnitId, string $value, string $code, ?string $productAttributeName, ?string $measureUnitName)
     {
         $this->productAttributeValueId = $productAttributeValueId;
         $this->productId = $productId;
         $this->productAttributeId = $productAttributeId;
         $this->measureUnitId = $measureUnitId;
         $this->value = $value;
-        $this->nameByAttribute = $nameByAttribute;
+        $this->code = $code;
+        $this->productAttributeName = $productAttributeName;
+        $this->measureUnitName = $measureUnitName;
     }
 
     /**
@@ -104,9 +108,9 @@ final class ProductAttributeValue
     /**
      * @return string
      */
-    public function getNameByAttribute(): string
+    public function getCode(): string
     {
-        return $this->nameByAttribute;
+        return $this->code;
     }
 
     /**
@@ -118,26 +122,10 @@ final class ProductAttributeValue
     }
 
     /**
-     * @param string|null $productAttributeName
-     */
-    public function setProductAttributeName(?string $productAttributeName): void
-    {
-        $this->productAttributeName = $productAttributeName;
-    }
-
-    /**
      * @return string|null
      */
     public function getMeasureUnitName(): ?string
     {
         return $this->measureUnitName;
-    }
-
-    /**
-     * @param string|null $measureUnitName
-     */
-    public function setMeasureUnitName(?string $measureUnitName): void
-    {
-        $this->measureUnitName = $measureUnitName;
     }
 }

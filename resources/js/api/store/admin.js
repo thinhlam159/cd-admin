@@ -29,6 +29,20 @@ export const createProductFromApi = async (data) => await api.post(apiConstants.
         "Content-Type": "multipart/form-data",
     },
 })
+export const getProductDetailFromApi = async (productId) => api.get(`${apiConstants.ADMIN.PRODUCT_DETAIL}/${productId}`)
 
 // category manage
 export const getListCategoryFromApi = async (page) => api.get(`${apiConstants.ADMIN.LIST_CATEGORY}?page=${page}`)
+
+// product attribute
+export const getListProductAttributeFromApi = async (page) => api.get(`${apiConstants.ADMIN.LIST_PRODUCT_ATTRIBUTE}?page=${page}`)
+
+// measure unit
+export const getListMeasureUnitFromApi = async (page) => api.get(`${apiConstants.ADMIN.LIST_MEASURE_UNIT}?page=${page}`)
+
+// product attribute value
+export const createProductAttributeValueFromApi = async (data) => await api.post(apiConstants.ADMIN.CREATE_PRODUCT_ATTRIBUTE_VALUE, data, {
+    headers: {
+        "Content-Type": "multipart/form-data",
+    },
+})

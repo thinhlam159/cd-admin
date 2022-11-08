@@ -58,4 +58,9 @@ Route::group([
     Route::get('/list-category', [CategoryController::class, 'getCategories'])->middleware('auth:api');
     Route::get('/category-detail/{id}', [CategoryController::class, 'getCategory'])->middleware('auth:api');
     Route::put('/update-category/{id}', [CategoryController::class, 'updateCategory'])->middleware('auth:api');
+
+    Route::get('/product-attributes', [ProductController::class, 'getProductAttributes'])->middleware('auth:api');
+    Route::get('/measure-unit', [ProductController::class, 'getMeasureUnit'])->middleware('auth:api');
+
+    Route::post('/product-attribute-value', [ProductController::class, 'createAttributeValueForProduct'])->middleware('auth:api');
 });

@@ -14,81 +14,94 @@
     <div class="mt-4">
       <table class="w-full">
         <thead>
-          <tr class="">
-            <th rowspan="2" class="border py-1 w-[5%]">
+        <tr class="">
+            <th rowspan="2" class="border py-1 w-[2%]">
                 id
             </th>
-            <th rowspan="2" class="border py-1 w-[20%]">
-              Tên sản phẩm
+            <th rowspan="2" class="border py-1 w-[7%]">
+                Tên sản phẩm
             </th>
-              <th rowspan="2" class="border py-1 w-[20%]">
-                  Mã sản phẩm
-              </th>
-              <th rowspan="2" class="border py-1 w-[10%]">
-                  Danh mục
-              </th>
-
-            <th rowspan="2" class="border py-1 w-[20%]">
-              Hình ảnh
+            <th rowspan="2" class="border py-1 w-[7%]">
+                Mã sản phẩm
+            </th>
+            <th rowspan="2" class="border py-1 w-[7%]">
+                Danh mục
             </th>
 
-            <th rowspan="2" class="border py-1 w-[10%]">
-              Mô tả
+            <th rowspan="2" class="border py-1 w-[8%]">
+                Hình ảnh
             </th>
-              <th colspan="3" rowspan="2" class="border py-1 w-[10%]">
-                  Loại sản phẩm
-              </th>
-<!--            <th class="border py-1 w-[10%]">-->
-<!--              {{ $t("list_user_manage_page.enabled_disabled") }}-->
-<!--            </th>-->
-<!--            <th class="border py-1 w-[10%]">-->
-<!--              {{ $t("list_user_manage_page.registered_date") }}-->
-<!--            </th>-->
-            <th rowspan="2" class="border py-1 w-[10%]">
-              Cập nhật
+
+            <th rowspan="2" class="border py-1 w-[8%]">
+                Mô tả
             </th>
-<!--            <th class="border py-1 w-[5%]"></th>-->
-          </tr>
+            <th colspan="3" class="border py-1 w-[20%]">
+                Dòng sản phẩm
+            </th>
+            <th rowspan="2" class="border py-1 w-[5%]">
+                Cập nhật
+            </th>
+            <!--            <th class="border py-1 w-[5%]"></th>-->
+        </tr>
+        <tr>
+            <th class="border py-1">Mã</th>
+            <th class="border py-1">Tồn kho</th>
+            <th class="border py-1">Đơn giá</th>
+        </tr>
         </thead>
         <tbody>
-          <tr v-for="item in listProduct" :key="item.id">
-              <td class="border text-center">{{ item.product_id }}</td>
-              <td class="border text-center">{{ item.name }}</td>
-              <td class="border text-center">{{ item.code }}</td>
-              <td class="border text-center">{{ item.category_name }}</td>
-              <td class="border text-center">
+        <template v-for="(item, index) in listProduct">
+            <tr v-if="item.product_attribute_values.length===0">
+                <td class="border text-center">{{ ++index }}</td>
+                <td class="border text-center">{{ item.name }}</td>
+                <td class="border text-center">{{ item.code }}</td>
+                <td class="border text-center">{{ item.category_name }}</td>
+                <td class="border text-center">
+                    <div class="h-16 w-20 object-contain mx-auto py-1">
+                        <img class="h-full" :src="item.image_path" alt="">
+                    </div>
+                </td>
+                <td class="border text-center">{{ item.description }}</td>
+                <td class="border text-center"></td>
+                <td class="border text-center"></td>
+                <td class="border text-center"></td>
+                <td class="border text-center">
+                    <div class="flex justify-center ">
+                        <ButtonAddNew @clickBtn="() => goToAddProductAttributeValue(item.product_id)" :text="' '"/>
+                        <ButtonEdit @clickBtn="() => goToAdd(item.product_id)" :text="editUser"/>
+                    </div>
+                </td>
+            </tr>
+          <tr v-else v-for="(subItem, subIndex) in item.product_attribute_values" :key="subItem.product_attribute_value_id">
+              <td v-if="subIndex === 0" :rowspan="item.product_attribute_values.length" class="border text-center">{{ ++index }}</td>
+              <td v-if="subIndex === 0" :rowspan="item.product_attribute_values.length" class="border text-center">{{ item.name }}</td>
+              <td v-if="subIndex === 0" :rowspan="item.product_attribute_values.length" class="border text-center">{{ item.code }}</td>
+              <td v-if="subIndex === 0" :rowspan="item.product_attribute_values.length" class="border text-center">{{ item.category_name }}</td>
+              <td v-if="subIndex === 0" :rowspan="item.product_attribute_values.length" class="border text-center">
                   <div class="h-16 w-20 object-contain mx-auto py-1">
                       <img class="h-full" :src="item.image_path" alt="">
                   </div>
               </td>
-              <td class="border text-center">{{ item.description }}</td>
-<!--              <td class="border text-center">-->
-<!--              <span class="text-[#337ab7] cursor-pointer break-all" @click="() => goToAdd(item.user_id)">-->
-<!--                {{ item.user_email }}-->
-<!--              </span>-->
-<!--              </td>-->
-<!--              <td class="border text-center">{{ item.phone }}</td>-->
-<!--              <td class="border text-center">{{ item.status ? 'Hoạt động' : '-' }}</td>-->
-<!--            <td class="border text-center">-->
-<!--              {{ $t(`list_user_manage_page.${item.user_type}`) }}-->
-<!--            </td>-->
-<!--            <td class="border text-center">-->
-<!--              <span class="text-[green]" v-if="item.user_active">{{ $t("common.effectiveness") }}</span>-->
-<!--              <span class="text-[red]" v-else>{{ $t("common.invalid") }}</span>-->
-<!--            </td>-->
-<!--            <td class="border text-center p-2">-->
-<!--              {{ item.register_date }}-->
-<!--            </td>-->
-<!--            <td class="border text-center p-2">-->
-<!--              {{ item.login_last_date }}-->
-<!--            </td>-->
-<!--            <td class="border text-center">{{ item.field9 }}</td>-->
-            <td class="border text-center">
+              <td v-if="subIndex === 0" :rowspan="item.product_attribute_values.length" class="border text-center">{{ item.description }}</td>
+<!--              <td class="border text-center">{{ item.description }}</td>-->
+<!--              <td class="border text-center">{{ item.description }}</td>-->
+              <td class="border text-center h-full m-0 p-0">
+                  {{ subItem.code }}
+              </td>
+              <td class="border text-center h-full m-0 p-0">
+                  {{ `${subItem.count} ${subItem.measure_unit_name}` }}
+              </td>
+              <td class="border text-center h-full m-0 p-0">
+                  {{ `${subItem.price} ${subItem.monetary_unit_name}`}}
+              </td>
+            <td v-if="subIndex === 0" :rowspan="item.product_attribute_values.length"  class="border text-center">
                 <div class="flex justify-center ">
+                    <ButtonAddNew @clickBtn="() => goToAddProductAttributeValue(item.product_id)" :text="' '"/>
                     <ButtonEdit @clickBtn="() => goToAdd(item.product_id)" :text="editUser"/>
                 </div>
             </td>
           </tr>
+        </template>
         </tbody>
       </table>
     </div>
@@ -159,6 +172,9 @@ export default {
     const goToAdd = (id) => {
       router.push(`${ROUTER_PATH.PRODUCT_MANAGE}/${ROUTER_PATH.EDIT}/` + id);
     };
+      const goToAddProductAttributeValue = (id) => {
+          router.push(`${ROUTER_PATH.PRODUCT_MANAGE}/${ROUTER_PATH.ADD_PRODUCT_ATTRIBUTE_VALUE}/` + id);
+      };
     const getListProduct = async (page) => {
       try {
         store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = true;
@@ -167,8 +183,6 @@ export default {
           listProduct.value = {
           ...response.data,
         };
-
-
 
         // listUserManage.value = response.data.map((item) => {
         //   return {
@@ -211,7 +225,8 @@ export default {
       handleBackPage,
       handleNextPage,
       addNewUser,
-      editUser
+      editUser,
+      goToAddProductAttributeValue
     };
   },
 };

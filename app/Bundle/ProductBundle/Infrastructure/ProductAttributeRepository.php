@@ -17,7 +17,7 @@ class ProductAttributeRepository implements IProductAttributeRepository
 
         $productAttribute = [];
         foreach ($entities as $entity) {
-            $productAttribute = new ProductAttribute(
+            $productAttribute[] = new ProductAttribute(
                 new ProductAttributeId($entity['id']),
                 $entity['name']
             );
@@ -26,4 +26,16 @@ class ProductAttributeRepository implements IProductAttributeRepository
         return $productAttribute;
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function findById(ProductAttributeId $productAttributeId): ?ProductAttribute
+    {
+        $entity = ModelProductAttribute::where('id', $productAttributeId->asString())->first();
+
+        return new ProductAttribute(
+            $productAttributeId,
+            $entity['name']
+        );
+    }
 }

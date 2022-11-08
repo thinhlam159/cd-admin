@@ -16,6 +16,7 @@ import ListProduct from "@/views/ProductManage/ListProduct";
 import AddProduct from "@/views/ProductManage/AddProduct";
 import CategoryManage from "@/views/CategoryManage";
 import ListCategory from "@/views/CategoryManage/ListCategory/ListCategory";
+import AddProductAttributeValue from "@/views/ProductManage/AddProductAttributeValue";
 
 export default [
     // ROUTER_ADMIN
@@ -88,6 +89,10 @@ export default [
                     {
                         path: ROUTER_PATH.EDIT_ID,
                         // component: EditProduct,
+                    },
+                    {
+                        path: ROUTER_PATH.ADD_PRODUCT_ATTRIBUTE_VALUE_ID,
+                        component: AddProductAttributeValue,
                     },
                 ],
             },

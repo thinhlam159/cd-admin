@@ -3,13 +3,8 @@
 namespace App\Http\Controllers\Bundle\Api\Product;
 
 use App\Bundle\Admin\Application\CustomerDeleteCommand;
-use App\Bundle\Common\Domain\Model\InvalidArgumentException;
-use App\Bundle\ProductBundle\Application\MeasureUnitListGetApplicationService;
-use App\Bundle\ProductBundle\Application\MeasureUnitListGetCommand;
 use App\Bundle\ProductBundle\Application\ProductAttributeListGetApplicationService;
 use App\Bundle\ProductBundle\Application\ProductAttributeListGetCommand;
-use App\Bundle\ProductBundle\Application\ProductAttributeValuePostApplicationService;
-use App\Bundle\ProductBundle\Application\ProductAttributeValuePostCommand;
 use App\Bundle\ProductBundle\Application\ProductGetApplicationService;
 use App\Bundle\ProductBundle\Application\ProductGetCommand;
 use App\Bundle\ProductBundle\Application\ProductListGetApplicationService;
@@ -20,7 +15,6 @@ use App\Bundle\ProductBundle\Application\ProductPutApplicationService;
 use App\Bundle\ProductBundle\Application\ProductPutCommand;
 use App\Bundle\ProductBundle\Infrastructure\CategoryRepository;
 use App\Bundle\ProductBundle\Infrastructure\FeatureImagePathRepository;
-use App\Bundle\ProductBundle\Infrastructure\MeasureUnitRepository;
 use App\Bundle\ProductBundle\Infrastructure\ProductAttributePriceRepository;
 use App\Bundle\ProductBundle\Infrastructure\ProductAttributeRepository;
 use App\Bundle\ProductBundle\Infrastructure\ProductAttributeValueRepository;
@@ -32,12 +26,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-class ProductController extends BaseController
+class ProductAttributeValueController extends BaseController
 {
     /**
      * @param Request $request request
      */
-    public function createProduct(Request $request)
+    public function createProductAttributevalue(Request $request)
     {
         $applicationService = new ProductPostApplicationService(
             new ProductRepository(),
@@ -79,12 +73,7 @@ class ProductController extends BaseController
         $applicationService = new ProductListGetApplicationService(
             new ProductRepository(),
             new CategoryRepository(),
-            new FeatureImagePathRepository(),
-            new ProductAttributeValueRepository(),
-            new ProductAttributePriceRepository(),
-            new ProductInventoryRepository(),
-            new ProductAttributeRepository(),
-            new MeasureUnitRepository(),
+            new FeatureImagePathRepository()
         );
 
         $command = new ProductListGetCommand();
@@ -93,19 +82,19 @@ class ProductController extends BaseController
         $paginationResult = $result->paginationResult;
         $data = [];
         foreach ($productResults as $product) {
-            $productAttributeValues = [];
-            foreach ($product->productAttributeValueResults as $productAttributeValueResult) {
-                $productAttributeValues[] = [
-                    'product_attribute_value_id' => $productAttributeValueResult->productAttributeValueId,
-                    'code' => $productAttributeValueResult->code,
-                    'product_attribute_value' => $productAttributeValueResult->productAttributeValue,
-                    'attribute_name' => $productAttributeValueResult->productAttributeName,
-                    'count' => $productAttributeValueResult->productInventoryCount,
-                    'measure_unit_name' => $productAttributeValueResult->measureUnit,
-                    'price' => $productAttributeValueResult->price,
-                    'monetary_unit_name' => $productAttributeValueResult->monetaryUnit,
-                ];
-            }
+//            $productAttributeValues = [];
+//            foreach ($product->productAttributeValueResults as $productAttributeValueResult) {
+//                $productAttributeValues[] = [
+//                    'product_attribute_value_id' => $productAttributeValueResult->productAttributeValueId,
+//                    'product_attribute_name' => $productAttributeValueResult->productAttributeName,
+//                    'product_attribute_value' => $productAttributeValueResult->productAttributeValue,
+//                    'attribute_name' => $productAttributeValueResult->nameByAttribute,
+//                    'product_inventory_count' => $productAttributeValueResult->productInventoryCount,
+//                    'measure_unit' => $productAttributeValueResult->measureUnit,
+//                    'price' => $productAttributeValueResult->price,
+//                    'monetary_unit' => $productAttributeValueResult->monetaryUnit,
+//                ];
+//            }
             $data[] = [
                 'product_id' => $product->productId,
                 'name' => $product->name,
@@ -114,7 +103,7 @@ class ProductController extends BaseController
                 'category_id' => $product->categoryId,
                 'category_name' => $product->categoryName,
                 'image_path' => url($product->imagePath),
-                'product_attribute_values' => $productAttributeValues
+//                'product_attribute_values' => $productAttributeValues
             ];
         }
         $response = [
@@ -140,9 +129,7 @@ class ProductController extends BaseController
             new ProductAttributeValueRepository(),
             new ProductAttributePriceRepository(),
             new ProductInventoryRepository(),
-            new CategoryRepository(),
-            new ProductAttributeRepository(),
-            new MeasureUnitRepository(),
+            new CategoryRepository()
         );
 
         $command = new ProductGetCommand($request->id);
@@ -153,14 +140,14 @@ class ProductController extends BaseController
                 'product_attribute_value_id' => $productAttributeValueResult->productAttributeValueId,
                 'product_attribute_name' => $productAttributeValueResult->productAttributeName,
                 'product_attribute_value' => $productAttributeValueResult->productAttributeValue,
-                'attribute_name' => $productAttributeValueResult->code,
+                'attribute_name' => $productAttributeValueResult->nameByAttribute,
                 'product_inventory_count' => $productAttributeValueResult->productInventoryCount,
                 'measure_unit' => $productAttributeValueResult->measureUnit,
                 'price' => $productAttributeValueResult->price,
                 'monetary_unit' => $productAttributeValueResult->monetaryUnit,
             ];
         }
-        $data = [
+        $data[] = [
             'product_id' => $product->productId,
             'name' => $product->name,
             'code' => $product->code,
@@ -170,7 +157,7 @@ class ProductController extends BaseController
             'product_attribute_values' => $productAttributeValues
         ];
 
-        return response()->json(['data' => $data], 200);
+        return response()->json($data, 200);
     }
 
     /**
@@ -243,7 +230,7 @@ class ProductController extends BaseController
      * @throws \App\Bundle\Common\Domain\Model\RecordNotFoundException
      * @throws \App\Bundle\Common\Domain\Model\TransactionException
      */
-    public function getProductAttributes(Request $request) {
+    public function getProductAttribute(Request $request) {
         $applicationService = new ProductAttributeListGetApplicationService(
             new ProductAttributeRepository()
         );
@@ -256,66 +243,6 @@ class ProductController extends BaseController
             $data[] = [
                 'id' => $productAttributeResult->productAttributeId,
                 'name' => $productAttributeResult->name,
-            ];
-        }
-
-        return response()->json(['data' => $data], 200);
-    }
-
-    public function createAttributeValueForProduct(Request $request)
-    {
-        $applicationService = new ProductAttributeValuePostApplicationService(
-            new ProductAttributeValueRepository(),
-            new FeatureImagePathRepository(),
-            new ProductAttributePriceRepository(),
-            new ProductInventoryRepository()
-        );
-        $file = $request->file('file');
-        if (!$file) {
-            throw new InvalidArgumentException();
-        }
-        $file->hashName();
-        $path = Storage::put('/public/'. Auth::id(), $file);
-        $url = Storage::url($path);
-
-        $command = new ProductAttributeValuePostCommand(
-            $request->product_id,
-            $request->product_attribute_id,
-            $request->measure_unit_id,
-            $request->value,
-            $request->code,
-            $url,
-            (int)$request->price,
-            (int)$request->count,
-        );
-
-        $result = $applicationService->handle($command);
-        $data = [
-            'id' => $result->productAttributeValueId,
-        ];
-
-        return response()->json(['data' => $data], 200);
-    }
-
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \App\Bundle\Common\Domain\Model\RecordNotFoundException
-     * @throws \App\Bundle\Common\Domain\Model\TransactionException
-     */
-    public function getMeasureUnit(Request $request) {
-        $applicationService = new MeasureUnitListGetApplicationService(
-            new MeasureUnitRepository()
-        );
-
-        $command = new MeasureUnitListGetCommand();
-        $result = $applicationService->handle($command);
-
-        $data = [];
-        foreach ($result->measureUnitResults as $measureUnitResult) {
-            $data[] = [
-                'id' => $measureUnitResult->measureUnitId,
-                'name' => $measureUnitResult->name,
             ];
         }
 

@@ -9,6 +9,8 @@ class ProductAttributeValue extends Model
 {
     use HasFactory;
 
+    protected $casts = ['id' => 'string'];
+    public $incrementing = false;
     protected $guarded = [];
     public function measureUnit() {
         return $this->belongsTo('App\Models\MeasureUnit');

@@ -7,9 +7,9 @@ interface IProductAttributeValueRepository
 {
     /**
      * @param ProductAttributeValue $productAttribute
-     * @return ProductAttributeValueId
+     * @return ProductAttributeValueId|null
      */
-    public function create(ProductAttributeValue $productAttribute): ProductAttributeValueId;
+    public function create(ProductAttributeValue $productAttribute): ?ProductAttributeValueId;
 
     /**
      * @param ProductAttributeValueId $productAttributeValueId
@@ -25,7 +25,7 @@ interface IProductAttributeValueRepository
 
     /**
      * @param ProductAttributeValue $productAttributeValue
-     * @return ProductAttributeValueId
+     * @return ProductAttributeValueId|null
      */
-    public function update(ProductAttributeValue $productAttributeValue): ProductAttributeValueId;
+    public function update(ProductAttributeValue $productAttributeValue): ?ProductAttributeValueId;
 }

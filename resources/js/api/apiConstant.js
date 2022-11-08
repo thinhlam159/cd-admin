@@ -25,6 +25,10 @@ export default {
       CREATE_CATEGORY: 'admin/create-category',
       CATEGORY_DETAIL: 'admin/category-detail',
       UPDATE_CATEGORY: 'admin/update-category',
+
+      LIST_PRODUCT_ATTRIBUTE: 'admin/product-attributes',
+      LIST_MEASURE_UNIT: 'admin/measure-unit',
+      CREATE_PRODUCT_ATTRIBUTE_VALUE: 'admin/product-attribute-value'
   }
 
   // ADMIN: "/admin/customer/user-manage",

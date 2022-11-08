@@ -9,7 +9,7 @@ interface IFeatureImagePathRepository
      * @param FeatureImagePath $featureImagePath
      * @return FeatureImagePathId
      */
-    public function create(FeatureImagePath $featureImagePath): FeatureImagePathId;
+    public function create(FeatureImagePath $featureImagePath): ?FeatureImagePathId;
 
     /**
      * @param ProductId $productId

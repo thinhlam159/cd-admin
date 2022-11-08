@@ -12,7 +12,7 @@ class FeatureImagePathRepository implements IFeatureImagePathRepository
     /**
      * @inheritDoc
      */
-    public function create(FeatureImagePath $featureImagePath): FeatureImagePathId
+    public function create(FeatureImagePath $featureImagePath): ?FeatureImagePathId
     {
         $productAttributeValueId = !is_null($featureImagePath->getProductAttributeValueId()) ? $featureImagePath->getProductAttributeValueId()->asString() : null;
         $result = ModelFeatureImagePath::create([
@@ -24,7 +24,7 @@ class FeatureImagePathRepository implements IFeatureImagePathRepository
         ]);
 
         if (!$result) {
-            throw new \Exception();
+            return null;
         }
 
         return $featureImagePath->getFeatureImagePathId();

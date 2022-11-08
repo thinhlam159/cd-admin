@@ -14,7 +14,7 @@ final class ProductAttributeValueRepository implements IProductAttributeValueRep
     /**
      * @inheritDoc
      */
-    public function create(ProductAttributeValue $productAttributeValue): ProductAttributeValueId
+    public function create(ProductAttributeValue $productAttributeValue): ?ProductAttributeValueId
     {
         $result = ModelProductAttributeValue::create([
             'id' => $productAttributeValue->getProductAttributeValueId()->asString(),
@@ -22,10 +22,10 @@ final class ProductAttributeValueRepository implements IProductAttributeValueRep
             'product_attribute_id' => $productAttributeValue->getProductAttributeId()->asString(),
             'measure_unit_id' => $productAttributeValue->getMeasureUnitId()->asString(),
             'value' => $productAttributeValue->getValue(),
-            'name_by_attribute' => $productAttributeValue->getNameByAttribute(),
+            'code' => $productAttributeValue->getCode(),
         ]);
         if (!$result) {
-            throw new \Exception();
+            return null;
         }
 
         return new ProductAttributeValueId($result->id);
@@ -48,7 +48,9 @@ final class ProductAttributeValueRepository implements IProductAttributeValueRep
             new ProductAttributeId($entity['id']),
             new MeasureUnitId($entity['id']),
             $entity['value'],
-            $entity['name_by_attribute'],
+            $entity['code'],
+            null,
+            null,
         );
     }
 
@@ -57,20 +59,20 @@ final class ProductAttributeValueRepository implements IProductAttributeValueRep
      */
     public function findByProductId(ProductId $productId): array
     {
-        $entities = ModelProductAttributeValue::find('product_id', $productId->asString());
+        $entities = ModelProductAttributeValue::where('product_id', $productId->asString())->get();
 
         $productAttributeValues = [];
         foreach ($entities as $entity) {
             $productAttributeValue = new ProductAttributeValue(
                 new ProductAttributeValueId($entity['id']),
-                new ProductId($entity['id']),
-                new ProductAttributeId($entity['id']),
-                new MeasureUnitId($entity['id']),
+                new ProductId($entity['product_id']),
+                new ProductAttributeId($entity['product_attribute_id']),
+                new MeasureUnitId($entity['measure_unit_id']),
                 $entity['value'],
-                $entity['name_by_attribute'],
+                $entity['code'],
+                null,
+                null,
             );
-            $productAttributeValue->setMeasureUnitName($entity->measureUnit->name);
-            $productAttributeValue->setProductAttributeName($entity->productAttribute->name);
 
             $productAttributeValues[] = $productAttributeValue;
         }

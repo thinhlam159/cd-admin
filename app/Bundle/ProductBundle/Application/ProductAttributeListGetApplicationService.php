@@ -46,7 +46,7 @@ class ProductAttributeListGetApplicationService
 
         $productAttributeResults = [];
         foreach ($productAttributes as $productAttribute) {
-            $productAttributeResults = new ProductAttributeResult(
+            $productAttributeResults[] = new ProductAttributeResult(
                 $productAttribute->getProductAttributeId()->asString(),
                 $productAttribute->getName(),
             );

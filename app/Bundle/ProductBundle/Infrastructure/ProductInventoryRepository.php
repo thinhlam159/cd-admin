@@ -38,4 +38,22 @@ final class ProductInventoryRepository implements IProductInventoryRepository
             $result['is_current']
         );
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function create(ProductInventory $productInventory): ?ProductInventoryId
+    {
+        $result = ModelProductInventory::create([
+            'id'=> $productInventory->getProductInventoryId()->asString(),
+            'product_attribute_value_id'=> $productInventory->getProductAttributeValueId()->asString(),
+            'count' => $productInventory->getCount(),
+            'is_current' => $productInventory->isCurrent(),
+        ]);
+        if (!$result) {
+            return null;
+        }
+
+        return $productInventory->getProductInventoryId();
+    }
 }

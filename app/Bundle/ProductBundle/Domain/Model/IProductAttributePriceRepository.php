@@ -8,9 +8,9 @@ interface IProductAttributePriceRepository
 
     /**
      * @param ProductAttributePrice $productAttributePrice
-     * @return ProductAttributePriceId
+     * @return ProductAttributePriceId|null
      */
-    public function create(ProductAttributePrice $productAttributePrice): ProductAttributePriceId;
+    public function create(ProductAttributePrice $productAttributePrice): ?ProductAttributePriceId;
 
     /**
      * @param ProductAttributeValueId $productAttributeValueId

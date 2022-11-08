@@ -35,7 +35,7 @@ final class ProductAttributePriceRepository implements IProductAttributePriceRep
      */
     public function findByAttributeValueId(ProductAttributeValueId $productAttributeValueId): ?ProductAttributePrice
     {
-        $result = ModelProductAttributePrice::latest()->first()('product_attribute_value_id', $productAttributeValueId->asString());
+        $result = ModelProductAttributePrice::where('product_attribute_value_id', $productAttributeValueId->asString())->latest()->first();
         if (!$result) {
             return null;
         }
@@ -44,7 +44,7 @@ final class ProductAttributePriceRepository implements IProductAttributePriceRep
             new ProductAttributePriceId($result['id']),
             new ProductAttributeValueId($result['product_attribute_value_id']),
             $result['price'],
-            MonetaryUnitType::fromType($result['monetary_unit']),
+            MonetaryUnitType::fromValue($result['monetary_unit']),
             $result['is_current']
         );
     }
