@@ -114,6 +114,7 @@
       @onNext="handleNextPage"
     />
   </div>
+  <QuotePriceModal></QuotePriceModal>
 </template>
 
 <script>
@@ -130,6 +131,7 @@ import { useRouter, useRoute } from "vue-router";
 import { useStore } from "vuex";
 import Pagination from "@/components/Pagination";
 import { useI18n } from "vue-i18n";
+import QuotePriceModal from "@/views/ProductManage/ListProduct/QuotePriceModal";
 
 export default {
   name: "ListProduct",
@@ -140,6 +142,7 @@ export default {
     ButtonDownloadCSV,
     ButtonEdit,
     Pagination,
+    QuotePriceModal
   },
 
   setup() {

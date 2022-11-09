@@ -4,8 +4,9 @@ module.exports = {
         "./index.html",
         "./resources/**/*.{vue,js,ts,jsx,tsx}",
     ],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
+    theme: {
+        extend: {},
+    },
+    plugins: [],
+    mode: process.env.NODE_ENV ? 'jit' : undefined,
 }

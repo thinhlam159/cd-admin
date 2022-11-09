@@ -5,6 +5,7 @@ import router from "./router";
 import store from "./store";
 import i18n from "./i18n";
 import "./assets/styles/base.css"
+import "../../public/css/app.css"
 import "./assets/styles/font-awesome-4.5.0-master/css/font-awesome.css"
 import * as VeeValidate from "vee-validate";
 import { plugin, defaultConfig } from "@formkit/vue";
