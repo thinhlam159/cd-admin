@@ -56,15 +56,36 @@ export default {
     const productAttributeValues = ref([])
     const listInput = ref([])
     const selectedOptionItems = ref([])
-    const currentPoductAttributeValues = ref([])
+    const currentProductAttributeValues = ref([])
 
 
 
     const getListProductAttributeValueFromApi = async () => {
-
+      currentProductAttributeValues.value = [
+        {
+          id: 'id1',
+          name: 'name1',
+          price: 1000,
+        },
+        {
+          id: 'id2',
+          name: 'name2',
+          price: 1000,
+        },
+        {
+          id: 'id3',
+          name: 'name3',
+          price: 1000,
+        }
+      ]
     }
 
-    return {}
+    return {
+      productAttributeValues,
+      listInput,
+      selectedOptionItems,
+      currentProductAttributeValues,
+    }
   }
 }
 </script>
