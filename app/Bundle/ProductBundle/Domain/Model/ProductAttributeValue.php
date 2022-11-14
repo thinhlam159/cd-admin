@@ -19,11 +19,6 @@ final class ProductAttributeValue
     private ProductAttributeId $productAttributeId;
 
     /**
-     * @var \App\Bundle\ProductBundle\Domain\Model\MeasureUnitId
-     */
-    private MeasureUnitId $measureUnitId;
-
-    /**
      * @var string
      */
     private string $value;
@@ -47,18 +42,16 @@ final class ProductAttributeValue
      * @param ProductAttributeValueId $productAttributeValueId
      * @param ProductId $productId
      * @param ProductAttributeId $productAttributeId
-     * @param MeasureUnitId $measureUnitId
      * @param string $value
      * @param string $code
      * @param string|null $productAttributeName
      * @param string|null $measureUnitName
      */
-    public function __construct(ProductAttributeValueId $productAttributeValueId, ProductId $productId, ProductAttributeId $productAttributeId, MeasureUnitId $measureUnitId, string $value, string $code, ?string $productAttributeName, ?string $measureUnitName)
+    public function __construct(ProductAttributeValueId $productAttributeValueId, ProductId $productId, ProductAttributeId $productAttributeId, string $value, string $code, ?string $productAttributeName, ?string $measureUnitName)
     {
         $this->productAttributeValueId = $productAttributeValueId;
         $this->productId = $productId;
         $this->productAttributeId = $productAttributeId;
-        $this->measureUnitId = $measureUnitId;
         $this->value = $value;
         $this->code = $code;
         $this->productAttributeName = $productAttributeName;
@@ -87,14 +80,6 @@ final class ProductAttributeValue
     public function getProductAttributeId(): ProductAttributeId
     {
         return $this->productAttributeId;
-    }
-
-    /**
-     * @return MeasureUnitId
-     */
-    public function getMeasureUnitId(): MeasureUnitId
-    {
-        return $this->measureUnitId;
     }
 
     /**

@@ -13,6 +13,7 @@ class ProductAttributeValueResult
     public string $productInventoryCount;
     public string $price;
     public string $monetaryUnit;
+    public string $noticePriceType;
 
     /**
      * @param string $productAttributeValueId
@@ -24,8 +25,20 @@ class ProductAttributeValueResult
      * @param string $productInventoryCount
      * @param string $price
      * @param string $monetaryUnit
+     * @param string $noticePriceType
      */
-    public function __construct(string $productAttributeValueId, string $productId, string $productAttributeName, string $productAttributeValue, string $code, string $measureUnit, string $productInventoryCount, string $price, string $monetaryUnit)
+    public function __construct(
+        string $productAttributeValueId,
+        string $productId,
+        string $productAttributeName,
+        string $productAttributeValue,
+        string $code,
+        string $measureUnit,
+        string $productInventoryCount,
+        string $price,
+        string $monetaryUnit,
+        string $noticePriceType
+    )
     {
         $this->productAttributeValueId = $productAttributeValueId;
         $this->productId = $productId;
@@ -36,5 +49,6 @@ class ProductAttributeValueResult
         $this->productInventoryCount = $productInventoryCount;
         $this->price = $price;
         $this->monetaryUnit = $monetaryUnit;
+        $this->noticePriceType = $noticePriceType;
     }
 }

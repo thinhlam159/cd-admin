@@ -18,6 +18,7 @@ class CreateProductAttributePricesTable extends Migration
             $table->string('product_attribute_value_id');
             $table->integer('price');
             $table->string('monetary_unit');
+            $table->integer('notice_price_type');
             $table->boolean('is_current');
             $table->timestamps();
         });

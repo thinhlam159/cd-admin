@@ -9,7 +9,7 @@ final class ProductInventory
     private ProductInventoryId $productInventoryId;
 
     /**
-     * @var ProductAttributeValueId
+     * @var \App\Bundle\ProductBundle\Domain\Model\ProductAttributeValueId
      */
     private ProductAttributeValueId $productAttributeValueId;
 
@@ -19,6 +19,11 @@ final class ProductInventory
     private int $count;
 
     /**
+     * @var \App\Bundle\ProductBundle\Domain\Model\MeasureUnitType
+     */
+    private MeasureUnitType $measureUnitType;
+
+    /**
      * @var bool
      */
     private bool $isCurrent;
@@ -26,14 +31,22 @@ final class ProductInventory
     /**
      * @param ProductInventoryId $productInventoryId
      * @param ProductAttributeValueId $productAttributeValueId
+     * @param MeasureUnitType $measureUnitType
      * @param int $count
      * @param bool $isCurrent
      */
-    public function __construct(ProductInventoryId $productInventoryId, ProductAttributeValueId $productAttributeValueId, int $count, bool $isCurrent)
+    public function __construct(
+        ProductInventoryId $productInventoryId,
+        ProductAttributeValueId $productAttributeValueId,
+        int $count,
+        MeasureUnitType $measureUnitType,
+        bool $isCurrent
+    )
     {
         $this->productInventoryId = $productInventoryId;
         $this->productAttributeValueId = $productAttributeValueId;
         $this->count = $count;
+        $this->measureUnitType = $measureUnitType;
         $this->isCurrent = $isCurrent;
     }
 
@@ -59,6 +72,14 @@ final class ProductInventory
     public function getCount(): int
     {
         return $this->count;
+    }
+
+    /**
+     * @return MeasureUnitType
+     */
+    public function getMeasureUnitType(): MeasureUnitType
+    {
+        return $this->measureUnitType;
     }
 
     /**

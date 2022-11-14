@@ -63,4 +63,5 @@ Route::group([
     Route::get('/measure-unit', [ProductController::class, 'getMeasureUnit'])->middleware('auth:api');
 
     Route::post('/product-attribute-value', [ProductController::class, 'createAttributeValueForProduct'])->middleware('auth:api');
+    Route::get('/product-attribute-values', [ProductController::class, 'getProductAttributeValues'])->middleware('auth:api');
 });

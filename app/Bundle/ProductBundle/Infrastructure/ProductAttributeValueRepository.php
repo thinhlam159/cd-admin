@@ -4,7 +4,9 @@ namespace App\Bundle\ProductBundle\Infrastructure;
 use App\Bundle\ProductBundle\Domain\Model\IProductAttributeValueRepository;
 use App\Bundle\ProductBundle\Domain\Model\MeasureUnitId;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributeId;
+use App\Bundle\ProductBundle\Domain\Model\ProductAttributePriceId;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValue;
+use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValueCriteria;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValueId;
 use App\Bundle\ProductBundle\Domain\Model\ProductId;
 use App\Models\ProductAttributeValue as ModelProductAttributeValue;
@@ -80,6 +82,9 @@ final class ProductAttributeValueRepository implements IProductAttributeValueRep
         return $productAttributeValues;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function update(ProductAttributeValue $productAttributeValue): ProductAttributeValueId
     {
         $entity = ModelProductAttributeValue::find($productAttributeValue->getProductAttributeValueId()->asString());
@@ -97,5 +102,34 @@ final class ProductAttributeValueRepository implements IProductAttributeValueRep
         }
 
         return $productAttributeValue->getProductAttributeValueId();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function findAll(ProductAttributeValueCriteria $productAttributeValueCriteria): array
+    {
+        $entities = ModelProductAttributeValue::all();
+        if ($entities->isEmpty()) {
+            return [];
+        }
+
+        $productAttributeValues = [];
+        foreach ($entities as $entity) {
+            $productAttributePrices = $entity->productAttributePrices();
+
+            $productAttributePriceId = $productAttributePrices->where('is_current', '=', 1)->first()->id;
+            $productAttributeValues[] = new ProductAttributeValue(
+                new ProductAttributeValueId($entity['id']),
+                new ProductId($entity['product_id']),
+                new ProductAttributeId($entity['product_attribute_id']),
+                $entity['value'],
+                $entity['code'],
+                null,
+                null
+            );
+        }
+
+        return $productAttributeValues;
     }
 }
