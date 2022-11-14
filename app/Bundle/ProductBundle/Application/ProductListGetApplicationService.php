@@ -114,10 +114,10 @@ class ProductListGetApplicationService
 
             $productAttributeValueResults = [];
             foreach ($productAttributeValues as $productAttributeValue) {
-                $productAttributePrice = $this->productAttributePriceRepository->findByAttributeValueId($productAttributeValue->getProductAttributeValueId());
-                $productInventory = $this->productInventoryRepository->findByProductId($productAttributePrice->getProductAttributeValueId());
+                $productAttributePrice = $this->productAttributePriceRepository->findByProductAttributeValueId($productAttributeValue->getProductAttributeValueId());
+                $productInventory = $this->productInventoryRepository->findByProductAttributeValueId($productAttributePrice->getProductAttributeValueId());
                 $productAttribute = $this->productAttributeRepository->findById($productAttributeValue->getProductAttributeId());
-                $measureUnit = $this->measureUnitRepository->findById($productAttributeValue->getMeasureUnitId());
+//                $measureUnit = $this->measureUnitRepository->findById($productAttributeValue->getMeasureUnitId());
 
                 $productAttributeValueResults[] = new ProductAttributeValueResult(
                     $productAttributeValue->getProductAttributeValueId()->asString(),
@@ -125,10 +125,11 @@ class ProductListGetApplicationService
                     $productAttribute->getName(),
                     $productAttributeValue->getValue(),
                     $productAttributeValue->getCode(),
-                    $measureUnit->getName(),
+                    $productInventory->getMeasureUnitType()->getValue(),
                     $productInventory->getCount(),
                     $productAttributePrice->getPrice(),
                     $productAttributePrice->getMonetaryUnitType()->getValue(),
+                    $productAttributePrice->getNoticePriceType()->getValue()
                 );
             }
 

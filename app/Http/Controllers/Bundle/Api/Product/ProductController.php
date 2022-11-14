@@ -108,6 +108,7 @@ class ProductController extends BaseController
                     'count' => $productAttributeValueResult->productInventoryCount,
                     'measure_unit_name' => $productAttributeValueResult->measureUnit,
                     'price' => $productAttributeValueResult->price,
+                    'notice_price_type' => $productAttributeValueResult->noticePriceType,
                     'monetary_unit_name' => $productAttributeValueResult->monetaryUnit,
                 ];
             }
@@ -394,6 +395,4 @@ class ProductController extends BaseController
 
         return response()->json(['data' => []], 200);
     }
-
-
 }

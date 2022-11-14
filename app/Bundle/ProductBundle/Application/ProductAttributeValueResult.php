@@ -11,7 +11,7 @@ class ProductAttributeValueResult
     public string $code;
     public string $measureUnit;
     public string $productInventoryCount;
-    public string $price;
+    public int $price;
     public string $monetaryUnit;
     public string $noticePriceType;
 
@@ -23,7 +23,7 @@ class ProductAttributeValueResult
      * @param string $code
      * @param string $measureUnit
      * @param string $productInventoryCount
-     * @param string $price
+     * @param int $price
      * @param string $monetaryUnit
      * @param string $noticePriceType
      */
@@ -35,7 +35,7 @@ class ProductAttributeValueResult
         string $code,
         string $measureUnit,
         string $productInventoryCount,
-        string $price,
+        int $price,
         string $monetaryUnit,
         string $noticePriceType
     )
