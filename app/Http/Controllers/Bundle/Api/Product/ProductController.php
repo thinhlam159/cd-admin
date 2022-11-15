@@ -8,6 +8,11 @@ use App\Bundle\ProductBundle\Application\MeasureUnitListGetApplicationService;
 use App\Bundle\ProductBundle\Application\MeasureUnitListGetCommand;
 use App\Bundle\ProductBundle\Application\ProductAttributeListGetApplicationService;
 use App\Bundle\ProductBundle\Application\ProductAttributeListGetCommand;
+use App\Bundle\ProductBundle\Application\ProductAttributePriceCommand;
+use App\Bundle\ProductBundle\Application\ProductAttributePriceListPutApplicationService;
+use App\Bundle\ProductBundle\Application\ProductAttributePriceListPutCommand;
+use App\Bundle\ProductBundle\Application\ProductAttributeValueListGetApplicationService;
+use App\Bundle\ProductBundle\Application\ProductAttributeValueListGetCommand;
 use App\Bundle\ProductBundle\Application\ProductAttributeValuePostApplicationService;
 use App\Bundle\ProductBundle\Application\ProductAttributeValuePostCommand;
 use App\Bundle\ProductBundle\Application\ProductGetApplicationService;
@@ -103,6 +108,7 @@ class ProductController extends BaseController
                     'count' => $productAttributeValueResult->productInventoryCount,
                     'measure_unit_name' => $productAttributeValueResult->measureUnit,
                     'price' => $productAttributeValueResult->price,
+                    'notice_price_type' => $productAttributeValueResult->noticePriceType,
                     'monetary_unit_name' => $productAttributeValueResult->monetaryUnit,
                 ];
             }
@@ -320,5 +326,73 @@ class ProductController extends BaseController
         }
 
         return response()->json(['data' => $data], 200);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getProductAttributeValues(Request $request) {
+        $applicationService = new ProductAttributeValueListGetApplicationService(
+            new ProductAttributeValueRepository(),
+            new ProductAttributePriceRepository(),
+            new ProductInventoryRepository(),
+            new ProductAttributeRepository(),
+        );
+
+        $command = new ProductAttributeValueListGetCommand(
+            $request->productId ?? null
+        );
+        $result = $applicationService->handle($command);
+
+        $data = [];
+        foreach ($result->productAttributeValueResults as $productAttributeValueResult) {
+            $data[] = [
+                'id' => $productAttributeValueResult->productAttributeValueId,
+                'product_id' => $productAttributeValueResult->productId,
+                'product_attribute_name' => $productAttributeValueResult->productAttributeName,
+                'product_attribute_value' => $productAttributeValueResult->productAttributeValue,
+                'code' => $productAttributeValueResult->code,
+                'measure_unit' => $productAttributeValueResult->measureUnit,
+                'inventory_count' => $productAttributeValueResult->productInventoryCount,
+                'price' => $productAttributeValueResult->price,
+                'monetary' => $productAttributeValueResult->monetaryUnit,
+                'notice_price_type' => $productAttributeValueResult->noticePriceType,
+            ];
+        }
+
+        return response()->json(['data' => $data], 200);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws InvalidArgumentException
+     * @throws \App\Bundle\Common\Domain\Model\TransactionException
+     */
+    public function updateProductAttributeValuePrice(Request $request)
+    {
+        $applicationService = new ProductAttributePriceListPutApplicationService(
+            new ProductAttributeValueRepository(),
+            new ProductAttributePriceRepository(),
+            new ProductInventoryRepository(),
+            new ProductAttributeRepository(),
+        );
+        $productAttributeValuePriceCommands = [];
+        $productAttributeValuePrices = !empty($request->product_attribute_value_price) ? $request->product_attribute_value_price : [];
+        foreach ($productAttributeValuePrices as $productAttributeValuePrice) {
+            $productAttributeValuePriceCommands[] = new ProductAttributePriceCommand(
+                $productAttributeValuePrice->product_attribute_price_id,
+                $productAttributeValuePrice->product_attribute_value_id,
+                $productAttributeValuePrice->price,
+                $productAttributeValuePrice->notice_price_type,
+            );
+        }
+        $command = new ProductAttributePriceListPutCommand(
+            $productAttributeValuePriceCommands
+        );
+        $result = $applicationService->handle($command);
+
+        return response()->json(['data' => []], 200);
     }
 }

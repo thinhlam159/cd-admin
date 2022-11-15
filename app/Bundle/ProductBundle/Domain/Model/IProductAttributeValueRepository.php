@@ -28,4 +28,10 @@ interface IProductAttributeValueRepository
      * @return ProductAttributeValueId|null
      */
     public function update(ProductAttributeValue $productAttributeValue): ?ProductAttributeValueId;
+
+    /**
+     * @param \App\Bundle\ProductBundle\Domain\Model\ProductAttributeValueCriteria $productAttributeValueCriteria
+     * @return ProductAttributeValue[]
+     */
+    public function findAll(ProductAttributeValueCriteria $productAttributeValueCriteria): array;
 }

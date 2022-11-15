@@ -17,6 +17,7 @@ class CreateProductInventoriesTable extends Migration
             $table->string('id')->primary();
             $table->string('product_attribute_value_id');
             $table->integer('count');
+            $table->string('measure_unit_type');
             $table->boolean('is_current');
             $table->timestamps();
         });

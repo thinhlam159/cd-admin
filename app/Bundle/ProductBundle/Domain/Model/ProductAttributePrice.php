@@ -24,6 +24,11 @@ final class ProductAttributePrice
     private MonetaryUnitType $monetaryUnitType;
 
     /**
+     * @var NoticePriceType
+     */
+    private NoticePriceType $noticePriceType;
+
+    /**
      * @var bool
      */
     private bool $isCurrent;
@@ -33,14 +38,23 @@ final class ProductAttributePrice
      * @param ProductAttributeValueId $productAttributeValueId
      * @param int $price
      * @param MonetaryUnitType $monetaryUnitType
+     * @param NoticePriceType $noticePriceType
      * @param bool $isCurrent
      */
-    public function __construct(ProductAttributePriceId $productAttributePriceId, ProductAttributeValueId $productAttributeValueId, int $price, MonetaryUnitType $monetaryUnitType, bool $isCurrent)
+    public function __construct(
+        ProductAttributePriceId $productAttributePriceId,
+        ProductAttributeValueId $productAttributeValueId,
+        int $price,
+        MonetaryUnitType $monetaryUnitType,
+        NoticePriceType $noticePriceType,
+        bool $isCurrent
+    )
     {
         $this->productAttributePriceId = $productAttributePriceId;
         $this->productAttributeValueId = $productAttributeValueId;
         $this->price = $price;
         $this->monetaryUnitType = $monetaryUnitType;
+        $this->noticePriceType = $noticePriceType;
         $this->isCurrent = $isCurrent;
     }
 
@@ -74,6 +88,14 @@ final class ProductAttributePrice
     public function getMonetaryUnitType(): MonetaryUnitType
     {
         return $this->monetaryUnitType;
+    }
+
+    /**
+     * @return NoticePriceType
+     */
+    public function getNoticePriceType(): NoticePriceType
+    {
+        return $this->noticePriceType;
     }
 
     /**

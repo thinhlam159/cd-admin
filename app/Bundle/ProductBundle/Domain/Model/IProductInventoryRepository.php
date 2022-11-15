@@ -10,7 +10,7 @@ interface IProductInventoryRepository
      * @param ProductAttributeValueId $productAttributeValueId
      * @return ProductInventory|null
      */
-    public function findByProductId(ProductAttributeValueId $productAttributeValueId): ?ProductInventory;
+    public function findByProductAttributeValueId(ProductAttributeValueId $productAttributeValueId): ?ProductInventory;
 
     /**
      * @param ProductInventory $productInventory
