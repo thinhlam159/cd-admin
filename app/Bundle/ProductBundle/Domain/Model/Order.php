@@ -23,8 +23,74 @@ final class Order
     private UserId $userId;
 
     /**
-     * @var string
+     * @var OrderDeliveryStatus
      */
-    private string $name;
+    private OrderDeliveryStatus $orderDeliveryStatus;
 
+    /**
+     * @var OrderPaymentStatus
+     */
+    private OrderPaymentStatus $orderPaymentStatus;
+
+    /**
+     * @param OrderId $orderId
+     * @param CustomerId $customerId
+     * @param UserId $userId
+     * @param OrderDeliveryStatus $orderDeliveryStatus
+     * @param OrderPaymentStatus $orderPaymentStatus
+     */
+    public function __construct(
+        OrderId $orderId,
+        CustomerId $customerId,
+        UserId $userId,
+        OrderDeliveryStatus $orderDeliveryStatus,
+        OrderPaymentStatus $orderPaymentStatus
+    )
+    {
+        $this->orderId = $orderId;
+        $this->customerId = $customerId;
+        $this->userId = $userId;
+        $this->orderDeliveryStatus = $orderDeliveryStatus;
+        $this->orderPaymentStatus = $orderPaymentStatus;
+    }
+
+    /**
+     * @return OrderId
+     */
+    public function getOrderId(): OrderId
+    {
+        return $this->orderId;
+    }
+
+    /**
+     * @return CustomerId
+     */
+    public function getCustomerId(): CustomerId
+    {
+        return $this->customerId;
+    }
+
+    /**
+     * @return UserId
+     */
+    public function getUserId(): UserId
+    {
+        return $this->userId;
+    }
+
+    /**
+     * @return OrderDeliveryStatus
+     */
+    public function getOrderDeliveryStatus(): OrderDeliveryStatus
+    {
+        return $this->orderDeliveryStatus;
+    }
+
+    /**
+     * @return OrderPaymentStatus
+     */
+    public function getOrderPaymentStatus(): OrderPaymentStatus
+    {
+        return $this->orderPaymentStatus;
+    }
 }
