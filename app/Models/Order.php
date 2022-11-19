@@ -13,4 +13,9 @@ class Order extends Model
     protected $casts = ['id' => 'string'];
     public $incrementing = false;
     protected $dates = ['deleted_at'];
+
+    public function orderProducts()
+    {
+        return $this->hasMany('App\Models\OrderProduct');
+    }
 }

@@ -6,8 +6,19 @@ use App\Bundle\Admin\Application\CustomerDeleteCommand;
 use App\Bundle\Admin\Infrastructure\CustomerRepository;
 use App\Bundle\Admin\Infrastructure\UserRepository;
 use App\Bundle\Common\Domain\Model\InvalidArgumentException;
+use App\Bundle\ProductBundle\Application\DeliveryStatusPutApplicationService;
+use App\Bundle\ProductBundle\Application\DeliveryStatusPutCommand;
 use App\Bundle\ProductBundle\Application\MeasureUnitListGetApplicationService;
 use App\Bundle\ProductBundle\Application\MeasureUnitListGetCommand;
+use App\Bundle\ProductBundle\Application\OrderCancelPostApplicationService;
+use App\Bundle\ProductBundle\Application\OrderCancelPostCommand;
+use App\Bundle\ProductBundle\Application\OrderGetApplicationService;
+use App\Bundle\ProductBundle\Application\OrderGetCommand;
+use App\Bundle\ProductBundle\Application\OrderListGetApplicationService;
+use App\Bundle\ProductBundle\Application\OrderListGetCommand;
+use App\Bundle\ProductBundle\Application\OrderPostApplicationService;
+use App\Bundle\ProductBundle\Application\OrderPostCommand;
+use App\Bundle\ProductBundle\Application\OrderProductCommand;
 use App\Bundle\ProductBundle\Application\ProductAttributeListGetApplicationService;
 use App\Bundle\ProductBundle\Application\ProductAttributeListGetCommand;
 use App\Bundle\ProductBundle\Application\ProductAttributePriceCommand;
@@ -21,13 +32,12 @@ use App\Bundle\ProductBundle\Application\ProductGetApplicationService;
 use App\Bundle\ProductBundle\Application\ProductGetCommand;
 use App\Bundle\ProductBundle\Application\ProductListGetApplicationService;
 use App\Bundle\ProductBundle\Application\ProductListGetCommand;
-use App\Bundle\ProductBundle\Application\ProductPostApplicationService;
-use App\Bundle\ProductBundle\Application\ProductPostCommand;
 use App\Bundle\ProductBundle\Application\ProductPutApplicationService;
 use App\Bundle\ProductBundle\Application\ProductPutCommand;
 use App\Bundle\ProductBundle\Infrastructure\CategoryRepository;
 use App\Bundle\ProductBundle\Infrastructure\FeatureImagePathRepository;
 use App\Bundle\ProductBundle\Infrastructure\MeasureUnitRepository;
+use App\Bundle\ProductBundle\Infrastructure\OrderRepository;
 use App\Bundle\ProductBundle\Infrastructure\ProductAttributePriceRepository;
 use App\Bundle\ProductBundle\Infrastructure\ProductAttributeRepository;
 use App\Bundle\ProductBundle\Infrastructure\ProductAttributeValueRepository;
@@ -46,35 +56,33 @@ final class OrderController extends BaseController
      */
     public function createOrder(Request $request)
     {
-        $applicationService = new ProductPostApplicationService(
+        $applicationService = new OrderPostApplicationService(
             new OrderRepository(),
             new CustomerRepository(),
             new UserRepository(),
-            new ProductRepository(),
+            new ProductAttributeValueRepository(),
+            new ProductInventoryRepository(),
         );
 
-        $file = $request->file('file');
-        if (!$file) {
-            throw new InvalidArgumentException();
+        $orderProducts = $request->orderProduct;
+        $orderProductCommands = [];
+        foreach ($orderProducts as $orderProduct) {
+            $orderProductCommands[] = new OrderProductCommand(
+                $orderProduct->product_id,
+                $orderProduct->product_attribute_value_id,
+                $orderProduct->product_attribute_price_id,
+                $orderProduct->count,
+            );
         }
-        $file->hashName();
-        $path = Storage::put('/public/'. Auth::id(), $file);
-        $url = Storage::url($path);
-
-        $isAvatar = true;
-
-        $command = new ProductPostCommand(
-            $request->name,
-            $request->code,
-            $request->description,
-            $request->category_id,
-            $url,
-            $isAvatar
+        $command = new OrderPostCommand(
+            $request->customer_id,
+            $request->user_id,
+            $orderProductCommands
         );
 
         $result = $applicationService->handle($command);
         $data = [
-            'id' => $result->productId,
+            'id' => $result->orderId,
         ];
 
         return response()->json(['data' => $data], 200);
@@ -84,47 +92,40 @@ final class OrderController extends BaseController
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getProducts(Request $request) {
-        $applicationService = new ProductListGetApplicationService(
-            new ProductRepository(),
-            new CategoryRepository(),
-            new FeatureImagePathRepository(),
+    public function getOrders(Request $request) {
+        $applicationService = new OrderListGetApplicationService(
+            new OrderRepository(),
+            new CustomerRepository(),
+            new UserRepository(),
             new ProductAttributeValueRepository(),
-            new ProductAttributePriceRepository(),
             new ProductInventoryRepository(),
-            new ProductAttributeRepository(),
-            new MeasureUnitRepository(),
         );
 
-        $command = new ProductListGetCommand();
+        $command = new OrderListGetCommand();
         $result = $applicationService->handle($command);
-        $productResults = $result->productResults;
+        $orderResults = $result->orderResults;
         $paginationResult = $result->paginationResult;
         $data = [];
-        foreach ($productResults as $product) {
-            $productAttributeValues = [];
-            foreach ($product->productAttributeValueResults as $productAttributeValueResult) {
-                $productAttributeValues[] = [
-                    'product_attribute_value_id' => $productAttributeValueResult->productAttributeValueId,
-                    'code' => $productAttributeValueResult->code,
-                    'product_attribute_value' => $productAttributeValueResult->productAttributeValue,
-                    'attribute_name' => $productAttributeValueResult->productAttributeName,
-                    'count' => $productAttributeValueResult->productInventoryCount,
-                    'measure_unit_name' => $productAttributeValueResult->measureUnit,
-                    'price' => $productAttributeValueResult->price,
-                    'notice_price_type' => $productAttributeValueResult->noticePriceType,
-                    'monetary_unit_name' => $productAttributeValueResult->monetaryUnit,
+        foreach ($orderResults as $orderResult) {
+            $orderProducts = [];
+            foreach ($orderResult->orderProductResults as $orderProductResult) {
+                $orderProducts[] = [
+                    'order_product_id' => $orderProductResult->orderProductId,
+                    'order_id' => $orderProductResult->orderId,
+                    'product_id' => $orderProductResult->productId,
+                    'product_attribute_value_id' => $orderProductResult->productAttributeValueId,
+                    'product_attribute_price_id' => $orderProductResult->productAttributePriceId,
+                    'count' => $orderProductResult->count,
                 ];
             }
             $data[] = [
-                'product_id' => $product->productId,
-                'name' => $product->name,
-                'code' => $product->code,
-                'description' => $product->description,
-                'category_id' => $product->categoryId,
-                'category_name' => $product->categoryName,
-                'image_path' => url($product->imagePath),
-                'product_attribute_values' => $productAttributeValues
+                'order_id' => $orderResult->orderId,
+                'customer_id' => $orderResult->customerId,
+                'user_id' => $orderResult->userId,
+                'delivery_status' => $orderResult->deliveryStatus,
+                'payment_status' => $orderResult->paymentStatus,
+                'order_products' => $orderProducts,
+                'update_at' => $orderResult->updateAt,
             ];
         }
         $response = [
@@ -144,40 +145,107 @@ final class OrderController extends BaseController
      * @return \Illuminate\Http\JsonResponse
      * @throws \App\Bundle\Common\Domain\Model\RecordNotFoundException
      */
-    public function getProduct(Request $request) {
-        $applicationService = new ProductGetApplicationService(
-            new ProductRepository(),
+    public function getOrder(Request $request) {
+        $applicationService = new OrderGetApplicationService(
+            new OrderRepository(),
+            new CustomerRepository(),
+            new UserRepository(),
             new ProductAttributeValueRepository(),
-            new ProductAttributePriceRepository(),
             new ProductInventoryRepository(),
-            new CategoryRepository(),
-            new ProductAttributeRepository(),
-            new MeasureUnitRepository(),
         );
 
-        $command = new ProductGetCommand($request->id);
-        $product = $applicationService->handle($command);
-        $productAttributeValues = [];
-        foreach ($product->productAttributeValueResults as $productAttributeValueResult) {
-            $productAttributeValues[] = [
-                'product_attribute_value_id' => $productAttributeValueResult->productAttributeValueId,
-                'product_attribute_name' => $productAttributeValueResult->productAttributeName,
-                'product_attribute_value' => $productAttributeValueResult->productAttributeValue,
-                'attribute_name' => $productAttributeValueResult->code,
-                'product_inventory_count' => $productAttributeValueResult->productInventoryCount,
-                'measure_unit' => $productAttributeValueResult->measureUnit,
-                'price' => $productAttributeValueResult->price,
-                'monetary_unit' => $productAttributeValueResult->monetaryUnit,
+        $command = new OrderGetCommand(
+            $request->order_id
+        );
+        $result = $applicationService->handle($command);
+
+            $orderProducts = [];
+            foreach ($result->orderProductResults as $orderProductResult) {
+                $orderProducts[] = [
+                    'order_product_id' => $orderProductResult->orderProductId,
+                    'order_id' => $orderProductResult->orderId,
+                    'product_id' => $orderProductResult->productId,
+                    'product_attribute_value_id' => $orderProductResult->productAttributeValueId,
+                    'product_attribute_price_id' => $orderProductResult->productAttributePriceId,
+                    'count' => $orderProductResult->count,
+                ];
+            }
+            $data[] = [
+                'order_id' => $result->orderId,
+                'customer_id' => $result->customerId,
+                'user_id' => $result->userId,
+                'delivery_status' => $result->deliveryStatus,
+                'payment_status' => $result->paymentStatus,
+                'order_products' => $orderProducts,
+                'update_at' => $result->updateAt,
             ];
-        }
-        $data = [
-            'product_id' => $product->productId,
-            'name' => $product->name,
-            'code' => $product->code,
-            'description' => $product->description,
-            'category_id' => $product->categoryId,
-            'category_name' => $product->categoryName,
-            'product_attribute_values' => $productAttributeValues
+
+        return response()->json(['data' => $data], 200);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \App\Bundle\Common\Domain\Model\RecordNotFoundException
+     */
+    public function updateDeliveryStatus(Request $request) {
+        $applicationService = new DeliveryStatusPutApplicationService(
+            new OrderRepository(),
+        );
+
+        $command = new DeliveryStatusPutCommand(
+            $request->order_id,
+            $request->delivery_status,
+        );
+        $result = $applicationService->handle($command);
+
+        $data[] = [
+            'order_id' => $result->orderId,
+        ];
+
+        return response()->json(['data' => $data], 200);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \App\Bundle\Common\Domain\Model\RecordNotFoundException
+     */
+    public function updatePaymentStatus(Request $request) {
+        $applicationService = new DeliveryStatusPutApplicationService(
+            new OrderRepository(),
+        );
+
+        $command = new DeliveryStatusPutCommand(
+            $request->order_id,
+            $request->delivery_status,
+        );
+        $result = $applicationService->handle($command);
+
+        $data[] = [
+            'order_id' => $result->orderId,
+        ];
+
+        return response()->json(['data' => $data], 200);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \App\Bundle\Common\Domain\Model\RecordNotFoundException
+     */
+    public function cancelOrder(Request $request) {
+        $applicationService = new OrderCancelPostApplicationService(
+            new OrderRepository(),
+        );
+
+        $command = new OrderCancelPostCommand(
+            $request->order_id,
+        );
+        $result = $applicationService->handle($command);
+
+        $data[] = [
+            'order_id' => $result->orderId,
         ];
 
         return response()->json(['data' => $data], 200);

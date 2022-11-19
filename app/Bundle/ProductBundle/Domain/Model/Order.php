@@ -33,9 +33,14 @@ final class Order
     private OrderPaymentStatus $orderPaymentStatus;
 
     /**
+     * @var SettingDate|null
+     */
+    private ?SettingDate $updateAt;
+
+    /**
      * @param OrderId $orderId
-     * @param CustomerId $customerId
-     * @param UserId $userId
+     * @param \App\Bundle\Admin\Domain\Model\CustomerId $customerId
+     * @param \App\Bundle\Admin\Domain\Model\UserId $userId
      * @param OrderDeliveryStatus $orderDeliveryStatus
      * @param OrderPaymentStatus $orderPaymentStatus
      */
@@ -63,7 +68,7 @@ final class Order
     }
 
     /**
-     * @return CustomerId
+     * @return \App\Bundle\Admin\Domain\Model\CustomerId
      */
     public function getCustomerId(): CustomerId
     {
@@ -71,7 +76,7 @@ final class Order
     }
 
     /**
-     * @return UserId
+     * @return \App\Bundle\Admin\Domain\Model\UserId
      */
     public function getUserId(): UserId
     {
@@ -92,5 +97,64 @@ final class Order
     public function getOrderPaymentStatus(): OrderPaymentStatus
     {
         return $this->orderPaymentStatus;
+    }
+
+    /**
+     * @return SettingDate|null
+     */
+    public function getUpdateAt(): ?SettingDate
+    {
+        return $this->updateAt;
+    }
+
+    /**
+     * @param SettingDate|null $updateAt
+     */
+    public function setUpdateAt(?SettingDate $updateAt): void
+    {
+        $this->updateAt = $updateAt;
+    }
+
+    /**
+     * @param OrderDeliveryStatus $orderDeliveryStatus
+     * @return void
+     * @throws \App\Bundle\Common\Domain\Model\InvalidArgumentException
+     */
+    public function updateDeliveryStatus(OrderDeliveryStatus $orderDeliveryStatus): void
+    {
+        if ($orderDeliveryStatus->getStatus() == OrderDeliveryStatus::SHIPPING && $this->orderDeliveryStatus == OrderDeliveryStatus::IN_PROGRESS) {
+            $this->orderDeliveryStatus = OrderDeliveryStatus::fromStatus(OrderDeliveryStatus::SHIPPING);
+            if ($this->orderPaymentStatus->getStatus() == OrderPaymentStatus::PLANNING) {
+                $this->orderPaymentStatus = OrderPaymentStatus::fromStatus(OrderPaymentStatus::PENDING);
+            }
+        }
+        if ($orderDeliveryStatus->getStatus() == OrderDeliveryStatus::DONE
+            && ($this->orderDeliveryStatus == OrderDeliveryStatus::IN_PROGRESS || $this->orderDeliveryStatus == OrderDeliveryStatus::SHIPPING))
+        {
+            $this->orderDeliveryStatus = OrderDeliveryStatus::fromStatus(OrderDeliveryStatus::DONE);
+            if ($this->orderPaymentStatus->getStatus() == OrderPaymentStatus::PLANNING) {
+                $this->orderPaymentStatus = OrderPaymentStatus::fromStatus($orderDeliveryStatus->getStatus());
+            }
+        }
+    }
+
+    /**
+     * @param OrderPaymentStatus $orderPaymentStatus
+     * @return void
+     * @throws \App\Bundle\Common\Domain\Model\InvalidArgumentException
+     */
+    public function updatePaymentStatus(OrderPaymentStatus $orderPaymentStatus): void
+    {
+        if ($orderPaymentStatus->getStatus() == OrderPaymentStatus::DONE
+            && ($this->orderPaymentStatus->getStatus() == OrderPaymentStatus::PLANNING || $this->orderPaymentStatus->getStatus() == OrderPaymentStatus::PENDING)
+        ) {
+            $this->orderPaymentStatus = OrderPaymentStatus::fromStatus($orderPaymentStatus->getStatus());
+        }
+    }
+
+    public function updateCancelStatus(): void
+    {
+        $this->orderDeliveryStatus = OrderDeliveryStatus::fromStatus(OrderDeliveryStatus::RETURNED_GOODS);
+        $this->orderPaymentStatus = OrderPaymentStatus::fromStatus(OrderPaymentStatus::CANCEL);
     }
 }
