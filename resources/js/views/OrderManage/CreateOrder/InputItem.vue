@@ -1,33 +1,33 @@
 <template>
-  <div class="flex py-1 border-b border-gray-50">
-    <div class="mr-4 w-[14%]">
+  <div class="flex py-1">
+    <div class="mr-4 w-[14%] border border-gray-500">
       <select name="category" class="p-3 w-full" v-model="formData.category" @change="handleOnChangeCategorySelect">
         <!--            <option disabled value="" class="w-full h-10 px-3 text-base text-gray-700" selected>Chọn danh mục</option>-->
         <option v-for="item in categories" :value="item.id" class="w-full h-10 px-3 text-base text-gray-700">{{ item.name }}</option>
       </select>
     </div>
-    <div class="mr-4 w-[14%]">
+    <div class="mr-4 w-[14%] border border-gray-500">
       <select name="product" class="p-3 w-full" v-model="formData.product" @change="handleOnChangeProductSelect">
         <!--            <option disabled value="" class="w-full h-10 px-3 text-base text-gray-700" selected>Chọn danh mục</option>-->
         <option v-for="item in productsByCategory" :value="item.product_id" class="w-full h-10 px-3 text-base text-gray-700">{{ item.name }}</option>
       </select>
     </div>
-    <div class="mr-4 w-[14%]">
+    <div class="mr-4 w-[14%] border border-gray-500">
       <select name="product_attribute_value" class="p-3 w-full" v-model="formData.productAttributeValue" @change="handleOnChangeProductAttributeValueSelect">
         <!--            <option disabled value="" class="w-full h-10 px-3 text-base text-gray-700" selected>Chọn danh mục</option>-->
         <option v-for="item in productAttributeValuesByProduct" :value="item.product_attribute_value_id" class="w-full h-10 px-3 text-base text-gray-700">{{ item.code }}</option>
       </select>
     </div>
-    <div class="mr-4 w-[14%]">
+    <div class="mr-4 w-[14%] border border-gray-500">
       <span class="p-3 w-full text-center">{{ noticePrice }}</span>
     </div>
-    <div class="mr-4 w-[14%]">
+    <div class="mr-4 w-[14%] border border-gray-500">
       <input type="number" class="p-3 w-full" v-model="count" placeholder="Số lượng">
     </div>
-    <div class="mr-4 w-[14%]">
+    <div class="mr-4 w-[14%] border border-gray-500">
       <span class="p-3 w-full text-center">{{ total.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</span>
     </div>
-    <div class="mr-4 w-[5%]">
+    <div class="">
       <ButtonRemove @clickBtn="$emit('handleRemoveInputItem')" :text="' '"/>
     </div>
   </div>

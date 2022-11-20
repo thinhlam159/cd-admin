@@ -6,13 +6,38 @@
         <hr>
       </div>
       <form @submit.prevent="handleSubmit(formData)">
-        <div class="mr-4 w-[14%]">
+        <div class="mr-4 w-[14%] mb-5">
+          <label for="customer" class="block mb-1 font-bold text-sm">Khách hàng</label>
           <select name="customer" class="p-3 w-full" v-model="formData.customerId">
-            <!--            <option disabled value="" class="w-full h-10 px-3 text-base text-gray-700" selected>Chọn danh mục</option>-->
-            <option v-for="item in customers" :value="item.customer_id" class="w-full h-10 px-3 text-base text-gray-700">{{ item.customer_name }}</option>
+            <option v-for="item in customers" :value="item.customer_id"
+                    class="w-full h-10 px-3 text-base text-gray-700">{{ item.customer_name }}
+            </option>
           </select>
         </div>
         <hr>
+        <div class="mt-5 py-3 flex">
+          <div class="mr-4 w-[14%]">
+            <span>Danh mục</span>
+          </div>
+          <div class="mr-4 w-[14%]">
+            <span>Sản phẩm</span>
+          </div>
+          <div class="mr-4 w-[14%]">
+            <span>Mã sản phẩm</span>
+          </div>
+          <div class="mr-4 w-[14%]">
+            <span>Báo giá</span>
+          </div>
+          <div class="mr-4 w-[14%]">
+            <span>Số lượng</span>
+          </div>
+          <div class="mr-4 w-[14%]">
+            <span>Thành tiền</span>
+          </div>
+          <div class="mr-4 w-[5%]">
+            <span>Xóa sp</span>
+          </div>
+        </div>
 <!--        <div class="h-48 my-4">-->
 <!--          <img class="h-full w-auto .object-contain" id="blah" :src="imageUrl" alt="your image" />-->
 <!--        </div>-->

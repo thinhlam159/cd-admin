@@ -11,68 +11,35 @@
       <table class="w-full">
         <thead>
         <tr class="">
-          <th rowspan="2" class="border py-1 w-[2%]">
-            id
+          <th class="border py-1 w-[2%]">
+            STT
           </th>
-          <th rowspan="2" class="border py-1 w-[7%]">
-            Tên sản phẩm
+          <th class="border py-1 w-[12%]">
+            Khách hàng
           </th>
-          <th rowspan="2" class="border py-1 w-[7%]">
-            Mã sản phẩm
+          <th class="border py-1 w-[9%]">
+            Giao hàng
           </th>
-          <th rowspan="2" class="border py-1 w-[7%]">
-            Danh mục
+          <th class="border py-1 w-[9%]">
+            Thanh toán
           </th>
-          <th rowspan="2" class="border py-1 w-[7%]">
-            Báo giá
+          <th class="border py-1 w-[9%]">
+            Ngày tạo đơn
           </th>
-          <th colspan="3" class="border py-1 w-[20%]">
-            Dòng sản phẩm
+          <th class="border py-1 w-[20%]">
+            Tổng giá
           </th>
-        </tr>
-        <tr>
-          <th class="border py-1">Mã</th>
-          <th class="border py-1">Tồn kho</th>
-          <th class="border py-1">Đơn giá</th>
         </tr>
         </thead>
         <tbody>
-        <template v-for="(item, index) in listProduct">
-          <tr v-if="item.product_attribute_values.length===0">
+        <template v-for="(item, index) in listOrder">
+          <tr>
             <td class="border text-center">{{ ++index }}</td>
-            <td class="border text-center">{{ item.name }}</td>
-            <td class="border text-center">{{ item.code }}</td>
-            <td class="border text-center">{{ item.category_name }}</td>
-            <td class="border text-center"></td>
-            <td class="border text-center"></td>
-            <td class="border text-center"></td>
-          </tr>
-          <tr v-else v-for="(subItem, subIndex) in item.product_attribute_values"
-              :key="subItem.product_attribute_value_id">
-            <td v-if="subIndex === 0" :rowspan="item.product_attribute_values.length" class="border text-center">
-              {{ ++index }}
-            </td>
-            <td v-if="subIndex === 0" :rowspan="item.product_attribute_values.length" class="border text-center">
-              {{ item.name }}
-            </td>
-            <td v-if="subIndex === 0" :rowspan="item.product_attribute_values.length" class="border text-center">
-              {{ item.code }}
-            </td>
-            <td v-if="subIndex === 0" :rowspan="item.product_attribute_values.length" class="border text-center">
-              {{ item.category_name }}
-            </td>
-            <td class="border text-center h-full m-0 p-0">
-              {{ `${subItem.code} x ${subItem.notice_price_type} x ${subItem.price}` }}
-            </td>
-            <td class="border text-center h-full m-0 p-0">
-              {{ subItem.code }}
-            </td>
-            <td class="border text-center h-full m-0 p-0">
-              {{ `${subItem.count} ${subItem.measure_unit_name}` }}
-            </td>
-            <td class="border text-center h-full m-0 p-0">
-              {{ `${subItem.price} ${subItem.monetary_unit_name}` }}
-            </td>
+            <td class="border text-center">{{ item.customerName }}</td>
+            <td class="border text-center">{{ item.delivery_status }}</td>
+            <td class="border text-center">{{ item.payment_status }}</td>
+            <td class="border text-center">{{ item.update_at }}</td>
+            <td class="border text-center">{{ item.totalPrice }}</td>
           </tr>
         </template>
         </tbody>
@@ -101,7 +68,7 @@ import {useRoute, useRouter} from "vue-router";
 import {useStore} from "vuex";
 import {useI18n} from "vue-i18n";
 import {MODULE_STORE, PAGE_DEFAULT, ROUTER_PATH} from "@/const";
-import {getListOrderFromApi} from "@/api";
+import {getListCustomerFromApi, getListOrderFromApi, getListProductFromApi, getListUserManagerFromApi} from "@/api";
 
 export default {
   name: "ListOrder",
@@ -124,8 +91,12 @@ export default {
     const {t} = useI18n();
     const toast = inject("$toast");
     const pagination = ref(null);
+    const customers = ref({});
+    const products = ref({});
+    const listUser = ref({});
     const addNewOrder = "Tạo đơn";
     const editUser = "Cập nhật";
+
 
     const pageCurrent = computed(() => {
       if (!route.query.page) {
@@ -135,27 +106,72 @@ export default {
     });
 
     const handleCreateOrder = () => {
-      console.log(123)
       router.push(`${ROUTER_PATH.ORDER_MANAGE}/${ROUTER_PATH.ADD}`);
     }
 
-    const getListOrder = async (page) => {
-      try {
-        const res = await getListOrderFromApi(page)
-        console.log(res.data)
-        pagination.value = res.pagination
-        listOrder.value = {
-          ...res.data
-        }
-
-      } catch (errors) {
-        const error = errors.message
-        // toast.error(error);
-      } finally {
-        store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false
+    // const getListOrder = async (page) => {
+    //   try {
+    //     const res = await getListOrderFromApi(page)
+    //     console.log(res.data)
+    //     pagination.value = res.pagination
+    //     listOrder.value = {
+    //       ...res.data
+    //     }
+    //   } catch (errors) {
+    //     const error = errors.message
+    //     // toast.error(error);
+    //   } finally {
+    //     store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false
+    //   }
+    // }
+    const getListCustomer = async () => {
+      const res = await getListCustomerFromApi();
+      customers.value = {
+        ...res.data
       }
     }
-    getListOrder(pageCurrent.value);
+    const getListProduct = async () => {
+      const res = await getListProductFromApi();
+      products.value = res.data
+    }
+    const getListUserManager = async (page) => {
+      try {
+        store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = true;
+        const response = await getListUserManagerFromApi(page);
+        pagination.value = response.pagination;
+        listUser.value = {
+          ...response.data,
+        };
+      } catch (errors) {
+        const error = errors.message || t("common.has_error");
+        toast.error(error);
+      } finally {
+        store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
+      }
+    };
+    const initComponent = async (page) => {
+      // const productResponse = await getListProductFromApi()
+      // const userResponse = await getListUserManagerFromApi()
+      const customerResponse = await getListCustomerFromApi()
+      const orderResponse = await getListOrderFromApi(page)
+      pagination.value = orderResponse.pagination
+
+      listOrder.value = orderResponse.data.map((order) => {
+        const customer = customerResponse.data.find((customer) => order.customer_id === customer.customer_id)
+
+        return  {
+          ...order,
+          customerName: customer.customer_name
+        }
+      })
+
+    }
+
+    // getListOrder(pageCurrent.value);
+    // getListCustomer();
+    // getListProduct();
+    // getListUserManager();
+    initComponent(pageCurrent.value)
 
     return {
       pagination,
