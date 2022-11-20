@@ -129,7 +129,8 @@ class ProductListGetApplicationService
                     $productInventory->getCount(),
                     $productAttributePrice->getPrice(),
                     $productAttributePrice->getMonetaryUnitType()->getValue(),
-                    $productAttributePrice->getNoticePriceType()->getValue()
+                    $productAttributePrice->getNoticePriceType()->getValue(),
+                    $productAttributePrice->getProductAttributePriceId()
                 );
             }
 

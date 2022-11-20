@@ -6,29 +6,32 @@ export default {
     USER_MANAGER: "/auth/user-management?page",
   },
   ADMIN: {
-      LIST_USER: '/admin/list-user',
-      USER_DETAIL: '/admin/user-detail',
-      UPDATE_USER: '/admin/update-user',
-      CREATE_USER: '/admin/create-user',
+    LIST_USER: '/admin/list-user',
+    USER_DETAIL: '/admin/user-detail',
+    UPDATE_USER: '/admin/update-user',
+    CREATE_USER: '/admin/create-user',
 
-      LIST_CUSTOMER: 'admin/list-customer',
-      CREATE_CUSTOMER: 'admin/create-customer',
-      CUSTOMER_DETAIL: 'admin/customer-detail',
-      UPDATE_CUSTOMER: 'admin/update-customer',
+    LIST_CUSTOMER: 'admin/list-customer',
+    CREATE_CUSTOMER: 'admin/create-customer',
+    CUSTOMER_DETAIL: 'admin/customer-detail',
+    UPDATE_CUSTOMER: 'admin/update-customer',
 
-      LIST_PRODUCT: 'admin/list-product',
-      CREATE_PRODUCT: 'admin/create-product',
-      PRODUCT_DETAIL: 'admin/product-detail',
-      UPDATE_PRODUCT: 'admin/update-product',
+    LIST_PRODUCT: 'admin/list-product',
+    CREATE_PRODUCT: 'admin/create-product',
+    PRODUCT_DETAIL: 'admin/product-detail',
+    UPDATE_PRODUCT: 'admin/update-product',
 
-      LIST_CATEGORY: 'admin/list-category',
-      CREATE_CATEGORY: 'admin/create-category',
-      CATEGORY_DETAIL: 'admin/category-detail',
-      UPDATE_CATEGORY: 'admin/update-category',
+    LIST_CATEGORY: 'admin/list-category',
+    CREATE_CATEGORY: 'admin/create-category',
+    CATEGORY_DETAIL: 'admin/category-detail',
+    UPDATE_CATEGORY: 'admin/update-category',
 
-      LIST_PRODUCT_ATTRIBUTE: 'admin/product-attributes',
-      LIST_MEASURE_UNIT: 'admin/measure-unit',
-      CREATE_PRODUCT_ATTRIBUTE_VALUE: 'admin/product-attribute-value'
+    LIST_PRODUCT_ATTRIBUTE: 'admin/product-attributes',
+    LIST_MEASURE_UNIT: 'admin/measure-unit',
+    CREATE_PRODUCT_ATTRIBUTE_VALUE: 'admin/product-attribute-value',
+
+    LIST_ORDER: 'admin/order/list-order',
+    CREATE_ORDER: 'admin/order/create-order'
   }
 
   // ADMIN: "/admin/customer/user-manage",

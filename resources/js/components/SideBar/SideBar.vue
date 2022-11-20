@@ -68,7 +68,7 @@ export default {
               id: 5,
               // title: this.$t("side_bar_components.dashboard"),
               title: 'Quản lý đơn hàng',
-              link: `${ROUTER_PATH.ADMIN}/${ROUTER_PATH.ROLE_MANAGE}`,
+              link: `${ROUTER_PATH.ADMIN}/${ROUTER_PATH.ORDER_MANAGE}`,
               icon: "fa fa-lg fa-diamond",
           },
           {

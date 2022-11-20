@@ -3,6 +3,7 @@
 use App\Http\Controllers\Bundle\Api\Admin\CustomerManagementController;
 use App\Http\Controllers\Bundle\Api\Admin\UserController;
 use App\Http\Controllers\Bundle\Api\Product\CategoryController;
+use App\Http\Controllers\Bundle\Api\Product\OrderController;
 use App\Http\Controllers\Bundle\Api\Product\ProductController;
 use App\Http\Controllers\Bundle\Auth\AdminAuthController;
 use Illuminate\Http\Request;
@@ -64,4 +65,7 @@ Route::group([
 
     Route::post('/product-attribute-value', [ProductController::class, 'createAttributeValueForProduct'])->middleware('auth:api');
     Route::get('/product-attribute-values', [ProductController::class, 'getProductAttributeValues'])->middleware('auth:api');
+
+    Route::get('/order/list-order', [OrderController::class, 'getOrders'])->middleware('auth:api');
+    Route::post('/order/create-order', [OrderController::class, 'createOrder'])->middleware('auth:api');
 });

@@ -28,10 +28,6 @@ use App\Bundle\ProductBundle\Application\ProductAttributeValueListGetApplication
 use App\Bundle\ProductBundle\Application\ProductAttributeValueListGetCommand;
 use App\Bundle\ProductBundle\Application\ProductAttributeValuePostApplicationService;
 use App\Bundle\ProductBundle\Application\ProductAttributeValuePostCommand;
-use App\Bundle\ProductBundle\Application\ProductGetApplicationService;
-use App\Bundle\ProductBundle\Application\ProductGetCommand;
-use App\Bundle\ProductBundle\Application\ProductListGetApplicationService;
-use App\Bundle\ProductBundle\Application\ProductListGetCommand;
 use App\Bundle\ProductBundle\Application\ProductPutApplicationService;
 use App\Bundle\ProductBundle\Application\ProductPutCommand;
 use App\Bundle\ProductBundle\Infrastructure\CategoryRepository;
@@ -64,19 +60,20 @@ final class OrderController extends BaseController
             new ProductInventoryRepository(),
         );
 
-        $orderProducts = $request->orderProduct;
+        $orderProducts = $request->order_products;
         $orderProductCommands = [];
         foreach ($orderProducts as $orderProduct) {
             $orderProductCommands[] = new OrderProductCommand(
-                $orderProduct->product_id,
-                $orderProduct->product_attribute_value_id,
-                $orderProduct->product_attribute_price_id,
-                $orderProduct->count,
+                $orderProduct['product_id'],
+                $orderProduct['product_attribute_value_id'],
+                $orderProduct['product_attribute_price_id'],
+                $orderProduct['count'],
             );
         }
+
         $command = new OrderPostCommand(
             $request->customer_id,
-            $request->user_id,
+            Auth::id(),
             $orderProductCommands
         );
 

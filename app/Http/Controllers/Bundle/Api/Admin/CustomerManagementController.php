@@ -59,9 +59,9 @@ class CustomerManagementController extends BaseController
         $data = [];
         foreach ($customerManageResults as $customer) {
             $data[] = [
-                'user_id' => $customer->customerId,
-                'user_name' => $customer->customerName,
-                'user_email' => $customer->email,
+                'customer_id' => $customer->customerId,
+                'customer_name' => $customer->customerName,
+                'customer_email' => $customer->email,
                 'phone' => $customer->phone,
                 'status' => $customer->isActive,
             ];

@@ -46,3 +46,7 @@ export const createProductAttributeValueFromApi = async (data) => await api.post
         "Content-Type": "multipart/form-data",
     },
 })
+
+//order
+export const getListOrderFromApi = async (page) => api.get(`${apiConstants.ADMIN.LIST_ORDER}?page=${page}`)
+export const createOrderFromApi = async (data) => await api.post(apiConstants.ADMIN.CREATE_ORDER, data)

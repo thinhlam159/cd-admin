@@ -17,6 +17,9 @@ import AddProduct from "@/views/ProductManage/AddProduct";
 import CategoryManage from "@/views/CategoryManage";
 import ListCategory from "@/views/CategoryManage/ListCategory/ListCategory";
 import AddProductAttributeValue from "@/views/ProductManage/AddProductAttributeValue";
+import OrderManage from "@/views/OrderManage";
+import ListOrder from "@/views/OrderManage/ListOrder";
+import CreateOrder from "@/views/OrderManage/CreateOrder";
 
 export default [
     // ROUTER_ADMIN
@@ -103,6 +106,20 @@ export default [
                     {
                         path: ROUTER_PATH.EMPTY,
                         component: ListCategory,
+                    },
+                ]
+            },
+            {
+                path: ROUTER_PATH.ORDER_MANAGE,
+                component: OrderManage,
+                children: [
+                    {
+                        path: ROUTER_PATH.EMPTY,
+                        component: ListOrder,
+                    },
+                    {
+                        path: ROUTER_PATH.ADD,
+                        component: CreateOrder,
                     },
                 ]
             }

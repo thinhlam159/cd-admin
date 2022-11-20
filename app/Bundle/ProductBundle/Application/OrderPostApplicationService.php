@@ -91,7 +91,7 @@ class OrderPostApplicationService
         }
         $user = $this->userRepository->findById($userId);
         if (!$user) {
-            throw new InvalidArgumentException('customer not exist!');
+            throw new InvalidArgumentException('user not exist!');
         }
 
         $order = new Order(
@@ -120,6 +120,7 @@ class OrderPostApplicationService
             if (!$orderId) {
                 throw new InvalidArgumentException('customer not exist!');
             }
+
             $result = $this->orderRepository->createOrderProducts($orderProducts);
             if (!$result) {
                 throw new InvalidArgumentException('customer not exist!');

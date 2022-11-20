@@ -81,7 +81,6 @@ export default {
               bodyFormData.append('category_id', data.category);
               bodyFormData.append('description', data.description);
               bodyFormData.append('file', file.value.files[0]);
-              console.log(file.value.files[0])
               const res = await createProductFromApi(bodyFormData)
               router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.PRODUCT_MANAGE}`)
           } catch (errors) {

@@ -110,6 +110,7 @@ class ProductController extends BaseController
                     'price' => $productAttributeValueResult->price,
                     'notice_price_type' => $productAttributeValueResult->noticePriceType,
                     'monetary_unit_name' => $productAttributeValueResult->monetaryUnit,
+                    'product_attribute_price_id' => $productAttributeValueResult->productAttributePriceId,
                 ];
             }
             $data[] = [

@@ -48,8 +48,8 @@ final class OrderRepository implements IOrderRepository
     public function createOrderProducts(array $orderProducts): bool
     {
         foreach ($orderProducts as $orderProduct) {
-            $result = ModelOrder::create([
-                'id' => $orderProduct->getProductId()->asString(),
+            $result = ModelOrderProduct::create([
+                'id' => $orderProduct->getOrderProductId()->asString(),
                 'order_id' => $orderProduct->getOrderId()->asString(),
                 'product_id' => $orderProduct->getProductId()->asString(),
                 'product_attribute_value_id' => $orderProduct->getProductAttributeValueId()->asString(),
@@ -79,7 +79,7 @@ final class OrderRepository implements IOrderRepository
                 OrderDeliveryStatus::fromStatus($entity->delivery_status),
                 OrderPaymentStatus::fromStatus($entity->payment_status)
             );
-            $order->setUpdateAt(SettingDate::fromYmdHis($entity->update_at));
+            $order->setUpdateAt(SettingDate::fromYmdHis($entity->updated_at));
 
             $orders[] = $order;
         }
