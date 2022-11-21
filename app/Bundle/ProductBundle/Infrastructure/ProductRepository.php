@@ -5,6 +5,7 @@ use App\Bundle\Common\Constants\PaginationConst;
 use App\Bundle\ProductBundle\Domain\Model\CategoryId;
 use App\Bundle\ProductBundle\Domain\Model\IProductRepository;
 use App\Bundle\ProductBundle\Domain\Model\Product;
+use App\Bundle\ProductBundle\Domain\Model\ProductCriteria;
 use App\Bundle\ProductBundle\Domain\Model\ProductId;
 use App\Bundle\ProductBundle\Domain\Model\UserId;
 use App\Bundle\UserBundle\Domain\Model\Pagination;
@@ -35,9 +36,17 @@ class ProductRepository implements IProductRepository
     /**
      * @inheritDoc
      */
-    public function findAll(): array
+    public function findAll(ProductCriteria $criteria): array
     {
-        $entities = ModelProduct::paginate(PaginationConst::PAGINATE_ROW);
+        $productAttributeValueIds = [];
+        foreach ($criteria->getProductAttributeValueIds() as $productAttributeValueId) {
+            $productAttributeValueIds[] = $productAttributeValueId->asString();
+        }
+        if (empty($productAttributeValueIds)) {
+            $entities = ModelProduct::paginate(PaginationConst::PAGINATE_ROW);
+        } else {
+            $entities = ModelProduct::whereIn('category_id', $productAttributeValueIds)->paginate(PaginationConst::PAGINATE_ROW);
+        }
         $products = [];
 
         foreach ($entities as $entity) {

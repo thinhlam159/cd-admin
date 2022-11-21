@@ -94,7 +94,7 @@ class ProductController extends BaseController
             new MeasureUnitRepository(),
         );
 
-        $command = new ProductListGetCommand();
+        $command = new ProductListGetCommand(!empty($request->category_ids) ? $request->category_ids : []);
         $result = $applicationService->handle($command);
         $productResults = $result->productResults;
         $paginationResult = $result->paginationResult;
@@ -129,7 +129,7 @@ class ProductController extends BaseController
         $response = [
             'data' => $data,
             'pagination' => [
-                'total' => $paginationResult->totalPage,
+                'total_page' => $paginationResult->totalPage,
                 'per_page' => $paginationResult->perPage,
                 'current_page' => $paginationResult->currentPage,
             ],

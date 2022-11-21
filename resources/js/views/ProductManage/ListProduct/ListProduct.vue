@@ -2,9 +2,10 @@
   <div class="p-5">
     <div class="w-full h-8 flex justify-between">
       <div class="flex">
-        <ButtonFilter @clickBtn="listByCategory(jumbo)" :text="'Jumbo'"/>
-        <ButtonFilter @clickBtn="listByCategory(jumbo)" :text="'Thành phẩm'"/>
-        <ButtonFilter @clickBtn="listByCategory(jumbo)" :text="'Khác'"/>
+        <ButtonFilter @clickBtn="listByCategory('all')" :text="'Tất cả'"/>
+        <ButtonFilter @clickBtn="listByCategory('jumbo')" :text="'Jumbo'"/>
+        <ButtonFilter @clickBtn="listByCategory('finishedProduct')" :text="'Thành phẩm'"/>
+<!--        <ButtonFilter @clickBtn="listByCategory('other')" :text="'Khác'"/>-->
       </div>
       <div class="flex justify-between">
         <ButtonAddNew @clickBtn="show" :text="'Báo giá'"/>
@@ -152,7 +153,7 @@ import ButtonAddNew from "@/components/Buttons/ButtonAddNew";
 import ButtonFilter from "@/components/Buttons/ButtonFilter";
 import ButtonDownloadCSV from "@/components/Buttons/ButtonDownloadCSV";
 import ButtonEdit from "@/components/Buttons/ButtonEdit";
-import {getListProductFromApi, getListUserManagerFromApi} from "@/api";
+import {getListProductFromApi, getListUserManagerFromApi, getListCategoryFromApi} from "@/api";
 import {convertDateByTimestamp} from "@/utils";
 import {ref, computed, watch, inject} from "vue";
 import {useRouter, useRoute} from "vue-router";
@@ -206,10 +207,10 @@ export default {
     const goToAddProductAttributeValue = (id) => {
       router.push(`${ROUTER_PATH.PRODUCT_MANAGE}/${ROUTER_PATH.ADD_PRODUCT_ATTRIBUTE_VALUE}/` + id);
     };
-    const getListProduct = async (page, category = '') => {
+    const getListProduct = async (page, categoryIds = []) => {
       try {
         store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = true
-        const response = await getListProductFromApi(page, category)
+        const response = await getListProductFromApi(page, categoryIds)
         pagination.value = response.pagination
 
         const productResult = response.data.map((product) => {
@@ -257,7 +258,45 @@ export default {
       router.push(`${ROUTER_PATH.USER_MANAGER}?page=${page}`);
     };
     const listByCategory = async (category) => {
-      getListProduct('', category)
+      let res;
+      switch (category) {
+        case 'all':
+          res = await getListProductFromApi(pageCurrent.value, )
+          break
+        case 'jumbo':
+          res = await getListProductFromApi(pageCurrent.value, {
+            params: {
+              category_ids: ["01GFJ38MBYTREEZP4S749MNFGV"]}
+            }
+          )
+          break
+        case 'finishedProduct':
+          res = await getListProductFromApi(pageCurrent.value, {
+            params: {
+              category_ids: ["01GFJ38MBYTRENFGVEZP4S749M"]}
+          })
+          break
+        case 'other':
+          res = await getListProductFromApi(pageCurrent.value)
+          break
+      }
+
+      const productResult = res.data.map((product) => {
+        const attvalue = product.product_attribute_values.map((attributeValue) => {
+          return {
+            ...attributeValue,
+            price: attributeValue.price.toLocaleString('it-IT', {style : 'currency', currency : 'VND'})
+          }
+
+        })
+        return {
+          ...product,
+          product_attribute_values : attvalue
+        }
+      })
+      listProduct.value = {
+        ...productResult,
+      };
     }
 
     getListProduct(pageCurrent.value);
@@ -267,17 +306,17 @@ export default {
       isShowSort,
       timeDatePicker,
       listProduct,
+      pagination,
+      addNewUser,
+      editUser,
       handleClickSortFn,
       handleAddProduct,
       goToAdd,
       getListProduct,
-      pagination,
       handleBackPage,
       handleNextPage,
-      addNewUser,
-      editUser,
       goToAddProductAttributeValue,
-      listByCategory
+      listByCategory,
     };
   },
 };

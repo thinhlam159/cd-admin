@@ -18,6 +18,8 @@ use App\Bundle\ProductBundle\Domain\Model\IProductAttributeRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductAttributeValueRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductInventoryRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductRepository;
+use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValueId;
+use App\Bundle\ProductBundle\Domain\Model\ProductCriteria;
 use App\Bundle\ProductBundle\Infrastructure\FeatureImagePathRepository;
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -104,7 +106,14 @@ class ProductListGetApplicationService
      */
     public function handle(ProductListGetCommand $command): ProductListGetResult
     {
-        [$products, $pagination] = $this->productRepository->findAll();
+        $productAttributeValueIds = [];
+        foreach ($command->productAttributeValueIds as $productAttributeValueId) {
+            $productAttributeValueIds[] = new ProductAttributeValueId($productAttributeValueId);
+        }
+        $productCriteria = new ProductCriteria(
+            $productAttributeValueIds,
+        );
+        [$products, $pagination] = $this->productRepository->findAll($productCriteria);
 
         $productResults = [];
         foreach ($products as $product) {
