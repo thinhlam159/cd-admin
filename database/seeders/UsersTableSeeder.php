@@ -19,6 +19,8 @@ class UsersTableSeeder extends Seeder
                 'email' => 'admin@cd-admin.co.vn',
                 'name' => 'admin',
                 'password' => bcrypt('dangnhap'),
+                'phone' => 123456789,
+                'status' => 1,
             ]
         ];
         foreach($defaults as $v){

@@ -16,11 +16,21 @@ final class Customer
      * @param string $customerName
      * @param string $email
      */
-    public function __construct(CustomerId $customerId, string $customerName, string $email)
+    public function __construct(
+        CustomerId $customerId,
+        string $customerName,
+        string $email,
+        ?string $password = null,
+        ?int $phone = null,
+        ?bool $isActive = false
+    )
     {
         $this->customerId = $customerId;
         $this->customerName = $customerName;
         $this->email = $email;
+        $this->password = $password;
+        $this->phone = $phone;
+        $this->isActive = $isActive;
     }
 
     /**

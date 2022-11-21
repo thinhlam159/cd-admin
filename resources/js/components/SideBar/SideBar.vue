@@ -51,6 +51,13 @@ export default {
           icon: "fa fa-lg fa-product-hunt",
         },
           {
+              id: 7,
+              // title: this.$t("side_bar_components.dashboard"),
+              title: 'Danh mục sản phẩm',
+              link: `${ROUTER_PATH.ADMIN}/${ROUTER_PATH.CATEGORY_MANAGE}`,
+              icon: "fa fa-lg fa-tasks",
+          },
+          {
               id: 4,
               // title: this.$t("side_bar_components.dashboard"),
               title: 'Khách hàng',
@@ -61,7 +68,7 @@ export default {
               id: 5,
               // title: this.$t("side_bar_components.dashboard"),
               title: 'Quản lý đơn hàng',
-              link: `${ROUTER_PATH.ADMIN}/${ROUTER_PATH.ROLE_MANAGE}`,
+              link: `${ROUTER_PATH.ADMIN}/${ROUTER_PATH.ORDER_MANAGE}`,
               icon: "fa fa-lg fa-diamond",
           },
           {

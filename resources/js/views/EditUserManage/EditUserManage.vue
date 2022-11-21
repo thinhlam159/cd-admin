@@ -80,8 +80,8 @@
 
 <script>
 import {ref} from "vue";
-import {useRoute} from 'vue-router'
-import {MODULE_STORE} from "@/const";
+import {useRoute, useRouter} from 'vue-router'
+import {MODULE_STORE, ROUTER_PATH} from "@/const";
 import {getUserDetailFromApi, updateUserProfileFormApi} from "@/api";
 import {useStore} from "vuex";
 
@@ -98,6 +98,7 @@ export default {
   methods: {},
     setup() {
       const route = useRoute()
+      const router = useRouter()
       const store = useStore()
       const userId = ref(route.params.id)
       const formData = ref({
@@ -135,6 +136,7 @@ export default {
                   userName: response.user_name,
                   email: response.email,
               };
+              router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.USER_MANAGER}`)
           } catch (errors) {
               const error = errors.message;
               // this.$toast.error(error);

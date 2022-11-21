@@ -124,6 +124,8 @@ export default {
                   phone: data.phone,
                   status: data.status,
               })
+              router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.USER_MANAGER}`)
+
           } catch (errors) {
               const error = errors.message;
               // this.$toast.error(error);
