@@ -9,6 +9,8 @@ use App\Bundle\ProductBundle\Application\MeasureUnitListGetCommand;
 use App\Bundle\ProductBundle\Application\ProductAttributeListGetApplicationService;
 use App\Bundle\ProductBundle\Application\ProductAttributeListGetCommand;
 use App\Bundle\ProductBundle\Application\ProductAttributePriceCommand;
+use App\Bundle\ProductBundle\Application\ProductAttributePriceListGetApplicationService;
+use App\Bundle\ProductBundle\Application\ProductAttributePriceListGetCommand;
 use App\Bundle\ProductBundle\Application\ProductAttributePriceListPutApplicationService;
 use App\Bundle\ProductBundle\Application\ProductAttributePriceListPutCommand;
 use App\Bundle\ProductBundle\Application\ProductAttributeValueListGetApplicationService;
@@ -393,6 +395,33 @@ class ProductController extends BaseController
             $productAttributeValuePriceCommands
         );
         $result = $applicationService->handle($command);
+
+        return response()->json(['data' => []], 200);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws InvalidArgumentException
+     * @throws \App\Bundle\Common\Domain\Model\TransactionException
+     */
+    public function getProductAttributeValuePrices(Request $request) {
+        $applicationService = new ProductAttributePriceListGetApplicationService(
+            new ProductAttributePriceRepository(),
+        );
+        $command = new ProductAttributePriceListGetCommand();
+        $result = $applicationService->handle($command);
+        $data = [];
+        foreach ($result->productAttributePriceResults as $productAttributePriceResult) {
+            $data[] = [
+                'product_attribute_price_id' => $productAttributePriceResult->productAttributePriceId,
+                'product_attribute_value_id' => $productAttributePriceResult->productAttributeValueId,
+                'price' => $productAttributePriceResult->price,
+                'monetary_unit' => $productAttributePriceResult->monetaryUnitType,
+                'notice_price_type' => $productAttributePriceResult->noticePriceType,
+                'is_current' => $productAttributePriceResult->isCurrent,
+            ];
+        }
 
         return response()->json(['data' => []], 200);
     }

@@ -124,4 +124,30 @@ final class ProductAttributePriceRepository implements IProductAttributePriceRep
 
         return $productAttributePriceIds;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function findAll(): array
+    {
+        $entities = ModelProductAttributePrice::where('is_current', true);
+        if (!$entities) {
+            return [];
+        }
+
+        $productAttributePrices = [];
+        foreach ($entities as $entity) {
+            $productAttributePrices[] = new ProductAttributePrice(
+                new ProductAttributePriceId($entity['id']),
+                new ProductAttributeValueId($entity['product_attribute_value_id']),
+                $entity['price'],
+                MonetaryUnitType::fromValue($entity['monetary_unit']),
+                NoticePriceType::fromValue($entity['notice_price_type']),
+                $entity['is_current']
+            );
+        }
+
+        return $productAttributePrices;
+    }
+
 }

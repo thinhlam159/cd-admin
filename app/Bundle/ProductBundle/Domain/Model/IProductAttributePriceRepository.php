@@ -35,4 +35,9 @@ interface IProductAttributePriceRepository
      * @return ProductAttributePriceId[]
      */
     public function createMany(array $productAttributePrices): array;
+
+    /**
+     * @return ProductAttributePrice[]
+     */
+    public function findAll(): array;
 }
