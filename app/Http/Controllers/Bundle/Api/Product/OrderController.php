@@ -8,7 +8,7 @@ use App\Bundle\ProductBundle\Application\DeliveryStatusPutApplicationService;
 use App\Bundle\ProductBundle\Application\DeliveryStatusPutCommand;
 use App\Bundle\ProductBundle\Application\ImportGoodPostCommand;
 use App\Bundle\ProductBundle\Application\ImportGoodProductCommand;
-use App\Bundle\ProductBundle\Application\ImportGoodsPostApplicationService;
+use App\Bundle\ProductBundle\Application\ImportGoodPostApplicationService;
 use App\Bundle\ProductBundle\Application\OrderCancelPostApplicationService;
 use App\Bundle\ProductBundle\Application\OrderCancelPostCommand;
 use App\Bundle\ProductBundle\Application\OrderGetApplicationService;
@@ -18,6 +18,8 @@ use App\Bundle\ProductBundle\Application\OrderListGetCommand;
 use App\Bundle\ProductBundle\Application\OrderPostApplicationService;
 use App\Bundle\ProductBundle\Application\OrderPostCommand;
 use App\Bundle\ProductBundle\Application\OrderProductCommand;
+use App\Bundle\ProductBundle\Application\RestoreImportGoodPutApplicationService;
+use App\Bundle\ProductBundle\Application\RestoreImportGoodPutCommand;
 use App\Bundle\ProductBundle\Infrastructure\ImportGoodRepository;
 use App\Bundle\ProductBundle\Infrastructure\OrderRepository;
 use App\Bundle\ProductBundle\Infrastructure\ProductAttributeValueRepository;
@@ -235,9 +237,10 @@ final class OrderController extends BaseController
      * @return \Illuminate\Http\JsonResponse
      * @throws \App\Bundle\Common\Domain\Model\RecordNotFoundException
      */
-    public function createImportGoods(Request $request) {
-        $applicationService = new ImportGoodsPostApplicationService(
+    public function createImportGood(Request $request) {
+        $applicationService = new ImportGoodPostApplicationService(
             new ImportGoodRepository(),
+            new ProductInventoryRepository()
         );
 
         $importGoodProducts = $request->import_good_products;
@@ -258,6 +261,22 @@ final class OrderController extends BaseController
             $request->user_id,
             $importGoodProductCommands,
         );
+        $result = $applicationService->handle($command);
+
+        $data[] = [
+            'import_good_id' => $result->importGood,
+        ];
+
+        return response()->json(['data' => $data], 200);
+    }
+
+    public function restoreImportGood(Request $request) {
+        $applicationService = new RestoreImportGoodPutApplicationService(
+            new ImportGoodRepository(),
+            new ProductInventoryRepository()
+        );
+
+        $command = new RestoreImportGoodPutCommand($request->import_good_id);
         $result = $applicationService->handle($command);
 
         $data[] = [

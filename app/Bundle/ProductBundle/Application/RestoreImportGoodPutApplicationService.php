@@ -22,7 +22,7 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class ImportGoodsPostApplicationService
+class RestoreImportGoodPutApplicationService
 {
     /**
      * @var IImportGoodRepository
@@ -48,19 +48,20 @@ class ImportGoodsPostApplicationService
     }
 
     /**
-     * @param ImportGoodPostCommand $command
-     * @return ImportGoodPostResult
+     * @param RestoreImportGoodPutCommand $command
+     * @return RestoreImportGoodPutResult
      * @throws InvalidArgumentException
      * @throws TransactionException
      */
-    public function handle(ImportGoodPostCommand $command): ImportGoodPostResult
+    public function handle(RestoreImportGoodPutCommand $command): RestoreImportGoodPutResult
     {
-        $importGoodId = ImportGoodId::newId();
-        $importGood = new ImportGood(
-            $importGoodId,
-            new DealerId($command->dealerId),
-            new UserId($command->dealerId),
-        );
+        $importGoodId = new ImportGoodId($command->importGoodId);
+        $importGood = $this->importGoodRepository->findById($importGoodId);
+        if (!$importGood) {
+            throw new \GuzzleHttp\Exception\InvalidArgumentException();
+        }
+
+        $currentImportGoodProducts = $this->importGoodRepository->findImportGoodProductByImportGoodId($importGoodId);
 
         $importGoodProducts = [];
         $currentProductInventories= [];
@@ -78,7 +79,7 @@ class ImportGoodsPostApplicationService
             );
             $productAttributeValueId = new ProductAttributeValueId($importGoodProductCommand->productAttributeValueId);
             $currentProductInventory = $this->productInventoryRepository->findByProductAttributeValueId($productAttributeValueId);
-            $newCount = $currentProductInventory->getCount() - $importGoodProductCommand->count;
+            $newCount = $currentProductInventory->getCount() + $importGoodProductCommand->count;
             $newProductInventories[] = new ProductInventory(
                 ProductInventoryId::newId(),
                 new ProductAttributeValueId($importGoodProductCommand->productAttributeValueId),
@@ -115,6 +116,6 @@ class ImportGoodsPostApplicationService
             throw new TransactionException('Add product fail!');
         }
 
-        return new ImportGoodPostResult($importGoodId->__toString());
+        return new RestoreImportGoodPutResult($importGoodId->__toString());
     }
 }
