@@ -405,7 +405,7 @@ class ProductController extends BaseController
      * @throws InvalidArgumentException
      * @throws \App\Bundle\Common\Domain\Model\TransactionException
      */
-    public function getProductAttributeValuePrices(Request $request) {
+    public function getProductAttributePrices(Request $request) {
         $applicationService = new ProductAttributePriceListGetApplicationService(
             new ProductAttributePriceRepository(),
         );
@@ -423,6 +423,6 @@ class ProductController extends BaseController
             ];
         }
 
-        return response()->json(['data' => []], 200);
+        return response()->json(['data' => $data], 200);
     }
 }

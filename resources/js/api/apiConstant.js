@@ -28,6 +28,7 @@ export default {
 
     LIST_PRODUCT_ATTRIBUTE: 'admin/product-attributes',
     LIST_MEASURE_UNIT: 'admin/measure-unit',
+    LIST_PRODUCT_ATTRIBUTE_PRICES: 'admin/product-attribute-prices',
     CREATE_PRODUCT_ATTRIBUTE_VALUE: 'admin/product-attribute-value',
 
     LIST_ORDER: 'admin/order/list-order',

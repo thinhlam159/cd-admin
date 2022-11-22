@@ -65,6 +65,7 @@ Route::group([
 
     Route::post('/product-attribute-value', [ProductController::class, 'createAttributeValueForProduct'])->middleware('auth:api');
     Route::get('/product-attribute-values', [ProductController::class, 'getProductAttributeValues'])->middleware('auth:api');
+    Route::get('/product-attribute-prices', [ProductController::class, 'getProductAttributePrices'])->middleware('auth:api');
 
     Route::get('/order/list-order', [OrderController::class, 'getOrders'])->middleware('auth:api');
     Route::post('/order/create-order', [OrderController::class, 'createOrder'])->middleware('auth:api');

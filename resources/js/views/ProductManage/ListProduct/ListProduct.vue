@@ -5,7 +5,7 @@
         <ButtonFilter @clickBtn="listByCategory('all')" :text="'Tất cả'"/>
         <ButtonFilter @clickBtn="listByCategory('jumbo')" :text="'Jumbo'"/>
         <ButtonFilter @clickBtn="listByCategory('finishedProduct')" :text="'Thành phẩm'"/>
-<!--        <ButtonFilter @clickBtn="listByCategory('other')" :text="'Khác'"/>-->
+        <ButtonFilter @clickBtn="listByCategory('other')" :text="'Khác'"/>
       </div>
       <div class="flex justify-between">
         <ButtonAddNew @clickBtn="show" :text="'Báo giá'"/>
@@ -266,18 +266,21 @@ export default {
         case 'jumbo':
           res = await getListProductFromApi(pageCurrent.value, {
             params: {
-              category_ids: ["01GFJ38MBYTREEZP4S749MNFGV"]}
+              category_ids: ["01GFYRT4343YMNC6ZEJK7K7F54"]}
             }
           )
           break
         case 'finishedProduct':
           res = await getListProductFromApi(pageCurrent.value, {
             params: {
-              category_ids: ["01GFJ38MBYTRENFGVEZP4S749M"]}
+              category_ids: ["01GFYRT43ZEJ443YMNC6K7K7F5"]}
           })
           break
         case 'other':
-          res = await getListProductFromApi(pageCurrent.value)
+          res = await getListProductFromApi(pageCurrent.value, {
+            params: {
+              category_ids: ["01GFYRT43ZEJK7K7F5443YMNC6"]}
+          })
           break
       }
 

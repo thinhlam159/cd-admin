@@ -130,7 +130,7 @@ final class ProductAttributePriceRepository implements IProductAttributePriceRep
      */
     public function findAll(): array
     {
-        $entities = ModelProductAttributePrice::where('is_current', true);
+        $entities = ModelProductAttributePrice::where('is_current', true)->get();
         if (!$entities) {
             return [];
         }
@@ -141,8 +141,8 @@ final class ProductAttributePriceRepository implements IProductAttributePriceRep
                 new ProductAttributePriceId($entity['id']),
                 new ProductAttributeValueId($entity['product_attribute_value_id']),
                 $entity['price'],
-                MonetaryUnitType::fromValue($entity['monetary_unit']),
-                NoticePriceType::fromValue($entity['notice_price_type']),
+                MonetaryUnitType::fromType((int)$entity['monetary_unit_type']),
+                NoticePriceType::fromType((int)$entity['notice_price_type']),
                 $entity['is_current']
             );
         }

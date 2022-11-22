@@ -39,7 +39,7 @@
             <td class="border text-center">{{ item.delivery_status }}</td>
             <td class="border text-center">{{ item.payment_status }}</td>
             <td class="border text-center">{{ item.update_at }}</td>
-            <td class="border text-center">{{ item.totalPrice }}</td>
+            <td class="border text-center">{{ item.totalPrice.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
           </tr>
         </template>
         </tbody>
@@ -68,7 +68,7 @@ import {useRoute, useRouter} from "vue-router";
 import {useStore} from "vuex";
 import {useI18n} from "vue-i18n";
 import {MODULE_STORE, PAGE_DEFAULT, ROUTER_PATH} from "@/const";
-import {getListCustomerFromApi, getListOrderFromApi, getListProductFromApi, getListUserManagerFromApi} from "@/api";
+import {getListCustomerFromApi, getListOrderFromApi, getListProductFromApi, getListUserManagerFromApi, getListProductAttributePriceFromApi} from "@/api";
 
 export default {
   name: "ListOrder",
@@ -154,14 +154,20 @@ export default {
       // const userResponse = await getListUserManagerFromApi()
       const customerResponse = await getListCustomerFromApi()
       const orderResponse = await getListOrderFromApi(page)
+      const priceResponse = await getListProductAttributePriceFromApi()
       pagination.value = orderResponse.pagination
 
       listOrder.value = orderResponse.data.map((order) => {
         const customer = customerResponse.data.find((customer) => order.customer_id === customer.customer_id)
+        const totalPrice = order.order_products.reduce((total, product) => {
+          const currentPrice = priceResponse.data.find((price) => price.product_attribute_value_id === product.product_attribute_value_id)
+          return total += currentPrice.price * product.count
+        }, 0)
 
         return  {
           ...order,
-          customerName: customer.customer_name
+          customerName: customer.customer_name,
+          totalPrice
         }
       })
 
