@@ -1,21 +1,12 @@
 <?php
 namespace App\Bundle\ProductBundle\Infrastructure;
 
-use App\Bundle\Common\Constants\PaginationConst;
-use App\Bundle\ProductBundle\Domain\Model\CategoryId;
-use App\Bundle\ProductBundle\Domain\Model\IProductAttributeValueRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductInventoryRepository;
-use App\Bundle\ProductBundle\Domain\Model\IProductRepository;
 use App\Bundle\ProductBundle\Domain\Model\MeasureUnitType;
-use App\Bundle\ProductBundle\Domain\Model\Product;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValueId;
-use App\Bundle\ProductBundle\Domain\Model\ProductId;
 use App\Bundle\ProductBundle\Domain\Model\ProductInventory;
 use App\Bundle\ProductBundle\Domain\Model\ProductInventoryId;
-use App\Bundle\ProductBundle\Domain\Model\UserId;
-use App\Bundle\UserBundle\Domain\Model\Pagination;
 use App\Models\ProductInventory as ModelProductInventory;
-use PHPUnit\Framework\Exception;
 
 final class ProductInventoryRepository implements IProductInventoryRepository
 {
@@ -58,4 +49,46 @@ final class ProductInventoryRepository implements IProductInventoryRepository
 
         return $productInventory->getProductInventoryId();
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function updateProductInventories(array $productInventories): bool
+    {
+        foreach ($productInventories as $inventory) {
+            $entity = ModelProductInventory::find($inventory->getProductInventoryId()->asString());
+            $result = $entity->update([
+                'is_current' => false,
+            ]);
+
+            if (!$result) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function createMultiProductInventory(array $productInventories): bool
+    {
+        foreach ($productInventories as $inventory) {
+            $result = ModelProductInventory::create([
+                'id' => $inventory->getProductInventoryId()->asString(),
+                'product_attribute_value_id' => $inventory->getProductAttributeValueId()->asString(),
+                'count' => $inventory->getCount(),
+                'measure_unit_type' => $inventory->getMeasureUnitType()->getType(),
+                'is_current' => true,
+            ]);
+
+            if (!$result) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 }

@@ -17,4 +17,16 @@ interface IProductInventoryRepository
      * @return ProductInventoryId|null
      */
     public function create(ProductInventory $productInventory): ?ProductInventoryId;
+
+    /**
+     * @param ProductInventory[] $productInventories
+     * @return bool
+     */
+    public function updateProductInventories(array $productInventories): bool;
+
+    /**
+     * @param ProductInventory[] $productInventories
+     * @return bool
+     */
+    public function createMultiProductInventory(array $productInventories): bool;
 }

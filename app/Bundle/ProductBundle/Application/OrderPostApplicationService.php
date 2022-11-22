@@ -11,6 +11,7 @@ use App\Bundle\Common\Domain\Model\TransactionException;
 use App\Bundle\ProductBundle\Domain\Model\IOrderRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductAttributeValueRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductInventoryRepository;
+use App\Bundle\ProductBundle\Domain\Model\MeasureUnitType;
 use App\Bundle\ProductBundle\Domain\Model\Order;
 use App\Bundle\ProductBundle\Domain\Model\OrderDeliveryStatus;
 use App\Bundle\ProductBundle\Domain\Model\OrderId;
@@ -20,6 +21,8 @@ use App\Bundle\ProductBundle\Domain\Model\OrderProductId;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributePriceId;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValueId;
 use App\Bundle\ProductBundle\Domain\Model\ProductId;
+use App\Bundle\ProductBundle\Domain\Model\ProductInventory;
+use App\Bundle\ProductBundle\Domain\Model\ProductInventoryId;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -103,6 +106,8 @@ class OrderPostApplicationService
         );
 
         $orderProducts = [];
+        $currentProductInventories= [];
+        $newProductInventories = [];
         foreach ($command->orderProductCommands as $orderProductCommand) {
             $orderProducts[] = new OrderProduct(
                 OrderProductId::newId(),
@@ -112,6 +117,17 @@ class OrderPostApplicationService
                 new ProductAttributePriceId($orderProductCommand->productAttributePriceId),
                 $orderProductCommand->count
             );
+            $productAttributeValueId = new ProductAttributeValueId($orderProductCommand->productAttributeValueId);
+            $currentProductInventory = $this->productInventoryRepository->findByProductAttributeValueId($productAttributeValueId);
+            $newCount = $currentProductInventory->getCount() - $orderProductCommand->count;
+            $newProductInventories[] = new ProductInventory(
+                ProductInventoryId::newId(),
+                new ProductAttributeValueId($orderProductCommand->productAttributeValueId),
+                $newCount,
+                MeasureUnitType::fromValue($orderProductCommand->measureUnitType),
+                true
+            );
+            $currentProductInventories[] = $currentProductInventory;
         }
 
         DB::beginTransaction();
@@ -120,7 +136,14 @@ class OrderPostApplicationService
             if (!$orderId) {
                 throw new InvalidArgumentException('customer not exist!');
             }
-
+            $updateCurrentInventoryResult = $this->productInventoryRepository->updateProductInventories($currentProductInventories);
+            if (!$updateCurrentInventoryResult) {
+                throw new InvalidArgumentException('customer not exist!');
+            }
+            $createInventoryProductResult = $this->productInventoryRepository->createMultiProductInventory($newProductInventories);
+            if (!$createInventoryProductResult) {
+                throw new InvalidArgumentException('customer not exist!');
+            }
             $result = $this->orderRepository->createOrderProducts($orderProducts);
             if (!$result) {
                 throw new InvalidArgumentException('customer not exist!');
