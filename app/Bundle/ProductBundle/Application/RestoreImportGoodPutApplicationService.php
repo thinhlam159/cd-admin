@@ -3,6 +3,7 @@
 namespace App\Bundle\ProductBundle\Application;
 
 use App\Bundle\Admin\Domain\Model\UserId;
+use App\Bundle\Common\Constants\MessageConst;
 use App\Bundle\Common\Domain\Model\InvalidArgumentException;
 use App\Bundle\Common\Domain\Model\TransactionException;
 use App\Bundle\ProductBundle\Domain\Model\DealerId;
@@ -58,33 +59,23 @@ class RestoreImportGoodPutApplicationService
         $importGoodId = new ImportGoodId($command->importGoodId);
         $importGood = $this->importGoodRepository->findById($importGoodId);
         if (!$importGood) {
-            throw new \GuzzleHttp\Exception\InvalidArgumentException();
+            throw new InvalidArgumentException(MessageConst::NOT_FOUND['message']);
         }
 
-        $currentImportGoodProducts = $this->importGoodRepository->findImportGoodProductByImportGoodId($importGoodId);
+        $restoreImportGoodProducts = $this->importGoodRepository->findImportGoodProductByImportGoodId($importGoodId);
 
         $importGoodProducts = [];
         $currentProductInventories= [];
         $newProductInventories = [];
-        foreach ($command->importGoodProductCommands as $importGoodProductCommand) {
-            $importGoodProducts[] = new ImportGoodProduct(
-                ImportGoodProductId::newId(),
-                $importGoodId,
-                new ProductId($importGoodProductCommand->productId),
-                new ProductAttributeValueId($importGoodProductCommand->productAttributeValueId),
-                $importGoodProductCommand->price,
-                MonetaryUnitType::fromValue($importGoodProductCommand->monetaryUnitType),
-                $importGoodProductCommand->count,
-                MeasureUnitType::fromValue($importGoodProductCommand->measureUnitType)
-            );
-            $productAttributeValueId = new ProductAttributeValueId($importGoodProductCommand->productAttributeValueId);
+        foreach ($restoreImportGoodProducts as $restoreImportGoodProduct) {
+            $productAttributeValueId = new ProductAttributeValueId($restoreImportGoodProduct->getProductAttributeValueId());
             $currentProductInventory = $this->productInventoryRepository->findByProductAttributeValueId($productAttributeValueId);
-            $newCount = $currentProductInventory->getCount() + $importGoodProductCommand->count;
+            $newCount = $currentProductInventory->getCount() - $restoreImportGoodProduct->getCount();
             $newProductInventories[] = new ProductInventory(
                 ProductInventoryId::newId(),
-                new ProductAttributeValueId($importGoodProductCommand->productAttributeValueId),
+                $productAttributeValueId,
                 $newCount,
-                MeasureUnitType::fromValue($importGoodProductCommand->measureUnitType),
+                MeasureUnitType::fromValue($restoreImportGoodProduct->getMeasureUnitType()->getValue()),
                 true
             );
             $currentProductInventories[] = $currentProductInventory;
@@ -92,18 +83,22 @@ class RestoreImportGoodPutApplicationService
 
         DB::beginTransaction();
         try {
-            $result = $this->importGoodRepository->create($importGood);
+            $result = $this->importGoodRepository->restoreImportGood($importGoodId);
             if (!$result) {
                 throw new InvalidArgumentException('update delivery status failed!');
             }
+
             $result = $this->importGoodRepository->createImportGoodProducts($importGoodProducts);
             if (!$result) {
                 throw new InvalidArgumentException('update delivery status failed!');
             }
+
+            //restore old inventory
             $updateCurrentInventoryResult = $this->productInventoryRepository->updateProductInventories($currentProductInventories);
             if (!$updateCurrentInventoryResult) {
                 throw new InvalidArgumentException('customer not exist!');
             }
+            //create new inventory
             $createInventoryProductResult = $this->productInventoryRepository->createMultiProductInventory($newProductInventories);
             if (!$createInventoryProductResult) {
                 throw new InvalidArgumentException('customer not exist!');

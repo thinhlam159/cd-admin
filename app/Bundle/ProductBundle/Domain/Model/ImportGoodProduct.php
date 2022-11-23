@@ -4,7 +4,6 @@ namespace App\Bundle\ProductBundle\Domain\Model;
 
 final class ImportGoodProduct
 {
-
     /**
      * @var ImportGoodProductId
      */
@@ -70,7 +69,7 @@ final class ImportGoodProduct
     /**
      * @return ImportGoodProductId
      */
-    public function getGoodProductId(): ImportGoodProductId
+    public function getImportGoodProductId(): ImportGoodProductId
     {
         return $this->goodProductId;
     }

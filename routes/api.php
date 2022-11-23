@@ -69,4 +69,10 @@ Route::group([
 
     Route::get('/order/list-order', [OrderController::class, 'getOrders'])->middleware('auth:api');
     Route::post('/order/create-order', [OrderController::class, 'createOrder'])->middleware('auth:api');
+    Route::get('/order/detail-order', [OrderController::class, 'getOrder'])->middleware('auth:api');
+    Route::put('/order/payment-status', [OrderController::class, 'updatePaymentStatus'])->middleware('auth:api');
+    Route::put('/order/delivery-status', [OrderController::class, 'updateDeliveryStatus'])->middleware('auth:api');
+
+    Route::post('/order/import-goods', [OrderController::class, 'createImportGood'])->middleware('auth:api');
+    Route::put('/order/restore-import-goods', [OrderController::class, 'restoreImportGood'])->middleware('auth:api');
 });

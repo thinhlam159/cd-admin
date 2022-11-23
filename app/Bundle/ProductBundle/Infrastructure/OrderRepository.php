@@ -131,7 +131,7 @@ final class OrderRepository implements IOrderRepository
             OrderDeliveryStatus::fromStatus($entity->delivery_status),
             OrderPaymentStatus::fromStatus($entity->payment_status)
         );
-        $order->setUpdateAt(SettingDate::fromYmdHis($entity->update_at));
+        $order->setUpdateAt(SettingDate::fromYmdHis($entity->updated_at));
 
         return $order;
     }

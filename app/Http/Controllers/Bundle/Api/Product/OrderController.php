@@ -247,18 +247,18 @@ final class OrderController extends BaseController
         $importGoodProductCommands = [];
         foreach ($importGoodProducts as $importGoodProduct) {
             $importGoodProductCommands[] = new ImportGoodProductCommand(
-                $importGoodProduct->product_id,
-                $importGoodProduct->product_attribute_value_id,
-                $importGoodProduct->price,
-                $importGoodProduct->monetary_unit_type,
-                $importGoodProduct->count,
-                $importGoodProduct->measure_unit_type,
+                $importGoodProduct['product_id'],
+                $importGoodProduct['product_attribute_value_id'],
+                $importGoodProduct['price'],
+                $importGoodProduct['monetary_unit_type'],
+                $importGoodProduct['count'],
+                $importGoodProduct['measure_unit_type'],
             );
         }
 
         $command = new ImportGoodPostCommand(
             $request->dealer_id,
-            $request->user_id,
+            Auth::id(),
             $importGoodProductCommands,
         );
         $result = $applicationService->handle($command);
@@ -270,6 +270,12 @@ final class OrderController extends BaseController
         return response()->json(['data' => $data], 200);
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \App\Bundle\Common\Domain\Model\InvalidArgumentException
+     * @throws \App\Bundle\Common\Domain\Model\TransactionException
+     */
     public function restoreImportGood(Request $request) {
         $applicationService = new RestoreImportGoodPutApplicationService(
             new ImportGoodRepository(),

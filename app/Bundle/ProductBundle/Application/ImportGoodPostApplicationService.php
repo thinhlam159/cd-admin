@@ -27,7 +27,7 @@ class ImportGoodPostApplicationService
     /**
      * @var IImportGoodRepository
      */
-    private IImportGoodReposiRestoretory $importGoodRepository;
+    private IImportGoodRepository $importGoodRepository;
 
     /**
      * @var IProductInventoryRepository
@@ -59,7 +59,7 @@ class ImportGoodPostApplicationService
         $importGood = new ImportGood(
             $importGoodId,
             new DealerId($command->dealerId),
-            new UserId($command->dealerId),
+            new UserId($command->userId),
         );
 
         $importGoodProducts = [];
@@ -93,26 +93,26 @@ class ImportGoodPostApplicationService
         try {
             $result = $this->importGoodRepository->create($importGood);
             if (!$result) {
-                throw new InvalidArgumentException('update delivery status failed!');
+                throw new InvalidArgumentException('create import good failed!');
             }
             $result = $this->importGoodRepository->createImportGoodProducts($importGoodProducts);
             if (!$result) {
-                throw new InvalidArgumentException('update delivery status failed!');
+                throw new InvalidArgumentException('create import good product failed!');
             }
             $updateCurrentInventoryResult = $this->productInventoryRepository->updateProductInventories($currentProductInventories);
             if (!$updateCurrentInventoryResult) {
-                throw new InvalidArgumentException('customer not exist!');
+                throw new InvalidArgumentException('update product inventory failed!');
             }
             $createInventoryProductResult = $this->productInventoryRepository->createMultiProductInventory($newProductInventories);
             if (!$createInventoryProductResult) {
-                throw new InvalidArgumentException('customer not exist!');
+                throw new InvalidArgumentException('create product inventory failed!');
             }
 
             DB::commit();
         } catch (Exception $e) {
             DB::rollBack();
             Log::error($e);
-            throw new TransactionException('Add product fail!');
+            throw new TransactionException($e->getMessage());
         }
 
         return new ImportGoodPostResult($importGoodId->__toString());
