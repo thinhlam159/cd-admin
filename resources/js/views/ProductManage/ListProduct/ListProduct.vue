@@ -153,7 +153,12 @@ import ButtonAddNew from "@/components/Buttons/ButtonAddNew";
 import ButtonFilter from "@/components/Buttons/ButtonFilter";
 import ButtonDownloadCSV from "@/components/Buttons/ButtonDownloadCSV";
 import ButtonEdit from "@/components/Buttons/ButtonEdit";
-import {getListProductFromApi, getListUserManagerFromApi, getListCategoryFromApi} from "@/api";
+import {
+  getListProductFromApi,
+  getListUserManagerFromApi,
+  getListCategoryFromApi,
+  downloadUserExcelFromApi
+} from "@/api";
 import {convertDateByTimestamp} from "@/utils";
 import {ref, computed, watch, inject} from "vue";
 import {useRouter, useRoute} from "vue-router";
@@ -212,6 +217,16 @@ export default {
         store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = true
         const response = await getListProductFromApi(page, categoryIds)
         pagination.value = response.pagination
+        const excelRes = await downloadUserExcelFromApi()
+        const url = URL.createObjectURL(new Blob([excelRes], {
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        }))
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', 'fileName')
+        document.body.appendChild(link)
+        link.click()
+        link.remove()
 
         const productResult = response.data.map((product) => {
           const attvalue = product.product_attribute_values.map((attributeValue) => {

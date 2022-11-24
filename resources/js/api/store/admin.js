@@ -53,3 +53,6 @@ export const createOrderFromApi = async (data) => await api.post(apiConstants.AD
 
 // product attribute price
 export const getListProductAttributePriceFromApi = async () => api.get(`${apiConstants.ADMIN.LIST_PRODUCT_ATTRIBUTE_PRICES}`)
+
+
+export const downloadUserExcelFromApi = async () => api.post(`${apiConstants.ADMIN.DOWNLOAD_USER_EXCEL}`,{},{responseType: 'blob'})

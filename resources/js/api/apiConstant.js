@@ -30,6 +30,7 @@ export default {
     LIST_MEASURE_UNIT: 'admin/measure-unit',
     LIST_PRODUCT_ATTRIBUTE_PRICES: 'admin/product-attribute-prices',
     CREATE_PRODUCT_ATTRIBUTE_VALUE: 'admin/product-attribute-value',
+    DOWNLOAD_USER_EXCEL: 'admin/users/export',
 
     LIST_ORDER: 'admin/order/list-order',
     CREATE_ORDER: 'admin/order/create-order'
