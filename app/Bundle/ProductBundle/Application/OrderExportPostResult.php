@@ -2,7 +2,7 @@
 
 namespace App\Bundle\ProductBundle\Application;
 
-class OrderGetResult
+class OrderExportPostResult
 {
     /**
      * @var string
@@ -30,9 +30,9 @@ class OrderGetResult
     public string $paymentStatus;
 
     /**
-     * @var OrderProductResult[]
+     * @var OrderProductExportResult[]
      */
-    public array $orderProductResults;
+    public array $orderProductExportResults;
 
     /**
      * @var string
@@ -40,22 +40,36 @@ class OrderGetResult
     public string $updateAt;
 
     /**
+     * @var string
+     */
+    public string $createdAt;
+
+    /**
+     * @var string
+     */
+    public string $customerName;
+
+    /**
      * @param string $orderId
      * @param string $customerId
      * @param string $userId
      * @param string $deliveryStatus
      * @param string $paymentStatus
-     * @param OrderProductResult[] $orderProductResults
+     * @param OrderProductExportResult[] $orderProductExportResults
      * @param string $updateAt
+     * @param string $createdAt
+     * @param string $customerName
      */
-    public function __construct(string $orderId, string $customerId, string $userId, string $deliveryStatus, string $paymentStatus, array $orderProductResults,string $updateAt)
+    public function __construct(string $orderId, string $customerId, string $userId, string $deliveryStatus, string $paymentStatus, array $orderProductExportResults,string $updateAt, string $createdAt, string $customerName)
     {
         $this->orderId = $orderId;
         $this->customerId = $customerId;
         $this->userId = $userId;
         $this->deliveryStatus = $deliveryStatus;
         $this->paymentStatus = $paymentStatus;
-        $this->orderProductResults = $orderProductResults;
+        $this->orderProductExportResults = $orderProductExportResults;
         $this->updateAt = $updateAt;
+        $this->createdAt = $createdAt;
+        $this->customerName = $customerName;
     }
 }

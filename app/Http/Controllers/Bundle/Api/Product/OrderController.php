@@ -11,6 +11,8 @@ use App\Bundle\ProductBundle\Application\ImportGoodProductCommand;
 use App\Bundle\ProductBundle\Application\ImportGoodPostApplicationService;
 use App\Bundle\ProductBundle\Application\OrderCancelPostApplicationService;
 use App\Bundle\ProductBundle\Application\OrderCancelPostCommand;
+use App\Bundle\ProductBundle\Application\OrderExportPostApplicationService;
+use App\Bundle\ProductBundle\Application\OrderExportPostCommand;
 use App\Bundle\ProductBundle\Application\OrderGetApplicationService;
 use App\Bundle\ProductBundle\Application\OrderGetCommand;
 use App\Bundle\ProductBundle\Application\OrderListGetApplicationService;
@@ -24,9 +26,12 @@ use App\Bundle\ProductBundle\Infrastructure\ImportGoodRepository;
 use App\Bundle\ProductBundle\Infrastructure\OrderRepository;
 use App\Bundle\ProductBundle\Infrastructure\ProductAttributeValueRepository;
 use App\Bundle\ProductBundle\Infrastructure\ProductInventoryRepository;
+use App\Bundle\ProductBundle\Infrastructure\ProductRepository;
+use App\Exports\OrderExport;
 use App\Http\Controllers\Bundle\Api\Common\BaseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 
 final class OrderController extends BaseController
 {
@@ -290,5 +295,28 @@ final class OrderController extends BaseController
         ];
 
         return response()->json(['data' => $data], 200);
+    }
+
+    public function exportOrder(Request $request, Excel $excel)
+    {
+        $applicationService = new OrderExportPostApplicationService(
+            new OrderRepository(),
+            new CustomerRepository(),
+            new UserRepository(),
+            new ProductAttributeValueRepository(),
+            new ProductInventoryRepository(),
+            new ProductRepository(),
+        );
+
+        $command = new OrderExportPostCommand(
+            $request->order_id,
+        );
+
+        $result = $applicationService->handle($command);
+        $customerName = $result->customerName;
+        $createdAt = $result->createdAt;
+
+        $orderExport = new OrderExport([$result]);
+        return $excel->download($orderExport, "$customerName-$createdAt.xlsx");
     }
 }

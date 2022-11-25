@@ -15,7 +15,7 @@ use App\Bundle\ProductBundle\Domain\Model\IProductRepository;
 use App\Bundle\ProductBundle\Domain\Model\OrderCriteria;
 use App\Bundle\ProductBundle\Domain\Model\OrderId;
 
-class OrderGetApplicationService
+class OrderExportPostApplicationService
 {
     /**
      * @var IOrderRepository
@@ -43,18 +43,25 @@ class OrderGetApplicationService
     private IProductInventoryRepository $productInventoryRepository;
 
     /**
+     * @var IProductRepository
+     */
+    private IProductRepository $productRepository;
+
+    /**
      * @param IOrderRepository $orderRepository
      * @param ICustomerRepository $customerRepository
      * @param IUserRepository $userRepository
      * @param IProductAttributeValueRepository $productAttributeValueRepository
      * @param IProductInventoryRepository $productInventoryRepository
+     * @param IProductRepository $productRepository
      */
     public function __construct(
         IOrderRepository $orderRepository,
         ICustomerRepository $customerRepository,
         IUserRepository $userRepository,
         IProductAttributeValueRepository $productAttributeValueRepository,
-        IProductInventoryRepository $productInventoryRepository
+        IProductInventoryRepository $productInventoryRepository,
+        IProductRepository $productRepository
     )
     {
         $this->orderRepository = $orderRepository;
@@ -62,42 +69,53 @@ class OrderGetApplicationService
         $this->userRepository = $userRepository;
         $this->productAttributeValueRepository = $productAttributeValueRepository;
         $this->productInventoryRepository = $productInventoryRepository;
+        $this->productRepository = $productRepository;
     }
 
     /**
-     * @param OrderGetCommand $command
-     * @return OrderGetResult
+     * @param OrderExportPostCommand $command
+     * @return OrderExportPostResult
      * @throws InvalidArgumentException
      * @throws TransactionException
      */
-    public function handle(OrderGetCommand $command): OrderGetResult
+    public function handle(OrderExportPostCommand $command): OrderExportPostResult
     {
         $orderId = new OrderId($command->orderId);
         $order = $this->orderRepository->findById($orderId);
+
         if (!$order) {
             throw new InvalidArgumentException(MessageConst::NOT_FOUND['message']);
         }
 
         $orderProducts = $this->orderRepository->findOrderProductsByOrderId($order->getOrderId());
-        $orderProductResults = [];
+        $customer = $this->customerRepository->findById($order->getCustomerId());
+
+        $orderProductExportResults = [];
         foreach ($orderProducts as $orderProduct) {
-            $orderProductResults[] = new OrderProductResult(
+            $productAttributeValue = $this->productAttributeValueRepository->findById($orderProduct->getProductAttributeValueId());
+            $product = $this->productRepository->findById($orderProduct->getProductId());
+            $orderProductExportResults[] = new OrderProductExportResult(
                 $orderProduct->getOrderProductId()->asString(),
                 $orderProduct->getOrderId()->asString(),
                 $orderProduct->getProductId()->asString(),
                 $orderProduct->getProductAttributeValueId()->asString(),
                 $orderProduct->getProductAttributePriceId()->asString(),
                 $orderProduct->getCount(),
+                $productAttributeValue->getValue(),
+                $product->getName()
             );
         }
 
-        return new OrderGetResult(
+        return new OrderExportPostResult(
             $order->getOrderId()->asString(),
             $order->getCustomerId()->asString(),
             $order->getUserId()->asString(),
             $order->getOrderDeliveryStatus()->getValue(),
             $order->getOrderPaymentStatus()->getValue(),
-            $orderProductResults,
+            $orderProductExportResults,
+            $order->getUpdatedAt()->asString(),
+            $order->getCreatedAt()->asString(),
+            $customer->getCustomerName(),
         );
     }
 }

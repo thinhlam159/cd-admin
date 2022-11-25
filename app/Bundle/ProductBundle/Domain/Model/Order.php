@@ -35,7 +35,12 @@ final class Order
     /**
      * @var SettingDate|null
      */
-    private ?SettingDate $updateAt;
+    private ?SettingDate $updatedAt;
+
+    /**
+     * @var SettingDate|null
+     */
+    private ?SettingDate $createdAt;
 
     /**
      * @param OrderId $orderId
@@ -102,7 +107,7 @@ final class Order
     /**
      * @return SettingDate|null
      */
-    public function getUpdateAt(): ?SettingDate
+    public function getUpdatedAt(): ?SettingDate
     {
         return $this->updateAt;
     }
@@ -110,9 +115,25 @@ final class Order
     /**
      * @param SettingDate|null $updateAt
      */
-    public function setUpdateAt(?SettingDate $updateAt): void
+    public function setUpdatedAt(?SettingDate $updateAt): void
     {
         $this->updateAt = $updateAt;
+    }
+
+    /**
+     * @return SettingDate|null
+     */
+    public function getCreatedAt(): ?SettingDate
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * @param SettingDate|null $createdAt
+     */
+    public function setCreatedAt(?SettingDate $createdAt): void
+    {
+        $this->createdAt = $createdAt;
     }
 
     /**
