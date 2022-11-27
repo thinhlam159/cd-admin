@@ -19,6 +19,7 @@ class CreateProductsTable extends Migration
             $table->string('code')->unique();
             $table->text('description');
             $table->string('category_id');
+            $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
             $table->softDeletes();
             $table->timestamps();
         });

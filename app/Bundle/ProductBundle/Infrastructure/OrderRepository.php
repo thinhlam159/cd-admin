@@ -126,8 +126,8 @@ final class OrderRepository implements IOrderRepository
         }
         $order = new Order(
             new OrderId($entity->id),
-            new CustomerId($entity->id),
-            new UserId($entity->id),
+            new CustomerId($entity->customer_id),
+            new UserId($entity->user_id),
             OrderDeliveryStatus::fromStatus($entity->delivery_status),
             OrderPaymentStatus::fromStatus($entity->payment_status)
         );

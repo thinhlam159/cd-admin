@@ -20,6 +20,7 @@ class CreateProductAttributePricesTable extends Migration
             $table->string('monetary_unit');
             $table->integer('notice_price_type');
             $table->boolean('is_current');
+            $table->foreign('product_attribute_value_id')->references('id')->on('product_attribute_values')->onDelete('cascade');
             $table->timestamps();
         });
     }

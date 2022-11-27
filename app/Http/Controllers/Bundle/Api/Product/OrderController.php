@@ -29,9 +29,12 @@ use App\Bundle\ProductBundle\Infrastructure\ProductInventoryRepository;
 use App\Bundle\ProductBundle\Infrastructure\ProductRepository;
 use App\Exports\OrderExport;
 use App\Http\Controllers\Bundle\Api\Common\BaseController;
+use App\Imports\OrderImport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\Console\Input\Input;
 
 final class OrderController extends BaseController
 {
@@ -297,7 +300,7 @@ final class OrderController extends BaseController
         return response()->json(['data' => $data], 200);
     }
 
-    public function exportOrder(Request $request, Excel $excel)
+    public function exportOrder(Request $request)
     {
         $applicationService = new OrderExportPostApplicationService(
             new OrderRepository(),
@@ -315,8 +318,27 @@ final class OrderController extends BaseController
         $result = $applicationService->handle($command);
         $customerName = $result->customerName;
         $createdAt = $result->createdAt;
-
-        $orderExport = new OrderExport([$result]);
-        return $excel->download($orderExport, "$customerName-$createdAt.xlsx");
+//        dd(Storage::disk('local')->exists('orderExcels/order.xlsx'));
+//        $collection = Excel::toCollection(new OrderExport($result), 'orderExcels/order.xlsx', 'local');
+        $template = Excel::toArray(new OrderImport(), 'orderExcels/order.xlsx', 'local');
+        $orderProductInfos = [];
+        foreach ($result->orderProductExportResults as $key => $orderProduct) {
+            $key ++;
+            $intoMoney = (int)$orderProduct->productAttributePriceId * $orderProduct->count;
+            $template[] = [
+                0 => $key,
+                1 => $orderProduct->productAttributeValueName,
+                2 => $orderProduct->productAttributeValueName,
+                3 => $orderProduct->count,
+                4 => $orderProduct->productAttributePriceId,
+                5 => $intoMoney,
+            ];
+        }
+//        $template[] = ...$orderProductInfos;
+//dd($template);
+//        $array[] = [];
+//        dd($array);
+        $orderExport = new OrderExport($template);
+        return Excel::download($orderExport, "dfsf.xlsx");
     }
 }

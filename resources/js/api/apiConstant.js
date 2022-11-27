@@ -31,6 +31,7 @@ export default {
     LIST_PRODUCT_ATTRIBUTE_PRICES: 'admin/product-attribute-prices',
     CREATE_PRODUCT_ATTRIBUTE_VALUE: 'admin/product-attribute-value',
     DOWNLOAD_USER_EXCEL: 'admin/users/export',
+    EXPORT_ORDER: 'admin/order/export-order',
 
     LIST_ORDER: 'admin/order/list-order',
     CREATE_ORDER: 'admin/order/create-order'

@@ -19,6 +19,7 @@ class CreateProductInventoriesTable extends Migration
             $table->integer('count');
             $table->string('measure_unit_type');
             $table->boolean('is_current');
+            $table->foreign('product_attribute_value_id')->references('id')->on('product_attribute_values')->onDelete('cascade');
             $table->timestamps();
         });
     }

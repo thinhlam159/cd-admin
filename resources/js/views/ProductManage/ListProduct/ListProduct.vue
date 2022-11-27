@@ -157,7 +157,7 @@ import {
   getListProductFromApi,
   getListUserManagerFromApi,
   getListCategoryFromApi,
-  downloadUserExcelFromApi
+  exportOrderFromApi
 } from "@/api";
 import {convertDateByTimestamp} from "@/utils";
 import {ref, computed, watch, inject} from "vue";
@@ -217,7 +217,7 @@ export default {
         store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = true
         const response = await getListProductFromApi(page, categoryIds)
         pagination.value = response.pagination
-        const excelRes = await downloadUserExcelFromApi()
+        const excelRes = await exportOrderFromApi({order_id: '01GJAC9G8BAH81DFQMWKG62TEM'})
         const url = URL.createObjectURL(new Blob([excelRes], {
           type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         }))
