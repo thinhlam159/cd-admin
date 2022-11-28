@@ -45,10 +45,6 @@ class ProductPostApplicationService
      */
     public function handle(ProductPostCommand $command): ProductPostResult
     {
-//        $existingEmail = $this->categoryRepository->checkExistingEmail($command->email);
-//        if ($existingEmail) {
-//            throw new InvalidArgumentException('Existing Email!');
-//        }
         $productId = ProductId::newId();
         $categoryId = new CategoryId($command->categoryId);
 
@@ -60,20 +56,9 @@ class ProductPostApplicationService
             $categoryId,
         );
 
-        $featureImagePathId = FeatureImagePathId::newId();
-        $featureImagePath = new FeatureImagePath(
-            $featureImagePathId,
-            $productId,
-            null,
-            true,
-            $command->path
-        );
-
         DB::beginTransaction();
         try {
             $productId = $this->productRepository->create($product);
-            $this->featureImagePathRepository->create($featureImagePath);
-
             DB::commit();
         } catch (Exception $e) {
             DB::rollBack();

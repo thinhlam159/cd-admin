@@ -11,7 +11,9 @@ use App\Bundle\ProductBundle\Domain\Model\IProductAttributePriceRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductAttributeValueRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductInventoryRepository;
 use App\Bundle\ProductBundle\Domain\Model\MeasureUnitId;
+use App\Bundle\ProductBundle\Domain\Model\MeasureUnitType;
 use App\Bundle\ProductBundle\Domain\Model\MonetaryUnitType;
+use App\Bundle\ProductBundle\Domain\Model\NoticePriceType;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributeId;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributePrice;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributePriceId;
@@ -73,10 +75,6 @@ class ProductAttributeValuePostApplicationService
      */
     public function handle(ProductAttributeValuePostCommand $command): ProductAttributeValuePostResult
     {
-//        $existingEmail = $this->categoryRepository->checkExistingEmail($command->email);
-//        if ($existingEmail) {
-//            throw new InvalidArgumentException('Existing Email!');
-//        }
         $productAttributeValueId = ProductAttributeValueId::newId();
         $productId = new ProductId($command->productId);
         $productAttributeId = new ProductAttributeId($command->productAttributeId);
@@ -86,26 +84,17 @@ class ProductAttributeValuePostApplicationService
             $productAttributeValueId,
             $productId,
             $productAttributeId,
-            $measureUnitId,
             $command->value,
             $command->code,
             null,
             null
         );
 
-        $featureImagePathId = FeatureImagePathId::newId();
-        $featureImagePath = new FeatureImagePath(
-            $featureImagePathId,
-            $productId,
-            $productAttributeValueId,
-            false,
-            $command->featureImagePath
-        );
-
         $productInventory = new ProductInventory(
             ProductInventoryId::newId(),
             $productAttributeValueId,
             $command->count,
+            MeasureUnitType::fromValue($command->measureUnitId),
             true
         );
 
@@ -114,16 +103,16 @@ class ProductAttributeValuePostApplicationService
             $productAttributeValueId,
             $command->price,
             MonetaryUnitType::fromType(MonetaryUnitType::VND),
+            NoticePriceType::fromValue(NoticePriceType::KG298),
             true
         );
 
         DB::beginTransaction();
         try {
             $productAttributeValueId = $this->productAttributeValueRepository->create($productAttributeValue);
-            $featureImagePathId = $this->featureImagePathRepository->create($featureImagePath);
             $productInventoryId = $this->productInventoryRepository->create($productInventory);
             $productAttributePriceId = $this->productAttributePriceRepository->create($productAttributePrice);
-            if (!$productAttributeValueId || !$featureImagePathId || !$productInventoryId || !$productAttributePriceId) {
+            if (!$productAttributeValueId || !$productInventoryId || !$productAttributePriceId) {
                 throw new Exception();
             }
 

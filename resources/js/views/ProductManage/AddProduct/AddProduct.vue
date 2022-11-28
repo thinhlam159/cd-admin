@@ -25,17 +25,17 @@
                         <option v-for="item in categories" :value="item.id" class="w-full h-10 px-3 text-base text-gray-700">{{ item.name }}</option>
                     </select>
                 </div>
-                <div class="h-48 my-4">
-                    <img class="h-full w-auto .object-contain" id="blah" :src="imageUrl" alt="your image" />
-                </div>
-                <div>
-                    <input
-                        type="file"
-                        @change="onFileChanged"
-                        accept="image/*"
-                        ref="file"
-                    />
-                </div>
+<!--                <div class="h-48 my-4">-->
+<!--                    <img class="h-full w-auto .object-contain" id="blah" :src="imageUrl" alt="your image" />-->
+<!--                </div>-->
+<!--                <div>-->
+<!--                    <input-->
+<!--                        type="file"-->
+<!--                        @change="onFileChanged"-->
+<!--                        accept="image/*"-->
+<!--                        ref="file"-->
+<!--                    />-->
+<!--                </div>-->
                 <div>
                     <label for="description" class="block mb-1 font-bold text-sm">Mô tả</label>
                     <textarea name="price" placeholder="Nhập giá sp" v-model="formData.description"
@@ -80,7 +80,7 @@ export default {
               bodyFormData.append('code', data.code);
               bodyFormData.append('category_id', data.category);
               bodyFormData.append('description', data.description);
-              bodyFormData.append('file', file.value.files[0]);
+              // bodyFormData.append('file', file.value.files[0]);
               const res = await createProductFromApi(bodyFormData)
               router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.PRODUCT_MANAGE}`)
           } catch (errors) {

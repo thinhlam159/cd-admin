@@ -51,23 +51,11 @@ class ProductController extends BaseController
             new FeatureImagePathRepository(),
         );
 
-        $file = $request->file('file');
-        if (!$file) {
-            throw new InvalidArgumentException();
-        }
-        $file->hashName();
-        $path = Storage::put('/public/'. Auth::id(), $file);
-        $url = Storage::url($path);
-
-        $isAvatar = true;
-
         $command = new ProductPostCommand(
             $request->name,
             $request->code,
             $request->description,
             $request->category_id,
-            $url,
-            $isAvatar
         );
 
         $result = $applicationService->handle($command);
@@ -122,7 +110,6 @@ class ProductController extends BaseController
                 'description' => $product->description,
                 'category_id' => $product->categoryId,
                 'category_name' => $product->categoryName,
-                'image_path' => url($product->imagePath),
                 'product_attribute_values' => $productAttributeValues
             ];
         }
@@ -279,13 +266,6 @@ class ProductController extends BaseController
             new ProductAttributePriceRepository(),
             new ProductInventoryRepository()
         );
-        $file = $request->file('file');
-        if (!$file) {
-            throw new InvalidArgumentException();
-        }
-        $file->hashName();
-        $path = Storage::put('/public/'. Auth::id(), $file);
-        $url = Storage::url($path);
 
         $command = new ProductAttributeValuePostCommand(
             $request->product_id,
@@ -293,7 +273,6 @@ class ProductController extends BaseController
             $request->measure_unit_id,
             $request->value,
             $request->code,
-            $url,
             (int)$request->price,
             (int)$request->count,
         );

@@ -25,6 +25,4 @@ class ProductAttributeSeeder extends Seeder
             DB::table('product_attributes')->insert($v);
         }
     }
-
-
 }

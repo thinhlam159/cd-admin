@@ -118,7 +118,7 @@ class ProductListGetApplicationService
         $productResults = [];
         foreach ($products as $product) {
             $category = $this->categoryRepository->findById($product->getCategoryId());
-            $featureImagePath = $this->featureImagePathRepository->findByProductId($product->getProductId());
+//            $featureImagePath = $this->featureImagePathRepository->findByProductId($product->getProductId());
             $productAttributeValues = $this->productAttributeValueRepository->findByProductId($product->getProductId());
 
             $productAttributeValueResults = [];
@@ -150,7 +150,6 @@ class ProductListGetApplicationService
                 $product->getDescription(),
                 $product->getCategoryId()->__toString(),
                 $category->getName(),
-                $featureImagePath->getPath(),
                 $productAttributeValueResults
             );
         }
