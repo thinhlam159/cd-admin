@@ -45,6 +45,11 @@ class OrderGetResult
     public string $updatedAt;
 
     /**
+     * @var int
+     */
+    public int $totalCost;
+
+    /**
      * @var OrderProductResult[]
      */
     public array $orderProductResults;
@@ -58,9 +63,10 @@ class OrderGetResult
      * @param string $deliveryStatus
      * @param string $paymentStatus
      * @param string $updatedAt
+     * @param int $totalCost
      * @param OrderProductResult[] $orderProductResults
      */
-    public function __construct(string $orderId, string $customerId, string $customerName, string $userId, string $userName, string $deliveryStatus, string $paymentStatus, string $updatedAt, array $orderProductResults)
+    public function __construct(string $orderId, string $customerId, string $customerName, string $userId, string $userName, string $deliveryStatus, string $paymentStatus, string $updatedAt, int $totalCost, array $orderProductResults)
     {
         $this->orderId = $orderId;
         $this->customerId = $customerId;
@@ -70,6 +76,7 @@ class OrderGetResult
         $this->deliveryStatus = $deliveryStatus;
         $this->paymentStatus = $paymentStatus;
         $this->updatedAt = $updatedAt;
+        $this->totalCost = $totalCost;
         $this->orderProductResults = $orderProductResults;
     }
 }

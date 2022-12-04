@@ -2,9 +2,6 @@
 
 namespace App\Bundle\ProductBundle\Application;
 
-use App\Bundle\Common\Application\PaginationResult;
-use App\Bundle\ProductBundle\Domain\Model\ProductAttribute;
-
 class OrderProductExportResult
 {
     /**
@@ -33,14 +30,29 @@ class OrderProductExportResult
     public string $productAttributePriceId;
 
     /**
-     * @var string
+     * @var int
      */
-    public string $count;
+    public int $count;
 
     /**
      * @var string
      */
-    public string $productAttributeValueName;
+    public string $measureUnitType;
+
+    /**
+     * @var int
+     */
+    public int $weight;
+
+    /**
+     * @var int
+     */
+    public int $attributeDisplayIndex;
+
+    /**
+     * @var int
+     */
+    public int $productOrderCost;
 
     /**
      * @var string
@@ -48,16 +60,49 @@ class OrderProductExportResult
     public string $productName;
 
     /**
+     * @var string
+     */
+    public string $productCode;
+
+    /**
+     * @var string
+     */
+    public string $productAttributeValueCode;
+
+    /**
+     * @var string
+     */
+    public string $noticePriceType;
+
+    /**
+     * @var int
+     */
+    public int $productAttributePrice;
+
+    /**
+     * @var int
+     */
+    public int $productAttributePriceStandard;
+
+    /**
      * @param string $orderProductId
      * @param string $orderId
      * @param string $productId
      * @param string $productAttributeValueId
      * @param string $productAttributePriceId
-     * @param string $count
-     * @param string $productAttributeValueName
+     * @param int $count
+     * @param string $measureUnitType
+     * @param int $weight
+     * @param int $attributeDisplayIndex
+     * @param int $productOrderCost
      * @param string $productName
+     * @param string $productCode
+     * @param string $productAttributeValueCode
+     * @param string $noticePriceType
+     * @param int $productAttributePrice
+     * @param int $productAttributePriceStandard
      */
-    public function __construct(string $orderProductId, string $orderId, string $productId, string $productAttributeValueId, string $productAttributePriceId, string $count, string $productAttributeValueName, string $productName)
+    public function __construct(string $orderProductId, string $orderId, string $productId, string $productAttributeValueId, string $productAttributePriceId, int $count, string $measureUnitType, int $weight, int $attributeDisplayIndex, int $productOrderCost, string $productName, string $productCode, string $productAttributeValueCode, string $noticePriceType, int $productAttributePrice, int $productAttributePriceStandard)
     {
         $this->orderProductId = $orderProductId;
         $this->orderId = $orderId;
@@ -65,7 +110,15 @@ class OrderProductExportResult
         $this->productAttributeValueId = $productAttributeValueId;
         $this->productAttributePriceId = $productAttributePriceId;
         $this->count = $count;
-        $this->productAttributeValueName = $productAttributeValueName;
+        $this->measureUnitType = $measureUnitType;
+        $this->weight = $weight;
+        $this->attributeDisplayIndex = $attributeDisplayIndex;
+        $this->productOrderCost = $productOrderCost;
         $this->productName = $productName;
+        $this->productCode = $productCode;
+        $this->productAttributeValueCode = $productAttributeValueCode;
+        $this->noticePriceType = $noticePriceType;
+        $this->productAttributePrice = $productAttributePrice;
+        $this->productAttributePriceStandard = $productAttributePriceStandard;
     }
 }

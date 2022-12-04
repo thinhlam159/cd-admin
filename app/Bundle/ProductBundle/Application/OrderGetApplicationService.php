@@ -92,10 +92,12 @@ class OrderGetApplicationService
 
         $orderProducts = $this->orderRepository->findOrderProductsByOrderId($order->getOrderId());
         $orderProductResults = [];
+        $totalCost = 0;
         foreach ($orderProducts as $orderProduct) {
             $productAttributePrice = $this->productAttributePriceRepository->findById($orderProduct->getProductAttributePriceId());
             $productAttributeValue = $this->productAttributeValueRepository->findById($orderProduct->getProductAttributeValueId());
             $product = $this->productRepository->findById($orderProduct->getProductId());
+            $totalCost += $orderProduct->getOrderProductCost();
             $orderProductResults[] = new OrderProductResult(
                 $orderProduct->getOrderProductId()->asString(),
                 $orderProduct->getOrderId()->asString(),
@@ -124,6 +126,7 @@ class OrderGetApplicationService
             $order->getOrderDeliveryStatus()->getValue(),
             $order->getOrderPaymentStatus()->getValue(),
             $order->getUpdatedAt()->asString(),
+            $totalCost,
             $orderProductResults,
         );
     }

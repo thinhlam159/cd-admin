@@ -50,6 +50,11 @@ class OrderExportPostResult
     public string $customerName;
 
     /**
+     * @var int
+     */
+    public int $totalCost;
+
+    /**
      * @param string $orderId
      * @param string $customerId
      * @param string $userId
@@ -59,8 +64,9 @@ class OrderExportPostResult
      * @param string $updateAt
      * @param string $createdAt
      * @param string $customerName
+     * @param int $totalCost
      */
-    public function __construct(string $orderId, string $customerId, string $userId, string $deliveryStatus, string $paymentStatus, array $orderProductExportResults,string $updateAt, string $createdAt, string $customerName)
+    public function __construct(string $orderId, string $customerId, string $userId, string $deliveryStatus, string $paymentStatus, array $orderProductExportResults,string $updateAt, string $createdAt, string $customerName, int $totalCost)
     {
         $this->orderId = $orderId;
         $this->customerId = $customerId;
@@ -71,5 +77,6 @@ class OrderExportPostResult
         $this->updateAt = $updateAt;
         $this->createdAt = $createdAt;
         $this->customerName = $customerName;
+        $this->totalCost = $totalCost;
     }
 }

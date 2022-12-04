@@ -20,6 +20,7 @@ import AddProductAttributeValue from "@/views/ProductManage/AddProductAttributeV
 import OrderManage from "@/views/OrderManage";
 import ListOrder from "@/views/OrderManage/ListOrder";
 import CreateOrder from "@/views/OrderManage/CreateOrder";
+import DetailOrder from "@/views/OrderManage/DetailOrder";
 
 export default [
     // ROUTER_ADMIN
@@ -120,6 +121,10 @@ export default [
                     {
                         path: ROUTER_PATH.ADD,
                         component: CreateOrder,
+                    },
+                    {
+                      path: ROUTER_PATH.DETAIL_ID,
+                      component: DetailOrder,
                     },
                 ]
             }

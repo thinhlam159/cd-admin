@@ -8,6 +8,8 @@ export const ROUTER_PATH = {
   RENTAL_PLAN_ID: "rental-plan/:id",
   EDIT_ID: "edit/:id",
   EMPTY_ID: ":id",
+  DETAIL: "detail",
+  DETAIL_ID: "detail/:id",
 
   // ROUTER_ADMIN
   ADMIN: "/admin",

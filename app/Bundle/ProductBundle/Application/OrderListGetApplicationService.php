@@ -88,11 +88,12 @@ class OrderListGetApplicationService
             $customer = $this->customerRepository->findById($order->getCustomerId());
             $user = $this->userRepository->findById($order->getUserId());
             $orderProductResults = [];
+            $totalCost = 0;
             foreach ($orderProducts as $orderProduct) {
                 $productAttributePrice = $this->productAttributePriceRepository->findById($orderProduct->getProductAttributePriceId());
                 $productAttributeValue = $this->productAttributeValueRepository->findById($orderProduct->getProductAttributeValueId());
                 $product = $this->productRepository->findById($orderProduct->getProductId());
-
+                $totalCost += $orderProduct->getOrderProductCost();
                 $orderProductResults[] = new OrderProductResult(
                     $orderProduct->getOrderProductId()->asString(),
                     $orderProduct->getOrderId()->asString(),
@@ -121,6 +122,7 @@ class OrderListGetApplicationService
                 $order->getOrderPaymentStatus()->getValue(),
                 $orderProductResults,
                 $order->getUpdatedAt()->asString(),
+                $totalCost
             );
         }
         $paginationResult = new PaginationResult(

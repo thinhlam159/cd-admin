@@ -34,7 +34,8 @@ export default {
     EXPORT_ORDER: 'admin/order/export-order',
 
     LIST_ORDER: 'admin/order/list-order',
-    CREATE_ORDER: 'admin/order/create-order'
+    CREATE_ORDER: 'admin/order/create-order',
+    DETAIL_ORDER: 'admin/order/detail-order'
   }
 
   // ADMIN: "/admin/customer/user-manage",

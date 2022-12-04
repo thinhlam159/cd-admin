@@ -124,10 +124,11 @@ final class OrderController extends BaseController
                 'user_id' => $orderResult->userId,
                 'delivery_status' => $orderResult->deliveryStatus,
                 'payment_status' => $orderResult->paymentStatus,
-                'update_at' => $orderResult->updatedAt,
+                'updated_at' => $orderResult->updatedAt,
                 'customer_name' => $orderResult->customerName,
                 'user_name' => $orderResult->userName,
                 'order_products' => $orderProducts,
+                'total_cost' => $orderResult->totalCost
             ];
         }
         $response = [
@@ -330,10 +331,9 @@ final class OrderController extends BaseController
         $applicationService = new OrderExportPostApplicationService(
             new OrderRepository(),
             new CustomerRepository(),
-            new UserRepository(),
             new ProductAttributeValueRepository(),
-            new ProductInventoryRepository(),
-            new ProductRepository(),
+            new ProductAttributePriceRepository(),
+            new ProductRepository()
         );
 
         $command = new OrderExportPostCommand(
@@ -341,28 +341,152 @@ final class OrderController extends BaseController
         );
 
         $result = $applicationService->handle($command);
-        $customerName = $result->customerName;
-        $createdAt = $result->createdAt;
-//        dd(Storage::disk('local')->exists('orderExcels/order.xlsx'));
-//        $collection = Excel::toCollection(new OrderExport($result), 'orderExcels/order.xlsx', 'local');
-        $template = Excel::toArray(new OrderImport(), 'orderExcels/order.xlsx', 'local');
-        $orderProductInfos = [];
+        $customerName = "Tên khách hàng: $result->customerName";
+
+        $template = [
+            [
+                0 => "CÔNG TY TNHH SẢN XUẤT VÀ XUẤT NHẬP KHẨU HƯNG THỊNH - NH",
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null,
+            ],
+            [
+                0 => "CHUYÊN SẢN XUẤT CÁC LOẠI BĂNG DÍNH",
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null,
+            ],
+            [
+                0 => "Địa chỉ: Số 145, Đường Đình Xuyên, Xã Đình Xuyên, Huyện Gia Lâm, TP. Hà Nội",
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null,
+            ],
+            [
+                0 => "ĐT: 0988.397.883 - 0987.594.704",
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null,
+            ],
+            [
+                0 => "STK: 100000958649 - Ngân hàng Viettinbank, CN Đông Hà Nội - Người thụ hưởng: Thạch Thị Thùy Hương",
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null,
+            ],
+            [
+                0 => null,
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null,
+            ],
+            [
+                0 => null,
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null,
+            ],
+            [
+                0 => "HÓA ĐƠN BÁN HÀNG",
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null,
+            ],
+            [
+                0 => $customerName,
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => "Điện thoại:",
+            ],
+            [
+                0 => "Địa chỉ:",
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null,
+            ],
+            [
+                0 => "STT",
+                1 => "Tên sản phẩm",
+                2 => 'ĐVT',
+                3 => 'Số lượng',
+                4 => 'Đơn giá',
+                5 => 'Thành tiền',
+            ]
+        ];
         foreach ($result->orderProductExportResults as $key => $orderProduct) {
             $key ++;
-            $intoMoney = (int)$orderProduct->productAttributePriceId * $orderProduct->count;
             $template[] = [
                 0 => $key,
-                1 => $orderProduct->productAttributeValueName,
-                2 => $orderProduct->productAttributeValueName,
-                3 => $orderProduct->count,
-                4 => $orderProduct->productAttributePriceId,
-                5 => $intoMoney,
+                1 => "$orderProduct->productCode $orderProduct->productAttributeValueCode$orderProduct->attributeDisplayIndex",
+                2 => $orderProduct->measureUnitType,
+                3 => $orderProduct->weight,
+                4 => $orderProduct->productAttributePriceStandard,
+                5 => $orderProduct->productOrderCost,
             ];
         }
-//        $template[] = ...$orderProductInfos;
-//dd($template);
-//        $array[] = [];
-//        dd($array);
+        $footer = [
+            [
+                0 => "Tổng cộng",
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => $result->totalCost
+            ],
+            [
+                0 => "Số tiền bằng chữ",
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null
+            ],
+            [
+                0 => null,
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null
+            ],
+            [
+                0 => null,
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => "Ngày tháng năm 2022",
+                5 => null
+            ],
+            [
+                0 => null,
+                1 => 'Người mua hàng',
+                2 => null,
+                3 => null,
+                4 => 'Người bán hàng',
+                5 => null
+            ],
+        ];
+        $template = array_merge($template, $footer);
         $orderExport = new OrderExport($template);
         return Excel::download($orderExport, "dfsf.xlsx");
     }

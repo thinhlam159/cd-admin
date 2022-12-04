@@ -15,6 +15,9 @@
             STT
           </th>
           <th class="border py-1 w-[12%]">
+            Nguời tạo đơn
+          </th>
+          <th class="border py-1 w-[12%]">
             Khách hàng
           </th>
           <th class="border py-1 w-[9%]">
@@ -29,17 +32,34 @@
           <th class="border py-1 w-[20%]">
             Tổng giá
           </th>
+          <th class="border py-1 w-[20%]">
+            Chi Tiết
+          </th>
+          <th class="border py-1 w-[20%]">
+            Xuất excel
+          </th>
         </tr>
         </thead>
         <tbody>
         <template v-for="(item, index) in listOrder">
           <tr>
             <td class="border text-center">{{ ++index }}</td>
-            <td class="border text-center">{{ item.customerName }}</td>
+            <td class="border text-center">{{ item.user_name }}</td>
+            <td class="border text-center">{{ item.customer_name }}</td>
             <td class="border text-center">{{ item.delivery_status }}</td>
             <td class="border text-center">{{ item.payment_status }}</td>
-            <td class="border text-center">{{ item.update_at }}</td>
-            <td class="border text-center">{{ item.totalPrice.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
+            <td class="border text-center">{{ item.updated_at }}</td>
+            <td class="border text-center">{{ item.total_cost.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
+            <td class="border text-center">
+              <div class="flex justify-center ">
+                <ButtonEdit @clickBtn="() => goToDetail(item.order_id)" :text="orderDetail"/>
+              </div>
+            </td>
+            <td class="border text-center">
+              <div class="flex justify-center ">
+                <ButtonEdit @clickBtn="() => exportOrder(item.order_id)" :text="exportExcel"/>
+              </div>
+            </td>
           </tr>
         </template>
         </tbody>
@@ -63,12 +83,11 @@ import ButtonFilter from "@/components/Buttons/ButtonFilter/ButtonFilter.vue";
 import ButtonDownloadCSV from "@/components/Buttons/ButtonDownloadCSV/ButtonDownloadCSV.vue";
 import ButtonEdit from "@/components/Buttons/ButtonEdit/ButtonEdit.vue";
 import Pagination from "@/components/Pagination/Pagination.vue";
-import {computed, inject, ref} from "vue";
+import {computed, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {useStore} from "vuex";
-import {useI18n} from "vue-i18n";
 import {MODULE_STORE, PAGE_DEFAULT, ROUTER_PATH} from "@/const";
-import {getListCustomerFromApi, getListOrderFromApi, getListProductFromApi, getListUserManagerFromApi, getListProductAttributePriceFromApi} from "@/api";
+import {exportOrderFromApi, getListOrderFromApi} from "@/api";
 
 export default {
   name: "ListOrder",
@@ -81,22 +100,14 @@ export default {
     Pagination,
   },
   setup() {
-    const filterKey = ref({});
-    const isShowSort = ref(false);
-    const timeDatePicker = ref(new Date());
     const listOrder = ref([]);
     const route = useRoute();
     const router = useRouter();
     const store = useStore();
-    const {t} = useI18n();
-    const toast = inject("$toast");
     const pagination = ref(null);
-    const customers = ref({});
-    const products = ref({});
-    const listUser = ref({});
     const addNewOrder = "Tạo đơn";
-    const editUser = "Cập nhật";
-
+    const orderDetail = "Chi tiết";
+    const exportExcel = "Xuất excel";
 
     const pageCurrent = computed(() => {
       if (!route.query.page) {
@@ -109,81 +120,50 @@ export default {
       router.push(`${ROUTER_PATH.ORDER_MANAGE}/${ROUTER_PATH.ADD}`);
     }
 
-    // const getListOrder = async (page) => {
-    //   try {
-    //     const res = await getListOrderFromApi(page)
-    //     console.log(res.data)
-    //     pagination.value = res.pagination
-    //     listOrder.value = {
-    //       ...res.data
-    //     }
-    //   } catch (errors) {
-    //     const error = errors.message
-    //     // toast.error(error);
-    //   } finally {
-    //     store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false
-    //   }
-    // }
-    const getListCustomer = async () => {
-      const res = await getListCustomerFromApi();
-      customers.value = {
-        ...res.data
-      }
-    }
-    const getListProduct = async () => {
-      const res = await getListProductFromApi();
-      products.value = res.data
-    }
-    const getListUserManager = async (page) => {
+    const getListOrder = async (page) => {
       try {
-        store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = true;
-        const response = await getListUserManagerFromApi(page);
-        pagination.value = response.pagination;
-        listUser.value = {
-          ...response.data,
-        };
-      } catch (errors) {
-        const error = errors.message || t("common.has_error");
-        toast.error(error);
-      } finally {
-        store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
-      }
-    };
-    const initComponent = async (page) => {
-      // const productResponse = await getListProductFromApi()
-      // const userResponse = await getListUserManagerFromApi()
-      const customerResponse = await getListCustomerFromApi()
-      const orderResponse = await getListOrderFromApi(page)
-      const priceResponse = await getListProductAttributePriceFromApi()
-      pagination.value = orderResponse.pagination
-
-      listOrder.value = orderResponse.data.map((order) => {
-        const customer = customerResponse.data.find((customer) => order.customer_id === customer.customer_id)
-        const totalPrice = order.order_products.reduce((total, product) => {
-          const currentPrice = priceResponse.data.find((price) => price.product_attribute_value_id === product.product_attribute_value_id)
-          return total += currentPrice.price * product.count
-        }, 0)
-
-        return  {
-          ...order,
-          customerName: customer.customer_name,
-          totalPrice
+        const res = await getListOrderFromApi(page)
+        pagination.value = res.pagination
+        listOrder.value = {
+          ...res.data
         }
-      })
-
+      } catch (errors) {
+        const error = errors.message
+        // toast.error(error);
+      } finally {
+        store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false
+      }
     }
 
-    // getListOrder(pageCurrent.value);
-    // getListCustomer();
-    // getListProduct();
-    // getListUserManager();
-    initComponent(pageCurrent.value)
+    const goToDetail = (id) => {
+      router.push(`${ROUTER_PATH.ORDER_MANAGE}/${ROUTER_PATH.DETAIL}/${id}`);
+    }
+
+    const exportOrder = async (id) => {
+      console.log(12313)
+      const excelRes = await exportOrderFromApi({order_id: id})
+      const url = URL.createObjectURL(new Blob([excelRes], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      }))
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', 'fileName')
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+    }
+
+    getListOrder(pageCurrent.value);
 
     return {
       pagination,
       addNewOrder,
+      orderDetail,
+      listOrder,
+      exportExcel,
       handleCreateOrder,
-      listOrder
+      goToDetail,
+      exportOrder
     }
   }
 }

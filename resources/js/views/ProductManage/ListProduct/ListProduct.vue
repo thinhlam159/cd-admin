@@ -195,16 +195,6 @@ export default {
         store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = true
         const response = await getListProductFromApi(page, categoryIds)
         pagination.value = response.pagination
-        // const excelRes = await exportOrderFromApi({order_id: '01GJAC9G8BAH81DFQMWKG62TEM'})
-        // const url = URL.createObjectURL(new Blob([excelRes], {
-        //   type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        // }))
-        // const link = document.createElement('a')
-        // link.href = url
-        // link.setAttribute('download', 'fileName')
-        // document.body.appendChild(link)
-        // link.click()
-        // link.remove()
         const productResult = response.data.map((product) => {
           const attvalue = product.product_attribute_values.map((attributeValue) => {
             return {
