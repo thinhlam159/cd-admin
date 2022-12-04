@@ -6,6 +6,7 @@ use App\Bundle\Admin\Domain\Model\CustomerId;
 use App\Bundle\Admin\Domain\Model\UserId;
 use App\Bundle\Common\Constants\PaginationConst;
 use App\Bundle\ProductBundle\Domain\Model\IOrderRepository;
+use App\Bundle\ProductBundle\Domain\Model\MeasureUnitType;
 use App\Bundle\ProductBundle\Domain\Model\Order;
 use App\Bundle\ProductBundle\Domain\Model\OrderCriteria;
 use App\Bundle\ProductBundle\Domain\Model\OrderDeliveryStatus;
@@ -54,7 +55,11 @@ final class OrderRepository implements IOrderRepository
                 'product_id' => $orderProduct->getProductId()->asString(),
                 'product_attribute_value_id' => $orderProduct->getProductAttributeValueId()->asString(),
                 'product_attribute_price_id' => $orderProduct->getProductAttributePriceId()->asString(),
+                'attribute_display_index' => $orderProduct->getAttributeDisplayIndex(),
+                'weight' => $orderProduct->getWeight(),
                 'count' => $orderProduct->getCount(),
+                'cost' => $orderProduct->getOrderProductCost(),
+                'measure_unit_type' => $orderProduct->getMeasureUnitType()->getType(),
             ]);
             if (!$result) {
                 return false;
@@ -79,7 +84,7 @@ final class OrderRepository implements IOrderRepository
                 OrderDeliveryStatus::fromStatus($entity->delivery_status),
                 OrderPaymentStatus::fromStatus($entity->payment_status)
             );
-            $order->setUpdateAt(SettingDate::fromYmdHis($entity->updated_at));
+            $order->setUpdatedAt(SettingDate::fromYmdHis($entity->updated_at));
 
             $orders[] = $order;
         }
@@ -107,7 +112,11 @@ final class OrderRepository implements IOrderRepository
                 new ProductId($orderProductEntity->product_id),
                 new ProductAttributeValueId($orderProductEntity->product_attribute_value_id),
                 new ProductAttributePriceId($orderProductEntity->product_attribute_price_id),
-                $orderProductEntity->count
+                $orderProductEntity->count,
+                MeasureUnitType::fromType($orderProductEntity->measure_unit_type),
+                $orderProductEntity->attribute_display_index,
+                $orderProductEntity->weight,
+                $orderProductEntity->cost
             );
         }
 

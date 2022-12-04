@@ -9,6 +9,7 @@ use App\Bundle\Admin\Domain\Model\UserId;
 use App\Bundle\Common\Domain\Model\InvalidArgumentException;
 use App\Bundle\Common\Domain\Model\TransactionException;
 use App\Bundle\ProductBundle\Domain\Model\IOrderRepository;
+use App\Bundle\ProductBundle\Domain\Model\IProductAttributePriceRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductAttributeValueRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductInventoryRepository;
 use App\Bundle\ProductBundle\Domain\Model\MeasureUnitType;
@@ -46,9 +47,9 @@ class OrderPostApplicationService
     private IUserRepository $userRepository;
 
     /**
-     * @var IProductAttributeValueRepository
+     * @var IProductAttributePriceRepository
      */
-    private IProductAttributeValueRepository $productAttributeValueRepository;
+    private IProductAttributePriceRepository $productAttributePriceRepository;
 
     /**
      * @var IProductInventoryRepository
@@ -59,21 +60,21 @@ class OrderPostApplicationService
      * @param IOrderRepository $orderRepository
      * @param ICustomerRepository $customerRepository
      * @param IUserRepository $userRepository
-     * @param IProductAttributeValueRepository $productAttributeValueRepository
+     * @param IProductAttributePriceRepository $productAttributePriceRepository
      * @param IProductInventoryRepository $productInventoryRepository
      */
     public function __construct(
         IOrderRepository $orderRepository,
         ICustomerRepository $customerRepository,
         IUserRepository $userRepository,
-        IProductAttributeValueRepository $productAttributeValueRepository,
+        IProductAttributePriceRepository $productAttributePriceRepository,
         IProductInventoryRepository $productInventoryRepository
     )
     {
         $this->orderRepository = $orderRepository;
         $this->customerRepository = $customerRepository;
         $this->userRepository = $userRepository;
-        $this->productAttributeValueRepository = $productAttributeValueRepository;
+        $this->productAttributePriceRepository = $productAttributePriceRepository;
         $this->productInventoryRepository = $productInventoryRepository;
     }
 
@@ -110,6 +111,7 @@ class OrderPostApplicationService
         $newProductInventories = [];
         foreach ($command->orderProductCommands as $orderProductCommand) {
             $productAttributeValueId = $orderProductCommand->productAttributeValueId;
+            $productAttributePrice = $this->productAttributePriceRepository->findById(new ProductAttributePriceId($orderProductCommand->productAttributePriceId));
             $orderProducts[] = new OrderProduct(
                 OrderProductId::newId(),
                 $orderId,
@@ -117,8 +119,10 @@ class OrderPostApplicationService
                 new ProductAttributeValueId($productAttributeValueId),
                 new ProductAttributePriceId($orderProductCommand->productAttributePriceId),
                 $orderProductCommand->count,
+                MeasureUnitType::fromType(MeasureUnitType::KG),
                 $orderProductCommand->attributeDisplayIndex,
                 $orderProductCommand->weight,
+                $productAttributePrice->getStandardPrice() * $orderProductCommand->weight
             );
 
             $newProductInventories[$productAttributeValueId]['count'] =
@@ -170,7 +174,7 @@ class OrderPostApplicationService
         } catch (Exception $e) {
             DB::rollBack();
             Log::error($e);
-            throw new TransactionException('Add product fail!');
+            throw new TransactionException($e->getMessage());
         }
 
         return new OrderPostResult($orderId->__toString());

@@ -39,4 +39,10 @@ interface IProductAttributePriceRepository
      * @return ProductAttributePrice[]
      */
     public function findAll(): array;
+
+    /**
+     * @param ProductAttributePriceId $productAttributePriceId
+     * @return ProductAttributePrice|null
+     */
+    public function findById(ProductAttributePriceId $productAttributePriceId): ?ProductAttributePrice;
 }

@@ -38,6 +38,11 @@ final class OrderProduct
     private int $count;
 
     /**
+     * @var MeasureUnitType
+     */
+    private MeasureUnitType $measureUnitType;
+
+    /**
      * @var int
      */
     private int $attributeDisplayIndex;
@@ -48,14 +53,21 @@ final class OrderProduct
     private int $weight;
 
     /**
+     * @var int
+     */
+    private int $orderProductCost;
+
+    /**
      * @param OrderProductId $orderProductId
      * @param OrderId $orderId
      * @param ProductId $productId
      * @param ProductAttributeValueId $productAttributeValueId
      * @param ProductAttributePriceId $productAttributePriceId
      * @param int $count
+     * @param MeasureUnitType $measureUnitType
      * @param int $attributeDisplayIndex
      * @param int $weight
+     * @param int $orderProductCost
      */
     public function __construct(
         OrderProductId $orderProductId,
@@ -64,8 +76,10 @@ final class OrderProduct
         ProductAttributeValueId $productAttributeValueId,
         ProductAttributePriceId $productAttributePriceId,
         int $count,
+        MeasureUnitType $measureUnitType,
         int $attributeDisplayIndex,
-        int $weight
+        int $weight,
+        int $orderProductCost
     )
     {
         $this->orderProductId = $orderProductId;
@@ -74,8 +88,10 @@ final class OrderProduct
         $this->productAttributeValueId = $productAttributeValueId;
         $this->productAttributePriceId = $productAttributePriceId;
         $this->count = $count;
+        $this->measureUnitType = $measureUnitType;
         $this->attributeDisplayIndex = $attributeDisplayIndex;
         $this->weight = $weight;
+        $this->orderProductCost = $orderProductCost;
     }
 
     /**
@@ -140,5 +156,21 @@ final class OrderProduct
     public function getWeight(): int
     {
         return $this->weight;
+    }
+
+    /**
+     * @return MeasureUnitType
+     */
+    public function getMeasureUnitType(): MeasureUnitType
+    {
+        return $this->measureUnitType;
+    }
+
+    /**
+     * @return int
+     */
+    public function getOrderProductCost(): int
+    {
+        return $this->orderProductCost;
     }
 }

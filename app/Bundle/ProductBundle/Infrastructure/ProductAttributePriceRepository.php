@@ -150,4 +150,23 @@ final class ProductAttributePriceRepository implements IProductAttributePriceRep
         return $productAttributePrices;
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function findById(ProductAttributePriceId $productAttributePriceId): ?ProductAttributePrice
+    {
+        $entity = ModelProductAttributePrice::find($productAttributePriceId->asString());
+        if (!$entity) {
+            return null;
+        }
+
+        return new ProductAttributePrice(
+            new ProductAttributePriceId($entity['id']),
+            new ProductAttributeValueId($entity['product_attribute_value_id']),
+            $entity['price'],
+            MonetaryUnitType::fromType((int)$entity['monetary_unit_type']),
+            NoticePriceType::fromType((int)$entity['notice_price_type']),
+            $entity['is_current']
+        );
+    }
 }

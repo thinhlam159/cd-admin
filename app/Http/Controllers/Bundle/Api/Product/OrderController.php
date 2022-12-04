@@ -24,6 +24,7 @@ use App\Bundle\ProductBundle\Application\RestoreImportGoodPutApplicationService;
 use App\Bundle\ProductBundle\Application\RestoreImportGoodPutCommand;
 use App\Bundle\ProductBundle\Infrastructure\ImportGoodRepository;
 use App\Bundle\ProductBundle\Infrastructure\OrderRepository;
+use App\Bundle\ProductBundle\Infrastructure\ProductAttributePriceRepository;
 use App\Bundle\ProductBundle\Infrastructure\ProductAttributeValueRepository;
 use App\Bundle\ProductBundle\Infrastructure\ProductInventoryRepository;
 use App\Bundle\ProductBundle\Infrastructure\ProductRepository;
@@ -45,7 +46,7 @@ final class OrderController extends BaseController
             new OrderRepository(),
             new CustomerRepository(),
             new UserRepository(),
-            new ProductAttributeValueRepository(),
+            new ProductAttributePriceRepository(),
             new ProductInventoryRepository(),
         );
 
@@ -87,7 +88,8 @@ final class OrderController extends BaseController
             new CustomerRepository(),
             new UserRepository(),
             new ProductAttributeValueRepository(),
-            new ProductInventoryRepository(),
+            new ProductAttributePriceRepository(),
+            new ProductRepository(),
         );
 
         $command = new OrderListGetCommand();
@@ -104,7 +106,16 @@ final class OrderController extends BaseController
                     'product_id' => $orderProductResult->productId,
                     'product_attribute_value_id' => $orderProductResult->productAttributeValueId,
                     'product_attribute_price_id' => $orderProductResult->productAttributePriceId,
+                    'measure_unit_type' => $orderProductResult->measureUnitType,
+                    'weight' => $orderProductResult->weight,
+                    'attribute_display_index' => $orderProductResult->count,
+                    'notice_price_type' => $orderProductResult->noticePriceType,
+                    'price' => $orderProductResult->price,
+                    'cost' => $orderProductResult->cost,
                     'count' => $orderProductResult->count,
+                    'product_attribute_value_code' => $orderProductResult->productAttributeValueCode,
+                    'product_name' => $orderProductResult->productName,
+                    'product_code' => $orderProductResult->productCode,
                 ];
             }
             $data[] = [
@@ -113,8 +124,10 @@ final class OrderController extends BaseController
                 'user_id' => $orderResult->userId,
                 'delivery_status' => $orderResult->deliveryStatus,
                 'payment_status' => $orderResult->paymentStatus,
+                'update_at' => $orderResult->updatedAt,
+                'customer_name' => $orderResult->customerName,
+                'user_name' => $orderResult->userName,
                 'order_products' => $orderProducts,
-                'update_at' => $orderResult->updateAt,
             ];
         }
         $response = [
@@ -140,11 +153,12 @@ final class OrderController extends BaseController
             new CustomerRepository(),
             new UserRepository(),
             new ProductAttributeValueRepository(),
-            new ProductInventoryRepository(),
+            new ProductAttributePriceRepository(),
+            new ProductRepository(),
         );
 
         $command = new OrderGetCommand(
-            $request->order_id
+            $request->id
         );
         $result = $applicationService->handle($command);
 
@@ -156,17 +170,28 @@ final class OrderController extends BaseController
                     'product_id' => $orderProductResult->productId,
                     'product_attribute_value_id' => $orderProductResult->productAttributeValueId,
                     'product_attribute_price_id' => $orderProductResult->productAttributePriceId,
+                    'measure_unit_type' => $orderProductResult->measureUnitType,
+                    'weight' => $orderProductResult->weight,
+                    'attribute_display_index' => $orderProductResult->count,
+                    'notice_price_type' => $orderProductResult->noticePriceType,
+                    'price' => $orderProductResult->price,
+                    'cost' => $orderProductResult->cost,
                     'count' => $orderProductResult->count,
+                    'product_attribute_value_code' => $orderProductResult->productAttributeValueCode,
+                    'product_name' => $orderProductResult->productName,
+                    'product_code' => $orderProductResult->productCode,
                 ];
             }
-            $data[] = [
+            $data = [
                 'order_id' => $result->orderId,
                 'customer_id' => $result->customerId,
+                'customer_name' => $result->customerName,
                 'user_id' => $result->userId,
+                'user_name' => $result->userName,
                 'delivery_status' => $result->deliveryStatus,
                 'payment_status' => $result->paymentStatus,
+                'update_at' => $result->updatedAt,
                 'order_products' => $orderProducts,
-                'update_at' => $result->updateAt,
             ];
 
         return response()->json(['data' => $data], 200);

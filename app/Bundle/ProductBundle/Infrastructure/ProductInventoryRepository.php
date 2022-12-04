@@ -83,6 +83,7 @@ final class ProductInventoryRepository implements IProductInventoryRepository
                 'update_type' => $inventory->getProductInventoryUpdateType()->getType(),
                 'order_id' => $inventory->getOrderId()->asString(),
                 'number_of_update' => $inventory->getNumberOfUpdate(),
+                'measure_unit_type' => $inventory->getMeasureUnitType()->getType(),
                 'is_current' => true,
             ]);
 
