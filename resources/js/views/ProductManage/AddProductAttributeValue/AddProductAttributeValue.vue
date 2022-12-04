@@ -130,7 +130,7 @@ export default {
         bodyFormData.append('code', data.code);
         bodyFormData.append('price', data.price);
         bodyFormData.append('count', data.count);
-        bodyFormData.append('count', data.notice_price_type);
+        bodyFormData.append('notice_price_type', data.notice_price_type);
         const res = await createProductAttributeValueFromApi(bodyFormData)
         router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.PRODUCT_MANAGE}`)
       } catch (errors) {

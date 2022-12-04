@@ -18,7 +18,6 @@ class CreateProductAttributeValuesTable extends Migration
             $table->string('product_id');
             $table->string('product_attribute_id');
             $table->string('value');
-            $table->string('name_by_attribute');
             $table->string('code');
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
             $table->foreign('product_attribute_id')->references('id')->on('product_attributes')->onDelete('cascade');

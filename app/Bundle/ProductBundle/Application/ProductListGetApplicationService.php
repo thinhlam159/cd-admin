@@ -127,7 +127,8 @@ class ProductListGetApplicationService
                 $productInventory = $this->productInventoryRepository->findByProductAttributeValueId($productAttributePrice->getProductAttributeValueId());
                 $productAttribute = $this->productAttributeRepository->findById($productAttributeValue->getProductAttributeId());
 //                $measureUnit = $this->measureUnitRepository->findById($productAttributeValue->getMeasureUnitId());
-
+                $standardPrice = $productAttributePrice->getPrice() / $productAttributePrice->getNoticePriceType()->getAmountValue();
+                $standardPrice = floor($standardPrice);
                 $productAttributeValueResults[] = new ProductAttributeValueResult(
                     $productAttributeValue->getProductAttributeValueId()->asString(),
                     $productAttributeValue->getProductId()->asString(),
@@ -139,7 +140,8 @@ class ProductListGetApplicationService
                     $productAttributePrice->getPrice(),
                     $productAttributePrice->getMonetaryUnitType()->getValue(),
                     $productAttributePrice->getNoticePriceType()->getValue(),
-                    $productAttributePrice->getProductAttributePriceId()
+                    $productAttributePrice->getProductAttributePriceId(),
+                    $standardPrice
                 );
             }
 

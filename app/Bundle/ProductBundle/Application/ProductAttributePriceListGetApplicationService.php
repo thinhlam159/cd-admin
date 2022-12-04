@@ -5,17 +5,6 @@ namespace App\Bundle\ProductBundle\Application;
 use App\Bundle\Common\Domain\Model\InvalidArgumentException;
 use App\Bundle\Common\Domain\Model\TransactionException;
 use App\Bundle\ProductBundle\Domain\Model\IProductAttributePriceRepository;
-use App\Bundle\ProductBundle\Domain\Model\IProductAttributeRepository;
-use App\Bundle\ProductBundle\Domain\Model\IProductAttributeValueRepository;
-use App\Bundle\ProductBundle\Domain\Model\IProductInventoryRepository;
-use App\Bundle\ProductBundle\Domain\Model\MonetaryUnitType;
-use App\Bundle\ProductBundle\Domain\Model\NoticePriceType;
-use App\Bundle\ProductBundle\Domain\Model\ProductAttributePrice;
-use App\Bundle\ProductBundle\Domain\Model\ProductAttributePriceId;
-use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValueId;
-use Exception;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class ProductAttributePriceListGetApplicationService
 {
@@ -43,6 +32,8 @@ class ProductAttributePriceListGetApplicationService
         $results = $this->productAttributePriceRepository->findAll();
         $productAttributePriceResults = [];
         foreach ($results as $result) {
+            $standardPrice = $result->getPrice() / $result->getNoticePriceType()->getAmountValue();
+            $standardPrice = floor($standardPrice);
             $productAttributePriceResults[] = new ProductAttributePriceResult(
                 $result->getProductAttributePriceId()->asString(),
                 $result->getProductAttributeValueId()->asString(),
@@ -50,6 +41,7 @@ class ProductAttributePriceListGetApplicationService
                 $result->getMonetaryUnitType()->getValue(),
                 $result->getNoticePriceType()->getValue(),
                 $result->isCurrent(),
+                $standardPrice
             );
         }
 

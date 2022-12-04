@@ -41,6 +41,7 @@ final class ProductInventoryRepository implements IProductInventoryRepository
             'id'=> $productInventory->getProductInventoryId()->asString(),
             'product_attribute_value_id'=> $productInventory->getProductAttributeValueId()->asString(),
             'count' => $productInventory->getCount(),
+            'measure_unit_type' => $productInventory->getMeasureUnitType()->getType(),
             'is_current' => $productInventory->isCurrent(),
         ]);
         if (!$result) {
@@ -72,14 +73,16 @@ final class ProductInventoryRepository implements IProductInventoryRepository
     /**
      * @inheritDoc
      */
-    public function createMultiProductInventory(array $productInventories): bool
+    public function createMultiProductInventoryByOrder(array $productInventories): bool
     {
         foreach ($productInventories as $inventory) {
             $result = ModelProductInventory::create([
                 'id' => $inventory->getProductInventoryId()->asString(),
                 'product_attribute_value_id' => $inventory->getProductAttributeValueId()->asString(),
                 'count' => $inventory->getCount(),
-                'measure_unit_type' => $inventory->getMeasureUnitType()->getType(),
+                'update_type' => $inventory->getProductInventoryUpdateType()->getType(),
+                'order_id' => $inventory->getOrderId()->asString(),
+                'number_of_update' => $inventory->getNumberOfUpdate(),
                 'is_current' => true,
             ]);
 
@@ -90,5 +93,4 @@ final class ProductInventoryRepository implements IProductInventoryRepository
 
         return true;
     }
-
 }

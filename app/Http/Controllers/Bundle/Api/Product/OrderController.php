@@ -6,9 +6,9 @@ use App\Bundle\Admin\Infrastructure\CustomerRepository;
 use App\Bundle\Admin\Infrastructure\UserRepository;
 use App\Bundle\ProductBundle\Application\DeliveryStatusPutApplicationService;
 use App\Bundle\ProductBundle\Application\DeliveryStatusPutCommand;
+use App\Bundle\ProductBundle\Application\ImportGoodPostApplicationService;
 use App\Bundle\ProductBundle\Application\ImportGoodPostCommand;
 use App\Bundle\ProductBundle\Application\ImportGoodProductCommand;
-use App\Bundle\ProductBundle\Application\ImportGoodPostApplicationService;
 use App\Bundle\ProductBundle\Application\OrderCancelPostApplicationService;
 use App\Bundle\ProductBundle\Application\OrderCancelPostCommand;
 use App\Bundle\ProductBundle\Application\OrderExportPostApplicationService;
@@ -32,9 +32,7 @@ use App\Http\Controllers\Bundle\Api\Common\BaseController;
 use App\Imports\OrderImport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
-use Symfony\Component\Console\Input\Input;
 
 final class OrderController extends BaseController
 {
@@ -57,9 +55,11 @@ final class OrderController extends BaseController
             $orderProductCommands[] = new OrderProductCommand(
                 $orderProduct['product_id'],
                 $orderProduct['product_attribute_value_id'],
+                (int)$orderProduct['attribute_display_index'],
                 $orderProduct['product_attribute_price_id'],
-                $orderProduct['count'],
+                (int)$orderProduct['count'],
                 $orderProduct['measure_unit_type'],
+                (int)$orderProduct['weight'],
             );
         }
 

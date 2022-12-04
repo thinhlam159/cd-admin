@@ -101,6 +101,7 @@ class ProductController extends BaseController
                     'notice_price_type' => $productAttributeValueResult->noticePriceType,
                     'monetary_unit_name' => $productAttributeValueResult->monetaryUnit,
                     'product_attribute_price_id' => $productAttributeValueResult->productAttributePriceId,
+                    'standard_price' => $productAttributeValueResult->standardPrice,
                 ];
             }
             $data[] = [
@@ -262,7 +263,6 @@ class ProductController extends BaseController
     {
         $applicationService = new ProductAttributeValuePostApplicationService(
             new ProductAttributeValueRepository(),
-            new FeatureImagePathRepository(),
             new ProductAttributePriceRepository(),
             new ProductInventoryRepository()
         );
@@ -275,6 +275,7 @@ class ProductController extends BaseController
             $request->code,
             (int)$request->price,
             (int)$request->count,
+            $request->notice_price_type,
         );
 
         $result = $applicationService->handle($command);
@@ -398,6 +399,7 @@ class ProductController extends BaseController
                 'price' => $productAttributePriceResult->price,
                 'monetary_unit' => $productAttributePriceResult->monetaryUnitType,
                 'notice_price_type' => $productAttributePriceResult->noticePriceType,
+                'standard_price' => $productAttributePriceResult->standardPrice,
                 'is_current' => $productAttributePriceResult->isCurrent,
             ];
         }

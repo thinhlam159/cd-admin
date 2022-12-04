@@ -28,6 +28,10 @@ final class ProductAttributePriceResult
      * @var bool
      */
     public bool $isCurrent;
+    /**
+     * @var int
+     */
+    public int $standardPrice;
 
     /**
      * @param string $productAttributePriceId
@@ -36,8 +40,9 @@ final class ProductAttributePriceResult
      * @param string $monetaryUnitType
      * @param string $noticePriceType
      * @param bool $isCurrent
+     * @param int $standardPrice
      */
-    public function __construct(string $productAttributePriceId, string $productAttributeValueId, int $price, string $monetaryUnitType, string $noticePriceType, bool $isCurrent)
+    public function __construct(string $productAttributePriceId, string $productAttributeValueId, int $price, string $monetaryUnitType, string $noticePriceType, bool $isCurrent, int $standardPrice)
     {
         $this->productAttributePriceId = $productAttributePriceId;
         $this->productAttributeValueId = $productAttributeValueId;
@@ -45,5 +50,6 @@ final class ProductAttributePriceResult
         $this->monetaryUnitType = $monetaryUnitType;
         $this->noticePriceType = $noticePriceType;
         $this->isCurrent = $isCurrent;
+        $this->standardPrice = $standardPrice;
     }
 }

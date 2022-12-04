@@ -4,13 +4,9 @@ namespace App\Bundle\ProductBundle\Application;
 
 use App\Bundle\Common\Domain\Model\InvalidArgumentException;
 use App\Bundle\Common\Domain\Model\TransactionException;
-use App\Bundle\ProductBundle\Domain\Model\FeatureImagePath;
-use App\Bundle\ProductBundle\Domain\Model\FeatureImagePathId;
-use App\Bundle\ProductBundle\Domain\Model\IFeatureImagePathRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductAttributePriceRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductAttributeValueRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductInventoryRepository;
-use App\Bundle\ProductBundle\Domain\Model\MeasureUnitId;
 use App\Bundle\ProductBundle\Domain\Model\MeasureUnitType;
 use App\Bundle\ProductBundle\Domain\Model\MonetaryUnitType;
 use App\Bundle\ProductBundle\Domain\Model\NoticePriceType;
@@ -34,11 +30,6 @@ class ProductAttributeValuePostApplicationService
     private IProductAttributeValueRepository $productAttributeValueRepository;
 
     /**
-     * @var IFeatureImagePathRepository
-     */
-    private IFeatureImagePathRepository $featureImagePathRepository;
-
-    /**
      * @var IProductAttributePriceRepository
      */
     private IProductAttributePriceRepository $productAttributePriceRepository;
@@ -50,19 +41,16 @@ class ProductAttributeValuePostApplicationService
 
     /**
      * @param IProductAttributeValueRepository $productAttributeValueRepository
-     * @param IFeatureImagePathRepository $featureImagePathRepository
      * @param IProductAttributePriceRepository $productAttributePriceRepository
      * @param IProductInventoryRepository $productInventoryRepository
      */
     public function __construct(
         IProductAttributeValueRepository $productAttributeValueRepository,
-        IFeatureImagePathRepository $featureImagePathRepository,
         IProductAttributePriceRepository $productAttributePriceRepository,
         IProductInventoryRepository $productInventoryRepository
     )
     {
         $this->productAttributeValueRepository = $productAttributeValueRepository;
-        $this->featureImagePathRepository = $featureImagePathRepository;
         $this->productAttributePriceRepository = $productAttributePriceRepository;
         $this->productInventoryRepository = $productInventoryRepository;
     }
@@ -78,7 +66,6 @@ class ProductAttributeValuePostApplicationService
         $productAttributeValueId = ProductAttributeValueId::newId();
         $productId = new ProductId($command->productId);
         $productAttributeId = new ProductAttributeId($command->productAttributeId);
-        $measureUnitId = new MeasureUnitId($command->measureUnitId);
 
         $productAttributeValue = new ProductAttributeValue(
             $productAttributeValueId,
@@ -103,7 +90,7 @@ class ProductAttributeValuePostApplicationService
             $productAttributeValueId,
             $command->price,
             MonetaryUnitType::fromType(MonetaryUnitType::VND),
-            NoticePriceType::fromValue(NoticePriceType::KG298),
+            NoticePriceType::fromValue($command->noticePriceType),
             true
         );
 

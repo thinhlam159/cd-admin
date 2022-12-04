@@ -25,8 +25,8 @@ interface IProductInventoryRepository
     public function updateProductInventories(array $productInventories): bool;
 
     /**
-     * @param ProductInventory[] $productInventories
+     * @param ProductInventoryOrder[] $productInventories
      * @return bool
      */
-    public function createMultiProductInventory(array $productInventories): bool;
+    public function createMultiProductInventoryByOrder(array $productInventories): bool;
 }

@@ -19,7 +19,7 @@
                       input: 'w-full h-10 px-3 border-none text-base text-gray-700 placeholder-gray-400',
                       help: 'text-xs text-gray-500'
                     }"
-                    v-model="formData.userName"
+                    v-model="formData.customerName"
                 />
                 <FormKit
                     type="text"
@@ -107,13 +107,13 @@ export default {
         phone: '',
         status: true
       })
-      const getCustomerDetail = async (userId) => {
+      const getCustomerDetail = async (customerId) => {
           try {
               store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = true;
-              const response = await getCustomerDetailFromApi(userId);
+              const response = await getCustomerDetailFromApi(customerId);
               formData.value = {
                   ...formData.value,
-                  userName: response.customer_name,
+                  customerNmae: response.customer_name,
                   email: response.email,
                   status: response.status,
               };

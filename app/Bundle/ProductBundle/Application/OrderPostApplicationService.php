@@ -21,8 +21,9 @@ use App\Bundle\ProductBundle\Domain\Model\OrderProductId;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributePriceId;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValueId;
 use App\Bundle\ProductBundle\Domain\Model\ProductId;
-use App\Bundle\ProductBundle\Domain\Model\ProductInventory;
 use App\Bundle\ProductBundle\Domain\Model\ProductInventoryId;
+use App\Bundle\ProductBundle\Domain\Model\ProductInventoryOrder;
+use App\Bundle\ProductBundle\Domain\Model\ProductInventoryUpdateType;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -106,26 +107,42 @@ class OrderPostApplicationService
         );
 
         $orderProducts = [];
-        $currentProductInventories= [];
         $newProductInventories = [];
         foreach ($command->orderProductCommands as $orderProductCommand) {
+            $productAttributeValueId = $orderProductCommand->productAttributeValueId;
             $orderProducts[] = new OrderProduct(
                 OrderProductId::newId(),
                 $orderId,
                 new ProductId($orderProductCommand->productId),
-                new ProductAttributeValueId($orderProductCommand->productAttributeValueId),
+                new ProductAttributeValueId($productAttributeValueId),
                 new ProductAttributePriceId($orderProductCommand->productAttributePriceId),
-                $orderProductCommand->count
+                $orderProductCommand->count,
+                $orderProductCommand->attributeDisplayIndex,
+                $orderProductCommand->weight,
             );
-            $productAttributeValueId = new ProductAttributeValueId($orderProductCommand->productAttributeValueId);
+
+            $newProductInventories[$productAttributeValueId]['count'] =
+                isset($newProductInventories[$productAttributeValueId]['count'])
+            ? $newProductInventories[$productAttributeValueId]['count'] += $orderProductCommand->count
+            : $orderProductCommand->count;
+            $newProductInventories[$productAttributeValueId]['measure_unit_type'] = $orderProductCommand->measureUnitType;
+        }
+
+        $saveNewProductInventories = [];
+        $currentProductInventories= [];
+        foreach ($newProductInventories as $key => $newProductInventory) {
+            $productAttributeValueId = new ProductAttributeValueId($key);
             $currentProductInventory = $this->productInventoryRepository->findByProductAttributeValueId($productAttributeValueId);
-            $newCount = $currentProductInventory->getCount() - $orderProductCommand->count;
-            $newProductInventories[] = new ProductInventory(
+            $newCount = $currentProductInventory->getCount() - $newProductInventory['count'];
+            $saveNewProductInventories[] = new ProductInventoryOrder(
                 ProductInventoryId::newId(),
-                new ProductAttributeValueId($orderProductCommand->productAttributeValueId),
+                $productAttributeValueId,
                 $newCount,
-                MeasureUnitType::fromValue($orderProductCommand->measureUnitType),
-                true
+                MeasureUnitType::fromValue($newProductInventory['measure_unit_type']),
+                ProductInventoryUpdateType::fromType(ProductInventoryUpdateType::ORDER),
+                $orderId,
+                $newProductInventory['count'],
+                true,
             );
             $currentProductInventories[] = $currentProductInventory;
         }
@@ -140,7 +157,7 @@ class OrderPostApplicationService
             if (!$updateCurrentInventoryResult) {
                 throw new InvalidArgumentException('customer not exist!');
             }
-            $createInventoryProductResult = $this->productInventoryRepository->createMultiProductInventory($newProductInventories);
+            $createInventoryProductResult = $this->productInventoryRepository->createMultiProductInventoryByOrder($saveNewProductInventories);
             if (!$createInventoryProductResult) {
                 throw new InvalidArgumentException('customer not exist!');
             }

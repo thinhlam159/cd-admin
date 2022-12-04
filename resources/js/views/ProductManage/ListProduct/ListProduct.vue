@@ -29,29 +29,29 @@
             <th rowspan="2" class="border py-1 w-[2%]">
               #
             </th>
-            <th rowspan="2" class="border py-1 w-[7%]">
+            <th rowspan="2" class="border py-1 w-[5%]">
               Tên sản phẩm
             </th>
-            <th rowspan="2" class="border py-1 w-[7%]">
+            <th rowspan="2" class="border py-1 w-[5%]">
               Mã sản phẩm
             </th>
-            <th rowspan="2" class="border py-1 w-[7%]">
+            <th rowspan="2" class="border py-1 w-[5%]">
               Danh mục
             </th>
-            <th rowspan="2" class="border py-1 w-[7%]">
+            <th rowspan="2" class="border py-1 w-[5%]">
               Báo giá
             </th>
             <th colspan="3" class="border py-1 w-[20%]">
               Dòng sản phẩm
             </th>
-            <th colspan="3" class="border py-1 w-[20%]">
+            <th class="border py-1 w-[5%]">
               Cập nhật
             </th>
           </tr>
           <tr>
             <th class="border py-1">Mã</th>
             <th class="border py-1">Tồn kho</th>
-            <th class="border py-1">Đơn giá</th>
+            <th class="border py-1">Đơn giá / kg</th>
           </tr>
         </thead>
         <tbody>
@@ -101,12 +101,12 @@
             <td class="border text-center h-full m-0 p-0">
               {{ `${subItem.price} ${subItem.monetary_unit_name}` }}
             </td>
-            <!--            <td v-if="subIndex === 0" :rowspan="item.product_attribute_values.length"  class="border text-center">-->
-            <!--                <div class="flex justify-center ">-->
-            <!--                    <ButtonAddNew @clickBtn="() => goToAddProductAttributeValue(item.product_id)" :text="' '"/>-->
-            <!--                    <ButtonEdit @clickBtn="() => goToAdd(item.product_id)" :text="editUser"/>-->
-            <!--                </div>-->
-            <!--            </td>-->
+            <td v-if="subIndex === 0" :rowspan="item.product_attribute_values.length" class="border text-center">
+              <div class="flex justify-center ">
+                <ButtonAddNew @clickBtn="() => goToAddProductAttributeValue(item.product_id)" :text="' '"/>
+                <ButtonEdit @clickBtn="() => goToAdd(item.product_id)" :text="editUser"/>
+              </div>
+            </td>
           </tr>
         </template>
         </tbody>

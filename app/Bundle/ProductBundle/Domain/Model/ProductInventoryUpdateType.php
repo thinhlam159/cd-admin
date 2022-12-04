@@ -1,16 +1,21 @@
 <?php
+
 namespace App\Bundle\ProductBundle\Domain\Model;
 
 use App\Bundle\Common\Domain\Model\InvalidArgumentException;
 
-final class MonetaryUnitType
+final class ProductInventoryUpdateType
 {
     /** @var int */
-    public const VND = 1;
+    public const ORDER = 1;
+
+    /** @var int */
+    public const IMPORT_GOOD = 2;
 
     /** @var array<int,string> */
     private const VALUES = [
-        self::VND => 'vnd',
+        self::ORDER => 'order',
+        self::IMPORT_GOOD => 'import_good',
     ];
     private int $type;
 
@@ -35,28 +40,28 @@ final class MonetaryUnitType
      * @param string $value value
      * @return self
      */
-    public static function fromValue(string $value): MonetaryUnitType
+    public static function fromValue(string $value): ProductInventoryUpdateType
     {
         foreach (self::VALUES as $type => $v) {
             if ($v === $value) {
-                return new MonetaryUnitType($type);
+                return new ProductInventoryUpdateType($type);
             }
         }
 
-        throw new InvalidArgumentException("[{$value}] Gía trị không hợp lệ");
+        throw new InvalidArgumentException("[{$value}] Giá trị không hợp lệ");
     }
 
     /**
      * @param int $type type
      * @return self
      */
-    public static function fromType(int $type): MonetaryUnitType
+    public static function fromType(int $type): ProductInventoryUpdateType
     {
         if (!isset(self::VALUES[$type])) {
-            throw new InvalidArgumentException("[{$type}] Type không hợp lệ");
+            throw new InvalidArgumentException("[{$type}] Loại không hợp lệ");
         }
 
-        return new MonetaryUnitType($type);
+        return new ProductInventoryUpdateType($type);
     }
 
     /**

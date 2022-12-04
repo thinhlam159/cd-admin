@@ -38,12 +38,24 @@ final class OrderProduct
     private int $count;
 
     /**
+     * @var int
+     */
+    private int $attributeDisplayIndex;
+
+    /**
+     * @var int
+     */
+    private int $weight;
+
+    /**
      * @param OrderProductId $orderProductId
      * @param OrderId $orderId
      * @param ProductId $productId
      * @param ProductAttributeValueId $productAttributeValueId
      * @param ProductAttributePriceId $productAttributePriceId
      * @param int $count
+     * @param int $attributeDisplayIndex
+     * @param int $weight
      */
     public function __construct(
         OrderProductId $orderProductId,
@@ -51,7 +63,9 @@ final class OrderProduct
         ProductId $productId,
         ProductAttributeValueId $productAttributeValueId,
         ProductAttributePriceId $productAttributePriceId,
-        int $count
+        int $count,
+        int $attributeDisplayIndex,
+        int $weight
     )
     {
         $this->orderProductId = $orderProductId;
@@ -60,6 +74,8 @@ final class OrderProduct
         $this->productAttributeValueId = $productAttributeValueId;
         $this->productAttributePriceId = $productAttributePriceId;
         $this->count = $count;
+        $this->attributeDisplayIndex = $attributeDisplayIndex;
+        $this->weight = $weight;
     }
 
     /**
@@ -108,5 +124,21 @@ final class OrderProduct
     public function getCount(): int
     {
         return $this->count;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAttributeDisplayIndex(): int
+    {
+        return $this->attributeDisplayIndex;
+    }
+
+    /**
+     * @return int
+     */
+    public function getWeight(): int
+    {
+        return $this->weight;
     }
 }

@@ -25,13 +25,16 @@
           <div class="mr-4 w-[14%]">
             <span>Mã sản phẩm</span>
           </div>
-          <div class="mr-4 w-[14%]">
-            <span>Báo giá</span>
+          <div class="mr-4 w-[10%]">
+            <span>Tên sản phẩm</span>
           </div>
-          <div class="mr-4 w-[14%]">
-            <span>Số lượng</span>
+          <div class="mr-4 w-[5%]">
+            <span>Giá</span>
           </div>
-          <div class="mr-4 w-[14%]">
+          <div class="mr-4 w-[7%]">
+            <span>Đơn vị tính</span>
+          </div>
+          <div class="mr-4 w-[10%]">
             <span>Thành tiền</span>
           </div>
           <div class="mr-4 w-[5%]">
@@ -55,16 +58,17 @@
 <!--                    class="w-full h-10 px-3 text-base text-gray-700 placeholder-gray-400 border border-gray-400"-->
 <!--          ></textarea>-->
 <!--        </div>-->
-        <input-item v-for="(item, index) in listInputItem" key="index"
-                    :categories="categories"
-                    :customers="customers"
-                    :products="products"
-                    @handle-remove-input-item="handleRemoveInputItem(item, index)"
-                    :index="index"
-        />
+
+        <div v-if="renderComponent">
+          <input-item v-for="(item, index) in listInputItem" :key="index"
+                      @handle-remove-input-item="handleRemoveInputItem(item)"
+                      @update-display="forceUpdate"
+                      :item="item"
+          />
+        </div>
 
         <div class="ml-2 my-4">
-          <ButtonAddNew @clickBtn="handleAddToOrder" :text="' '"/>
+          <ButtonAddNew @clickBtn="handleAddToOrder" :text="'Sản phẩm'"/>
         </div>
         <div class="pr-4">
           <input class="w-25 h-10 mt-5 px-3 text-base text-gray-700 placeholder-gray-400 bg-green-400 cursor-pointer" type="submit" value="Tạo đơn">
@@ -77,7 +81,7 @@
 <script>
 import {useRouter} from "vue-router";
 import {useStore} from "vuex";
-import {ref} from "vue";
+import {ref, reactive, onMounted} from "vue";
 import logoTimeSharing from "@/assets/images/default-thumbnail.jpg";
 import {
   createOrderFromApi,
@@ -93,6 +97,19 @@ import ButtonAddNew from "@/components/Buttons/ButtonAddNew";
 export default {
   name: "CreateOrder",
   components: { InputItem, ButtonAddNew },
+  methods: {
+    forceUpdate() {
+      this.renderComponent = false
+      this.$nextTick(() => {
+        this.renderComponent = true
+      })
+    }
+  },
+  data() {
+    return {
+      renderComponent: true
+    }
+  },
   setup() {
     const router = useRouter()
     const store = useStore()
@@ -105,9 +122,7 @@ export default {
     const productSelected = ref({})
     const productAttributeValues = ref({})
     const productAttributeValuesByProduct = ref({})
-    const listInputItem = ref([
-      {}
-    ])
+    const listInputItem = ref(store.state[MODULE_STORE.ORDER.NAME].orderPostData)
 
     const handleSubmit = async (data) => {
       try {
@@ -142,6 +157,7 @@ export default {
           ]
         }, [])
         formData.value.category = res.data[0].category_id
+        store.state[MODULE_STORE.ORDER.NAME].categories = res.data
       } catch (errors) {
         // const error = errors.message;
         // console.log(error)
@@ -151,12 +167,15 @@ export default {
     const getListProduct = async () => {
       const res = await getListProductFromApi();
       products.value = res.data
+      store.state[MODULE_STORE.ORDER.NAME].products = res.data
     }
     const getListCustomer = async () => {
       const res = await getListCustomerFromApi();
       customers.value = {
         ...res.data
       }
+      console.log(res)
+      store.state[MODULE_STORE.ORDER.NAME].customers = res.data
     }
     const handleOnChangeCategorySelect = () => {
       productsByCategory.value = products.value.filter((product) => {
@@ -171,18 +190,18 @@ export default {
       productAttributeValuesByProduct.value = productSelected.value.product_attribute_values
     }
     const handleAddToOrder = () => {
-      listInputItem.value.push({})
+      const index = store.state[MODULE_STORE.ORDER.NAME].orderPostData.length
+      store.commit(`${MODULE_STORE.ORDER.NAME}/${MODULE_STORE.ORDER.MUTATIONS.ADD_ORDER_DATA}`, {index})
+      // listInputItem.value = store.state[MODULE_STORE.ORDER.NAME].orderPostData
     }
-    const handleRemoveInputItem = (item, index) => {
-      console.log('remove item:' + index)
-      if (listInputItem.value[index] === item) {
-        listInputItem.value.splice(index, 1)
-      } else {
-        let found = listInputItem.value.indexOf(item)
-        listInputItem.value.splice(found, 1)
-      }
-      store.commit(`${MODULE_STORE.ORDER.NAME}/${MODULE_STORE.ORDER.MUTATIONS.REMOVE_ORDER_DATA_ITEM}`, index)
+    const handleRemoveInputItem = (item) => {
+      store.commit(`${MODULE_STORE.ORDER.NAME}/${MODULE_STORE.ORDER.MUTATIONS.REMOVE_ORDER_DATA_ITEM}`, item)
+      // listInputItem.value = store.state[MODULE_STORE.ORDER.NAME].orderPostData
     }
+    const updateDisplay = () => {
+      listInputItem.value = store.state[MODULE_STORE.ORDER.NAME].orderPostData
+    }
+    onMounted(() => {console.log(store.state[MODULE_STORE.ORDER.NAME].customers)})
 
     getListCategory()
     getListCustomer()
@@ -200,7 +219,8 @@ export default {
       handleOnChangeCategorySelect,
       handleOnChangeProductSelect,
       handleAddToOrder,
-      handleRemoveInputItem
+      handleRemoveInputItem,
+      updateDisplay
     }
   }
 }
