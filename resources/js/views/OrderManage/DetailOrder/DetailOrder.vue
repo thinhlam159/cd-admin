@@ -1,13 +1,36 @@
 <template>
-<!--  <FormUserManage :edit="true" />-->
-    <div class="w-full h-full relative">
-        <div class="w-[650px] pt-14 h-full absolute left-20">
-            <div class="w-full py-6 py-auto text-xl">
-                <span class="text-gray-500">Chi tiết đơn hàng</span>
-            </div>
-
+  <!--  <FormUserManage :edit="true" />-->
+  <div class="w-full h-full relative">
+    <div class="w-[720px] pt-14 h-full absolute left-20">
+      <div class="w-full py-6 py-auto text-xl">
+        <span class="text-gray-500">Chi tiết đơn hàng</span>
+      </div>
+      <div class="w-full py-1 text-sm flex justify-between">
+        <span class="text-gray-900">Tên khách hàng: {{ orderResponse.customer_name }}</span>
+        <span class="">Ngày tạo đơn: {{ orderResponse.update_at}}</span>
+      </div>
+      <hr>
+      <div class="w-full py-4 text-sm">
+        <div class="w-full py-2 flex border-b border-gray-50 text-xs">
+          <div class="inline-block w-[4%]"><span>#</span></div>
+          <div class="inline-block w-[22%]"><span>Tên sản phẩm</span></div>
+          <div class="inline-block w-[8%]"><span>ĐVT</span></div>
+          <div class="inline-block w-[20%]"><span>Số lượng</span></div>
+          <div class="inline-block w-[20%]"><span>Đơn giá</span></div>
+          <div class="inline-block w-[22%]"><span>Thành tiền</span></div>
         </div>
+        <div v-for="(item, index) in orderProductResponse" class="w-full py-2 flex border-b border-gray-50">
+          <div class="inline-block w-[4%]"><span>{{ ++index }}</span></div>
+          <div class="inline-block w-[22%]"><span>{{ item.product_name + ' ' + item.product_attribute_value_code + item.attribute_display_index }}</span></div>
+          <div class="inline-block w-[8%]"><span>{{ item.measure_unit_type }}</span></div>
+          <div class="inline-block w-[20%]"><span>{{ item.weight }}</span></div>
+          <div class="inline-block w-[20%]"><span>{{ item.price.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</span></div>
+          <div class="inline-block w-[22%]"><span>{{ item.cost.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</span></div>
+        </div>
+        <div class="flex justify-end mt-5"><span>Tổng cộng: {{ orderResponse.total_cost.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</span></div>
+      </div>
     </div>
+  </div>
 </template>
 
 <script>
@@ -33,17 +56,18 @@ export default {
       const router = useRouter()
       const store = useStore()
       const OrderId = ref(route.params.id)
-      const formData = ref({})
+      const orderResponse = ref({})
+      const orderProductResponse = ref([])
 
       const getOrderDetail = async (id) => {
         try {
           console.log(id)
           store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = true;
           const response = await getOrderDetailFromApi(id);
-          formData.value = {
-            ...formData.value,
+          orderResponse.value = {
+            ...response.data,
           };
-          console.log(response)
+          orderProductResponse.value = [...response.data.order_products]
         } catch (errors) {
           const error = errors.message || this.$t("common.has_error");
           // this.$toast.error(error);
@@ -51,35 +75,13 @@ export default {
           store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
         }
       }
-      const handleSubmit = async (CustomerId, data) => {
-        try {
-          const res = await updateCustomerFormApi(CustomerId, {
-            user_name: data.userName,
-            email: data.email,
-            status: data.status,
-            phone: data.phone
-          })
-          const response = await getCustomerDetailFromApi(CustomerId);
-          formData.value = {
-            ...formData.value,
-            userName: response.customer_name,
-            email: response.email,
-          };
-        } catch (errors) {
-          const error = errors.message;
-          // this.$toast.error(error);
-        } finally {
-          store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
-        }
-
-      }
 
       getOrderDetail(OrderId.value)
 
       return {
         OrderId,
-        formData,
-        handleSubmit
+        orderResponse,
+        orderProductResponse,
       }
     }
 };

@@ -38,10 +38,10 @@
             <th rowspan="2" class="border py-1 w-[5%]">
               Danh mục
             </th>
-            <th rowspan="2" class="border py-1 w-[5%]">
+            <th rowspan="2" class="border py-1 w-[10%]">
               Báo giá
             </th>
-            <th colspan="3" class="border py-1 w-[20%]">
+            <th colspan="3" class="border py-1 w-[14%]">
               Dòng sản phẩm
             </th>
             <th class="border py-1 w-[5%]">
@@ -90,16 +90,16 @@
 <!--              {{ item.description }}-->
 <!--            </td>-->
             <td class="border text-center h-full m-0 p-0">
-              {{ `${subItem.code} x ${subItem.notice_price_type} x ${subItem.price}` }}
+              {{ `${item.name} ${subItem.code} x ${subItem.notice_price_type} x ${subItem.price}` }}
             </td>
             <td class="border text-center h-full m-0 p-0">
-              {{ subItem.code }}
+              {{ `${item.code} ${subItem.code}` }}
             </td>
             <td class="border text-center h-full m-0 p-0">
               {{ `${subItem.count} ${subItem.measure_unit_name}` }}
             </td>
             <td class="border text-center h-full m-0 p-0">
-              {{ `${subItem.price} ${subItem.monetary_unit_name}` }}
+              {{ `${subItem.standard_price.toLocaleString('it-IT', {style : 'currency', currency : 'VND'})}` }}
             </td>
             <td v-if="subIndex === 0" :rowspan="item.product_attribute_values.length" class="border text-center">
               <div class="flex justify-center ">

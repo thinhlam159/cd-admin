@@ -30,12 +30,11 @@ use App\Bundle\ProductBundle\Infrastructure\ProductInventoryRepository;
 use App\Bundle\ProductBundle\Infrastructure\ProductRepository;
 use App\Exports\OrderExport;
 use App\Http\Controllers\Bundle\Api\Common\BaseController;
-use App\Imports\OrderImport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 
-final class OrderController extends BaseController
+class OrderController extends BaseController
 {
     /**
      * @param Request $request request
@@ -173,7 +172,7 @@ final class OrderController extends BaseController
                     'product_attribute_price_id' => $orderProductResult->productAttributePriceId,
                     'measure_unit_type' => $orderProductResult->measureUnitType,
                     'weight' => $orderProductResult->weight,
-                    'attribute_display_index' => $orderProductResult->count,
+                    'attribute_display_index' => $orderProductResult->attributeDisplayIndex,
                     'notice_price_type' => $orderProductResult->noticePriceType,
                     'price' => $orderProductResult->price,
                     'cost' => $orderProductResult->cost,
@@ -193,6 +192,7 @@ final class OrderController extends BaseController
                 'payment_status' => $result->paymentStatus,
                 'update_at' => $result->updatedAt,
                 'order_products' => $orderProducts,
+                'total_cost' => $result->totalCost,
             ];
 
         return response()->json(['data' => $data], 200);

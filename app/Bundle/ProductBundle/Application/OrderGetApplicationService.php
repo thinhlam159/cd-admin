@@ -109,7 +109,7 @@ class OrderGetApplicationService
                 $orderProduct->getWeight(),
                 $orderProduct->getAttributeDisplayIndex(),
                 $productAttributePrice->getNoticePriceType()->getValue(),
-                $productAttributePrice->getPrice(),
+                $productAttributePrice->getStandardPrice(),
                 $orderProduct->getOrderProductCost(),
                 $productAttributeValue->getCode(),
                 $product->getName(),
