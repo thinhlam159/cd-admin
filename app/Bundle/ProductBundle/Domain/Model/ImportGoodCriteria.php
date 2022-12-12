@@ -5,49 +5,58 @@ namespace App\Bundle\ProductBundle\Domain\Model;
 final class ImportGoodCriteria
 {
     /**
-     * @var ProductId
+     * @var ProductId|null
      */
-    private ProductId $productId;
+    private ?ProductId $productId;
     /**
-     * @var DealerId
+     * @var DealerId|null
      */
-    private DealerId $dealerId;
+    private ?DealerId $dealerId;
     /**
-     * @var ProductAttributeValueId
+     * @var ProductAttributeValueId|null
      */
-    private ProductAttributeValueId $productAttributeValueId;
+    private ?ProductAttributeValueId $productAttributeValueId;
     /**
-     * @var string
+     * @var string|null
      */
-    private string $keyword;
+    private ?string $keyword;
     /**
-     * @var string
+     * @var string|null
      */
-    private string $sort;
+    private ?string $sort;
     /**
-     * @var string
+     * @var string|null
      */
-    private string $order;
+    private ?string $order;
     /**
-     * @var SettingDate
+     * @var SettingDate|null
      */
-    private SettingDate $startDate;
+    private ?SettingDate $startDate;
     /**
-     * @var SettingDate
+     * @var SettingDate|null
      */
-    private SettingDate $endDate;
+    private ?SettingDate $endDate;
 
     /**
-     * @param ProductId $productId
-     * @param DealerId $dealerId
-     * @param ProductAttributeValueId $productAttributeValueId
-     * @param string $keyword
-     * @param string $sort
-     * @param string $order
-     * @param SettingDate $startDate
-     * @param SettingDate $endDate
+     * @param ProductId|null $productId
+     * @param DealerId|null $dealerId
+     * @param ProductAttributeValueId|null $productAttributeValueId
+     * @param string|null $keyword
+     * @param string|null $sort
+     * @param string|null $order
+     * @param SettingDate|null $startDate
+     * @param SettingDate|null $endDate
      */
-    public function __construct(ProductId $productId, DealerId $dealerId, ProductAttributeValueId $productAttributeValueId, string $keyword, string $sort, string $order, SettingDate $startDate, SettingDate $endDate)
+    public function __construct(
+        ?ProductId $productId,
+        ?DealerId $dealerId,
+        ?ProductAttributeValueId $productAttributeValueId,
+        ?string $keyword,
+        ?string $sort,
+        ?string $order,
+        ?SettingDate $startDate,
+        ?SettingDate $endDate
+    )
     {
         $this->productId = $productId;
         $this->dealerId = $dealerId;
@@ -60,65 +69,65 @@ final class ImportGoodCriteria
     }
 
     /**
-     * @return ProductId
+     * @return ProductId|null
      */
-    public function getProductId(): ProductId
+    public function getProductId(): ?ProductId
     {
         return $this->productId;
     }
 
     /**
-     * @return DealerId
+     * @return DealerId|null
      */
-    public function getDealerId(): DealerId
+    public function getDealerId(): ?DealerId
     {
         return $this->dealerId;
     }
 
     /**
-     * @return ProductAttributeValueId
+     * @return ProductAttributeValueId|null
      */
-    public function getProductAttributeValueId(): ProductAttributeValueId
+    public function getProductAttributeValueId(): ?ProductAttributeValueId
     {
         return $this->productAttributeValueId;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getKeyword(): string
+    public function getKeyword(): ?string
     {
         return $this->keyword;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getSort(): string
+    public function getSort(): ?string
     {
         return $this->sort;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getOrder(): string
+    public function getOrder(): ?string
     {
         return $this->order;
     }
 
     /**
-     * @return SettingDate
+     * @return SettingDate|null
      */
-    public function getStartDate(): SettingDate
+    public function getStartDate(): ?SettingDate
     {
         return $this->startDate;
     }
 
     /**
-     * @return SettingDate
+     * @return SettingDate|null
      */
-    public function getEndDate(): SettingDate
+    public function getEndDate(): ?SettingDate
     {
         return $this->endDate;
     }

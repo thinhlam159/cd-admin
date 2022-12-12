@@ -2,6 +2,8 @@
 
 namespace App\Bundle\Admin\Domain\Model;
 
+use App\Bundle\Common\Domain\Model\Pagination;
+
 interface IDealerRepository
 {
     /**
@@ -9,4 +11,10 @@ interface IDealerRepository
      * @return \App\Bundle\Admin\Domain\Model\Dealer
      */
     public function findById(DealerId $dealerId): ?Dealer;
+
+    /**
+     * @noparam
+     * @return array{Dealer[], Pagination}
+     */
+    public function findAll(): array;
 }

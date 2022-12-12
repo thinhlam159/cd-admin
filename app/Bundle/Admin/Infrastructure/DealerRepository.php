@@ -34,4 +34,35 @@ class DealerRepository implements IDealerRepository
             $entity->is_active,
         );
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function findAll(): array
+    {
+        $entities = ModelDealer::paginate(PaginationConst::PAGINATE_ROW);
+
+        /** @var \App\Bundle\Admin\Domain\Model\Dealer[] $result */
+        $dealers = [];
+        foreach ($entities as $entity) {
+            $dealer = new Dealer(
+                new DealerId($entity->id),
+                $entity->name,
+                $entity->email,
+                null,
+                $entity->phone,
+                $entity->is_active,
+            );
+
+            $dealers[] = $dealer;
+        }
+
+        $pagination = new Pagination(
+            $entities->lastPage(),
+            $entities->perPage(),
+            $entities->currentPage()
+        );
+
+        return [$dealers, $pagination];
+    }
 }

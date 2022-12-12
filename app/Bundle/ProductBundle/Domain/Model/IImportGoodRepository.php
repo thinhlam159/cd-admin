@@ -37,7 +37,7 @@ interface IImportGoodRepository
 
     /**
      * @param ImportGoodCriteria $importGoodCriteria
-     * @return array{ImportGoodCriteria[], Pagination}
+     * @return array{ImportGood[], Pagination}
      */
     public function findAll(ImportGoodCriteria $importGoodCriteria): array;
 }

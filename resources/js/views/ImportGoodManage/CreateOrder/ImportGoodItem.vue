@@ -1,10 +1,14 @@
 <template>
   <div class="flex py-1">
-    <div class="mr-4 w-[14%] border border-gray-500">
-      <select name="category" class="p-3 w-full" v-model="formData.category" @change="handleOnChangeCategorySelect">
-        <!--            <option disabled value="" class="w-full h-10 px-3 text-base text-gray-700" selected>Chọn danh mục</option>-->
-        <option v-for="item in categories" :value="item.id" class="w-full h-10 px-3 text-base text-gray-700">{{ item.name }}</option>
-      </select>
+    <div class="mr-4 w-[14%] border border-gray-500 flex">
+<!--      <select name="category" class="p-3 w-full" v-model="formData.category" @change="handleOnChangeCategorySelect">-->
+<!--        &lt;!&ndash;            <option disabled value="" class="w-full h-10 px-3 text-base text-gray-700" selected>Chọn danh mục</option>&ndash;&gt;-->
+<!--        <option v-for="item in categories" :value="item.id" class="w-full h-10 px-3 text-base text-gray-700">{{ item.name }}</option>-->
+<!--      </select>-->
+      <div class="inline p-0" v-for="(item, index) in categories" :key="index">
+        <input class="" type="radio" :id="item.name" :value="item.id" v-model="formData.category" :checked="index===0">
+        <label class="p-2 category-radio-label " :for="item.name">{{ item.name }}</label><br>
+      </div>
     </div>
     <div class="mr-4 w-[14%] border border-gray-500">
       <select name="product" class="p-3 w-full" v-model="formData.product" @change="handleOnChangeProductSelect">
@@ -44,7 +48,7 @@ import ButtonRemove from "@/components/Buttons/ButtonRemove";
 import {MODULE_STORE} from "@/const";
 
 export default {
-  name: "InputItem",
+  name: "ImportGoodItem",
   components: {ButtonRemove},
   props: {
     categories: Object,
@@ -56,12 +60,12 @@ export default {
     const router = useRouter()
     const store = useStore()
 
-    // const categories = toRef(props, 'categories')
-    // const customers = toRef(props, 'customers')
-    // const products = toRef(props, 'products')
-    const categories = ref(store.state[MODULE_STORE.ORDER.NAME].categories)
-    const customers = ref(store.state[MODULE_STORE.ORDER.NAME].customers)
-    const products = ref(store.state[MODULE_STORE.ORDER.NAME].products)
+    const categories = toRef(props, 'categories')
+    const customers = toRef(props, 'customers')
+    const products = toRef(props, 'products')
+    // const categories = ref(store.state[MODULE_STORE.ORDER.NAME].categories)
+    // const customers = ref(store.state[MODULE_STORE.ORDER.NAME].customers)
+    // const products = ref(store.state[MODULE_STORE.ORDER.NAME].products)
     const item = toRef(props, 'item')
     const productOrderName = ref(item.value.productOrderName)
     const productsByCategory = ref({})
@@ -196,5 +200,7 @@ export default {
 </script>
 
 <style scoped>
-
+.category-radio-label:checked {
+  color: #1a202c;
+}
 </style>

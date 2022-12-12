@@ -8,9 +8,9 @@
       <form @submit.prevent="handleSubmit(formData)">
         <div class="mr-4 w-[14%] mb-5">
           <label for="customer" class="block mb-1 font-bold text-sm">Khách hàng</label>
-          <select name="customer" class="p-3 w-full" v-model="formData.customerId">
-            <option v-for="item in customers" :value="item.customer_id"
-                    class="w-full h-10 px-3 text-base text-gray-700">{{ item.customer_name }}
+          <select name="customer" class="p-3 w-full" v-model="formData.dealer_id">
+            <option v-for="item in dealers" :value="item.dealer_id"
+                    class="w-full h-10 px-3 text-base text-gray-700">{{ item.dealer_name }}
             </option>
           </select>
         </div>
@@ -41,37 +41,20 @@
             <span>Xóa sp</span>
           </div>
         </div>
-<!--        <div class="h-48 my-4">-->
-<!--          <img class="h-full w-auto .object-contain" id="blah" :src="imageUrl" alt="your image" />-->
-<!--        </div>-->
-<!--        <div>-->
-<!--          <input-->
-<!--            type="file"-->
-<!--            @change="onFileChanged"-->
-<!--            accept="image/*"-->
-<!--            ref="file"-->
-<!--          />-->
-<!--        </div>-->
-<!--        <div>-->
-<!--          <label for="description" class="block mb-1 font-bold text-sm">Mô tả</label>-->
-<!--          <textarea name="price" placeholder="Nhập giá sp" v-model="formData.description"-->
-<!--                    class="w-full h-10 px-3 text-base text-gray-700 placeholder-gray-400 border border-gray-400"-->
-<!--          ></textarea>-->
-<!--        </div>-->
 
         <div v-if="renderComponent">
-          <input-item v-for="(item, index) in listInputItem" :key="index"
+          <import-good-item v-for="(item, index) in listImportGoodItem" :key="index"
                       @handle-remove-input-item="handleRemoveInputItem(item)"
                       @update-display="forceUpdate"
                       :item="item"
+                      :categories="categories"
+                      :dealers="dealers"
+                      :products="products"
           />
         </div>
 
         <div class="ml-2 my-4">
-          <ButtonAddNew @clickBtn="handleAddToOrder" :text="'Sản phẩm'"/>
-        </div>
-        <div class="pr-4">
-          <input class="w-25 h-10 mt-5 px-3 text-base text-gray-700 placeholder-gray-400 bg-green-400 cursor-pointer" type="submit" value="Tạo đơn">
+          <ButtonAddNew @clickBtn="handleAddToImportGood" :text="'Sản phẩm'"/>
         </div>
       </form>
     </div>
@@ -87,16 +70,16 @@ import {
   createOrderFromApi,
   createProductFromApi,
   getListCategoryFromApi,
-  getListCustomerFromApi,
+  getListCustomerFromApi, getListDealerFromApi,
   getListProductFromApi
 } from "@/api";
 import {MODULE_STORE, ROUTER_PATH} from "@/const";
-import InputItem from "@/views/OrderManage/CreateOrder/InputItem";
 import ButtonAddNew from "@/components/Buttons/ButtonAddNew";
+import ImportGoodItem from "@/views/ImportGoodManage/CreateOrder/ImportGoodItem.vue";
 
 export default {
-  name: "CreateOrder",
-  components: { InputItem, ButtonAddNew },
+  name: "CreateImportGood",
+  components: { ImportGoodItem, ButtonAddNew },
   methods: {
     forceUpdate() {
       this.renderComponent = false
@@ -114,19 +97,18 @@ export default {
     const router = useRouter()
     const store = useStore()
     const formData = ref({})
-    const file = ref(null)
     const categories = ref({})
-    const customers = ref({})
+    const dealers = ref({})
     const products = ref({})
     const productsByCategory = ref({})
     const productSelected = ref({})
     const productAttributeValues = ref({})
     const productAttributeValuesByProduct = ref({})
-    const listInputItem = ref(store.state[MODULE_STORE.ORDER.NAME].orderPostData)
+    const listImportGoodItem = ref(store.state[MODULE_STORE.IMPORT_GOOD.NAME].importGoodPostData)
 
     const handleSubmit = async (data) => {
       try {
-        const orderPostData = [...store.state[MODULE_STORE.ORDER.NAME].orderPostData]
+        const orderPostData = [...store.state[MODULE_STORE.IMPORT_GOOD.NAME].orderPostData]
         const bodyFormData = new FormData()
         bodyFormData.append('customer_id', data.customerId);
         // bodyFormData.append('order_products', orderPostData);
@@ -157,7 +139,7 @@ export default {
           ]
         }, [])
         formData.value.category = res.data[0].category_id
-        store.state[MODULE_STORE.ORDER.NAME].categories = res.data
+        store.state[MODULE_STORE.IMPORT_GOOD.NAME].categories = res.data
       } catch (errors) {
         // const error = errors.message;
         // console.log(error)
@@ -167,16 +149,16 @@ export default {
     const getListProduct = async () => {
       const res = await getListProductFromApi();
       products.value = res.data
-      store.state[MODULE_STORE.ORDER.NAME].products = res.data
+      store.state[MODULE_STORE.IMPORT_GOOD.NAME].products = res.data
     }
-    const getListCustomer = async () => {
-      const res = await getListCustomerFromApi();
-      customers.value = {
+
+    const getListDealer = async () => {
+      const res = await getListDealerFromApi();
+      dealers.value = {
         ...res.data
       }
-      console.log(res)
-      store.state[MODULE_STORE.ORDER.NAME].customers = res.data
     }
+
     const handleOnChangeCategorySelect = () => {
       productsByCategory.value = products.value.filter((product) => {
         return product.category_id === formData.value.category
@@ -189,36 +171,35 @@ export default {
 
       productAttributeValuesByProduct.value = productSelected.value.product_attribute_values
     }
-    const handleAddToOrder = () => {
-      const index = store.state[MODULE_STORE.ORDER.NAME].orderPostData.length
-      store.commit(`${MODULE_STORE.ORDER.NAME}/${MODULE_STORE.ORDER.MUTATIONS.ADD_ORDER_DATA}`, {index})
-      // listInputItem.value = store.state[MODULE_STORE.ORDER.NAME].orderPostData
+    const handleAddToImportGood = () => {
+      const index = store.state[MODULE_STORE.IMPORT_GOOD.NAME].importGoodPostData.length
+      store.commit(`${MODULE_STORE.IMPORT_GOOD.NAME}/${MODULE_STORE.IMPORT_GOOD.MUTATIONS.ADD_IMPORT_GOOD_DATA}`, {index})
+      listImportGoodItem.value = store.state[MODULE_STORE.IMPORT_GOOD.NAME].importGoodPostData
     }
     const handleRemoveInputItem = (item) => {
-      store.commit(`${MODULE_STORE.ORDER.NAME}/${MODULE_STORE.ORDER.MUTATIONS.REMOVE_ORDER_DATA_ITEM}`, item)
-      // listInputItem.value = store.state[MODULE_STORE.ORDER.NAME].orderPostData
+      store.commit(`${MODULE_STORE.IMPORT_GOOD.NAME}/${MODULE_STORE.IMPORT_GOOD.MUTATIONS.REMOVE_IMPORT_GOOD_DATA_ITEM}`, item)
+      // listInputItem.value = store.state[MODULE_STORE.IMPORT_GOOD.NAME].importGoodPostData
     }
     const updateDisplay = () => {
-      listInputItem.value = store.state[MODULE_STORE.ORDER.NAME].orderPostData
+      listImportGoodItem.value = store.state[MODULE_STORE.IMPORT_GOOD.NAME].importGoodPostData
     }
-    onMounted(() => {console.log(store.state[MODULE_STORE.ORDER.NAME].customers)})
 
     getListCategory()
-    getListCustomer()
+    getListDealer()
     getListProduct()
 
     return {
       formData,
       categories,
-      customers,
+      dealers,
       products,
       productAttributeValuesByProduct,
       productsByCategory,
-      listInputItem,
+      listImportGoodItem,
       handleSubmit,
       handleOnChangeCategorySelect,
       handleOnChangeProductSelect,
-      handleAddToOrder,
+      handleAddToImportGood,
       handleRemoveInputItem,
       updateDisplay
     }

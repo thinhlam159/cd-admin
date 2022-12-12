@@ -35,7 +35,13 @@ export default {
 
     LIST_ORDER: 'admin/order/list-order',
     CREATE_ORDER: 'admin/order/create-order',
-    DETAIL_ORDER: 'admin/order/detail-order'
+    DETAIL_ORDER: 'admin/order/detail-order',
+
+    LIST_IMPORT_GOOD: 'admin/import-good/import-goods',
+    CREATE_IMPORT_GOOD: 'admin/import-good/import-good',
+    RESTORE_IMPORT_GOOD: 'admin/import-good/restore-import-good',
+
+    LIST_DEALER: 'admin/dealer/dealers',
   }
 
   // ADMIN: "/admin/customer/user-manage",

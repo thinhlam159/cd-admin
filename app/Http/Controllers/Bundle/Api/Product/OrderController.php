@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Bundle\Api\Product;
 
 use App\Bundle\Admin\Infrastructure\CustomerRepository;
+use App\Bundle\Admin\Infrastructure\DealerRepository;
 use App\Bundle\Admin\Infrastructure\UserRepository;
 use App\Bundle\ProductBundle\Application\DeliveryStatusPutApplicationService;
 use App\Bundle\ProductBundle\Application\DeliveryStatusPutCommand;
+use App\Bundle\ProductBundle\Application\ImportGoodListGetApplicationService;
+use App\Bundle\ProductBundle\Application\ImportGoodListGetCommand;
 use App\Bundle\ProductBundle\Application\ImportGoodPostApplicationService;
 use App\Bundle\ProductBundle\Application\ImportGoodPostCommand;
 use App\Bundle\ProductBundle\Application\ImportGoodProductCommand;
@@ -299,36 +302,66 @@ class OrderController extends BaseController
      */
     public function getImportGoods(Request $request)
     {
-        $applicationService = new ImportGoodPostApplicationService(
+        $applicationService = new ImportGoodListGetApplicationService(
             new ImportGoodRepository(),
-            new ProductInventoryRepository()
+            new ProductInventoryRepository(),
+            new ProductAttributeValueRepository(),
+            new ProductRepository(),
+            new DealerRepository(),
+            new UserRepository(),
         );
 
-        $importGoodProducts = $request->import_good_products;
-        $importGoodProductCommands = [];
-        foreach ($importGoodProducts as $importGoodProduct) {
-            $importGoodProductCommands[] = new ImportGoodProductCommand(
-                $importGoodProduct['product_id'],
-                $importGoodProduct['product_attribute_value_id'],
-                $importGoodProduct['price'],
-                $importGoodProduct['monetary_unit_type'],
-                $importGoodProduct['count'],
-                $importGoodProduct['measure_unit_type'],
-            );
-        }
-
-        $command = new ImportGoodPostCommand(
-            $request->dealer_id,
-            Auth::id(),
-            $importGoodProductCommands,
+        $command = new ImportGoodListGetCommand(
+            !empty($request->product_id) ? $request->product_id : null,
+            !empty($request->dealer_id) ? $request->dealer_id : null,
+            !empty($request->product_attribute_value_id) ? $request->product_attribute_value_id : null,
+            !empty($request->keyword) ? $request->keyword : null,
+            !empty($request->sort) ? $request->sort : null,
+            !empty($request->order) ? $request->order : null,
+            !empty($request->start_date) ? $request->start_date : null,
+            !empty($request->end_date) ? $request->end_date : null,
         );
         $result = $applicationService->handle($command);
 
-        $data[] = [
-            'import_good_id' => $result->importGood,
+        $data = [];
+        foreach ($result->importGoodResults as $importGoodResult) {
+            $importGoodProducts = [];
+            foreach ($importGoodResult->importGoodProductResults as $importGoodProductResult) {
+                $importGoodProducts[] = [
+                    'import_good_product_id' => $importGoodProductResult->importGoodProductId,
+                    'product_id' => $importGoodProductResult->productId,
+                    'product_name' => $importGoodProductResult->productName,
+                    'product_code' => $importGoodProductResult->productCode,
+                    'product_attribute_value_id' => $importGoodProductResult->productAttributeValueId,
+                    'product_attribute_value_name' => $importGoodProductResult->productName,
+                    'product_attribute_value_code' => $importGoodProductResult->productCode,
+                    'import_good_product_price' => $importGoodProductResult->importGoodPrice,
+                    'monetary_unit_type' => $importGoodProductResult->monetaryUnitType,
+                    'count' => $importGoodProductResult->count,
+                    'measure_unit_type' => $importGoodProductResult->measureUnitType,
+                ];
+            }
+            $data[] = [
+                'import_good_id' => $importGoodResult->importGoodId,
+                'dealer_id' => $importGoodResult->dealerId,
+                'dealer_name' => $importGoodResult->dealerName,
+                'user_id' => $importGoodResult->userId,
+                'user_name' => $importGoodResult->userName,
+                'import_good_products' => $importGoodProducts
+            ];
+        }
+        $paginationResult = $result->paginationResult;
+
+        $response = [
+            'data' => $data,
+            'pagination' => [
+                'total_page' => $paginationResult->totalPage,
+                'per_page' => $paginationResult->perPage,
+                'current_page' => $paginationResult->currentPage,
+            ],
         ];
 
-        return response()->json(['data' => $data], 200);
+        return response()->json($response, 200);
     }
 
     /**
@@ -337,7 +370,8 @@ class OrderController extends BaseController
      * @throws \App\Bundle\Common\Domain\Model\InvalidArgumentException
      * @throws \App\Bundle\Common\Domain\Model\TransactionException
      */
-    public function restoreImportGood(Request $request) {
+    public function restoreImportGood(Request $request)
+    {
         $applicationService = new RestoreImportGoodPutApplicationService(
             new ImportGoodRepository(),
             new ProductInventoryRepository()

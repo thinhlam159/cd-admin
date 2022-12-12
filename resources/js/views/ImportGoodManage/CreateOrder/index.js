@@ -1,1 +1,1 @@
-export { default } from './CreateOrder'
+export { default } from './CreateImportGood.vue'

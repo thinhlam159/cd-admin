@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Bundle\Api\Admin\CustomerManagementController;
+use App\Http\Controllers\Bundle\Api\Admin\DealerController;
 use App\Http\Controllers\Bundle\Api\Admin\UserController;
 use App\Http\Controllers\Bundle\Api\Product\CategoryController;
 use App\Http\Controllers\Bundle\Api\Product\OrderController;
@@ -73,8 +74,11 @@ Route::group([
     Route::put('/order/payment-status', [OrderController::class, 'updatePaymentStatus'])->middleware('auth:api');
     Route::put('/order/delivery-status', [OrderController::class, 'updateDeliveryStatus'])->middleware('auth:api');
 
-    Route::post('/order/import-goods', [OrderController::class, 'createImportGood'])->middleware('auth:api');
-    Route::put('/order/restore-import-goods', [OrderController::class, 'restoreImportGood'])->middleware('auth:api');
+    Route::post('/import-good/import-good', [OrderController::class, 'createImportGood'])->middleware('auth:api');
+    Route::put('/import-good/restore-import-good', [OrderController::class, 'restoreImportGood'])->middleware('auth:api');
+    Route::get('/import-good/import-goods', [OrderController::class, 'getImportGoods'])->middleware('auth:api');
 
     Route::post('/order/export-order', [OrderController::class, 'exportOrder'])->middleware('auth:api');
+
+    Route::get('/dealer/dealers', [DealerController::class, 'getDealers'])->middleware('auth:api');
 });

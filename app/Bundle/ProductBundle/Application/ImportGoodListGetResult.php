@@ -2,6 +2,8 @@
 
 namespace App\Bundle\ProductBundle\Application;
 
+use App\Bundle\Common\Application\PaginationResult;
+
 class ImportGoodListGetResult
 {
     /**
@@ -10,10 +12,17 @@ class ImportGoodListGetResult
     public array $importGoodResults;
 
     /**
-     * @param ImportGoodResult[] $importGoodResults
+     * @var PaginationResult
      */
-    public function __construct(array $importGoodResults)
+    public PaginationResult $paginationResult;
+
+    /**
+     * @param ImportGoodResult[] $importGoodResults
+     * @param PaginationResult $paginationResult
+     */
+    public function __construct(array $importGoodResults, PaginationResult $paginationResult)
     {
         $this->importGoodResults = $importGoodResults;
+        $this->paginationResult = $paginationResult;
     }
 }

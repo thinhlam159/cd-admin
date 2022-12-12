@@ -20,9 +20,9 @@ final class Dealer
     private ?string $email;
 
     /**
-     * @var string
+     * @var string|null
      */
-    private string $password;
+    private ?string $password;
 
     /**
      * @var string|null
@@ -30,19 +30,19 @@ final class Dealer
     private ?string $phone;
 
     /**
-     * @var bool
+     * @var bool|null
      */
-    private bool $isActive;
+    private ?bool $isActive;
 
     /**
      * @param DealerId $dealerId
      * @param string $name
      * @param string|null $email
-     * @param string $password
+     * @param string|null $password
      * @param string|null $phone
-     * @param bool $isActive
+     * @param bool|null $isActive
      */
-    public function __construct(DealerId $dealerId, string $name, ?string $email, string $password, ?string $phone, bool $isActive)
+    public function __construct(DealerId $dealerId, string $name, ?string $email = null, ?string $password = null, ?string $phone = null, ?bool $isActive = null)
     {
         $this->dealerId = $dealerId;
         $this->name = $name;
@@ -77,9 +77,9 @@ final class Dealer
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getPassword(): string
+    public function getPassword(): ?string
     {
         return $this->password;
     }
@@ -93,9 +93,9 @@ final class Dealer
     }
 
     /**
-     * @return bool
+     * @return bool|null
      */
-    public function isActive(): bool
+    public function getIsActive(): ?bool
     {
         return $this->isActive;
     }

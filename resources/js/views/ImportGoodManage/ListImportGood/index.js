@@ -1,1 +1,1 @@
-export { default } from './ListImportGood'
+export { default } from './ListImportGood.vue'

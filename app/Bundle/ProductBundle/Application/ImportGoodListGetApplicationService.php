@@ -6,6 +6,7 @@ use App\Bundle\Admin\Domain\Model\ICustomerRepository;
 use App\Bundle\Admin\Domain\Model\IDealerRepository;
 use App\Bundle\Admin\Domain\Model\IUserRepository;
 use App\Bundle\Admin\Domain\Model\UserId;
+use App\Bundle\Common\Application\PaginationResult;
 use App\Bundle\Common\Domain\Model\InvalidArgumentException;
 use App\Bundle\Common\Domain\Model\TransactionException;
 use App\Bundle\ProductBundle\Domain\Model\DealerId;
@@ -61,53 +62,92 @@ class ImportGoodListGetApplicationService
     private IDealerRepository $dealerRepository;
 
     /**
+     * @var IUserRepository
+     */
+    private IUserRepository $userRepository;
+
+    /**
      * @param IImportGoodRepository $importGoodRepository
      * @param IProductInventoryRepository $productInventoryRepository
      * @param IProductAttributeValueRepository $productAttributeValueRepository
      * @param IProductRepository $productRepository
      * @param IDealerRepository $dealerRepository
+     * @param IUserRepository $userRepository
      */
-    public function __construct(IImportGoodRepository $importGoodRepository, IProductInventoryRepository $productInventoryRepository, IProductAttributeValueRepository $productAttributeValueRepository, IProductRepository $productRepository, IDealerRepository $dealerRepository)
+    public function __construct(
+        IImportGoodRepository $importGoodRepository,
+        IProductInventoryRepository $productInventoryRepository,
+        IProductAttributeValueRepository $productAttributeValueRepository,
+        IProductRepository $productRepository,
+        IDealerRepository $dealerRepository,
+        IUserRepository $userRepository
+    )
     {
         $this->importGoodRepository = $importGoodRepository;
         $this->productInventoryRepository = $productInventoryRepository;
         $this->productAttributeValueRepository = $productAttributeValueRepository;
         $this->productRepository = $productRepository;
         $this->dealerRepository = $dealerRepository;
+        $this->userRepository = $userRepository;
     }
 
     /**
      * @param ImportGoodListGetCommand $command
-     * @return ImportGoodPostResult
+     * @return ImportGoodListGetResult
      * @throws InvalidArgumentException
      * @throws TransactionException
      */
-    public function handle(ImportGoodListGetCommand $command): ImportGoodPostResult
+    public function handle(ImportGoodListGetCommand $command): ImportGoodListGetResult
     {
         $criteria = new ImportGoodCriteria(
-            new ProductId($command->productId),
-            new DealerId($command->dealerId),
-            new ProductAttributeValueId($command->productAttributeValueId),
+            !is_null($command->productId) ? new ProductId($command->productId) : null,
+            !is_null($command->dealerId) ? new DealerId($command->dealerId) : null,
+            !is_null($command->productAttributeValueId) ? new ProductAttributeValueId($command->productAttributeValueId) : null,
             $command->keyword,
             $command->sort,
             $command->order,
-            SettingDate::fromYmdHis($command->startDate),
-            SettingDate::fromYmdHis($command->endDate),
+            !is_null($command->startDate) ? SettingDate::fromYmdHis($command->startDate) : null,
+            !is_null($command->endDate) ? SettingDate::fromYmdHis($command->endDate) : null,
         );
         [$importGoods, $pagination] = $this->importGoodRepository->findAll($criteria);
+        $importGoodResults = [];
         foreach ($importGoods as $importGood) {
             $importGoodProducts = $this->importGoodRepository->findImportGoodProductByImportGoodId($importGood->getProductId());
             $dealer = $this->dealerRepository->findById(new AdminDealerId($importGood->getDealerId()->asString()));
+            $user = $this->userRepository->findById($importGood->getUserId());
             $importGoodProductResults = [];
             foreach ($importGoodProducts as $importGoodProduct) {
                 $productAttributeValue = $this->productAttributeValueRepository->findById($importGoodProduct->getProductAttributeValueId());
                 $product = $this->productRepository->findById($importGoodProduct->getProductId());
                 $importGoodProductResults[] = new ImportGoodProductResult(
+                    $importGoodProduct->getImportGoodProductId()->asString(),
                     $importGoodProduct->getProductId()->asString(),
+                    $product->getName(),
+                    $product->getCode(),
+                    $productAttributeValue->getProductAttributeValueId()->asString(),
+                    $productAttributeValue->getProductAttributeName(),
+                    $productAttributeValue->getCode(),
+                    $importGoodProduct->getPrice(),
+                    $importGoodProduct->getMonetaryUnitType()->getValue(),
+                    $importGoodProduct->getCount(),
+                    $importGoodProduct->getMeasureUnitType()->getValue(),
                 );
             }
+            $importGoodResults[] = new ImportGoodResult(
+                $importGood->getImportGoodId(),
+                $importGood->getDealerId()->asString(),
+                $dealer->getName(),
+                $importGood->getUserId(),
+                $user->getUserName(),
+                $importGoodProductResults
+            );
         }
+        $paginationResult = new PaginationResult(
+            $pagination->getTotalPages(),
+            $pagination->getPerPage(),
+            $pagination->getCurrentPage(),
+        );
 
-        return new ImportGoodPostResult($importGoodId->__toString());
+        return new ImportGoodListGetResult($importGoodResults, $paginationResult);
     }
 }
