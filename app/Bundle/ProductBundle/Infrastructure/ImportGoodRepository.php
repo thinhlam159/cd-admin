@@ -3,9 +3,11 @@
 namespace App\Bundle\ProductBundle\Infrastructure;
 
 use App\Bundle\Admin\Domain\Model\UserId;
+use App\Bundle\Common\Constants\PaginationConst;
 use App\Bundle\ProductBundle\Domain\Model\DealerId;
 use App\Bundle\ProductBundle\Domain\Model\IImportGoodRepository;
 use App\Bundle\ProductBundle\Domain\Model\ImportGood;
+use App\Bundle\ProductBundle\Domain\Model\ImportGoodCriteria;
 use App\Bundle\ProductBundle\Domain\Model\ImportGoodId;
 use App\Bundle\ProductBundle\Domain\Model\ImportGoodProduct;
 use App\Bundle\ProductBundle\Domain\Model\ImportGoodProductId;
@@ -13,6 +15,7 @@ use App\Bundle\ProductBundle\Domain\Model\MeasureUnitType;
 use App\Bundle\ProductBundle\Domain\Model\MonetaryUnitType;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValueId;
 use App\Bundle\ProductBundle\Domain\Model\ProductId;
+use App\Bundle\UserBundle\Domain\Model\Pagination;
 use App\Models\ImportGood as ModelImportGood;
 use App\Models\ImportGoodProduct as ModelImportGoodProduct;
 
@@ -115,5 +118,30 @@ class ImportGoodRepository implements IImportGoodRepository
         }
 
         return true;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function findAll(ImportGoodCriteria $importGoodCriteria): array
+    {
+        $entities = ModelImportGood::paginate(PaginationConst::PAGINATE_ROW);
+
+        $importGoods = [];
+        foreach ($entities as $entity) {
+            $importGoods[] = new ImportGood(
+                new ImportGoodId($entity['id']),
+                new DealerId($entity['dealer_id']),
+                new UserId(($entity['user_id']))
+            );
+        }
+
+        $pagination = new Pagination(
+            $entities->lastPage(),
+            $entities->perPage(),
+            $entities->currentPage()
+        );
+
+        return [$importGoods, $pagination];
     }
 }

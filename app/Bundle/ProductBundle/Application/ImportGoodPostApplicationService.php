@@ -16,8 +16,9 @@ use App\Bundle\ProductBundle\Domain\Model\MeasureUnitType;
 use App\Bundle\ProductBundle\Domain\Model\MonetaryUnitType;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValueId;
 use App\Bundle\ProductBundle\Domain\Model\ProductId;
-use App\Bundle\ProductBundle\Domain\Model\ProductInventory;
 use App\Bundle\ProductBundle\Domain\Model\ProductInventoryId;
+use App\Bundle\ProductBundle\Domain\Model\ProductInventoryImportGood;
+use App\Bundle\ProductBundle\Domain\Model\ProductInventoryUpdateType;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -66,8 +67,9 @@ class ImportGoodPostApplicationService
         $currentProductInventories= [];
         $newProductInventories = [];
         foreach ($command->importGoodProductCommands as $importGoodProductCommand) {
+            $importGoodProductId = ImportGoodProductId::newId();
             $importGoodProducts[] = new ImportGoodProduct(
-                ImportGoodProductId::newId(),
+                $importGoodProductId,
                 $importGoodId,
                 new ProductId($importGoodProductCommand->productId),
                 new ProductAttributeValueId($importGoodProductCommand->productAttributeValueId),
@@ -79,11 +81,14 @@ class ImportGoodPostApplicationService
             $productAttributeValueId = new ProductAttributeValueId($importGoodProductCommand->productAttributeValueId);
             $currentProductInventory = $this->productInventoryRepository->findByProductAttributeValueId($productAttributeValueId);
             $newCount = $currentProductInventory->getCount() + $importGoodProductCommand->count;
-            $newProductInventories[] = new ProductInventory(
+            $newProductInventories[] = new ProductInventoryImportGood(
                 ProductInventoryId::newId(),
                 new ProductAttributeValueId($importGoodProductCommand->productAttributeValueId),
                 $newCount,
                 MeasureUnitType::fromValue($importGoodProductCommand->measureUnitType),
+                ProductInventoryUpdateType::fromType(ProductInventoryUpdateType::IMPORT_GOOD),
+                $importGoodProductId,
+                $importGoodProductCommand->count,
                 true
             );
             $currentProductInventories[] = $currentProductInventory;
@@ -103,7 +108,7 @@ class ImportGoodPostApplicationService
             if (!$updateCurrentInventoryResult) {
                 throw new InvalidArgumentException('update product inventory failed!');
             }
-            $createInventoryProductResult = $this->productInventoryRepository->createMultiProductInventory($newProductInventories);
+            $createInventoryProductResult = $this->productInventoryRepository->createMultiProductInventoryByImportGood($newProductInventories);
             if (!$createInventoryProductResult) {
                 throw new InvalidArgumentException('create product inventory failed!');
             }

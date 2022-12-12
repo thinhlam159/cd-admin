@@ -1,6 +1,8 @@
 <?php
 namespace App\Bundle\ProductBundle\Domain\Model;
 
+use App\Bundle\Common\Domain\Model\Pagination;
+
 interface IImportGoodRepository
 {
     /**
@@ -32,4 +34,10 @@ interface IImportGoodRepository
      * @return bool
      */
     public function restoreImportGood(ImportGoodId $importGoodId): bool;
+
+    /**
+     * @param ImportGoodCriteria $importGoodCriteria
+     * @return array{ImportGoodCriteria[], Pagination}
+     */
+    public function findAll(ImportGoodCriteria $importGoodCriteria): array;
 }

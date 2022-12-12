@@ -271,7 +271,34 @@ class OrderController extends BaseController
      * @return \Illuminate\Http\JsonResponse
      * @throws \App\Bundle\Common\Domain\Model\RecordNotFoundException
      */
-    public function createImportGood(Request $request) {
+    public function createImportGood(Request $request)
+    {
+        $applicationService = new ImportGoodPostApplicationService(
+            new ImportGoodRepository(),
+            new ProductInventoryRepository()
+        );
+
+        $importGoodProducts = $request->import_good_products;
+        $importGoodProductCommands = [];
+        foreach ($importGoodProducts as $importGoodProduct) {
+            $importGoodProductCommands[] = new ImportGoodProductCommand(
+                $importGoodProduct['product_id'],
+                $importGoodProduct['product_attribute_value_id'],
+                $importGoodProduct['price'],
+                $importGoodProduct['monetary_unit_type'],
+                $importGoodProduct['count'],
+                $importGoodProduct['measure_unit_type'],
+            );
+        }
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \App\Bundle\Common\Domain\Model\RecordNotFoundException
+     */
+    public function getImportGoods(Request $request)
+    {
         $applicationService = new ImportGoodPostApplicationService(
             new ImportGoodRepository(),
             new ProductInventoryRepository()

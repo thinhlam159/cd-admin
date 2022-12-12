@@ -94,4 +94,29 @@ final class ProductInventoryRepository implements IProductInventoryRepository
 
         return true;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function createMultiProductInventoryByImportGood(array $productInventoryImportGoods): bool
+    {
+        foreach ($productInventoryImportGoods as $inventory) {
+            $result = ModelProductInventory::create([
+                'id' => $inventory->getProductInventoryId()->asString(),
+                'product_attribute_value_id' => $inventory->getProductAttributeValueId()->asString(),
+                'count' => $inventory->getCount(),
+                'update_type' => $inventory->getProductInventoryUpdateType()->getType(),
+                'import_good_product_id' => $inventory->getOrderId()->asString(),
+                'number_of_update' => $inventory->getNumberOfUpdate(),
+                'measure_unit_type' => $inventory->getMeasureUnitType()->getType(),
+                'is_current' => true,
+            ]);
+
+            if (!$result) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

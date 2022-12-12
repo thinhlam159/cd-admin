@@ -21,6 +21,7 @@ import OrderManage from "@/views/OrderManage";
 import ListOrder from "@/views/OrderManage/ListOrder";
 import CreateOrder from "@/views/OrderManage/CreateOrder";
 import DetailOrder from "@/views/OrderManage/DetailOrder";
+import ImportGoodManage from "@/views/ImportGoodManage";
 
 export default [
     // ROUTER_ADMIN
@@ -127,7 +128,25 @@ export default [
                       component: DetailOrder,
                     },
                 ]
-            }
+            },
+          {
+            path: ROUTER_PATH.IMPORT_GOOD_MANAGE,
+            component: ImportGoodManage,
+            children: [
+              {
+                path: ROUTER_PATH.EMPTY,
+                component: ListImportGood,
+              },
+              {
+                path: ROUTER_PATH.ADD,
+                component: CreateImportGood,
+              },
+              {
+                path: ROUTER_PATH.DETAIL_ID,
+                component: DetailImportGood,
+              },
+            ]
+          }
         ]
     },
 ]
