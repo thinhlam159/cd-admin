@@ -26,9 +26,9 @@ class ImportGoodProductResult
      */
     public string $productAttributeValueId;
     /**
-     * @var string
+     * @var string|null
      */
-    public string $productAttributeValueName;
+    public ?string $productAttributeValueName;
     /**
      * @var string
      */
@@ -56,14 +56,14 @@ class ImportGoodProductResult
      * @param string $productName
      * @param string $productCode
      * @param string $productAttributeValueId
-     * @param string $productAttributeValueName
+     * @param string|null $productAttributeValueName
      * @param string $productAttributeValueCode
      * @param string $importGoodPrice
      * @param string $monetaryUnitType
      * @param int $count
      * @param string $measureUnitType
      */
-    public function __construct(string $importGoodProductId, string $productId, string $productName, string $productCode, string $productAttributeValueId, string $productAttributeValueName, string $productAttributeValueCode, string $importGoodPrice, string $monetaryUnitType, int $count, string $measureUnitType)
+    public function __construct(string $importGoodProductId, string $productId, string $productName, string $productCode, string $productAttributeValueId, ?string $productAttributeValueName, string $productAttributeValueCode, string $importGoodPrice, string $monetaryUnitType, int $count, string $measureUnitType)
     {
         $this->importGoodProductId = $importGoodProductId;
         $this->productId = $productId;

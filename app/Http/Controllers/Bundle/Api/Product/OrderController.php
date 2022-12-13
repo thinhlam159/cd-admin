@@ -287,12 +287,26 @@ class OrderController extends BaseController
             $importGoodProductCommands[] = new ImportGoodProductCommand(
                 $importGoodProduct['product_id'],
                 $importGoodProduct['product_attribute_value_id'],
-                $importGoodProduct['price'],
-                $importGoodProduct['monetary_unit_type'],
+//                $importGoodProduct['price'],
+                1,
+//                $importGoodProduct['monetary_unit_type'],
+                'vnd',
                 $importGoodProduct['count'],
                 $importGoodProduct['measure_unit_type'],
             );
         }
+        $command = new ImportGoodPostCommand(
+            Auth::id(),
+            $importGoodProductCommands
+        );
+
+        $result = $applicationService->handle($command);
+
+        $data[] = [
+            'import_good_id' => $result->importGoodId,
+        ];
+
+        return response()->json(['data' => $data], 200);
     }
 
     /**
@@ -347,6 +361,7 @@ class OrderController extends BaseController
                 'dealer_name' => $importGoodResult->dealerName,
                 'user_id' => $importGoodResult->userId,
                 'user_name' => $importGoodResult->userName,
+                'import_good_date' => $importGoodResult->importGoodDate,
                 'import_good_products' => $importGoodProducts
             ];
         }

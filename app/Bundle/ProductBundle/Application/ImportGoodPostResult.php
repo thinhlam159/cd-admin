@@ -7,13 +7,13 @@ class ImportGoodPostResult
     /**
      * @var string
      */
-    public string $importGood;
+    public string $importGoodId;
 
     /**
-     * @param string $importGood
+     * @param string $importGoodId
      */
-    public function __construct(string $importGood)
+    public function __construct(string $importGoodId)
     {
-        $this->importGood = $importGood;
+        $this->importGoodId = $importGoodId;
     }
 }

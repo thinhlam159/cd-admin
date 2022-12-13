@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Bundle\Api\Product;
 
+use App\Bundle\Common\Constants\MessageConst;
+use App\Bundle\Common\Domain\Model\InvalidArgumentException;
 use App\Bundle\ProductBundle\Application\ProductPostApplicationService;
 use App\Bundle\ProductBundle\Application\ProductPostCommand;
 use App\Bundle\ProductBundle\Infrastructure\FeatureImagePathRepository;

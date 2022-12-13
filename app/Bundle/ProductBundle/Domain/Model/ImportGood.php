@@ -11,9 +11,9 @@ final class ImportGood
      */
     private ImportGoodId $importGoodId;
     /**
-     * @var DealerId
+     * @var DealerId|null
      */
-    private DealerId $dealerId;
+    private ?DealerId $dealerId;
     /**
      * @var UserId
      */
@@ -21,10 +21,10 @@ final class ImportGood
 
     /**
      * @param ImportGoodId $importGoodId
-     * @param DealerId $dealerId
+     * @param DealerId|null $dealerId
      * @param UserId $userId
      */
-    public function __construct(ImportGoodId $importGoodId, DealerId $dealerId, UserId $userId)
+    public function __construct(ImportGoodId $importGoodId, ?DealerId $dealerId, UserId $userId)
     {
         $this->importGoodId = $importGoodId;
         $this->dealerId = $dealerId;
@@ -40,9 +40,9 @@ final class ImportGood
     }
 
     /**
-     * @return DealerId
+     * @return DealerId|null
      */
-    public function getDealerId(): DealerId
+    public function getDealerId(): ?DealerId
     {
         return $this->dealerId;
     }

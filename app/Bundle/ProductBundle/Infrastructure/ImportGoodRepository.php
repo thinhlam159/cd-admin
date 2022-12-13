@@ -28,7 +28,7 @@ class ImportGoodRepository implements IImportGoodRepository
     {
         $result = ModelImportGood::create([
             'id' => $importGood->getImportGoodId()->asString(),
-            'dealer_id' => $importGood->getDealerId()->asString(),
+            'dealer_id' => !is_null($importGood->getDealerId()) ? $importGood->getDealerId()->asString() : null,
             'user_id' => $importGood->getUserId()->asString(),
         ]);
 
@@ -131,7 +131,7 @@ class ImportGoodRepository implements IImportGoodRepository
         foreach ($entities as $entity) {
             $importGoods[] = new ImportGood(
                 new ImportGoodId($entity['id']),
-                new DealerId($entity['dealer_id']),
+                !is_null($entity['dealer_id']) ? new DealerId($entity['dealer_id']) : null,
                 new UserId(($entity['user_id']))
             );
         }

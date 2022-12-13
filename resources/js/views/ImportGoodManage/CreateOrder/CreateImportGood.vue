@@ -6,38 +6,35 @@
         <hr>
       </div>
       <form @submit.prevent="handleSubmit(formData)">
-        <div class="mr-4 w-[14%] mb-5">
-          <label for="customer" class="block mb-1 font-bold text-sm">Khách hàng</label>
-          <select name="customer" class="p-3 w-full" v-model="formData.dealer_id">
-            <option v-for="item in dealers" :value="item.dealer_id"
-                    class="w-full h-10 px-3 text-base text-gray-700">{{ item.dealer_name }}
-            </option>
-          </select>
-        </div>
+<!--        <div class="mr-4 w-[14%] mb-5">-->
+<!--          <label for="customer" class="block mb-1 font-bold text-sm">Khách hàng</label>-->
+<!--          <select name="customer" class="p-3 w-full" v-model="formData.dealer_id">-->
+<!--            <option v-for="item in dealers" :value="item.dealer_id"-->
+<!--                    class="w-full h-10 px-3 text-base text-gray-700">{{ item.dealer_name }}-->
+<!--            </option>-->
+<!--          </select>-->
+<!--        </div>-->
         <hr>
         <div class="mt-5 py-3 flex">
-          <div class="mr-4 w-[14%]">
+          <div class="mr-4 w-[18%]">
             <span>Danh mục</span>
           </div>
-          <div class="mr-4 w-[14%]">
+          <div class="mr-4 w-[18%]">
             <span>Sản phẩm</span>
           </div>
-          <div class="mr-4 w-[14%]">
+          <div class="mr-4 w-[18%]">
             <span>Mã sản phẩm</span>
           </div>
-          <div class="mr-4 w-[10%]">
+          <div class="mr-4 w-[18%]">
             <span>Tên sản phẩm</span>
           </div>
           <div class="mr-4 w-[5%]">
-            <span>Giá</span>
-          </div>
-          <div class="mr-4 w-[7%]">
-            <span>Đơn vị tính</span>
+            <span>Số lượng</span>
           </div>
           <div class="mr-4 w-[10%]">
-            <span>Thành tiền</span>
+            <span>Số lượng</span>
           </div>
-          <div class="mr-4 w-[5%]">
+          <div class="mr-4 w-[2%]">
             <span>Xóa sp</span>
           </div>
         </div>
@@ -56,6 +53,9 @@
         <div class="ml-2 my-4">
           <ButtonAddNew @clickBtn="handleAddToImportGood" :text="'Sản phẩm'"/>
         </div>
+        <div>
+          <input class="w-25 h-10 mt-5 px-3 text-base text-gray-700 placeholder-gray-400 bg-green-400 cursor-pointer" type="submit" value="Tạo đơn nhập hàng">
+        </div>
       </form>
     </div>
   </div>
@@ -67,6 +67,7 @@ import {useStore} from "vuex";
 import {ref, reactive, onMounted} from "vue";
 import logoTimeSharing from "@/assets/images/default-thumbnail.jpg";
 import {
+  createImportGoodFromApi,
   createOrderFromApi,
   createProductFromApi,
   getListCategoryFromApi,
@@ -108,15 +109,15 @@ export default {
 
     const handleSubmit = async (data) => {
       try {
-        const orderPostData = [...store.state[MODULE_STORE.IMPORT_GOOD.NAME].orderPostData]
-        const bodyFormData = new FormData()
-        bodyFormData.append('customer_id', data.customerId);
+        const orderPostData = [...store.state[MODULE_STORE.IMPORT_GOOD.NAME].importGoodPostData]
+        // const bodyFormData = new FormData()
+        // bodyFormData.append('customer_id', data.customerId);
         // bodyFormData.append('order_products', orderPostData);
         const postData = {
-          customer_id: data.customerId,
-          order_products: orderPostData
+          // customer_id: data.customerId,
+          import_good_products: orderPostData
         }
-        const res = await createOrderFromApi(postData)
+        const res = await createImportGoodFromApi(postData)
         // router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.PRODUCT_MANAGE}`)
       } catch (errors) {
         const error = errors.message;

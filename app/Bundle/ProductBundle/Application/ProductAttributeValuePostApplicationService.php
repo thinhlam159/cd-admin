@@ -107,7 +107,7 @@ class ProductAttributeValuePostApplicationService
         } catch (Exception $e) {
             DB::rollBack();
             Log::error($e);
-            throw new TransactionException('Add product fail!');
+            throw new TransactionException($e->getMessage());
         }
 
         return new ProductAttributeValuePostResult($productAttributeValueId->__toString());

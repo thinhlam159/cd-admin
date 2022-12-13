@@ -9,13 +9,13 @@ class ImportGoodResult
      */
     public string $importGoodId;
     /**
-     * @var string
+     * @var string|null
      */
-    public string $dealerId;
+    public ?string $dealerId;
     /**
-     * @var string
+     * @var string|null
      */
-    public string $dealerName;
+    public ?string $dealerName;
     /**
      * @var string
      */
@@ -25,25 +25,31 @@ class ImportGoodResult
      */
     public string $userName;
     /**
+     * @var string
+     */
+    public string $importGoodDate;
+    /**
      * @var ImportGoodProductResult[]
      */
     public array $importGoodProductResults;
 
     /**
      * @param string $importGoodId
-     * @param string $dealerId
-     * @param string $dealerName
+     * @param string|null $dealerId
+     * @param string|null $dealerName
      * @param string $userId
      * @param string $userName
+     * @param string $importGoodDate
      * @param ImportGoodProductResult[] $importGoodProductResults
      */
-    public function __construct(string $importGoodId, string $dealerId, string $dealerName, string $userId, string $userName, array $importGoodProductResults)
+    public function __construct(string $importGoodId, ?string $dealerId, ?string $dealerName, string $userId, string $userName, string $importGoodDate, array $importGoodProductResults)
     {
         $this->importGoodId = $importGoodId;
         $this->dealerId = $dealerId;
         $this->dealerName = $dealerName;
         $this->userId = $userId;
         $this->userName = $userName;
+        $this->importGoodDate = $importGoodDate;
         $this->importGoodProductResults = $importGoodProductResults;
     }
 }

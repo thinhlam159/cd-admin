@@ -112,8 +112,8 @@ class ImportGoodListGetApplicationService
         [$importGoods, $pagination] = $this->importGoodRepository->findAll($criteria);
         $importGoodResults = [];
         foreach ($importGoods as $importGood) {
-            $importGoodProducts = $this->importGoodRepository->findImportGoodProductByImportGoodId($importGood->getProductId());
-            $dealer = $this->dealerRepository->findById(new AdminDealerId($importGood->getDealerId()->asString()));
+            $importGoodProducts = $this->importGoodRepository->findImportGoodProductByImportGoodId($importGood->getImportGoodId());
+            $dealer = !is_null($importGood->getDealerId()) ? $this->dealerRepository->findById(new AdminDealerId($importGood->getDealerId()->asString())) : null;
             $user = $this->userRepository->findById($importGood->getUserId());
             $importGoodProductResults = [];
             foreach ($importGoodProducts as $importGoodProduct) {
@@ -135,10 +135,11 @@ class ImportGoodListGetApplicationService
             }
             $importGoodResults[] = new ImportGoodResult(
                 $importGood->getImportGoodId(),
-                $importGood->getDealerId()->asString(),
-                $dealer->getName(),
+                !is_null($dealer) ? $dealer->getDealerId()->asString() : null,
+                !is_null($dealer) ? $dealer->getName() : null,
                 $importGood->getUserId(),
                 $user->getUserName(),
+                'date',
                 $importGoodProductResults
             );
         }

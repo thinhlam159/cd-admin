@@ -36,6 +36,11 @@
             Xuất excel
           </th>
         </tr>
+        <tr>
+          <th class="border py-1">Mã</th>
+          <th class="border py-1">Nhập kho</th>
+          <th class="border py-1">Đơn giá / kg</th>
+        </tr>
         </thead>
         <tbody>
         <template v-for="(item, index) in listImportGood">
@@ -71,6 +76,9 @@
               {{ item.payment_status }}
             </td>
             <td v-if="subIndex === 0" :rowspan="item.import_good_products.length" class="border text-center">
+              {{ item.import_good_date }}
+            </td>
+            <td v-if="subIndex === 0" :rowspan="item.import_good_products.length" class="border text-center">
               {{ item.updated_at }}
             </td>
 
@@ -78,15 +86,14 @@
               {{ `${subItem.product_code} ${subItem.product_attribute_value_code}` }}
             </td>
             <td class="border text-center h-full m-0 p-0">
-              {{ `${subItem.import_good_product_price.toLocaleString('it-IT', {style : 'currency', currency : 'VND'})}` }}
+              {{ `${subItem.count} ${subItem.measure_unit_type}` }}
             </td>
             <td class="border text-center h-full m-0 p-0">
-              {{ `${subItem.count} ${subItem.measure_unit_name}` }}
+
             </td>
 
             <td v-if="subIndex === 0" :rowspan="item.import_good_products.length" class="border text-center">
               <div class="flex justify-center ">
-                <ButtonAddNew @clickBtn="() => goToAddProductAttributeValue(item.product_id)" :text="' '"/>
                 <ButtonEdit @clickBtn="() => goToAdd(item.product_id)" :text="editUser"/>
               </div>
             </td>
@@ -122,11 +129,11 @@ import listImportGood from "@/views/ImportGoodManage/ListImportGood/ListImportGo
 
 export default {
   name: "ListImportGood",
-  methods: {
-    listImportGood() {
-      return listImportGood
-    }
-  },
+  // methods: {
+  //   listImportGood() {
+  //     return listImportGood
+  //   }
+  // },
   components: {
     Datepicker,
     ButtonAddNew,
@@ -180,6 +187,7 @@ export default {
       pagination,
       addNewImportGood,
       orderDetail,
+      listImportGood,
       handleCreateOrder,
       goToDetail,
       getListImportGood,

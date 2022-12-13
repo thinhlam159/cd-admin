@@ -15,7 +15,7 @@ class CreateImportGoodsTable extends Migration
     {
         Schema::create('import_goods', function (Blueprint $table) {
             $table->string('id')->primary();
-            $table->string('dealer_id');
+            $table->string('dealer_id')->nullable();
             $table->string('user_id');
             $table->tinyInteger('is_restore')->nullable();
             $table->timestamps();

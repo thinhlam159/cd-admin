@@ -59,7 +59,7 @@ class ImportGoodPostApplicationService
         $importGoodId = ImportGoodId::newId();
         $importGood = new ImportGood(
             $importGoodId,
-            new DealerId($command->dealerId),
+            null,
             new UserId($command->userId),
         );
 
