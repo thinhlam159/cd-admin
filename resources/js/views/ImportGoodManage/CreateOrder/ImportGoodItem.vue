@@ -1,38 +1,29 @@
 <template>
-  <div class="flex py-1">
-    <div class="mr-4 w-[20%] border border-gray-500 flex">
-<!--      <select name="category" class="p-3 w-full" v-model="formData.category" @change="handleOnChangeCategorySelect">-->
-<!--        &lt;!&ndash;            <option disabled value="" class="w-full h-10 px-3 text-base text-gray-700" selected>Chọn danh mục</option>&ndash;&gt;-->
-<!--        <option v-for="item in categories" :value="item.id" class="w-full h-10 px-3 text-base text-gray-700">{{ item.name }}</option>-->
-<!--      </select>-->
+  <div class="flex py-1 border-b border-gray-200">
+    <div class="mr-4 w-[18%] flex items-center">
       <div class="inline p-0" v-for="(item, index) in categories" :key="index">
-        <input class="" name="category" type="radio" :id="item.name" :value="item.id" v-model="formData.category" @change="handleOnChangeCategorySelect">
-        <label class="p-2 category-radio-label " :for="item.name">{{ item.name }}</label><br>
+        <input class="hidden" :name="item.name + unique" type="radio" :id="item.name + unique" :value="item.id" v-model="formData.category" @change="handleOnChangeCategorySelect">
+        <label class="mr-1 p-1 min-w-[60px] category-radio-label border border-gray-500 rounded-full cursor-pointer" :for="item.name + unique">{{ item.name }}</label><br>
       </div>
     </div>
-    <div class="mr-4 w-[20%] border border-gray-500">
+    <div class="mr-4 w-[18%] flex items-center">
       <div class="inline p-0" v-for="(item, index) in productsByCategory" :key="index">
-        <input class="" name="product" type="radio" :id="item.name" :value="item.product_id" v-model="formData.product" @change="handleOnChangeProductSelect">
-        <label class="p-2 category-radio-label " :for="item.name">{{ item.name }}</label><br>
+        <input :checked="item.checked" class="hidden" :name="item.name + unique" type="radio" :id="item.name + unique" :value="item.product_id" v-model="formData.product" @change="handleOnChangeProductSelect">
+        <label class="mr-1 p-1 min-w-[60px] category-radio-label border border-gray-500 rounded-full cursor-pointer" :for="item.name + unique">{{ item.name }}</label><br>
       </div>
     </div>
-    <div class="mr-4 w-[20%] border border-gray-500">
+    <div class="mr-4 w-[18%] flex items-center">
       <div class="inline p-0" v-for="(item, index) in productAttributeValuesByProduct" :key="index">
-        <input class="" name="product" type="radio" :id="item.code" :value="item.product_attribute_value_id" v-model="formData.productAttributeValue" @change="handleOnChangeProductAttributeValueSelect">
-        <label class="p-2 category-radio-label " :for="item.code">{{ item.code }}</label><br>
+        <input :checked="item.checked" class="hidden" :name="item.code + unique" type="radio" :id="item.code + unique" :value="item.product_attribute_value_id" v-model="formData.productAttributeValue" @change="handleOnChangeProductAttributeValueSelect">
+        <label class="mr-1 p-1 px-3 min-w-[60px] category-radio-label border border-gray-500 rounded-full cursor-pointer" :for="item.code + unique">{{ item.code }}</label><br>
       </div>
     </div>
-    <div class="mr-4 w-[20%] border border-gray-500">
-      <span class="p-3 w-full text-center">{{ productAttributeValueName }}</span>
+    <div class="mr-4 w-[10%] flex">
+      <span class="py-3 w-full">{{ productAttributeValueName }}</span>
     </div>
-    <div class="mr-4 w-[10%] border border-gray-500">
-      <div class="inline p-0" v-for="(item, index) in listMeasureUnitType" :key="index">
-        <input class="" name="measure-unit-type" type="radio" :id="item.name" :value="item.type" v-model="formData.measureUnitType">
-        <label class="p-2 category-radio-label " :for="item.name">{{ item.name }}</label><br>
-      </div>
-    </div>
-    <div class="mr-4 w-[2%] border border-gray-500">
+    <div class="mr-4 w-[10%] flex relative border border-gray-100">
       <input type="number" class="p-3 w-full" v-model="count" placeholder="Số lượng">
+      <span class="absolute top-[50%] right-10 -translate-y-1/2">{{ measureUnitType }}</span>
     </div>
     <div class="">
       <ButtonRemove @clickBtn="$emit('handleRemoveInputItem')" :text="' '"/>
@@ -43,7 +34,7 @@
 <script>
 import {useRouter} from "vue-router";
 import {useStore} from "vuex";
-import {ref, toRef, watch, nextTick, onBeforeUpdate} from "vue";
+import {ref, toRef, watch, nextTick} from "vue";
 import ButtonRemove from "@/components/Buttons/ButtonRemove";
 import {MODULE_STORE} from "@/const";
 
@@ -55,21 +46,24 @@ export default {
     customers: Object,
     products: Object,
     item: Object,
+    index: String,
   },
   setup(props, { emit }) {
-    const router = useRouter()
     const store = useStore()
-
     const categories = toRef(props, 'categories')
     const customers = toRef(props, 'customers')
     const products = toRef(props, 'products')
-
+    const unique = toRef(props, 'index')
     const item = toRef(props, 'item')
-    const productsByCategory = ref({})
-    const productSelected = ref({})
-    const productAttributeValuesByProduct = ref({})
+    const productsByCategory = ref([])
+    const productAttributeValuesByProduct = ref([])
+    const productSelected = ref({
+      product_id: null,
+      product_attribute_values: []
+    })
     const importGoodDataItem = ref({})
     const measureUnitType = ref('')
+
     const listMeasureUnitType = ref([
       {
         name: 'kg',
@@ -78,14 +72,44 @@ export default {
       {
         name: 'met',
         type: 'met'
-
       },
       {
         name: 'cuộn',
         type: 'roll'
-
       },
     ])
+
+    const initItem = () => {
+      if (item.value.category_id === '') return
+      productsByCategory.value = products.value.filter((product) => {
+        return product.category_id === item.value.category_id
+      })
+      productsByCategory.value = productsByCategory.value.map((product) => {
+        return {
+          ...product,
+          checked : product.product_id === item.value.product_id
+        }
+      })
+
+      productSelected.value = productsByCategory.value.find((product) => {
+        return product.checked
+      })
+
+      productAttributeValuesByProduct.value = productSelected.value.product_attribute_values
+      console.log(productAttributeValuesByProduct.value)
+      productAttributeValuesByProduct.value = productAttributeValuesByProduct.value.map((productAttributeValue) => {
+        return {
+          ...productAttributeValue,
+          checked : productAttributeValue.product_attribute_value_id === item.value.product_attribute_value_id
+        }
+      })
+
+      const productAttributeValuesSelected = productAttributeValuesByProduct.value.find((product) => {
+        return product.checked
+      })
+      productAttributeValueName.value = `${productSelected.value.name} ${productAttributeValuesSelected.code}`
+      measureUnitType.value = listMeasureUnitType.value.find( item => productAttributeValuesSelected.measure_unit_name === item.type).name
+    }
 
     const count = ref(item.value.count)
     const productAttributePriceId = ref('')
@@ -93,23 +117,27 @@ export default {
       category : item.value.category_id,
       product : item.value.product_id,
       productAttributeValue : item.value.product_attribute_value_id,
-      measureUnitType : ''
+      measureUnitType : item.value.measure_unit_type
     })
     const productAttributeValueName = ref('')
 
     const handleOnChangeCategorySelect = () => {
-      productAttributeValuesByProduct.value = {}
+      productAttributeValuesByProduct.value = []
+      productsByCategory.value = []
       productAttributeValueName.value = ''
-      productsByCategory.value = products.value.filter((product) => {
-        return product.category_id === formData.value.category
+      nextTick(() => {
+        productsByCategory.value = products.value.filter((product) => {
+          return product.category_id === formData.value.category
+        })
       })
     }
     const handleOnChangeProductSelect = () => {
       productAttributeValueName.value = ''
+      productAttributeValuesByProduct.value = []
       productSelected.value = products.value.find((product) => {
         return product.product_id === formData.value.product
       })
-      productAttributeValuesByProduct.value = productSelected.value.product_attribute_values
+      nextTick(() => {productAttributeValuesByProduct.value = productSelected.value.product_attribute_values})
     }
 
     const handleOnChangeProductAttributeValueSelect = () => {
@@ -118,37 +146,31 @@ export default {
       })
 
       productAttributePriceId.value = productAttributeValuesSelected.product_attribute_price_id
-      count.value = 1
+      count.value = 0
       productAttributeValueName.value = `${productSelected.value.name} ${productAttributeValuesSelected.code}`
+      measureUnitType.value = listMeasureUnitType.value.find( item => productAttributeValuesSelected.measure_unit_name === item.type)
+      formData.value.measureUnitType = measureUnitType.value.type
+      measureUnitType.value = measureUnitType.value.name
     }
 
     watch(count, () => {
       importGoodDataItem.value = {
-        // category_id: formData.value.category,
+        category_id: formData.value.category,
         product_id: formData.value.product,
         product_attribute_value_id: formData.value.productAttributeValue,
         product_attribute_price_id: productAttributePriceId.value,
         count: count.value,
-        index: item.value.index,
         measure_unit_type: formData.value.measureUnitType
       }
 
-      // let payload = store.state[MODULE_STORE.ORDER.NAME].orderPostData.splice(item.value.index, 1, importGoodDataItem.value)
-      // payload = payload.sort((x, y) => x.product_attribute_value_id > y.product_attribute_value_id ? 1 : -1)
-      // payload = payload.map((item, index) => {
-      //   return {
-      //     ...item,
-      //     index
-      //   }
-      // })
-      // payload = payload.reduce((result, item) => {
-      //   length = result.filter(filterItem => {
-      //     return filterItem.product_attribute_value_id === item.product_attribute_value_id
-      //   }).length
-      //   return [...result, {...item, productOrderName: length + 1}]
-      // }, [])
-      store.commit(`${MODULE_STORE.IMPORT_GOOD.NAME}/${MODULE_STORE.IMPORT_GOOD.MUTATIONS.UPDATE_IMPORT_GOOD_DATA_ITEM}`, importGoodDataItem.value)
+      const payload = {
+        index: unique.value,
+        data: importGoodDataItem.value
+      }
+      store.commit(`${MODULE_STORE.IMPORT_GOOD.NAME}/${MODULE_STORE.IMPORT_GOOD.MUTATIONS.UPDATE_IMPORT_GOOD_DATA_ITEM}`, payload)
     })
+
+    initItem()
 
     return {
       formData,
@@ -159,7 +181,9 @@ export default {
       productAttributeValuesByProduct,
       productsByCategory,
       count,
-      listMeasureUnitType,
+      measureUnitType,
+      unique,
+      productSelected,
       handleOnChangeCategorySelect,
       handleOnChangeProductSelect,
       handleOnChangeProductAttributeValueSelect,
@@ -171,5 +195,9 @@ export default {
 <style scoped>
 .category-radio-label:checked {
   color: #1a202c;
+}
+input[type=radio]:checked ~ label {
+  background: #6b7280;
+  color: #fff;
 }
 </style>

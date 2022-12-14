@@ -348,7 +348,7 @@ class OrderController extends BaseController
                     'product_code' => $importGoodProductResult->productCode,
                     'product_attribute_value_id' => $importGoodProductResult->productAttributeValueId,
                     'product_attribute_value_name' => $importGoodProductResult->productName,
-                    'product_attribute_value_code' => $importGoodProductResult->productCode,
+                    'product_attribute_value_code' => $importGoodProductResult->productAttributeValueCode,
                     'import_good_product_price' => $importGoodProductResult->importGoodPrice,
                     'monetary_unit_type' => $importGoodProductResult->monetaryUnitType,
                     'count' => $importGoodProductResult->count,

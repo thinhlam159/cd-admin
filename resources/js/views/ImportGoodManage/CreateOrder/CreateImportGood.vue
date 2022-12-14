@@ -1,6 +1,6 @@
 <template>
-  <div class="w-full h-full relative">
-    <div class="w-full pt-14 h-full absolute left-20">
+  <div class="w-full h-full">
+    <div class="w-full pt-14 h-full pl-10">
       <div class="w-full py-6 py-auto text-xl">
         <span class="text-gray-500">Thêm sản phẩm</span>
         <hr>
@@ -14,7 +14,6 @@
 <!--            </option>-->
 <!--          </select>-->
 <!--        </div>-->
-        <hr>
         <div class="mt-5 py-3 flex">
           <div class="mr-4 w-[18%]">
             <span>Danh mục</span>
@@ -25,25 +24,23 @@
           <div class="mr-4 w-[18%]">
             <span>Mã sản phẩm</span>
           </div>
-          <div class="mr-4 w-[18%]">
+          <div class="mr-4 w-[10%]">
             <span>Tên sản phẩm</span>
-          </div>
-          <div class="mr-4 w-[5%]">
-            <span>Số lượng</span>
           </div>
           <div class="mr-4 w-[10%]">
             <span>Số lượng</span>
           </div>
-          <div class="mr-4 w-[2%]">
+          <div class="mr-4 w-[10%]">
             <span>Xóa sp</span>
           </div>
         </div>
 
         <div v-if="renderComponent">
           <import-good-item v-for="(item, index) in listImportGoodItem" :key="index"
-                      @handle-remove-input-item="handleRemoveInputItem(item)"
+                      @handle-remove-input-item="handleRemoveInputItem({item, index})"
                       @update-display="forceUpdate"
                       :item="item"
+                      :index="index"
                       :categories="categories"
                       :dealers="dealers"
                       :products="products"
@@ -64,14 +61,12 @@
 <script>
 import {useRouter} from "vue-router";
 import {useStore} from "vuex";
-import {ref, reactive, onMounted} from "vue";
+import {ref, reactive, onMounted, nextTick} from "vue";
 import logoTimeSharing from "@/assets/images/default-thumbnail.jpg";
 import {
   createImportGoodFromApi,
-  createOrderFromApi,
-  createProductFromApi,
   getListCategoryFromApi,
-  getListCustomerFromApi, getListDealerFromApi,
+  getListDealerFromApi,
   getListProductFromApi
 } from "@/api";
 import {MODULE_STORE, ROUTER_PATH} from "@/const";
@@ -173,13 +168,23 @@ export default {
       productAttributeValuesByProduct.value = productSelected.value.product_attribute_values
     }
     const handleAddToImportGood = () => {
-      const index = store.state[MODULE_STORE.IMPORT_GOOD.NAME].importGoodPostData.length
-      store.commit(`${MODULE_STORE.IMPORT_GOOD.NAME}/${MODULE_STORE.IMPORT_GOOD.MUTATIONS.ADD_IMPORT_GOOD_DATA}`, {index})
-      listImportGoodItem.value = store.state[MODULE_STORE.IMPORT_GOOD.NAME].importGoodPostData
+      const payload = {
+        category_id: '',
+        product_id: '',
+        product_attribute_value_id: '',
+        product_attribute_price_id: '',
+        count: '',
+        measure_unit_type: '',
+        checked: false
+      }
+      store.commit(`${MODULE_STORE.IMPORT_GOOD.NAME}/${MODULE_STORE.IMPORT_GOOD.MUTATIONS.ADD_IMPORT_GOOD_DATA}`, payload)
+      listImportGoodItem.value = []
+      nextTick(() => {listImportGoodItem.value = store.state[MODULE_STORE.IMPORT_GOOD.NAME].importGoodPostData})
     }
     const handleRemoveInputItem = (item) => {
       store.commit(`${MODULE_STORE.IMPORT_GOOD.NAME}/${MODULE_STORE.IMPORT_GOOD.MUTATIONS.REMOVE_IMPORT_GOOD_DATA_ITEM}`, item)
-      // listInputItem.value = store.state[MODULE_STORE.IMPORT_GOOD.NAME].importGoodPostData
+      listImportGoodItem.value = []
+      nextTick(() => {listImportGoodItem.value = store.state[MODULE_STORE.IMPORT_GOOD.NAME].importGoodPostData})
     }
     const updateDisplay = () => {
       listImportGoodItem.value = store.state[MODULE_STORE.IMPORT_GOOD.NAME].importGoodPostData

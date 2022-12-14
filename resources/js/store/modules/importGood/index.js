@@ -26,13 +26,14 @@ const importGood = {
   },
   mutations: {
     [MODULE_STORE.IMPORT_GOOD.MUTATIONS.ADD_IMPORT_GOOD_DATA](state, payload) {
+      // console.log(state.importGoodPostData)
       return state.importGoodPostData.push(payload)
     },
     [MODULE_STORE.IMPORT_GOOD.MUTATIONS.REMOVE_IMPORT_GOOD_DATA_ITEM](state, payload) {
-      if (state.importGoodPostData[payload.index] === payload) {
+      if (state.importGoodPostData[payload.index] === payload.item) {
         state.importGoodPostData.splice(payload.index, 1)
       } else {
-        let found = state.importGoodPostData.indexOf(payload)
+        let found = state.importGoodPostData.indexOf(payload.item)
         state.importGoodPostData.splice(found, 1)
       }
 
@@ -40,12 +41,18 @@ const importGood = {
     },
 
     [MODULE_STORE.IMPORT_GOOD.MUTATIONS.UPDATE_IMPORT_GOOD_DATA_ITEM](state, payload) {
-      if (state.importGoodPostData[payload.index] === payload) {
-        state.importGoodPostData.splice(payload.index, 1, payload)
-      } else {
-        let found = state.importGoodPostData.indexOf(payload)
-        state.importGoodPostData.splice(found, 1, payload)
+      // console.log(state.importGoodPostData)
+      state.importGoodPostData[payload.index] = {
+        ...payload.data
       }
+      // console.log(payload.index)
+      // console.log(state.importGoodPostData)
+      // if (state.importGoodPostData[payload.index] === payload.index) {
+      //   state.importGoodPostData.splice(payload.index, 1, payload.data)
+      // } else {
+      //   let found = state.importGoodPostData.indexOf(payload.data)
+      //   state.importGoodPostData.splice(found, 1, payload.data)
+      // }
 
       return state.importGoodPostData;
     },
