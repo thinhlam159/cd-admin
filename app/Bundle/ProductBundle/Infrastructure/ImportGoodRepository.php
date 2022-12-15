@@ -30,6 +30,7 @@ class ImportGoodRepository implements IImportGoodRepository
             'id' => $importGood->getImportGoodId()->asString(),
             'dealer_id' => !is_null($importGood->getDealerId()) ? $importGood->getDealerId()->asString() : null,
             'user_id' => $importGood->getUserId()->asString(),
+            'import_good_date' => $importGood->getDate(),
         ]);
 
         if (!$result) {

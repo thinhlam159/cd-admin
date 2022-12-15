@@ -61,6 +61,7 @@ class ImportGoodPostApplicationService
             $importGoodId,
             null,
             new UserId($command->userId),
+            $command->date
         );
 
         $importGoodProducts = [];

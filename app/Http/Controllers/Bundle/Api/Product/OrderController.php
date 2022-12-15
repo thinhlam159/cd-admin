@@ -297,7 +297,8 @@ class OrderController extends BaseController
         }
         $command = new ImportGoodPostCommand(
             Auth::id(),
-            $importGoodProductCommands
+            $importGoodProductCommands,
+            $request->date
         );
 
         $result = $applicationService->handle($command);

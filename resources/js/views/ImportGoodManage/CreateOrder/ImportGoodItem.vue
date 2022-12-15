@@ -22,17 +22,17 @@
       <span class="py-3 w-full">{{ productAttributeValueName }}</span>
     </div>
     <div class="mr-4 w-[10%] flex relative border border-gray-100">
-      <input type="number" class="p-3 w-full" v-model="count" placeholder="Số lượng">
+      <input type="number" class="p-3 w-full" v-model="count" placeholder="Số lượng" :min="0">
       <span class="absolute top-[50%] right-10 -translate-y-1/2">{{ measureUnitType }}</span>
     </div>
-    <div class="">
+    <div class="w-[4%] flex items-center">
       <ButtonRemove @clickBtn="$emit('handleRemoveInputItem')" :text="' '"/>
     </div>
+    <div class="mr-4 w-[10%] flex items-center" v-show="!isValid"><span class="text-[red] text-sm">Số lượng lớn hơn 0</span></div>
   </div>
 </template>
 
 <script>
-import {useRouter} from "vue-router";
 import {useStore} from "vuex";
 import {ref, toRef, watch, nextTick} from "vue";
 import ButtonRemove from "@/components/Buttons/ButtonRemove";
@@ -63,7 +63,16 @@ export default {
     })
     const importGoodDataItem = ref({})
     const measureUnitType = ref('')
-
+    const isValid = ref(false)
+    const count = ref(item.value.count)
+    const productAttributePriceId = ref('')
+    const formData = ref({
+      category : item.value.category_id,
+      product : item.value.product_id,
+      productAttributeValue : item.value.product_attribute_value_id,
+      measureUnitType : item.value.measure_unit_type
+    })
+    const productAttributeValueName = ref('')
     const listMeasureUnitType = ref([
       {
         name: 'kg',
@@ -109,22 +118,18 @@ export default {
       })
       productAttributeValueName.value = `${productSelected.value.name} ${productAttributeValuesSelected.code}`
       measureUnitType.value = listMeasureUnitType.value.find( item => productAttributeValuesSelected.measure_unit_name === item.type).name
+      if (count.value <= 0) {
+        isValid.value = false
+      } else {
+        isValid.value = true
+      }
     }
-
-    const count = ref(item.value.count)
-    const productAttributePriceId = ref('')
-    const formData = ref({
-      category : item.value.category_id,
-      product : item.value.product_id,
-      productAttributeValue : item.value.product_attribute_value_id,
-      measureUnitType : item.value.measure_unit_type
-    })
-    const productAttributeValueName = ref('')
 
     const handleOnChangeCategorySelect = () => {
       productAttributeValuesByProduct.value = []
       productsByCategory.value = []
       productAttributeValueName.value = ''
+      count.value = 0
       nextTick(() => {
         productsByCategory.value = products.value.filter((product) => {
           return product.category_id === formData.value.category
@@ -134,6 +139,7 @@ export default {
     const handleOnChangeProductSelect = () => {
       productAttributeValueName.value = ''
       productAttributeValuesByProduct.value = []
+      count.value = 0
       productSelected.value = products.value.find((product) => {
         return product.product_id === formData.value.product
       })
@@ -154,6 +160,11 @@ export default {
     }
 
     watch(count, () => {
+      if (count.value <= 0) {
+        isValid.value = false
+      } else {
+        isValid.value = true
+      }
       importGoodDataItem.value = {
         category_id: formData.value.category,
         product_id: formData.value.product,
@@ -184,6 +195,7 @@ export default {
       measureUnitType,
       unique,
       productSelected,
+      isValid,
       handleOnChangeCategorySelect,
       handleOnChangeProductSelect,
       handleOnChangeProductAttributeValueSelect,

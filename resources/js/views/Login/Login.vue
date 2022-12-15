@@ -43,7 +43,6 @@ import { useStore } from "vuex";
 import {ROUTER_PATH, MODULE_STORE, PAGE_DEFAULT, TYPE_USER} from "@/const";
 import {getToken, removeToken, setToken} from "@/utils/authToken";
 
-
 export default {
     name: "Login",
     setup() {

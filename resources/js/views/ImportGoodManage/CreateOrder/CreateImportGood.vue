@@ -38,7 +38,7 @@
         <div v-if="renderComponent">
           <import-good-item v-for="(item, index) in listImportGoodItem" :key="index"
                       @handle-remove-input-item="handleRemoveInputItem({item, index})"
-                      @update-display="forceUpdate"
+                      @item-valid="checkItemValid(error)"
                       :item="item"
                       :index="index"
                       :categories="categories"
@@ -46,7 +46,8 @@
                       :products="products"
           />
         </div>
-
+        <Datepicker class="p-2 border border-gray-200 mt-3" v-model="picked" :style="styleDatePicker">
+        </Datepicker>
         <div class="ml-2 my-4">
           <ButtonAddNew @clickBtn="handleAddToImportGood" :text="'Sản phẩm'"/>
         </div>
@@ -61,8 +62,7 @@
 <script>
 import {useRouter} from "vue-router";
 import {useStore} from "vuex";
-import {ref, reactive, onMounted, nextTick} from "vue";
-import logoTimeSharing from "@/assets/images/default-thumbnail.jpg";
+import {ref, nextTick, inject} from "vue";
 import {
   createImportGoodFromApi,
   getListCategoryFromApi,
@@ -72,18 +72,13 @@ import {
 import {MODULE_STORE, ROUTER_PATH} from "@/const";
 import ButtonAddNew from "@/components/Buttons/ButtonAddNew";
 import ImportGoodItem from "@/views/ImportGoodManage/CreateOrder/ImportGoodItem.vue";
+import Datepicker from 'vue3-datepicker'
+
+import {convertDateByTimestamp} from "@/utils";
 
 export default {
   name: "CreateImportGood",
-  components: { ImportGoodItem, ButtonAddNew },
-  methods: {
-    forceUpdate() {
-      this.renderComponent = false
-      this.$nextTick(() => {
-        this.renderComponent = true
-      })
-    }
-  },
+  components: { ImportGoodItem, ButtonAddNew, Datepicker },
   data() {
     return {
       renderComponent: true
@@ -101,24 +96,49 @@ export default {
     const productAttributeValues = ref({})
     const productAttributeValuesByProduct = ref({})
     const listImportGoodItem = ref(store.state[MODULE_STORE.IMPORT_GOOD.NAME].importGoodPostData)
+    const importGoodItemErrors = ref([])
+    const toast = inject("$toast");
+    const picked = ref(new Date())
+    const styleDatePicker = ref({
+      "--vdp-bg-color": "#ffffff",
+      "--vdp-text-color": "#e21818",
+      "--vdp-box-shadow": "0 4px 10px 0 rgba(128, 144, 160, 0.1), 0 0 1px 0 rgba(128, 144, 160, 0.81)",
+      "--vdp-border-radius": "10px",
+      "--vdp-heading-size": "2.5em",
+      "--vdp-heading-weight": "bold",
+      "--vdp-heading-hover-color": "#eeeeee",
+      "--vdp-arrow-color": "currentColor",
+      "--vdp-elem-color": "currentColor",
+      "--vdp-disabled-color": "#d5d9e0",
+      "--vdp-hover-color": "#ffffff",
+      "--vdp-hover-bg-color": "#0baf74",
+      "--vdp-selected-color": "#ffffff",
+      "--vdp-selected-bg-color": "#0baf74",
+      "--vdp-current-date-outline-color": "#888888",
+      "--vdp-current-date-font-weight": "bold",
+      "--vdp-elem-font-size": "1em",
+      "--vdp-elem-border-radius": "3px",
+      "--vdp-divider-color": "#ffffff"
+    })
 
-    const handleSubmit = async (data) => {
+    const handleSubmit = async () => {
       try {
+        store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = true
         const orderPostData = [...store.state[MODULE_STORE.IMPORT_GOOD.NAME].importGoodPostData]
-        // const bodyFormData = new FormData()
-        // bodyFormData.append('customer_id', data.customerId);
-        // bodyFormData.append('order_products', orderPostData);
         const postData = {
-          // customer_id: data.customerId,
-          import_good_products: orderPostData
+          import_good_products: orderPostData,
+          date: picked.value.getTime() / 1000 | 0
         }
         const res = await createImportGoodFromApi(postData)
-        // router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.PRODUCT_MANAGE}`)
+        console.log(res)
+        toast.success("Tạo đơn nhập thành công!", {duration:3000})
+        router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.IMPORT_GOOD_MANAGE}`)
+        store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false
       } catch (errors) {
         const error = errors.message;
-        // this.$toast.error(error);
+        toast.error(error)
       } finally {
-        store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
+        store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false
       }
     }
 
@@ -137,8 +157,7 @@ export default {
         formData.value.category = res.data[0].category_id
         store.state[MODULE_STORE.IMPORT_GOOD.NAME].categories = res.data
       } catch (errors) {
-        // const error = errors.message;
-        // console.log(error)
+        toast.error(errors.message)
       }
     }
 
@@ -186,9 +205,14 @@ export default {
       listImportGoodItem.value = []
       nextTick(() => {listImportGoodItem.value = store.state[MODULE_STORE.IMPORT_GOOD.NAME].importGoodPostData})
     }
-    const updateDisplay = () => {
-      listImportGoodItem.value = store.state[MODULE_STORE.IMPORT_GOOD.NAME].importGoodPostData
-    }
+
+    // const checkItemValid = (error) => {
+    //   if (error.isValid === true) {
+    //     importGoodItemErrors.value[error.index] = error.isValid
+    //   } else {
+    //     importGoodItemErrors.value.splice(error.index, 1)
+    //   }
+    // }
 
     getListCategory()
     getListDealer()
@@ -202,12 +226,14 @@ export default {
       productAttributeValuesByProduct,
       productsByCategory,
       listImportGoodItem,
+      picked,
+      styleDatePicker,
       handleSubmit,
       handleOnChangeCategorySelect,
       handleOnChangeProductSelect,
       handleAddToImportGood,
-      handleRemoveInputItem,
-      updateDisplay
+      // checkItemValid,
+      handleRemoveInputItem
     }
   }
 }
