@@ -78,7 +78,8 @@ class ImportGoodRepository implements IImportGoodRepository
         return new ImportGood(
             $importGoodId,
             new DealerId($entity['dealer_id']),
-            new UserId(($entity['user_id']))
+            new UserId(($entity['user_id'])),
+            $entity['import_good_date']
         );
     }
 
@@ -133,7 +134,8 @@ class ImportGoodRepository implements IImportGoodRepository
             $importGoods[] = new ImportGood(
                 new ImportGoodId($entity['id']),
                 !is_null($entity['dealer_id']) ? new DealerId($entity['dealer_id']) : null,
-                new UserId(($entity['user_id']))
+                new UserId(($entity['user_id'])),
+                $entity['import_good_date']
             );
         }
 

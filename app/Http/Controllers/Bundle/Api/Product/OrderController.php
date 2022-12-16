@@ -7,6 +7,8 @@ use App\Bundle\Admin\Infrastructure\DealerRepository;
 use App\Bundle\Admin\Infrastructure\UserRepository;
 use App\Bundle\ProductBundle\Application\DeliveryStatusPutApplicationService;
 use App\Bundle\ProductBundle\Application\DeliveryStatusPutCommand;
+use App\Bundle\ProductBundle\Application\ImportGoodGetApplicationService;
+use App\Bundle\ProductBundle\Application\ImportGoodGetCommand;
 use App\Bundle\ProductBundle\Application\ImportGoodListGetApplicationService;
 use App\Bundle\ProductBundle\Application\ImportGoodListGetCommand;
 use App\Bundle\ProductBundle\Application\ImportGoodPostApplicationService;
@@ -378,6 +380,54 @@ class OrderController extends BaseController
         ];
 
         return response()->json($response, 200);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \App\Bundle\Common\Domain\Model\RecordNotFoundException
+     */
+    public function getImportGood(Request $request)
+    {
+        $applicationService = new ImportGoodGetApplicationService(
+            new ImportGoodRepository(),
+            new ProductInventoryRepository(),
+            new ProductAttributeValueRepository(),
+            new ProductRepository(),
+            new DealerRepository(),
+            new UserRepository(),
+        );
+
+        $command = new ImportGoodGetCommand($request->id);
+        $result = $applicationService->handle($command);
+
+        $importGoodProducts = [];
+        foreach ($result->importGoodProductResults as $importGoodProductResult) {
+            $importGoodProducts[] = [
+                'import_good_product_id' => $importGoodProductResult->importGoodProductId,
+                'product_id' => $importGoodProductResult->productId,
+                'product_name' => $importGoodProductResult->productName,
+                'product_code' => $importGoodProductResult->productCode,
+                'product_attribute_value_id' => $importGoodProductResult->productAttributeValueId,
+                'product_attribute_value_name' => $importGoodProductResult->productName,
+                'product_attribute_value_code' => $importGoodProductResult->productAttributeValueCode,
+                'import_good_product_price' => $importGoodProductResult->importGoodPrice,
+                'monetary_unit_type' => $importGoodProductResult->monetaryUnitType,
+                'count' => $importGoodProductResult->count,
+                'measure_unit_type' => $importGoodProductResult->measureUnitType,
+            ];
+        }
+        $data = [
+            'import_good_id' => $result->importGoodId,
+            'dealer_id' => $result->dealerId,
+            'dealer_name' => $result->dealerName,
+            'user_id' => $result->userId,
+            'user_name' => $result->userName,
+            'import_good_date' => $result->importGoodDate,
+            'import_good_products' => $importGoodProducts
+        ];
+
+        return response()->json(['data' => $data], 200);
     }
 
     /**

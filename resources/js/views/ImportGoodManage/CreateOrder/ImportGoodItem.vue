@@ -118,11 +118,7 @@ export default {
       })
       productAttributeValueName.value = `${productSelected.value.name} ${productAttributeValuesSelected.code}`
       measureUnitType.value = listMeasureUnitType.value.find( item => productAttributeValuesSelected.measure_unit_name === item.type).name
-      if (count.value <= 0) {
-        isValid.value = false
-      } else {
-        isValid.value = true
-      }
+      isValid.value = count.value > 0;
     }
 
     const handleOnChangeCategorySelect = () => {

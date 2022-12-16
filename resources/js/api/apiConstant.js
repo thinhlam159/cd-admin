@@ -40,6 +40,7 @@ export default {
     LIST_IMPORT_GOOD: 'admin/import-good/import-goods',
     CREATE_IMPORT_GOOD: 'admin/import-good/import-good',
     RESTORE_IMPORT_GOOD: 'admin/import-good/restore-import-good',
+    DETAIL_IMPORT_GOOD: 'admin/import-good/detail-import-good',
 
     LIST_DEALER: 'admin/dealer/dealers',
   }

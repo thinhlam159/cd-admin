@@ -57,9 +57,10 @@ export const getListProductAttributePriceFromApi = async () => api.get(`${apiCon
 
 export const exportOrderFromApi = async (data) => await api.post(apiConstants.ADMIN.EXPORT_ORDER, data,{responseType: 'blob'})
 
-export const getListImportGoodFromApi = async (param) => api.get(`${apiConstants.ADMIN.LIST_IMPORT_GOOD}`)
+export const getListImportGoodFromApi = async (params) => api.get(`${apiConstants.ADMIN.LIST_IMPORT_GOOD}`, {params})
 export const createImportGoodFromApi = async (data) => api.post(`${apiConstants.ADMIN.CREATE_IMPORT_GOOD}`, data)
 export const deleteImportGoodFromApi = async () => api.delete(`${apiConstants.ADMIN.RESTORE_IMPORT_GOOD}`)
+export const getImportGoodDetailFromApi = async (id) => await api.get(`${apiConstants.ADMIN.DETAIL_IMPORT_GOOD}/${id}`)
 
 // dealer
 export const getListDealerFromApi = async (page) => api.get(`${apiConstants.ADMIN.LIST_DEALER}?page=${page}`)

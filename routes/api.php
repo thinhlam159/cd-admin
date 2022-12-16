@@ -77,6 +77,7 @@ Route::group([
     Route::post('/import-good/import-good', [OrderController::class, 'createImportGood'])->middleware('auth:api');
     Route::put('/import-good/restore-import-good', [OrderController::class, 'restoreImportGood'])->middleware('auth:api');
     Route::get('/import-good/import-goods', [OrderController::class, 'getImportGoods'])->middleware('auth:api');
+    Route::get('/import-good/detail-import-good/{id}', [OrderController::class, 'getImportGood'])->middleware('auth:api');
 
     Route::post('/order/export-order', [OrderController::class, 'exportOrder'])->middleware('auth:api');
 

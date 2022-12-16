@@ -1,1 +1,1 @@
-export { default } from "./DetailOrder.vue";
+export { default } from "./DetailImportGood.vue";

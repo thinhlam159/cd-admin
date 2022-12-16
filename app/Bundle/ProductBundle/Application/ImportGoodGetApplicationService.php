@@ -5,20 +5,15 @@ namespace App\Bundle\ProductBundle\Application;
 use App\Bundle\Admin\Domain\Model\DealerId as AdminDealerId;
 use App\Bundle\Admin\Domain\Model\IDealerRepository;
 use App\Bundle\Admin\Domain\Model\IUserRepository;
-use App\Bundle\Common\Application\PaginationResult;
 use App\Bundle\Common\Domain\Model\InvalidArgumentException;
 use App\Bundle\Common\Domain\Model\TransactionException;
-use App\Bundle\ProductBundle\Domain\Model\DealerId;
 use App\Bundle\ProductBundle\Domain\Model\IImportGoodRepository;
-use App\Bundle\ProductBundle\Domain\Model\ImportGoodCriteria;
+use App\Bundle\ProductBundle\Domain\Model\ImportGoodId;
 use App\Bundle\ProductBundle\Domain\Model\IProductAttributeValueRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductInventoryRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductRepository;
-use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValueId;
-use App\Bundle\ProductBundle\Domain\Model\ProductId;
-use App\Bundle\ProductBundle\Domain\Model\SettingDate;
 
-class ImportGoodListGetApplicationService
+class ImportGoodGetApplicationService
 {
     /**
      * @var IImportGoodRepository
@@ -76,26 +71,14 @@ class ImportGoodListGetApplicationService
     }
 
     /**
-     * @param ImportGoodListGetCommand $command
-     * @return ImportGoodListGetResult
+     * @param ImportGoodGetCommand $command
+     * @return ImportGoodGetResult
      * @throws InvalidArgumentException
      * @throws TransactionException
      */
-    public function handle(ImportGoodListGetCommand $command): ImportGoodListGetResult
+    public function handle(ImportGoodGetCommand $command): ImportGoodGetResult
     {
-        $criteria = new ImportGoodCriteria(
-            !is_null($command->productId) ? new ProductId($command->productId) : null,
-            !is_null($command->dealerId) ? new DealerId($command->dealerId) : null,
-            !is_null($command->productAttributeValueId) ? new ProductAttributeValueId($command->productAttributeValueId) : null,
-            $command->keyword,
-            $command->sort,
-            $command->order,
-            !is_null($command->startDate) ? SettingDate::fromYmdHis($command->startDate) : null,
-            !is_null($command->endDate) ? SettingDate::fromYmdHis($command->endDate) : null,
-        );
-        [$importGoods, $pagination] = $this->importGoodRepository->findAll($criteria);
-        $importGoodResults = [];
-        foreach ($importGoods as $importGood) {
+        $importGood = $this->importGoodRepository->findById(new ImportGoodId($command->importGoodId));
             $importGoodProducts = $this->importGoodRepository->findImportGoodProductByImportGoodId($importGood->getImportGoodId());
             $dealer = !is_null($importGood->getDealerId()) ? $this->dealerRepository->findById(new AdminDealerId($importGood->getDealerId()->asString())) : null;
             $user = $this->userRepository->findById($importGood->getUserId());
@@ -117,7 +100,7 @@ class ImportGoodListGetApplicationService
                     $importGoodProduct->getMeasureUnitType()->getValue(),
                 );
             }
-            $importGoodResults[] = new ImportGoodResult(
+        return new ImportGoodGetResult(
                 $importGood->getImportGoodId(),
                 !is_null($dealer) ? $dealer->getDealerId()->asString() : null,
                 !is_null($dealer) ? $dealer->getName() : null,
@@ -126,13 +109,5 @@ class ImportGoodListGetApplicationService
                 $importGood->getDate(),
                 $importGoodProductResults
             );
-        }
-        $paginationResult = new PaginationResult(
-            $pagination->getTotalPages(),
-            $pagination->getPerPage(),
-            $pagination->getCurrentPage(),
-        );
-
-        return new ImportGoodListGetResult($importGoodResults, $paginationResult);
     }
 }

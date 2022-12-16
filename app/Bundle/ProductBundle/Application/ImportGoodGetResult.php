@@ -2,7 +2,7 @@
 
 namespace App\Bundle\ProductBundle\Application;
 
-class ImportGoodResult
+class ImportGoodGetResult
 {
     /**
      * @var string

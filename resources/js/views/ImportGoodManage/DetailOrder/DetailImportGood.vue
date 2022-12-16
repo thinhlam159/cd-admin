@@ -34,14 +34,19 @@
 </template>
 
 <script>
-import {ref} from "vue";
+import {inject, ref} from "vue";
 import { useRoute,useRouter } from 'vue-router'
 import {MODULE_STORE, ROUTER_PATH} from "@/const";
-import {getCustomerDetailFromApi, updateCustomerFormApi, getOrderDetailFromApi} from "@/api";
+import {
+  getCustomerDetailFromApi,
+  updateCustomerFormApi,
+  getOrderDetailFromApi,
+  getImportGoodDetailFromApi
+} from "@/api";
 import {useStore} from "vuex";
 
 export default {
-  name: "DetailOrder",
+  name: "DetailImportGood",
   components: { },
 
   data() {
@@ -58,12 +63,14 @@ export default {
       const OrderId = ref(route.params.id)
       const orderResponse = ref({})
       const orderProductResponse = ref([])
+      const toast = inject('$toast')
 
       const getOrderDetail = async (id) => {
         try {
-          console.log(id)
+          console.log(id, 123)
           store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = true;
-          const response = await getOrderDetailFromApi(id);
+          console.log(getImportGoodDetailFromApi)
+          const response = await getImportGoodDetailFromApi(id);
           orderResponse.value = {
             ...response.data,
           };
