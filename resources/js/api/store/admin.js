@@ -59,7 +59,7 @@ export const exportOrderFromApi = async (data) => await api.post(apiConstants.AD
 
 export const getListImportGoodFromApi = async (params) => api.get(`${apiConstants.ADMIN.LIST_IMPORT_GOOD}`, {params})
 export const createImportGoodFromApi = async (data) => api.post(`${apiConstants.ADMIN.CREATE_IMPORT_GOOD}`, data)
-export const deleteImportGoodFromApi = async () => api.delete(`${apiConstants.ADMIN.RESTORE_IMPORT_GOOD}`)
+export const restoreImportGoodFromApi = async (id) => api.delete(`${apiConstants.ADMIN.RESTORE_IMPORT_GOOD}/${id}`)
 export const getImportGoodDetailFromApi = async (id) => await api.get(`${apiConstants.ADMIN.DETAIL_IMPORT_GOOD}/${id}`)
 
 // dealer

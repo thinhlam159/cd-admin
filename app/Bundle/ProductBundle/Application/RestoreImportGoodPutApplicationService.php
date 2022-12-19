@@ -19,6 +19,8 @@ use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValueId;
 use App\Bundle\ProductBundle\Domain\Model\ProductId;
 use App\Bundle\ProductBundle\Domain\Model\ProductInventory;
 use App\Bundle\ProductBundle\Domain\Model\ProductInventoryId;
+use App\Bundle\ProductBundle\Domain\Model\ProductInventoryImportGood;
+use App\Bundle\ProductBundle\Domain\Model\ProductInventoryUpdateType;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -71,11 +73,14 @@ class RestoreImportGoodPutApplicationService
             $productAttributeValueId = new ProductAttributeValueId($restoreImportGoodProduct->getProductAttributeValueId());
             $currentProductInventory = $this->productInventoryRepository->findByProductAttributeValueId($productAttributeValueId);
             $newCount = $currentProductInventory->getCount() - $restoreImportGoodProduct->getCount();
-            $newProductInventories[] = new ProductInventory(
+            $newProductInventories[] = new ProductInventoryImportGood(
                 ProductInventoryId::newId(),
                 $productAttributeValueId,
                 $newCount,
                 MeasureUnitType::fromValue($restoreImportGoodProduct->getMeasureUnitType()->getValue()),
+                ProductInventoryUpdateType::fromType(ProductInventoryUpdateType::RESTORE_IMPORT_GOOD),
+                $restoreImportGoodProduct->getImportGoodProductId(),
+                $restoreImportGoodProduct->getCount(),
                 true
             );
             $currentProductInventories[] = $currentProductInventory;
@@ -99,7 +104,7 @@ class RestoreImportGoodPutApplicationService
                 throw new InvalidArgumentException('customer not exist!');
             }
             //create new inventory
-            $createInventoryProductResult = $this->productInventoryRepository->createMultiProductInventory($newProductInventories);
+            $createInventoryProductResult = $this->productInventoryRepository->createMultiProductInventoryByImportGood($newProductInventories);
             if (!$createInventoryProductResult) {
                 throw new InvalidArgumentException('customer not exist!');
             }

@@ -77,7 +77,7 @@ class ImportGoodRepository implements IImportGoodRepository
 
         return new ImportGood(
             $importGoodId,
-            new DealerId($entity['dealer_id']),
+            !is_null($entity['dealer_id']) ? new DealerId($entity['dealer_id']) : null,
             new UserId(($entity['user_id'])),
             $entity['import_good_date']
         );
@@ -127,7 +127,7 @@ class ImportGoodRepository implements IImportGoodRepository
      */
     public function findAll(ImportGoodCriteria $importGoodCriteria): array
     {
-        $entities = ModelImportGood::paginate(PaginationConst::PAGINATE_ROW);
+        $entities = ModelImportGood::where('is_restore')->paginate(PaginationConst::PAGINATE_ROW);
 
         $importGoods = [];
         foreach ($entities as $entity) {

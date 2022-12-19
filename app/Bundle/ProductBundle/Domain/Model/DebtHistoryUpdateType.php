@@ -4,34 +4,30 @@ namespace App\Bundle\ProductBundle\Domain\Model;
 
 use App\Bundle\Common\Domain\Model\InvalidArgumentException;
 
-final class ProductInventoryUpdateType
+final class DebtHistoryUpdateType
 {
     /** @var int */
     public const ORDER = 1;
 
     /** @var int */
-    public const RESTORE_ORDER = 2;
+    public const CONTAINER_ORDER = 2;
 
     /** @var int */
-    public const UPDATE_ORDER = 3;
+    public const VAT = 3;
 
     /** @var int */
-    public const IMPORT_GOOD = 4;
+    public const PAYMENT = 4;
 
     /** @var int */
-    public const RESTORE_IMPORT_GOOD = 5;
-
-    /** @var int */
-    public const UPDATE_IMPORT_GOOD = 6;
+    public const OTHER_DEBT = 5;
 
     /** @var array<int,string> */
     private const VALUES = [
         self::ORDER => 'order',
-        self::RESTORE_ORDER => 'restore_order',
-        self::UPDATE_ORDER => 'update_order',
-        self::IMPORT_GOOD => 'import_good',
-        self::RESTORE_IMPORT_GOOD => 'restore_import_good',
-        self::UPDATE_IMPORT_GOOD => 'update_import_good',
+        self::CONTAINER_ORDER => 'container_order',
+        self::VAT => 'vat',
+        self::PAYMENT => 'payment',
+        self::OTHER_DEBT => 'other_debt',
     ];
     private int $type;
 
@@ -56,11 +52,11 @@ final class ProductInventoryUpdateType
      * @param string $value value
      * @return self
      */
-    public static function fromValue(string $value): ProductInventoryUpdateType
+    public static function fromValue(string $value): DebtHistoryUpdateType
     {
         foreach (self::VALUES as $type => $v) {
             if ($v === $value) {
-                return new ProductInventoryUpdateType($type);
+                return new DebtHistoryUpdateType($type);
             }
         }
 
@@ -71,13 +67,13 @@ final class ProductInventoryUpdateType
      * @param int $type type
      * @return self
      */
-    public static function fromType(int $type): ProductInventoryUpdateType
+    public static function fromType(int $type): DebtHistoryUpdateType
     {
         if (!isset(self::VALUES[$type])) {
             throw new InvalidArgumentException("[{$type}] Loại không hợp lệ");
         }
 
-        return new ProductInventoryUpdateType($type);
+        return new DebtHistoryUpdateType($type);
     }
 
     /**

@@ -46,8 +46,7 @@
                       :products="products"
           />
         </div>
-        <Datepicker class="p-2 border border-gray-200 mt-3" v-model="picked" :style="styleDatePicker">
-        </Datepicker>
+        <Datepicker class="p-2 border border-gray-200 mt-3" v-model="picked" :style="styleDatePicker" />
         <div class="ml-2 my-4">
           <ButtonAddNew @clickBtn="handleAddToImportGood" :text="'Sản phẩm'"/>
         </div>

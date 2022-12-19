@@ -443,7 +443,7 @@ class OrderController extends BaseController
             new ProductInventoryRepository()
         );
 
-        $command = new RestoreImportGoodPutCommand($request->import_good_id);
+        $command = new RestoreImportGoodPutCommand($request->id);
         $result = $applicationService->handle($command);
 
         $data[] = [
