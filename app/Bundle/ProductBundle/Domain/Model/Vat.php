@@ -1,15 +1,14 @@
 <?php
-
 namespace App\Bundle\ProductBundle\Domain\Model;
 
 use App\Bundle\Admin\Domain\Model\CustomerId;
 
-final class Payment
+final class Vat
 {
     /**
-     * @var PaymentId
+     * @var \App\Bundle\ProductBundle\Domain\Model\VatId
      */
-    private PaymentId $paymentId;
+    private VatId $vatId;
 
     /**
      * @var int
@@ -37,36 +36,43 @@ final class Payment
     private UserId $userId;
 
     /**
-     * @var int
+     * @var OrderPaymentStatus
      */
-    private int $date;
+    private OrderPaymentStatus $paymentStatus;
 
     /**
-     * @param PaymentId $paymentId
+     * @var int
+     */
+    private int $arisingDate;
+
+    /**
+     * @param VatId $vatId
      * @param int $cost
      * @param MonetaryUnitType $monetaryUnitType
      * @param string|null $comment
      * @param CustomerId $customerId
      * @param UserId $userId
-     * @param int $date
+     * @param OrderPaymentStatus $paymentStatus
+     * @param int $arisingDate
      */
-    public function __construct(PaymentId $paymentId, int $cost, MonetaryUnitType $monetaryUnitType, ?string $comment, CustomerId $customerId, UserId $userId, int $date)
+    public function __construct(VatId $vatId, int $cost, MonetaryUnitType $monetaryUnitType, ?string $comment, CustomerId $customerId, UserId $userId, OrderPaymentStatus $paymentStatus, int $arisingDate)
     {
-        $this->paymentId = $paymentId;
+        $this->vatId = $vatId;
         $this->cost = $cost;
         $this->monetaryUnitType = $monetaryUnitType;
         $this->comment = $comment;
         $this->customerId = $customerId;
         $this->userId = $userId;
-        $this->date = $date;
+        $this->paymentStatus = $paymentStatus;
+        $this->arisingDate = $arisingDate;
     }
 
     /**
-     * @return PaymentId
+     * @return VatId
      */
-    public function getPaymentId(): PaymentId
+    public function getVatId(): VatId
     {
-        return $this->paymentId;
+        return $this->vatId;
     }
 
     /**
@@ -110,10 +116,18 @@ final class Payment
     }
 
     /**
+     * @return OrderPaymentStatus
+     */
+    public function getPaymentStatus(): OrderPaymentStatus
+    {
+        return $this->paymentStatus;
+    }
+
+    /**
      * @return int
      */
-    public function getDate(): int
+    public function getArisingDate(): int
     {
-        return $this->date;
+        return $this->arisingDate;
     }
 }

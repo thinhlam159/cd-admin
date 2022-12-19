@@ -6,8 +6,8 @@ use App\Bundle\Common\Domain\Model\Pagination;
 interface IContainerOrderRepository
 {
     /**
-     * @param Product $category
-     * @return ProductId
+     * @param ContainerOrder $containerOrder
+     * @return ContainerOrderId|null
      */
-    public function create(Product $category): ProductId;
+    public function create(ContainerOrder $containerOrder): ?ContainerOrderId;
 }

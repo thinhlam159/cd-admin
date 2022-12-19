@@ -6,8 +6,8 @@ use App\Bundle\Common\Domain\Model\Pagination;
 interface IVatRepository
 {
     /**
-     * @param Product $category
-     * @return ProductId
+     * @param Vat $vat
+     * @return VatId|null
      */
-    public function create(Product $category): ProductId;
+    public function create(Vat $vat): ?VatId;
 }

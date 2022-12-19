@@ -43,6 +43,8 @@ export default {
     DETAIL_IMPORT_GOOD: 'admin/import-good/detail-import-good',
 
     LIST_DEALER: 'admin/dealer/dealers',
+
+    LIST_DEBT: 'admin/debt/list-debt',
   }
 
   // ADMIN: "/admin/customer/user-manage",

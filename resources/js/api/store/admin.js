@@ -64,3 +64,5 @@ export const getImportGoodDetailFromApi = async (id) => await api.get(`${apiCons
 
 // dealer
 export const getListDealerFromApi = async (page) => api.get(`${apiConstants.ADMIN.LIST_DEALER}?page=${page}`)
+
+export const getListDebtFromApi = async (params) => api.get(`${apiConstants.ADMIN.LIST_DEBT}`, {params})

@@ -25,6 +25,9 @@ import ImportGoodManage from "@/views/ImportGoodManage";
 import ListImportGood from "@/views/ImportGoodManage/ListImportGood";
 import CreateImportGood from "@/views/ImportGoodManage/CreateOrder";
 import DetailImportGood from "@/views/ImportGoodManage/DetailOrder";
+import DebtManage from "@/views/DebtManage";
+import ListDebt from "@/views/DebtManage/ListDebt";
+import CreateDebt from "@/views/DebtManage/CreateDebt";
 
 export default [
     // ROUTER_ADMIN
@@ -148,6 +151,24 @@ export default [
                 path: ROUTER_PATH.DETAIL_ID,
                 component: DetailImportGood,
               },
+            ]
+          },
+          {
+            path: ROUTER_PATH.DEBT_MANAGE,
+            component: DebtManage,
+            children: [
+              {
+                path: ROUTER_PATH.EMPTY,
+                component: ListDebt,
+              },
+              {
+                path: ROUTER_PATH.ADD,
+                component: CreateDebt,
+              },
+              // {
+              //   path: ROUTER_PATH.DETAIL_ID,
+              //   component: DetailImportGood,
+              // },
             ]
           }
         ]

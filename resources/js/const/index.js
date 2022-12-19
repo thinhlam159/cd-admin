@@ -25,6 +25,7 @@ export const ROUTER_PATH = {
   ADD_PRODUCT_ATTRIBUTE_VALUE_ID: "add-attribute-value/:id",
   ORDER_MANAGE: "order-manage",
   IMPORT_GOOD_MANAGE: "import-good-manage",
+  DEBT_MANAGE: "debt-manage",
 
   CONFIGURATION: "configuration",
   RESERVATIONS: "reservations",

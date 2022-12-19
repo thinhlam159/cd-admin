@@ -4,6 +4,7 @@ use App\Http\Controllers\Bundle\Api\Admin\CustomerManagementController;
 use App\Http\Controllers\Bundle\Api\Admin\DealerController;
 use App\Http\Controllers\Bundle\Api\Admin\UserController;
 use App\Http\Controllers\Bundle\Api\Product\CategoryController;
+use App\Http\Controllers\Bundle\Api\Product\DebtController;
 use App\Http\Controllers\Bundle\Api\Product\OrderController;
 use App\Http\Controllers\Bundle\Api\Product\ProductController;
 use App\Http\Controllers\Bundle\Auth\AdminAuthController;
@@ -82,4 +83,8 @@ Route::group([
     Route::post('/order/export-order', [OrderController::class, 'exportOrder'])->middleware('auth:api');
 
     Route::get('/dealer/dealers', [DealerController::class, 'getDealers'])->middleware('auth:api');
+
+    Route::post('/debt/create-payment', [DebtController::class, 'createPayment'])->middleware('auth:api');
+    Route::get('/debt/list-debt', [DebtController::class, 'getDebts'])->middleware('auth:api');
+    Route::get('/debt/list-customer-debt/{id}', [DebtController::class, 'getCustomerDebtDetail'])->middleware('auth:api');
 });

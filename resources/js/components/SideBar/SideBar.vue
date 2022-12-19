@@ -79,6 +79,13 @@ export default {
           icon: "fa fa-lg fa-exchange",
         },
         {
+          id: 9,
+          // title: this.$t("side_bar_components.dashboard"),
+          title: 'Công nợ',
+          link: `${ROUTER_PATH.ADMIN}/${ROUTER_PATH.DEBT_MANAGE}`,
+          icon: "fa fa-lg fa-file-text-o",
+        },
+        {
           id: 6,
           // title: this.$t("side_bar_components.dashboard"),
           title: 'Quản lý vai trò',

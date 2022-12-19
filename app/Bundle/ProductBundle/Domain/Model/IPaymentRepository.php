@@ -6,8 +6,8 @@ use App\Bundle\Common\Domain\Model\Pagination;
 interface IPaymentRepository
 {
     /**
-     * @param Product $category
-     * @return ProductId
+     * @param Payment $payment
+     * @return PaymentId|null
      */
-    public function create(Product $category): ProductId;
+    public function create(Payment $payment): ?PaymentId;
 }
