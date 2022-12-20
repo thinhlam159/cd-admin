@@ -14,7 +14,9 @@
         </select>
       </div>
       <TabsWrapper>
-        <TabItem title="Container">Content from Tab 1</TabItem>
+        <TabItem title="Container">
+          <CurrencyInput />
+        </TabItem>
         <TabItem title="Vat">Content from Tab 2 Lorem ipsum dolor sit amet.</TabItem>
         <TabItem title="Khác">Content from Tab 3 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Voluptates, ipsa.</TabItem>
       </TabsWrapper>
@@ -25,8 +27,7 @@
 <script>
 import {useRouter} from "vue-router";
 import {useStore} from "vuex";
-import {ref, reactive, onMounted} from "vue";
-import logoTimeSharing from "@/assets/images/default-thumbnail.jpg";
+import {ref, onMounted} from "vue";
 import {
   createOrderFromApi,
   createProductFromApi,
@@ -39,10 +40,12 @@ import InputItem from "@/views/OrderManage/CreateOrder/InputItem";
 import ButtonAddNew from "@/components/Buttons/ButtonAddNew";
 import TabsWrapper from "@/views/DebtManage/CreateDebt/TabsWrapper.vue";
 import TabItem from "@/views/DebtManage/CreateDebt/TabItem.vue";
+import ContainerOrderItem from "@/views/DebtManage/CreateDebt/ContainerOrderItem.vue";
+import CurrencyInput from "@/views/DebtManage/CreateDebt/CurrencyInput.vue";
 
 export default {
   name: "CreateDebt",
-  components: { InputItem, ButtonAddNew, TabsWrapper, TabItem },
+  components: { InputItem, ButtonAddNew, TabsWrapper, TabItem, ContainerOrderItem, CurrencyInput },
   methods: {
     forceUpdate() {
       this.renderComponent = false
@@ -60,7 +63,6 @@ export default {
     const router = useRouter()
     const store = useStore()
     const formData = ref({})
-    const file = ref(null)
     const categories = ref({})
     const customers = ref({})
     const products = ref({})

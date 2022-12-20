@@ -28,6 +28,7 @@ import DetailImportGood from "@/views/ImportGoodManage/DetailOrder";
 import DebtManage from "@/views/DebtManage";
 import ListDebt from "@/views/DebtManage/ListDebt";
 import CreateDebt from "@/views/DebtManage/CreateDebt";
+import quiz from "@/views/quiz";
 
 export default [
     // ROUTER_ADMIN
@@ -170,7 +171,11 @@ export default [
               //   component: DetailImportGood,
               // },
             ]
-          }
+          },
+          {
+            path: 'quiz',
+            component: quiz,
+          },
         ]
     },
 ]
