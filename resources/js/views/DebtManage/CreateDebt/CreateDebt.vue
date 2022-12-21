@@ -13,13 +13,15 @@
           </option>
         </select>
       </div>
-      <TabsWrapper>
-        <TabItem title="Container">
-          <CurrencyInput />
-        </TabItem>
-        <TabItem title="Vat">Content from Tab 2 Lorem ipsum dolor sit amet.</TabItem>
-        <TabItem title="Khác">Content from Tab 3 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Voluptates, ipsa.</TabItem>
-      </TabsWrapper>
+      <div class="w-1/2 h-full">
+        <TabsWrapper>
+          <TabItem title="Container">
+            <ContainerOrderItem />
+          </TabItem>
+          <TabItem title="Vat">Content from Tab 2 Lorem ipsum dolor sit amet.</TabItem>
+          <TabItem title="Khác">Content from Tab 3 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Voluptates, ipsa.</TabItem>
+        </TabsWrapper>
+      </div>
     </div>
   </div>
 </template>
@@ -122,7 +124,6 @@ export default {
       customers.value = {
         ...res.data
       }
-      console.log(res)
       store.state[MODULE_STORE.ORDER.NAME].customers = res.data
     }
     const handleOnChangeCategorySelect = () => {
@@ -149,7 +150,6 @@ export default {
     const updateDisplay = () => {
       listInputItem.value = store.state[MODULE_STORE.ORDER.NAME].orderPostData
     }
-    onMounted(() => {console.log(store.state[MODULE_STORE.ORDER.NAME].customers)})
 
     getListCategory()
     getListCustomer()

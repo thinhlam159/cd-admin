@@ -1,6 +1,6 @@
 <template>
   <div class="w-full rounded-full bg-[#F1F5F9] relative h-[16px]">
-    <div class="absolute top-0 left-0 rounded-full w-1/4 bg-[#627D98] h-full transition" :style="ratio"></div>
+    <div class="absolute top-0 left-0 rounded-full w-1/4 bg-[#627D98] h-full transition transition_123" :style="ratio"></div>
   </div>
 </template>
 
@@ -31,7 +31,7 @@ export default {
 </script>
 
 <style scoped>
-/*.transition_123{*/
-/*  transition: width 0.5s ease;*/
-/*}*/
+.transition_123{
+  transition: width 0.5s ease;
+}
 </style>

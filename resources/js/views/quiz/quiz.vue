@@ -6,9 +6,9 @@
     <div>
       <div class="bg-[#F0F4F8] py-12">
         <div class="flex justify-center mb-15">
-          <div class="mr-5 flex">
+          <div class="mr-5 flex relative">
             <div><img :src="icon" alt="" class="z-0"></div>
-            <div class="relative"><span class="absolute top-3 -right-3">{{ queTag.queNum }}</span></div>
+            <span class="absolute top-[10px] right-[16px]">{{ queTag.queNum }}</span>
           </div>
           <div class="py-6"><span>{{ queTag.que_text }}</span></div>
         </div>
@@ -37,7 +37,7 @@
 
 <script>
 import {ref} from "vue";
-import icon from "@/assets/images/Group 494924.png"
+import icon from "@/assets/images/Group 494944.png"
 import progressBar from "@/views/quiz/progressBar.vue";
 
 export default {
