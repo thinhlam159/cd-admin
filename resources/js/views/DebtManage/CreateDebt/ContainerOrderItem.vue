@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="w-full p-5">
     <Form
       @submit="handleSubmit"
       :validation-schema="schema"
@@ -11,12 +11,18 @@
       <CurrencyInput
         name="price"
         type="text"
-        class="border border-gray-200"
-        label="Full Name"
-        placeholder="Your Name"
+        v-model="price"
+        label="Giá thành container"
+        placeholder="nhập giá"
         success-message="Nice to meet you!"
+        :options="{ currency: 'EUR', currencyDisplay: 'hidden' }"
       />
-      <button class="submit-btn border border-gray-200 p-3" type="submit">Submit</button>
+      <div>
+        <label for="" class="font-bold mb-3 text-lg text-gray-500">Ghi chú</label>
+        <textarea class="w-full h-auto border border-gray-200 min-h-[80px] outline-none text-sm"></textarea>
+      </div>
+
+      <button class="submit-btn border border-gray-200 p-3 max-w-[80px]" type="submit">Submit</button>
     </Form>
   </div>
 </template>
@@ -28,6 +34,7 @@ import * as Yup from 'yup';
 import CurrencyInput from "@/views/DebtManage/CreateDebt/CurrencyInput.vue";
 import {setLocale} from "yup";
 
+const price = ref('')
 
 setLocale({
   // use constant translation keys for messages without values
@@ -44,12 +51,6 @@ setLocale({
 const schema = Yup.object().shape({
   price: Yup.number().min(3).required().typeError("Custom not a number message!"),
 });
-
-// setLocale({
-//   price: {
-//     default: 'field_invalid',
-//   },
-// });
 
 function handleSubmit(values) {
   alert(JSON.stringify(values, null, 2));

@@ -55,9 +55,6 @@ provide('selectedTitle', selectedTitle)
 
 .tabs__content {
   background-color: #ffffff;
-  /*min-height: 300px;*/
-  display: grid;
-  place-items: center;
   border-radius: 0 0 5px 5px;
   padding: 10px;
   border: 1px solid #bfbfbf;

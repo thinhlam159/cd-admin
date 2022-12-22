@@ -13,7 +13,7 @@
           </option>
         </select>
       </div>
-      <div class="w-1/2 h-full">
+      <div class="w-1/2 h-full p-5">
         <TabsWrapper>
           <TabItem title="Container">
             <ContainerOrderItem />
