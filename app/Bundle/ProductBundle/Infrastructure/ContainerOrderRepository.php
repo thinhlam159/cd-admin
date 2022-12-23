@@ -20,6 +20,7 @@ class ContainerOrderRepository implements IContainerOrderRepository
             'comment' => $containerOrder->getComment(),
             'customer_id' => $containerOrder->getCustomerId()->asString(),
             'user_id' => $containerOrder->getUserId()->asString(),
+            'payment_status' => $containerOrder->getPaymentStatus()->getStatus(),
             'arising_date' => $containerOrder->getArisingDate(),
     	]);
         if (!$result) {

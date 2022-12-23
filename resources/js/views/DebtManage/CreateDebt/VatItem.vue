@@ -7,14 +7,14 @@
         name="price"
         type="text"
         v-model="price"
-        label="Giá thành container"
-        placeholder="nhập giá"
+        label="Số tiền VAT"
+        placeholder="Số tiền"
         success-message="Nice to meet you!"
         :options="{ currency: 'EUR', currencyDisplay: 'hidden' }"
       />
       <p v-if="!!priceMessageError" class="text-red-500">{{ priceMessageError }}</p>
       <div>
-        <label for="" class="font-bold mb-3 text-lg text-gray-500">Ngày bán</label>
+        <label for="" class="font-bold mb-3 text-lg text-gray-500">Ngày tạo</label>
         <Datepicker class="p-2 border border-gray-200 mt-3" v-model="picked" :style="styleDatePicker" />
       </div>
       <div>
@@ -32,8 +32,7 @@ import {inject, ref} from 'vue';
 import * as Yup from 'yup';
 import CurrencyInput from "@/views/DebtManage/CreateDebt/CurrencyInput.vue";
 import Datepicker from 'vue3-datepicker'
-import { setLocale } from "yup";
-import { createContainerOrderFromApi } from "@/api";
+import { createVatFromApi } from "@/api";
 import {ROUTER_PATH} from "@/const";
 import { useRouter } from 'vue-router';
 
@@ -90,9 +89,9 @@ async function handleSubmit() {
       monetary_unit_type: 'vnd',
       customer_id: props.customerId
     }
-    const res = await createContainerOrderFromApi(postData)
-    console.log(res.data)
-    toast.success("Tạo đơn container thành công!", {duration:3000})
+    const res = await createVatFromApi(postData)
+    console.log(postData)
+    toast.success("Tạo công nợ VAT thành công!", {duration:3000})
     router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.DEBT_MANAGE}`)
 
   } catch (err) {
@@ -115,60 +114,6 @@ function onInvalidSubmit() {
   }, 1000);
 }
 
-// export default {
-//   name: "ContainerOrderItem",
-//   components: {Form, Field, ErrorMessage, CurrencyInput},
-//   setup() {
-//     const price = ref(0)
-//     const handleSubmit = () => {
-//       console.log('Submitting :(');
-//     }
-//     //
-//     // const formatPrice = () => {
-//     //   price.value.toLocaleString('it-IT', {style : 'currency', currency : 'VND'})
-//     // }
-//     //
-//     // const validatePrice = (value) => {
-//     //   // if the field is empty
-//     //   if (!value) {
-//     //     return 'This field is required';
-//     //   }
-//     //   // if the field is not a valid email
-//     //   const regex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
-//     //   if (!regex.test(value)) {
-//     //     return 'This field must be a valid email';
-//     //   }
-//     //   // All is good
-//     //   return true;
-//     // }
-//
-//     const onInvalidSubmit = () => {
-//       const submitBtn = document.querySelector('.submit-btn');
-//       submitBtn.classList.add('invalid');
-//       setTimeout(() => {
-//         submitBtn.classList.remove('invalid');
-//       }, 1000);
-//     }
-//
-//     const validateComment = () => {
-//
-//     }
-//
-//     const schema = Yup.object().shape({
-//       price: Yup.number().required(),
-//     });
-//
-//     return {
-//       price,
-//       schema,
-//       handleSubmit,
-//       onInvalidSubmit,
-//       // validatePrice,
-//       // formatPrice,
-//       validateComment
-//     }
-//   }
-// }
 </script>
 
 <style scoped>

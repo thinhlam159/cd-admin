@@ -62,7 +62,7 @@ class ContainerOrderPostApplicationService
             $command->comment,
             $customerId,
             $userId,
-            OrderPaymentStatus::fromValue(OrderPaymentStatus::PENDING),
+            OrderPaymentStatus::fromStatus(OrderPaymentStatus::PENDING),
             $command->date,
         );
         $currentDebt = $this->debtHistoryRepository->findCurrentDebtByCustomerId($customerId);
@@ -75,7 +75,7 @@ class ContainerOrderPostApplicationService
             !is_null($currentDebt) ? $currentDebt->getTotalDebt() + $command->cost : $command->cost,
             !is_null($currentDebt) ? $currentDebt->getTotalPayment() : 0,
             true,
-            DebtHistoryUpdateType::fromType(DebtHistoryUpdateType::PAYMENT),
+            DebtHistoryUpdateType::fromType(DebtHistoryUpdateType::CONTAINER_ORDER),
             null,
             $containerOrderId,
             null,
@@ -84,18 +84,21 @@ class ContainerOrderPostApplicationService
             $command->cost,
             $command->date,
             MonetaryUnitType::fromValue($command->monetaryUnitType),
-            !is_null($currentDebt) ? $currentDebt + 1 : 1
+            !is_null($currentDebt) ? $currentDebt->getVersion() + 1 : 1
         );
 
         DB::beginTransaction();
         try {
             $containerOrderId = $this->containerOrderRepository->create($containerOrder);
+            if ($currentDebt) {
+                $this->debtHistoryRepository->updateCurrentDebtHistory($currentDebt->getDebtHistoryId());
+            }
             $this->debtHistoryRepository->create($newDebtHistory);
             DB::commit();
         } catch (Exception $e) {
             DB::rollBack();
             Log::error($e);
-            throw new TransactionException('Create Payment Fail!');
+            throw new TransactionException($e->getMessage());
         }
 
         return new ContainerOrderPostResult($containerOrderId->__toString());

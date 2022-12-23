@@ -34,11 +34,11 @@ class DebtHistoryRepository implements IDebtHistoryRepository
             'total_payment' => $debtHistory->getTotalPayment(),
             'is_current' => $debtHistory->isCurrent(),
             'update_type' => $debtHistory->getDebtHistoryUpdateType()->getType(),
-            'order_id' => $debtHistory->getOrderId()->asString(),
-            'container_order_id' => $debtHistory->getContainerOrderId()->asString(),
-            'vat_id' => $debtHistory->getVatId()->asString(),
-            'other_debt_id' => $debtHistory->getOtherDebtId()->asString(),
-            'payment_id' => $debtHistory->getPaymentId()->asString(),
+            'order_id' => !is_null($debtHistory->getOrderId()) ? $debtHistory->getOrderId()->asString() : null,
+            'container_order_id' => !is_null($debtHistory->getContainerOrderId()) ? $debtHistory->getContainerOrderId()->asString() : null,
+            'vat_id' => !is_null($debtHistory->getVatId()) ? $debtHistory->getVatId()->asString() : null,
+            'other_debt_id' => !is_null($debtHistory->getOtherDebtId()) ? $debtHistory->getDebtHistoryId()->asString() : null,
+            'payment_id' => !is_null($debtHistory->getPaymentId()) ? $debtHistory->getPaymentId()->asString() : null,
             'update_date' => $debtHistory->getUpdateDate(),
             'number_of_money' => $debtHistory->getNumberOfMoney(),
             'monetary_unit_type' => $debtHistory->getMonetaryUnitType()->getType(),
@@ -59,7 +59,7 @@ class DebtHistoryRepository implements IDebtHistoryRepository
         $entity = ModelDebtHistory::where([
             ['is_current', '=', true],
             ['customer_id', '=', $customerId->asString()],
-        ])->get();
+        ])->first();
 
         if (!$entity) {
             return null;
@@ -67,12 +67,12 @@ class DebtHistoryRepository implements IDebtHistoryRepository
 
         return new DebtHistory(
             new DebtHistoryId($entity->id),
-            new CustomerId($entity->id),
-            new UserId($entity->id),
+            new CustomerId($entity->customer_id),
+            new UserId($entity->user_id),
             $entity->total_debt,
             $entity->total_payment,
             $entity->is_current,
-            DebtHistoryUpdateType::fromType($entity->debt_history_update_type),
+            DebtHistoryUpdateType::fromType($entity->update_type),
             !is_null($entity->order_id) ? new OrderId($entity->order_id) : null,
             !is_null($entity->container_order_id) ? new ContainerOrderId($entity->container_order_id) : null,
             !is_null($entity->vat_id) ? new VatId($entity->vat_id) : null,
@@ -96,12 +96,12 @@ class DebtHistoryRepository implements IDebtHistoryRepository
         foreach ($entities as $entity) {
             $debts[] = new DebtHistory(
                 new DebtHistoryId($entity->id),
-                new CustomerId($entity->id),
-                new UserId($entity->id),
+                new CustomerId($entity->customer_id),
+                new UserId($entity->user_id),
                 $entity->total_debt,
                 $entity->total_payment,
                 $entity->is_current,
-                DebtHistoryUpdateType::fromType($entity->debt_history_update_type),
+                DebtHistoryUpdateType::fromType($entity->update_type),
                 !is_null($entity->order_id) ? new OrderId($entity->order_id) : null,
                 !is_null($entity->container_order_id) ? new ContainerOrderId($entity->container_order_id) : null,
                 !is_null($entity->vat_id) ? new VatId($entity->vat_id) : null,
@@ -159,5 +159,19 @@ class DebtHistoryRepository implements IDebtHistoryRepository
         );
 
         return [$debts, $pagination];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function updateCurrentDebtHistory(DebtHistoryId $debtHistoryId): bool
+    {
+        $entity = ModelDebtHistory::find($debtHistoryId->asString());
+        $result = $entity->update(['is_current' => false]);
+        if (!$result) {
+            return false;
+        }
+
+        return true;
     }
 }

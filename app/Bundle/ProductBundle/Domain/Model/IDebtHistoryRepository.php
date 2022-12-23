@@ -29,4 +29,10 @@ interface IDebtHistoryRepository
      * @return array{DebtHistory[], Pagination}
      */
     public function findAllHistoryByCustomer(CustomerDebtHistoryCriteria $criteria): array;
+
+    /**
+     * @param DebtHistoryId $debtHistoryId
+     * @return bool
+     */
+    public function updateCurrentDebtHistory(DebtHistoryId $debtHistoryId): bool;
 }

@@ -61,6 +61,9 @@ export const getListImportGoodFromApi = async (params) => api.get(`${apiConstant
 export const createImportGoodFromApi = async (data) => api.post(`${apiConstants.ADMIN.CREATE_IMPORT_GOOD}`, data)
 export const restoreImportGoodFromApi = async (id) => api.delete(`${apiConstants.ADMIN.RESTORE_IMPORT_GOOD}/${id}`)
 export const getImportGoodDetailFromApi = async (id) => await api.get(`${apiConstants.ADMIN.DETAIL_IMPORT_GOOD}/${id}`)
+export const createContainerOrderFromApi = async (data) => api.post(`${apiConstants.ADMIN.CREATE_CONTAINER_ORDER}`, data)
+export const createVatFromApi = async (data) => api.post(`${apiConstants.ADMIN.CREATE_VAT_DEBT}`, data)
+export const createPaymentFromApi = async (data) => api.post(`${apiConstants.ADMIN.CREATE_PAYMENT}`, data)
 
 // dealer
 export const getListDealerFromApi = async (page) => api.get(`${apiConstants.ADMIN.LIST_DEALER}?page=${page}`)

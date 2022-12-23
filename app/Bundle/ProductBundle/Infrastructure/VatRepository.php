@@ -21,6 +21,7 @@ class VatRepository implements IVatRepository
             'customer_id' => $vat->getCustomerId()->asString(),
             'user_id' => $vat->getUserId()->asString(),
             'arising_date' => $vat->getArisingDate(),
+            'payment_status' => $vat->getPaymentStatus()->getStatus(),
     	]);
         if (!$result) {
             return null;

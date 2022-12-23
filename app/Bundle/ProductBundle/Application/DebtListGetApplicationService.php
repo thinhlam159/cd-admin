@@ -6,6 +6,7 @@ use App\Bundle\Admin\Domain\Model\DealerId as AdminDealerId;
 use App\Bundle\Admin\Domain\Model\ICustomerRepository;
 use App\Bundle\Admin\Domain\Model\IDealerRepository;
 use App\Bundle\Admin\Domain\Model\IUserRepository;
+use App\Bundle\Admin\Domain\Model\UserId;
 use App\Bundle\Common\Application\PaginationResult;
 use App\Bundle\Common\Domain\Model\InvalidArgumentException;
 use App\Bundle\Common\Domain\Model\TransactionException;
@@ -70,7 +71,7 @@ class DebtListGetApplicationService
         $debtResults = [];
         foreach ($debts as $debt) {
             $customer = $this->customerRepository->findById($debt->getCustomerId());
-            $user = $this->userRepository->findById($debt->getUserId());
+            $user = $this->userRepository->findById(new UserId($debt->getUserId()->asString()));
             $debtResults[] = new DebtResult(
                 $debt->getDebtHistoryId()->asString(),
                 $customer->getCustomerId()->asString(),
@@ -81,11 +82,11 @@ class DebtListGetApplicationService
                 $debt->getTotalPayment(),
                 $debt->isCurrent(),
                 $debt->getDebtHistoryUpdateType()->getValue(),
-                $debt->getOrderId()->asString(),
-                $debt->getContainerOrderId()->asString(),
-                $debt->getVatId()->asString(),
-                $debt->getPaymentId()->asString(),
-                $debt->getOtherDebtId()->asString(),
+                !is_null($debt->getOrderId()) ? $debt->getOrderId()->asString() : null,
+                !is_null($debt->getContainerOrderId()) ? $debt->getContainerOrderId()->asString() : null,
+                !is_null($debt->getVatId()) ? $debt->getVatId()->asString() : null,
+                !is_null($debt->getPaymentId()) ? $debt->getPaymentId()->asString() : null,
+                !is_null($debt->getOtherDebtId()) ? $debt->getOtherDebtId()->asString() : null,
                 $debt->getNumberOfMoney(),
                 $debt->getUpdateDate(),
                 $debt->getMonetaryUnitType()->getValue(),

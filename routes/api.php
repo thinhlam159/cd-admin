@@ -87,4 +87,8 @@ Route::group([
     Route::post('/debt/create-payment', [DebtController::class, 'createPayment'])->middleware('auth:api');
     Route::get('/debt/list-debt', [DebtController::class, 'getDebts'])->middleware('auth:api');
     Route::get('/debt/list-customer-debt/{id}', [DebtController::class, 'getCustomerDebtDetail'])->middleware('auth:api');
+
+    Route::post('/debt/create-container-order', [DebtController::class, 'createContainerOrderDebt'])->middleware('auth:api');
+    Route::post('/debt/create-vat-debt', [DebtController::class, 'createVatDebt'])->middleware('auth:api');
+    Route::post('/debt/create-payment', [DebtController::class, 'createPayment'])->middleware('auth:api');
 });

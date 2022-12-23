@@ -35,7 +35,7 @@ import {useStore} from "vuex";
 import {ref, onMounted} from "vue";
 import {
   createOrderFromApi,
-  createProductFromApi,
+
   getListCategoryFromApi,
   getListCustomerFromApi,
   getListProductFromApi

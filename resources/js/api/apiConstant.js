@@ -45,6 +45,9 @@ export default {
     LIST_DEALER: 'admin/dealer/dealers',
 
     LIST_DEBT: 'admin/debt/list-debt',
+    CREATE_CONTAINER_ORDER: 'admin/debt/create-container-order',
+    CREATE_VAT_DEBT: 'admin/debt/create-vat-debt',
+    CREATE_PAYMENT: 'admin/debt/create-payment',
   }
 
   // ADMIN: "/admin/customer/user-manage",
