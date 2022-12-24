@@ -11,6 +11,8 @@ export const ROUTER_PATH = {
   DETAIL: "detail",
   DETAIL_ID: "detail/:id",
 
+  PAYMENT: 'payment',
+
   // ROUTER_ADMIN
   ADMIN: "/admin",
   LOGIN: "/admin/login",

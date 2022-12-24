@@ -15,15 +15,30 @@
         <p v-if="!!customerMessageError" class="text-red-500">{{ customerMessageError }}</p>
       </div>
       <div class="w-1/2 h-full p-5">
-        <TabsWrapper>
-          <TabItem title="Container">
-            <ContainerOrderItem :customer-id="formData.customerId" @customer-id-error="handleCustomerIdError"/>
-          </TabItem>
-          <TabItem title="Vat" :customer-id="formData.customerId" @customer-id-error="handleCustomerIdError">
-            <VatItem :customer-id="formData.customerId" @customer-id-error="handleCustomerIdError"/>
-          </TabItem>
-          <TabItem title="Khác">Content from Tab 3 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Voluptates, ipsa.</TabItem>
-        </TabsWrapper>
+        <form
+          @submit.prevent="handleSubmit"
+        >
+          <CurrencyInput
+            name="price"
+            type="text"
+            v-model="price"
+            label="Giá thành container"
+            placeholder="nhập giá"
+            success-message="Nice to meet you!"
+            :options="{ currency: 'EUR', currencyDisplay: 'hidden' }"
+          />
+          <p v-if="!!priceMessageError" class="text-red-500">{{ priceMessageError }}</p>
+          <div>
+            <label for="" class="font-bold mb-3 text-lg text-gray-500">Ngày bán</label>
+            <Datepicker class="p-2 border border-gray-200 mt-3" v-model="picked" :style="styleDatePicker" />
+          </div>
+          <div>
+            <label for="" class="font-bold mb-3 text-lg text-gray-500">Ghi chú</label>
+            <textarea class="w-full h-auto border border-gray-200 min-h-[80px] outline-none text-sm" v-model="comment"></textarea>
+          </div>
+
+          <button class="submit-btn border border-gray-200 p-3 max-w-[80px]" type="submit">Submit</button>
+        </form>
       </div>
     </div>
   </div>
@@ -32,96 +47,80 @@
 <script>
 import {useRouter} from "vue-router";
 import {useStore} from "vuex";
-import {ref, onMounted} from "vue";
+import {inject, ref} from "vue";
 import {
-  createOrderFromApi,
-
-  getListCategoryFromApi,
+  createPaymentFromApi,
   getListCustomerFromApi,
-  getListProductFromApi
 } from "@/api";
 import {MODULE_STORE, ROUTER_PATH} from "@/const";
 import InputItem from "@/views/OrderManage/CreateOrder/InputItem";
 import ButtonAddNew from "@/components/Buttons/ButtonAddNew";
-import TabsWrapper from "@/views/DebtManage/CreateDebt/TabsWrapper.vue";
-import TabItem from "@/views/DebtManage/CreateDebt/TabItem.vue";
-import ContainerOrderItem from "@/views/DebtManage/CreateDebt/ContainerOrderItem.vue";
-import VatItem from "@/views/DebtManage/CreateDebt/VatItem.vue";
+import CurrencyInput from "@/views/DebtManage/CreateDebt/CurrencyInput.vue";
+import Datepicker from 'vue3-datepicker'
+import * as Yup from 'yup';
 
 export default {
   name: "CreateDebt",
-  components: { InputItem, ButtonAddNew, TabsWrapper, TabItem, ContainerOrderItem, VatItem },
-  methods: {
-    forceUpdate() {
-      this.renderComponent = false
-      this.$nextTick(() => {
-        this.renderComponent = true
-      })
-    }
-  },
-  data() {
-    return {
-      renderComponent: true
-    }
-  },
-  setup() {
+  components: {CurrencyInput, InputItem, ButtonAddNew, Datepicker },
+  setup(emit) {
     const router = useRouter()
     const store = useStore()
     const formData = ref({})
-    const categories = ref({})
     const customers = ref({})
-    const products = ref({})
-    const productsByCategory = ref({})
-    const productSelected = ref({})
-    const productAttributeValues = ref({})
-    const productAttributeValuesByProduct = ref({})
-    const listInputItem = ref(store.state[MODULE_STORE.ORDER.NAME].orderPostData)
     const customerMessageError = ref(null)
+    const priceMessageError = ref(null)
+    const price = ref(null)
+    const comment = ref(null)
+    const picked = ref(new Date())
+    const toast = inject('$toast')
+    const styleDatePicker = ref({
+      "--vdp-bg-color": "#ffffff",
+      "--vdp-text-color": "#e21818",
+      "--vdp-box-shadow": "0 4px 10px 0 rgba(128, 144, 160, 0.1), 0 0 1px 0 rgba(128, 144, 160, 0.81)",
+      "--vdp-border-radius": "10px",
+      "--vdp-heading-size": "2.5em",
+      "--vdp-heading-weight": "bold",
+      "--vdp-heading-hover-color": "#eeeeee",
+      "--vdp-arrow-color": "currentColor",
+      "--vdp-elem-color": "currentColor",
+      "--vdp-disabled-color": "#d5d9e0",
+      "--vdp-hover-color": "#ffffff",
+      "--vdp-hover-bg-color": "#0baf74",
+      "--vdp-selected-color": "#ffffff",
+      "--vdp-selected-bg-color": "#0baf74",
+      "--vdp-current-date-outline-color": "#888888",
+      "--vdp-current-date-font-weight": "bold",
+      "--vdp-elem-font-size": "1em",
+      "--vdp-elem-border-radius": "3px",
+      "--vdp-divider-color": "#ffffff"
+    })
 
     const handleSubmit = async (data) => {
       try {
-        const orderPostData = [...store.state[MODULE_STORE.ORDER.NAME].orderPostData]
-        const bodyFormData = new FormData()
-        bodyFormData.append('customer_id', data.customerId);
-        // bodyFormData.append('order_products', orderPostData);
+        await schema.validate({ price: price.value, customerId: formData.value.customerId });
+        priceMessageError.value = ''
         const postData = {
-          customer_id: data.customerId,
-          order_products: orderPostData
+          cost: price.value,
+          comment: comment.value,
+          date: picked.value.getTime() / 1000 | 0,
+          monetary_unit_type: 'vnd',
+          customer_id: formData.value.customerId
         }
-        const res = await createOrderFromApi(postData)
-      } catch (errors) {
-        const error = errors.message;
-        // this.$toast.error(error);
-      } finally {
-        store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
+        const res = await createPaymentFromApi(postData)
+        toast.success("Tạo đơn container thành công!", {duration:3000})
+        router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.DEBT_MANAGE}`)
+      } catch (err) {
+        switch (err.path) {
+          case 'price':
+            priceMessageError.value = err.errors[0];
+            break
+          case 'customerId':
+            emit('customerIdError', err.errors[0])
+            break
+        }
       }
     }
 
-    const getListCategory = async () => {
-      try {
-        const res = await getListCategoryFromApi()
-        categories.value = res.data.reduce( (option, data) => {
-          return [
-            ...option,
-            {
-              name: data.name,
-              id: data.category_id
-            }
-          ]
-        }, [])
-        formData.value.category = res.data[0].category_id
-        store.state[MODULE_STORE.ORDER.NAME].categories = res.data
-      } catch (errors) {
-        // const error = errors.message;
-        // console.log(error)
-      }
-    }
-
-    const getListProduct = async () => {
-      const res = await getListProductFromApi();
-      products.value = res.data
-      store.state[MODULE_STORE.ORDER.NAME].products = res.data
-    }
     const getListCustomer = async () => {
       const res = await getListCustomerFromApi();
       customers.value = {
@@ -134,25 +133,6 @@ export default {
         return product.category_id === formData.value.category
       })
     }
-    const handleOnChangeProductSelect = () => {
-      productSelected.value = products.value.filter((product) => {
-        return product.product_id === formData.value.product
-      })[0]
-
-      productAttributeValuesByProduct.value = productSelected.value.product_attribute_values
-    }
-    const handleAddToOrder = () => {
-      const index = store.state[MODULE_STORE.ORDER.NAME].orderPostData.length
-      store.commit(`${MODULE_STORE.ORDER.NAME}/${MODULE_STORE.ORDER.MUTATIONS.ADD_ORDER_DATA}`, {index})
-      // listInputItem.value = store.state[MODULE_STORE.ORDER.NAME].orderPostData
-    }
-    const handleRemoveInputItem = (item) => {
-      store.commit(`${MODULE_STORE.ORDER.NAME}/${MODULE_STORE.ORDER.MUTATIONS.REMOVE_ORDER_DATA_ITEM}`, item)
-      // listInputItem.value = store.state[MODULE_STORE.ORDER.NAME].orderPostData
-    }
-    const updateDisplay = () => {
-      listInputItem.value = store.state[MODULE_STORE.ORDER.NAME].orderPostData
-    }
 
     const handleCustomerIdError = (value) => {
       customerMessageError.value = value
@@ -162,27 +142,25 @@ export default {
       customerMessageError.value = false
     }
 
-    getListCategory()
+    const schema = Yup.object().shape({
+      price: Yup.number().min(1000).typeError("Tối thiểu 1000đ"),
+      customerId: Yup.string().required().typeError('Chọn khách hàng'),
+    });
+
     getListCustomer()
-    getListProduct()
 
     return {
       formData,
-      categories,
       customers,
-      products,
-      productAttributeValuesByProduct,
-      productsByCategory,
-      listInputItem,
       customerMessageError,
+      priceMessageError,
+      price,
+      styleDatePicker,
+      picked,
       handleSubmit,
       handleOnChangeCategorySelect,
-      handleOnChangeProductSelect,
-      handleAddToOrder,
-      handleRemoveInputItem,
       handleCustomerIdError,
-      handleSelectCustomer,
-      updateDisplay
+      handleSelectCustomer
     }
   }
 }

@@ -5,7 +5,7 @@
         <ButtonAddNew @clickBtn="goToCreateDebt" :text="addNewDebt"/>
       </div>
       <div class="ml-2">
-        <ButtonAddNew @clickBtn="goToCreatePayment" :text="addNewPayment"/>
+        <ButtonAddNew @clickBtn="goToCreatePaymnet" :text="addNewPayment"/>
       </div>
     </div>
 
@@ -63,7 +63,7 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import ButtonAddNew from "@/components/Buttons/ButtonAddNew/ButtonAddNew.vue";
 import ButtonFilter from "@/components/Buttons/ButtonFilter/ButtonFilter.vue";
 import ButtonDownloadCSV from "@/components/Buttons/ButtonDownloadCSV/ButtonDownloadCSV.vue";
@@ -75,100 +75,41 @@ import {useStore} from "vuex";
 import {MODULE_STORE, PAGE_DEFAULT, ROUTER_PATH} from "@/const";
 import {exportOrderFromApi, getListDebtFromApi, getListOrderFromApi} from "@/api";
 
-export default {
-  name: "ListOrder",
-  components: {
-    ButtonAddNew,
-    ButtonFilter,
-    ButtonDownloadCSV,
-    ButtonEdit,
-    Pagination,
-  },
-  setup() {
-    const listDebt = ref([]);
-    const route = useRoute();
-    const router = useRouter();
-    const store = useStore();
-    const pagination = ref(null);
-    const toast = inject('$toast');
-    const addNewDebt = "Thêm công nợ";
-    const orderDetail = "Chi tiết";
-    const exportExcel = "Xuất excel";
-    const addNewPayment = "Tạo thanh toán";
+const listDebt = ref([]);
+const route = useRoute();
+const router = useRouter();
+const store = useStore();
+const pagination = ref(null);
+const toast = inject('$toast');
+const addNewDebt = "Thêm công nợ";
+const orderDetail = "Chi tiết";
+const exportExcel = "Xuất excel";
+const addNewPayment = "Tạo thanh toán";
 
-    const pageCurrent = computed(() => {
-      if (!route.query.page) {
-        return PAGE_DEFAULT;
-      }
-      return Number(route.query.page);
-    });
-
-    const goToCreateDebt = () => {
-      router.push(`${ROUTER_PATH.DEBT_MANAGE}/${ROUTER_PATH.ADD}`);
+const getListCustomerDebt = async (page) => {
+  try {
+    const res = await getListDebtFromApi({page})
+    pagination.value = res.pagination
+    listDebt.value = {
+      ...res.data
     }
-
-    const goToCreatePayment = () => {
-      router.push(`${ROUTER_PATH.DEBT_MANAGE}/${ROUTER_PATH.PAYMENT}/${ROUTER_PATH.ADD}`);
-    }
-
-    const getListDebt = async (page) => {
-      try {
-        const res = await getListDebtFromApi({page})
-        pagination.value = res.pagination
-        listDebt.value = {
-          ...res.data
-        }
-      } catch (errors) {
-        const error = errors.message
-        toast.error(error);
-      } finally {
-        store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false
-      }
-    }
-
-    const goToDetail = (id) => {
-      router.push(`${ROUTER_PATH.DEBT_MANAGE}/${ROUTER_PATH.DETAIL}/${id}`);
-    }
-
-    const exportOrder = async (id) => {
-      console.log(12313)
-      const excelRes = await exportOrderFromApi({order_id: id})
-      const url = URL.createObjectURL(new Blob([excelRes], {
-        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-      }))
-      const link = document.createElement('a')
-      link.href = url
-      link.setAttribute('download', 'fileName')
-      document.body.appendChild(link)
-      link.click()
-      link.remove()
-    }
-
-    const handleBackPage = (page) => {
-      getListDebt({page})
-    }
-    const handleNextPage = (page) => {
-      getListDebt({page})
-    }
-
-    getListDebt(pageCurrent.value);
-
-    return {
-      pagination,
-      addNewDebt,
-      orderDetail,
-      listDebt,
-      exportExcel,
-      addNewPayment,
-      goToDetail,
-      goToCreateDebt,
-      goToCreatePayment,
-      handleBackPage,
-      handleNextPage,
-      exportOrder
-    }
+  } catch (errors) {
+    const error = errors.message
+    toast.error(error);
+  } finally {
+    store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false
   }
 }
+
+const handleBackPage = (page) => {
+  getListCustomerDebt({page})
+}
+const handleNextPage = (page) => {
+  getListCustomerDebt({page})
+}
+
+getListCustomerDebt(pageCurrent.value);
+
 </script>
 
 <style scoped>

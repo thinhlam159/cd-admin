@@ -32,7 +32,6 @@ import {inject, ref} from 'vue';
 import * as Yup from 'yup';
 import CurrencyInput from "@/views/DebtManage/CreateDebt/CurrencyInput.vue";
 import Datepicker from 'vue3-datepicker'
-import { setLocale } from "yup";
 import { createContainerOrderFromApi } from "@/api";
 import {ROUTER_PATH} from "@/const";
 import { useRouter } from 'vue-router';
@@ -91,10 +90,8 @@ async function handleSubmit() {
       customer_id: props.customerId
     }
     const res = await createContainerOrderFromApi(postData)
-    console.log(res.data)
     toast.success("Tạo đơn container thành công!", {duration:3000})
     router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.DEBT_MANAGE}`)
-
   } catch (err) {
     switch (err.path) {
       case 'price':

@@ -70,7 +70,7 @@ class PaymentPostApplicationService
             $debtHistoryId,
             $customerId,
             $userId,
-            !is_null($currentDebt) ? $currentDebt->getTotalDebt() + $command->cost : $command->cost,
+            !is_null($currentDebt) ? $currentDebt->getTotalDebt() - $command->cost : -$command->cost,
             !is_null($currentDebt) ? $currentDebt->getTotalPayment() + $command->cost : $command->cost,
             true,
             DebtHistoryUpdateType::fromType(DebtHistoryUpdateType::PAYMENT),
@@ -82,12 +82,15 @@ class PaymentPostApplicationService
             $command->cost,
             $command->date,
             MonetaryUnitType::fromValue($command->monetaryUnitType),
-            !is_null($currentDebt) ? $currentDebt + 1 : 1
+            !is_null($currentDebt) ? $currentDebt->getVersion() + 1 : 1
         );
 
         DB::beginTransaction();
         try {
             $paymentId = $this->paymentRepository->create($payment);
+            if ($currentDebt) {
+                $this->debtHistoryRepository->updateCurrentDebtHistory($currentDebt->getDebtHistoryId());
+            }
             $this->debtHistoryRepository->create($newDebtHistory);
             DB::commit();
         } catch (Exception $e) {
