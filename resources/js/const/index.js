@@ -13,6 +13,10 @@ export const ROUTER_PATH = {
 
   PAYMENT: 'payment',
 
+  //Debt
+  LIST_CUSTOMER_DEBT: 'list-customer-debt',
+  LIST_CUSTOMER_DEBT_ID: 'list-customer-debt/:id',
+
   // ROUTER_ADMIN
   ADMIN: "/admin",
   LOGIN: "/admin/login",

@@ -5,9 +5,9 @@ namespace App\Bundle\ProductBundle\Application;
 class CustomerDebtHistoryListGetCommand
 {
     /**
-     * @var string|null
+     * @var string
      */
-    public ?string $customerId;
+    public string $customerId;
 
     /**
      * @var string|null
@@ -15,10 +15,10 @@ class CustomerDebtHistoryListGetCommand
     public ?string $keyword;
 
     /**
-     * @param string|null $customerId
+     * @param string $customerId
      * @param string|null $keyword
      */
-    public function __construct(?string $customerId, ?string $keyword)
+    public function __construct(string $customerId, ?string $keyword)
     {
         $this->customerId = $customerId;
         $this->keyword = $keyword;
