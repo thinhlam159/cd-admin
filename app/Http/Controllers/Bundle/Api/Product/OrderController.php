@@ -27,6 +27,7 @@ use App\Bundle\ProductBundle\Application\OrderPostCommand;
 use App\Bundle\ProductBundle\Application\OrderProductCommand;
 use App\Bundle\ProductBundle\Application\RestoreImportGoodPutApplicationService;
 use App\Bundle\ProductBundle\Application\RestoreImportGoodPutCommand;
+use App\Bundle\ProductBundle\Infrastructure\DebtHistoryRepository;
 use App\Bundle\ProductBundle\Infrastructure\ImportGoodRepository;
 use App\Bundle\ProductBundle\Infrastructure\OrderRepository;
 use App\Bundle\ProductBundle\Infrastructure\ProductAttributePriceRepository;
@@ -52,6 +53,7 @@ class OrderController extends BaseController
             new UserRepository(),
             new ProductAttributePriceRepository(),
             new ProductInventoryRepository(),
+            new DebtHistoryRepository()
         );
 
         $orderProducts = $request->order_products;
@@ -71,6 +73,7 @@ class OrderController extends BaseController
         $command = new OrderPostCommand(
             $request->customer_id,
             Auth::id(),
+            $request->date,
             $orderProductCommands
         );
 

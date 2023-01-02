@@ -6,13 +6,18 @@ use App\Bundle\Admin\Domain\Model\CustomerId;
 use App\Bundle\Admin\Domain\Model\ICustomerRepository;
 use App\Bundle\Admin\Domain\Model\IUserRepository;
 use App\Bundle\Admin\Domain\Model\UserId;
+use App\Bundle\ProductBundle\Domain\Model\UserId as ProductBundleUserId;
 use App\Bundle\Common\Domain\Model\InvalidArgumentException;
 use App\Bundle\Common\Domain\Model\TransactionException;
+use App\Bundle\ProductBundle\Domain\Model\DebtHistory;
+use App\Bundle\ProductBundle\Domain\Model\DebtHistoryId;
+use App\Bundle\ProductBundle\Domain\Model\DebtHistoryUpdateType;
+use App\Bundle\ProductBundle\Domain\Model\IDebtHistoryRepository;
 use App\Bundle\ProductBundle\Domain\Model\IOrderRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductAttributePriceRepository;
-use App\Bundle\ProductBundle\Domain\Model\IProductAttributeValueRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductInventoryRepository;
 use App\Bundle\ProductBundle\Domain\Model\MeasureUnitType;
+use App\Bundle\ProductBundle\Domain\Model\MonetaryUnitType;
 use App\Bundle\ProductBundle\Domain\Model\Order;
 use App\Bundle\ProductBundle\Domain\Model\OrderDeliveryStatus;
 use App\Bundle\ProductBundle\Domain\Model\OrderId;
@@ -57,18 +62,25 @@ class OrderPostApplicationService
     private IProductInventoryRepository $productInventoryRepository;
 
     /**
+     * @var IDebtHistoryRepository
+     */
+    private IDebtHistoryRepository $debtHistoryRepository;
+
+    /**
      * @param IOrderRepository $orderRepository
      * @param ICustomerRepository $customerRepository
      * @param IUserRepository $userRepository
      * @param IProductAttributePriceRepository $productAttributePriceRepository
      * @param IProductInventoryRepository $productInventoryRepository
+     * @param IDebtHistoryRepository $debtHistoryRepository
      */
     public function __construct(
         IOrderRepository $orderRepository,
         ICustomerRepository $customerRepository,
         IUserRepository $userRepository,
         IProductAttributePriceRepository $productAttributePriceRepository,
-        IProductInventoryRepository $productInventoryRepository
+        IProductInventoryRepository $productInventoryRepository,
+        IDebtHistoryRepository $debtHistoryRepository
     )
     {
         $this->orderRepository = $orderRepository;
@@ -76,6 +88,7 @@ class OrderPostApplicationService
         $this->userRepository = $userRepository;
         $this->productAttributePriceRepository = $productAttributePriceRepository;
         $this->productInventoryRepository = $productInventoryRepository;
+        $this->debtHistoryRepository = $debtHistoryRepository;
     }
 
     /**
@@ -109,9 +122,12 @@ class OrderPostApplicationService
 
         $orderProducts = [];
         $newProductInventories = [];
+        $totalOrderCost = 0;
         foreach ($command->orderProductCommands as $orderProductCommand) {
             $productAttributeValueId = $orderProductCommand->productAttributeValueId;
             $productAttributePrice = $this->productAttributePriceRepository->findById(new ProductAttributePriceId($orderProductCommand->productAttributePriceId));
+            $orderProductCost = $productAttributePrice->getStandardPrice() * $orderProductCommand->weight;
+            $totalOrderCost += $orderProductCost;
             $orderProducts[] = new OrderProduct(
                 OrderProductId::newId(),
                 $orderId,
@@ -122,7 +138,7 @@ class OrderPostApplicationService
                 MeasureUnitType::fromType(MeasureUnitType::KG),
                 $orderProductCommand->attributeDisplayIndex,
                 $orderProductCommand->weight,
-                $productAttributePrice->getStandardPrice() * $orderProductCommand->weight
+                $orderProductCost
             );
 
             $newProductInventories[$productAttributeValueId]['count'] =
@@ -151,6 +167,27 @@ class OrderPostApplicationService
             $currentProductInventories[] = $currentProductInventory;
         }
 
+        $currentDebt = $this->debtHistoryRepository->findCurrentDebtByCustomerId($customerId);
+        $debtHistoryId = DebtHistoryId::newId();
+        $newDebtHistory = new DebtHistory(
+            $debtHistoryId,
+            $customerId,
+            new ProductBundleUserId($userId->asString()),
+            !is_null($currentDebt) ? $currentDebt->getTotalDebt() + $totalOrderCost : $totalOrderCost,
+            !is_null($currentDebt) ? $currentDebt->getTotalPayment() : 0,
+            true,
+            DebtHistoryUpdateType::fromType(DebtHistoryUpdateType::CONTAINER_ORDER),
+            $orderId,
+            null,
+            null,
+            null,
+            null,
+            $totalOrderCost,
+            $command->date,
+            MonetaryUnitType::fromValue($command->orderProductCommands[0]->measureUnitType),
+            !is_null($currentDebt) ? $currentDebt->getVersion() + 1 : 1
+        );
+
         DB::beginTransaction();
         try {
             $orderId = $this->orderRepository->create($order);
@@ -169,6 +206,10 @@ class OrderPostApplicationService
             if (!$result) {
                 throw new InvalidArgumentException('customer not exist!');
             }
+            if ($currentDebt) {
+                $this->debtHistoryRepository->updateCurrentDebtHistory($currentDebt->getDebtHistoryId());
+            }
+            $this->debtHistoryRepository->create($newDebtHistory);
 
             DB::commit();
         } catch (Exception $e) {
