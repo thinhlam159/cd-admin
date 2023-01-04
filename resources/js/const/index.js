@@ -13,6 +13,10 @@ export const ROUTER_PATH = {
 
   PAYMENT: 'payment',
 
+  //Debt
+  LIST_CUSTOMER_DEBT: 'list-customer-debt',
+  LIST_CUSTOMER_DEBT_ID: 'list-customer-debt/:id',
+
   // ROUTER_ADMIN
   ADMIN: "/admin",
   LOGIN: "/admin/login",
@@ -107,6 +111,7 @@ export const MODULE_STORE = {
       ADD_ORDER_DATA: 'ADD_ORDER_DATA',
       REMOVE_ORDER_DATA_ITEM: 'REMOVE_ORDER_DATA_ITEM',
       UPDATE_ORDER_DATA_ITEM: 'UPDATE_ORDER_DATA_ITEM',
+      SORT_ORDER_DATA_ITEM: 'SORT_ORDER_DATA_ITEM',
     },
   },
   PRODUCT: {

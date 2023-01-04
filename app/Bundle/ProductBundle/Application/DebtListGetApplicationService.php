@@ -2,25 +2,15 @@
 
 namespace App\Bundle\ProductBundle\Application;
 
-use App\Bundle\Admin\Domain\Model\DealerId as AdminDealerId;
+use App\Bundle\Admin\Domain\Model\CustomerId;
 use App\Bundle\Admin\Domain\Model\ICustomerRepository;
-use App\Bundle\Admin\Domain\Model\IDealerRepository;
 use App\Bundle\Admin\Domain\Model\IUserRepository;
 use App\Bundle\Admin\Domain\Model\UserId;
 use App\Bundle\Common\Application\PaginationResult;
 use App\Bundle\Common\Domain\Model\InvalidArgumentException;
 use App\Bundle\Common\Domain\Model\TransactionException;
-use App\Bundle\ProductBundle\Domain\Model\DealerId;
 use App\Bundle\ProductBundle\Domain\Model\DebtHistoryCriteria;
 use App\Bundle\ProductBundle\Domain\Model\IDebtHistoryRepository;
-use App\Bundle\ProductBundle\Domain\Model\IImportGoodRepository;
-use App\Bundle\ProductBundle\Domain\Model\ImportGoodCriteria;
-use App\Bundle\ProductBundle\Domain\Model\IProductAttributeValueRepository;
-use App\Bundle\ProductBundle\Domain\Model\IProductInventoryRepository;
-use App\Bundle\ProductBundle\Domain\Model\IProductRepository;
-use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValueId;
-use App\Bundle\ProductBundle\Domain\Model\ProductId;
-use App\Bundle\ProductBundle\Domain\Model\SettingDate;
 
 class DebtListGetApplicationService
 {
@@ -64,7 +54,7 @@ class DebtListGetApplicationService
     public function handle(DebtListGetCommand $command): DebtListGetResult
     {
         $criteria = new DebtHistoryCriteria(
-            !is_null($command->customerId) ? new ProductId($command->customerId) : null,
+            !is_null($command->customerId) ? new CustomerId($command->customerId) : null,
             $command->keyword,
         );
         [$debts, $pagination] = $this->debtHistoryRepository->findAllCurrentByCustomer($criteria);

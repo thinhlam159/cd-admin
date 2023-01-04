@@ -1,6 +1,6 @@
 <template>
-  <div class="w-full h-full relative">
-    <div class="w-full pt-14 h-full absolute left-20">
+  <div class="w-full h-full">
+    <div class="w-full pt-14 h-full pl-10">
       <div class="w-full py-6 py-auto text-xl">
         <span class="text-gray-500">Thêm sản phẩm</span>
         <hr>
@@ -22,7 +22,7 @@
           <div class="mr-4 w-[14%]">
             <span>Sản phẩm</span>
           </div>
-          <div class="mr-4 w-[14%]">
+          <div class="mr-4 w-[10%]">
             <span>Mã sản phẩm</span>
           </div>
           <div class="mr-4 w-[10%]">
@@ -31,8 +31,8 @@
           <div class="mr-4 w-[5%]">
             <span>Giá</span>
           </div>
-          <div class="mr-4 w-[7%]">
-            <span>Đơn vị tính</span>
+          <div class="mr-4 w-[10%]">
+            <span>Số lượng</span>
           </div>
           <div class="mr-4 w-[10%]">
             <span>Thành tiền</span>
@@ -41,29 +41,14 @@
             <span>Xóa sp</span>
           </div>
         </div>
-<!--        <div class="h-48 my-4">-->
-<!--          <img class="h-full w-auto .object-contain" id="blah" :src="imageUrl" alt="your image" />-->
-<!--        </div>-->
-<!--        <div>-->
-<!--          <input-->
-<!--            type="file"-->
-<!--            @change="onFileChanged"-->
-<!--            accept="image/*"-->
-<!--            ref="file"-->
-<!--          />-->
-<!--        </div>-->
-<!--        <div>-->
-<!--          <label for="description" class="block mb-1 font-bold text-sm">Mô tả</label>-->
-<!--          <textarea name="price" placeholder="Nhập giá sp" v-model="formData.description"-->
-<!--                    class="w-full h-10 px-3 text-base text-gray-700 placeholder-gray-400 border border-gray-400"-->
-<!--          ></textarea>-->
-<!--        </div>-->
-
         <div v-if="renderComponent">
           <input-item v-for="(item, index) in listInputItem" :key="index"
-                      @handle-remove-input-item="handleRemoveInputItem(item)"
+                      @handle-remove-input-item="handleRemoveInputItem({item, index})"
                       @update-display="forceUpdate"
                       :item="item"
+                      :index="index"
+                      :categories="categories"
+                      :products="products"
           />
         </div>
 
@@ -81,8 +66,7 @@
 <script>
 import {useRouter} from "vue-router";
 import {useStore} from "vuex";
-import {ref, reactive, onMounted} from "vue";
-import logoTimeSharing from "@/assets/images/default-thumbnail.jpg";
+import {ref, nextTick} from "vue";
 import {
   createOrderFromApi,
   createProductFromApi,
@@ -114,7 +98,6 @@ export default {
     const router = useRouter()
     const store = useStore()
     const formData = ref({})
-    const file = ref(null)
     const categories = ref({})
     const customers = ref({})
     const products = ref({})
@@ -174,7 +157,6 @@ export default {
       customers.value = {
         ...res.data
       }
-      console.log(res)
       store.state[MODULE_STORE.ORDER.NAME].customers = res.data
     }
     const handleOnChangeCategorySelect = () => {
@@ -190,18 +172,27 @@ export default {
       productAttributeValuesByProduct.value = productSelected.value.product_attribute_values
     }
     const handleAddToOrder = () => {
-      const index = store.state[MODULE_STORE.ORDER.NAME].orderPostData.length
-      store.commit(`${MODULE_STORE.ORDER.NAME}/${MODULE_STORE.ORDER.MUTATIONS.ADD_ORDER_DATA}`, {index})
-      // listInputItem.value = store.state[MODULE_STORE.ORDER.NAME].orderPostData
+      const payload = {
+        category_id: '',
+        product_id: '',
+        product_attribute_value_id: '',
+        product_attribute_price_id: '',
+        count: '',
+        weight: '',
+        price: '',
+        total: '',
+        measure_unit_type: '',
+        checked: false
+      }
+      store.commit(`${MODULE_STORE.ORDER.NAME}/${MODULE_STORE.ORDER.MUTATIONS.ADD_ORDER_DATA}`, payload)
+      listInputItem.value = [];
+      nextTick(() => {listInputItem.value = store.state[MODULE_STORE.ORDER.NAME].orderPostData})
     }
     const handleRemoveInputItem = (item) => {
       store.commit(`${MODULE_STORE.ORDER.NAME}/${MODULE_STORE.ORDER.MUTATIONS.REMOVE_ORDER_DATA_ITEM}`, item)
-      // listInputItem.value = store.state[MODULE_STORE.ORDER.NAME].orderPostData
+      listInputItem.value = [];
+      nextTick(() => {listInputItem.value = store.state[MODULE_STORE.ORDER.NAME].orderPostData})
     }
-    const updateDisplay = () => {
-      listInputItem.value = store.state[MODULE_STORE.ORDER.NAME].orderPostData
-    }
-    onMounted(() => {console.log(store.state[MODULE_STORE.ORDER.NAME].customers)})
 
     getListCategory()
     getListCustomer()
@@ -220,7 +211,6 @@ export default {
       handleOnChangeProductSelect,
       handleAddToOrder,
       handleRemoveInputItem,
-      updateDisplay
     }
   }
 }

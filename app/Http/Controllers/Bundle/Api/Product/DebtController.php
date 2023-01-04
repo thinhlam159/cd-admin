@@ -6,6 +6,8 @@ use App\Bundle\Admin\Infrastructure\CustomerRepository;
 use App\Bundle\Admin\Infrastructure\UserRepository;
 use App\Bundle\ProductBundle\Application\ContainerOrderPostApplicationService;
 use App\Bundle\ProductBundle\Application\ContainerOrderPostCommand;
+use App\Bundle\ProductBundle\Application\CustomerDebtHistoryListGetApplicationService;
+use App\Bundle\ProductBundle\Application\CustomerDebtHistoryListGetCommand;
 use App\Bundle\ProductBundle\Application\DebtListGetApplicationService;
 use App\Bundle\ProductBundle\Application\DebtListGetCommand;
 use App\Bundle\ProductBundle\Application\PaymentPostApplicationService;
@@ -153,14 +155,14 @@ class DebtController extends BaseController
      */
     public function getCustomerDebtDetail(Request $request)
     {
-        $applicationService = new DebtListGetApplicationService(
+        $applicationService = new CustomerDebtHistoryListGetApplicationService(
             new DebtHistoryRepository(),
             new CustomerRepository(),
             new UserRepository()
         );
 
-        $command = new DebtListGetCommand(
-            !empty($request->customer_id) ? $request->customer_id : null,
+        $command = new CustomerDebtHistoryListGetCommand(
+            $request->id,
             !empty($request->keyword) ? $request->keyword : null,
         );
 
@@ -175,8 +177,9 @@ class DebtController extends BaseController
                 'user_name' => $debtResult->userName,
                 'total_debt' => $debtResult->totalDebt,
                 'total_payment' => $debtResult->totalPayment,
-                'update_date' => $debtResult->updateDate,
+                'updated_date' => $debtResult->updateDate,
                 'monetary_unit_type' => $debtResult->monetaryUnitType,
+                'update_type' => $debtResult->debtHistoryUpdateType,
                 'order_id' => $debtResult->orderId,
                 'container_order_id' => $debtResult->containerOrderId,
                 'vat_id' => $debtResult->vatId,

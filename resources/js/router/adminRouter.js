@@ -29,6 +29,7 @@ import DebtManage from "@/views/DebtManage";
 import ListDebt from "@/views/DebtManage/ListDebt";
 import CreateDebt from "@/views/DebtManage/CreateDebt";
 import CreatePayment from "@/views/DebtManage/CreateDebt/CreatePayment.vue";
+import ListCustomerDebt from "@/views/DebtManage/ListDebt/ListCustomerDebt.vue";
 
 export default [
     // ROUTER_ADMIN
@@ -170,10 +171,10 @@ export default [
                 path: ROUTER_PATH.PAYMENT + '/' +ROUTER_PATH.ADD,
                 component: CreatePayment,
               },
-              // {
-              //   path: ROUTER_PATH.DETAIL_ID,
-              //   component: DetailImportGood,
-              // },
+              {
+                path: ROUTER_PATH.LIST_CUSTOMER_DEBT_ID,
+                component: ListCustomerDebt,
+              },
             ]
           },
         ]

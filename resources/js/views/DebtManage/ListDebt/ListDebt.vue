@@ -26,6 +26,9 @@
           <th class="border py-1 w-[9%]">
             Đã thanh toán
           </th>
+          <th class="border py-1 w-[9%]">
+            Nợ phải thu
+          </th>
           <th class="border py-1 w-[20%]">
             Cập nhật mới nhất
           </th>
@@ -41,10 +44,11 @@
             <td class="border text-center">{{ item.customer_name }}</td>
             <td class="border text-center">{{ item.total_debt.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
             <td class="border text-center">{{ item.total_payment.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
-            <td class="border text-center">{{ item.updated_date }}</td>
+            <td class="border text-center">{{ (item.total_debt - item.total_payment).toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
+            <td class="border text-center">{{ convertDateByTimestamp()(item.updated_date) }}</td>
             <td class="border text-center">
               <div class="flex justify-center">
-                <ButtonEdit @clickBtn="() => goToDetail(item.order_id)" :text="orderDetail"/>
+                <ButtonEdit @clickBtn="() => goToCustomerDebtList(item.customer_id)" :text="DebtDetail"/>
               </div>
             </td>
           </tr>
@@ -74,9 +78,15 @@ import {useRoute, useRouter} from "vue-router";
 import {useStore} from "vuex";
 import {MODULE_STORE, PAGE_DEFAULT, ROUTER_PATH} from "@/const";
 import {exportOrderFromApi, getListDebtFromApi, getListOrderFromApi} from "@/api";
+import { convertDateByTimestamp } from "@/utils";
 
 export default {
   name: "ListOrder",
+  methods: {
+    convertDateByTimestamp() {
+      return convertDateByTimestamp
+    }
+  },
   components: {
     ButtonAddNew,
     ButtonFilter,
@@ -92,7 +102,7 @@ export default {
     const pagination = ref(null);
     const toast = inject('$toast');
     const addNewDebt = "Thêm công nợ";
-    const orderDetail = "Chi tiết";
+    const DebtDetail = "Chi tiết";
     const exportExcel = "Xuất excel";
     const addNewPayment = "Tạo thanh toán";
 
@@ -116,7 +126,7 @@ export default {
         const res = await getListDebtFromApi({page})
         pagination.value = res.pagination
         listDebt.value = {
-          ...res.data
+          ...res.data,
         }
       } catch (errors) {
         const error = errors.message
@@ -126,8 +136,8 @@ export default {
       }
     }
 
-    const goToDetail = (id) => {
-      router.push(`${ROUTER_PATH.DEBT_MANAGE}/${ROUTER_PATH.DETAIL}/${id}`);
+    const goToCustomerDebtList = (id) => {
+      router.push(`${ROUTER_PATH.DEBT_MANAGE}/${ROUTER_PATH.LIST_CUSTOMER_DEBT}/${id}`);
     }
 
     const exportOrder = async (id) => {
@@ -156,11 +166,11 @@ export default {
     return {
       pagination,
       addNewDebt,
-      orderDetail,
+      DebtDetail,
       listDebt,
       exportExcel,
       addNewPayment,
-      goToDetail,
+      goToCustomerDebtList,
       goToCreateDebt,
       goToCreatePayment,
       handleBackPage,

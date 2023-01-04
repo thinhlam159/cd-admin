@@ -126,20 +126,22 @@ class DebtHistoryRepository implements IDebtHistoryRepository
     /**
      * @inheritDoc
      */
-    public function findAllHistoryByCustomer(CustomerDebtHistoryCriteria $criteria): array
+    public function findAllHistoryByCustomerId(CustomerDebtHistoryCriteria $criteria): array
     {
-        $entities = ModelDebtHistory::where(['customer_id', '=', $criteria->getCustomerId()->asString()])->paginate(PaginationConst::PAGINATE_ROW);
+        $entities = ModelDebtHistory::where([
+            ['customer_id', '=', $criteria->getCustomerId()->asString(),]
+        ])->paginate(PaginationConst::PAGINATE_ROW);
 
         $debts = [];
         foreach ($entities as $entity) {
             $debts[] = new DebtHistory(
                 new DebtHistoryId($entity->id),
-                new CustomerId($entity->id),
-                new UserId($entity->id),
+                new CustomerId($entity->customer_id),
+                new UserId($entity->user_id),
                 $entity->total_debt,
                 $entity->total_payment,
                 $entity->is_current,
-                DebtHistoryUpdateType::fromType($entity->debt_history_update_type),
+                DebtHistoryUpdateType::fromType($entity->update_type),
                 !is_null($entity->order_id) ? new OrderId($entity->order_id) : null,
                 !is_null($entity->container_order_id) ? new ContainerOrderId($entity->container_order_id) : null,
                 !is_null($entity->vat_id) ? new VatId($entity->vat_id) : null,

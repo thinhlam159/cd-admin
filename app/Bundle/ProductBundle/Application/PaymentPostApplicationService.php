@@ -70,7 +70,7 @@ class PaymentPostApplicationService
             $debtHistoryId,
             $customerId,
             $userId,
-            !is_null($currentDebt) ? $currentDebt->getTotalDebt() - $command->cost : -$command->cost,
+            !is_null($currentDebt) ? $currentDebt->getTotalDebt() : 0,
             !is_null($currentDebt) ? $currentDebt->getTotalPayment() + $command->cost : $command->cost,
             true,
             DebtHistoryUpdateType::fromType(DebtHistoryUpdateType::PAYMENT),

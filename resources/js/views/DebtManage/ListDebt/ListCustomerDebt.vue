@@ -17,20 +17,38 @@
           <th class="border py-1 w-[2%]">
             STT
           </th>
-          <th class="border py-1 w-[12%]">
-            Khách hàng
-          </th>
           <th class="border py-1 w-[9%]">
             Tổng công nợ
           </th>
           <th class="border py-1 w-[9%]">
-            Đã thanh toán
+            Tổng thanh toán
           </th>
-          <th class="border py-1 w-[20%]">
-            Cập nhật mới nhất
+          <th class="border py-1 w-[9%]">
+            Nợ phải thu
           </th>
-          <th class="border py-1 w-[10%]">
-            Chi tiết công nợ
+          <th class="border py-1 w-[9%]">
+            Ngày tạo
+          </th>
+          <th class="border py-1 w-[9%]">
+            Thay đổi
+          </th>
+          <th class="border py-1 w-[9%]">
+            Thanh toán
+          </th>
+          <th class="border py-1 w-[9%]">
+            Đơn thông thường
+          </th>
+          <th class="border py-1 w-[9%]">
+            Container
+          </th>
+          <th class="border py-1 w-[9%]">
+            Vat
+          </th>
+          <th class="border py-1 w-[9%]">
+            Khác
+          </th>
+          <th class="border py-1 w-[9%]">
+            Ghi Chú
           </th>
         </tr>
         </thead>
@@ -38,15 +56,37 @@
         <template v-for="(item, index) in listDebt">
           <tr>
             <td class="border text-center">{{ ++index }}</td>
-            <td class="border text-center">{{ item.customer_name }}</td>
             <td class="border text-center">{{ item.total_debt.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
             <td class="border text-center">{{ item.total_payment.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
-            <td class="border text-center">{{ item.updated_date }}</td>
+            <td class="border text-center">{{ (item.total_debt - item.total_payment).toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
+            <td class="border text-center">{{ convertDateByTimestamp(item.updated_date) }}</td>
+            <td class="border text-center">{{ item.number_of_money.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
             <td class="border text-center">
-              <div class="flex justify-center">
-                <ButtonEdit @clickBtn="() => goToDetail(item.order_id)" :text="orderDetail"/>
+              <div class="flex w-full h-full items-center justify-center" v-show="!!item.payment_id">
+                <div class="w-[5px] h-[5px] border border-[#000] rounded-full"></div>
               </div>
             </td>
+            <td class="border text-center">
+              <div class="flex w-full h-full items-center justify-center" v-show="!!item.order_id">
+                <div class="w-[5px] h-[5px] border border-[#000] rounded-full"></div>
+              </div>
+            </td>
+            <td class="border text-center">
+              <div class="flex w-full h-full items-center justify-center" v-show="!!item.container_order_id">
+                <div class="w-[5px] h-[5px] border border-[#000] rounded-full"></div>
+              </div>
+            </td>
+            <td class="border text-center">
+              <div class="flex w-full h-full items-center justify-center" v-show="!!item.vat_id">
+                <div class="w-[5px] h-[5px] border border-[#000] rounded-full"></div>
+              </div>
+            </td>
+            <td class="border text-center">
+              <div class="flex w-full h-full items-center justify-center" v-show="!!item.other_debt_id">
+                <div class="w-[5px] h-[5px] border border-[#000] rounded-full"></div>
+              </div>
+            </td>
+            <td class="border text-center">{{ item.comment }}</td>
           </tr>
         </template>
         </tbody>
@@ -73,7 +113,8 @@ import {computed, inject, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {useStore} from "vuex";
 import {MODULE_STORE, PAGE_DEFAULT, ROUTER_PATH} from "@/const";
-import {exportOrderFromApi, getListDebtFromApi, getListOrderFromApi} from "@/api";
+import {exportOrderFromApi, getListCustomerDebtFromApi, getListDebtFromApi, getListOrderFromApi} from "@/api";
+import { convertDateByTimestamp } from '@/utils'
 
 const listDebt = ref([]);
 const route = useRoute();
@@ -85,10 +126,18 @@ const addNewDebt = "Thêm công nợ";
 const orderDetail = "Chi tiết";
 const exportExcel = "Xuất excel";
 const addNewPayment = "Tạo thanh toán";
+const customerId = ref(route.params.id)
 
-const getListCustomerDebt = async (page) => {
+const pageCurrent = computed(() => {
+  if (!route.query.page) {
+    return PAGE_DEFAULT;
+  }
+  return Number(route.query.page);
+});
+
+const getListCustomerDebt = async (customerId, page) => {
   try {
-    const res = await getListDebtFromApi({page})
+    const res = await getListCustomerDebtFromApi(customerId,{page})
     pagination.value = res.pagination
     listDebt.value = {
       ...res.data
@@ -108,7 +157,7 @@ const handleNextPage = (page) => {
   getListCustomerDebt({page})
 }
 
-getListCustomerDebt(pageCurrent.value);
+getListCustomerDebt(customerId.value, pageCurrent.value);
 
 </script>
 
