@@ -90,7 +90,17 @@ class DebtHistoryRepository implements IDebtHistoryRepository
      */
     public function findAllCurrentByCustomer(DebtHistoryCriteria $criteria): array
     {
-        $entities = ModelDebtHistory::where([['is_current', '=', true]])->paginate(PaginationConst::PAGINATE_ROW);
+        $keyword = !is_null($criteria->getKeyword()) ? $criteria->getKeyword() : null;
+        $order = 'updated_at';
+        $sort = 'DESC';
+        if (!is_null($criteria->getOrder())) {
+            $order = $criteria->getOrder();
+            $sort = $criteria->getSort();
+        }
+        $entities = ModelDebtHistory::where([['is_current', '=', true]])
+            ->whereHas('customer', function ($query) use ($keyword) {$query->where('name', 'like', "%$keyword%");})
+            ->orderBy($order, $sort)
+            ->paginate(PaginationConst::PAGINATE_ROW);
 
         $debts = [];
         foreach ($entities as $entity) {

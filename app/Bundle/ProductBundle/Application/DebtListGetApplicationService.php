@@ -56,6 +56,8 @@ class DebtListGetApplicationService
         $criteria = new DebtHistoryCriteria(
             !is_null($command->customerId) ? new CustomerId($command->customerId) : null,
             $command->keyword,
+            $command->order,
+            $command->sort,
         );
         [$debts, $pagination] = $this->debtHistoryRepository->findAllCurrentByCustomer($criteria);
         $debtResults = [];

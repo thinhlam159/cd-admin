@@ -19,6 +19,7 @@ class CreateDebtHistoriesTable extends Migration
             $table->string('user_id');
             $table->integer('total_debt');
             $table->integer('total_payment');
+            $table->integer('rest_debt');
             $table->tinyInteger('is_current');
             $table->integer('update_type');
             $table->string('order_id')->nullable();

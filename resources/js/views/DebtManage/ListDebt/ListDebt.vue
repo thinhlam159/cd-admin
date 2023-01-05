@@ -1,6 +1,13 @@
 <template>
   <div class="p-5">
     <div class="w-full h-8 flex justify-between">
+      <input type="text" @input="onInput" class="outline-none w-[150px] h-full border border-gray-200" placeholder="Tìm khách hàng">
+      <div class="ml-2">
+        <ButtonFilter @clickBtn="sortByTotalDebt" :text="sortTotalDebt"/>
+      </div>
+      <div class="ml-2">
+        <ButtonFilter @clickBtn="sortByRestDebt" :text="sortRestDebt"/>
+      </div>
       <div class="ml-2">
         <ButtonAddNew @clickBtn="goToCreateDebt" :text="addNewDebt"/>
       </div>
@@ -105,6 +112,10 @@ export default {
     const DebtDetail = "Chi tiết";
     const exportExcel = "Xuất excel";
     const addNewPayment = "Tạo thanh toán";
+    const sortTotalDebt = "Tổng công nợ";
+    const sortRestDebt = "Nợ phải thu";
+    const sortTotalDebtUp = ref(true);
+    const sortRestDebtUp = ref(true);
 
     const pageCurrent = computed(() => {
       if (!route.query.page) {
@@ -121,9 +132,9 @@ export default {
       router.push(`${ROUTER_PATH.DEBT_MANAGE}/${ROUTER_PATH.PAYMENT}/${ROUTER_PATH.ADD}`);
     }
 
-    const getListDebt = async (page) => {
+    const getListDebt = async (page, keyword = '',order = '', sort = '') => {
       try {
-        const res = await getListDebtFromApi({page})
+        const res = await getListDebtFromApi({page, keyword, order, sort})
         pagination.value = res.pagination
         listDebt.value = {
           ...res.data,
@@ -161,6 +172,23 @@ export default {
       getListDebt({page})
     }
 
+    const onInput = async (e) => {
+      const keyword = e.target.value
+      await getListDebt(pageCurrent.value, keyword);
+    }
+
+    const sortByTotalDebt = () => {
+      sortTotalDebtUp.value = !sortTotalDebtUp.value
+      const sort = sortTotalDebtUp.value ? 'ASC' : 'DESC'
+      getListDebt(pageCurrent.value,'', 'total_debt', sort)
+    }
+
+    const sortByRestDebt = () => {
+      sortRestDebtUp.value = !sortRestDebtUp.value
+      const sort = sortRestDebtUp.value ? 'ASC' : 'DESC'
+      getListDebt(pageCurrent.value,'', 'rest_debt', sort)
+    }
+
     getListDebt(pageCurrent.value);
 
     return {
@@ -170,11 +198,16 @@ export default {
       listDebt,
       exportExcel,
       addNewPayment,
+      sortTotalDebt,
+      sortRestDebt,
       goToCustomerDebtList,
       goToCreateDebt,
       goToCreatePayment,
       handleBackPage,
       handleNextPage,
+      onInput,
+      sortByTotalDebt,
+      sortByRestDebt,
       exportOrder
     }
   }

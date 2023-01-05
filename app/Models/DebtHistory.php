@@ -13,4 +13,11 @@ class DebtHistory extends Model
     protected $casts = ['id' => 'string'];
     public $incrementing = false;
     protected $dates = ['deleted_at'];
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function customer(){
+        return $this->belongsTo('App\Models\Customer');
+    }
 }

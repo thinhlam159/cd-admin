@@ -119,6 +119,8 @@ class DebtController extends BaseController
         $command = new DebtListGetCommand(
             !empty($request->customer_id) ? $request->customer_id : null,
             !empty($request->keyword) ? $request->keyword : null,
+            !empty($request->order) ? $request->order : null,
+            !empty($request->sort) ? $request->sort : null,
         );
 
         $result = $applicationService->handle($command);

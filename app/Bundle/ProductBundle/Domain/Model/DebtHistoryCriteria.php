@@ -17,13 +17,27 @@ final class DebtHistoryCriteria
     private ?string $keyword;
 
     /**
+     * @var string|null
+     */
+    private ?string $order;
+
+    /**
+     * @var string|null
+     */
+    private ?string $sort;
+
+    /**
      * @param CustomerId|null $customerId
      * @param string|null $keyword
+     * @param string|null $order
+     * @param string|null $sort
      */
-    public function __construct(?CustomerId $customerId, ?string $keyword)
+    public function __construct(?CustomerId $customerId, ?string $keyword, ?string $order, ?string $sort)
     {
         $this->customerId = $customerId;
         $this->keyword = $keyword;
+        $this->order = $order;
+        $this->sort = $sort;
     }
 
     /**
@@ -40,5 +54,21 @@ final class DebtHistoryCriteria
     public function getKeyword(): ?string
     {
         return $this->keyword;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getOrder(): ?string
+    {
+        return $this->order;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getSort(): ?string
+    {
+        return $this->sort;
     }
 }
