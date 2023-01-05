@@ -203,4 +203,56 @@ class DebtController extends BaseController
 
         return response()->json($response, 200);
     }
+
+    /**
+     * @param Request $request request
+     */
+    public function getCustomerCurrentDebtDetail(Request $request)
+    {
+        $applicationService = new CustomerDebtHistoryListGetApplicationService(
+            new DebtHistoryRepository(),
+            new CustomerRepository(),
+            new UserRepository()
+        );
+
+        $command = new CustomerDebtHistoryListGetCommand(
+            $request->id,
+            !empty($request->keyword) ? $request->keyword : null,
+        );
+
+        $result = $applicationService->handle($command);
+        $data = [];
+        foreach ($result->debtResults as $debtResult) {
+            $data[] = [
+                'debt_history_id' => $debtResult->debtHistoryId,
+                'customer_id' => $debtResult->customerId,
+                'customer_name' => $debtResult->customerName,
+                'user_id' => $debtResult->userId,
+                'user_name' => $debtResult->userName,
+                'total_debt' => $debtResult->totalDebt,
+                'total_payment' => $debtResult->totalPayment,
+                'updated_date' => $debtResult->updateDate,
+                'monetary_unit_type' => $debtResult->monetaryUnitType,
+                'update_type' => $debtResult->debtHistoryUpdateType,
+                'order_id' => $debtResult->orderId,
+                'container_order_id' => $debtResult->containerOrderId,
+                'vat_id' => $debtResult->vatId,
+                'payment_id' => $debtResult->paymentId,
+                'other_debt_id' => $debtResult->otherDebtId,
+                'number_of_money' => $debtResult->numberOfMoney,
+            ];
+        }
+
+        $paginationResult = $result->paginationResult;
+        $response = [
+            'data' => $data,
+            'pagination' => [
+                'total_page' => $paginationResult->totalPage,
+                'per_page' => $paginationResult->perPage,
+                'current_page' => $paginationResult->currentPage,
+            ],
+        ];
+
+        return response()->json($response, 200);
+    }
 }

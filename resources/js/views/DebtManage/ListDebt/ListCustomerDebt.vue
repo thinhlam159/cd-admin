@@ -8,7 +8,20 @@
         <ButtonAddNew @clickBtn="goToCreatePaymnet" :text="addNewPayment"/>
       </div>
     </div>
-
+    <div class="w-full px-3 h-auto">
+      <div class="">
+        <span class="text-lg text-gray-400">Khách hàng: </span>
+        <span class="text-2xl">{{ customerName }}</span>
+      </div>
+      <div class="">
+        <span class="text-lg text-gray-400">Tổng công nợ: </span>
+        <span class="text-2xl">{{ customerName }}</span>
+      </div>
+      <div class="">
+        <span class="text-lg text-gray-400">Nợ phải thu: </span>
+        <span class="text-2xl">{{ customerName }}</span>
+      </div>
+    </div>
     <!-- *********** -->
     <div class="mt-4">
       <table class="w-full">
@@ -105,15 +118,15 @@
 
 <script setup>
 import ButtonAddNew from "@/components/Buttons/ButtonAddNew/ButtonAddNew.vue";
-import ButtonFilter from "@/components/Buttons/ButtonFilter/ButtonFilter.vue";
-import ButtonDownloadCSV from "@/components/Buttons/ButtonDownloadCSV/ButtonDownloadCSV.vue";
-import ButtonEdit from "@/components/Buttons/ButtonEdit/ButtonEdit.vue";
 import Pagination from "@/components/Pagination/Pagination.vue";
 import {computed, inject, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {useStore} from "vuex";
 import {MODULE_STORE, PAGE_DEFAULT, ROUTER_PATH} from "@/const";
-import {exportOrderFromApi, getListCustomerDebtFromApi, getListDebtFromApi, getListOrderFromApi} from "@/api";
+import {
+  getCustomerDetailFromApi,
+  getListCustomerDebtFromApi
+} from "@/api";
 import { convertDateByTimestamp } from '@/utils'
 
 const listDebt = ref([]);
@@ -127,6 +140,7 @@ const orderDetail = "Chi tiết";
 const exportExcel = "Xuất excel";
 const addNewPayment = "Tạo thanh toán";
 const customerId = ref(route.params.id)
+const customerName = ref('')
 
 const pageCurrent = computed(() => {
   if (!route.query.page) {
@@ -150,6 +164,20 @@ const getListCustomerDebt = async (customerId, page) => {
   }
 }
 
+const getCustomerDetail = async (customerId) => {
+  try {
+    store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = true;
+    const response = await getCustomerDetailFromApi(customerId);
+    customerName.value = response.customer_name
+    console.log(response)
+  } catch (errors) {
+    const error = errors.message
+    toast.error(error);
+  } finally {
+    store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
+  }
+}
+
 const handleBackPage = (page) => {
   getListCustomerDebt({page})
 }
@@ -158,6 +186,7 @@ const handleNextPage = (page) => {
 }
 
 getListCustomerDebt(customerId.value, pageCurrent.value);
+getCustomerDetail(customerId.value);
 
 </script>
 
