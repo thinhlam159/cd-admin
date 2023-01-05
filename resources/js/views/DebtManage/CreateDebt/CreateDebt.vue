@@ -12,18 +12,23 @@
 <!--                  class="w-full h-10 px-3 text-base text-gray-700">{{ item.customer_name }}-->
 <!--          </option>-->
 <!--        </select>-->
-        <MultiSelect
-          only-select-one
-          key-id="id"
-          key-name="position_name"
-          id="hrPositionAnalysis"
-          :options="customers"
-          :value="selectedCustomers"
-          :placeholder="'Nhập tên'"
-          :hasSearch="true"
-          @change="handleSelectCustomer"
-        />
-        <p v-if="!!customerMessageError" class="text-red-500">{{ customerMessageError }}</p>
+        <div class="flex items-center">
+          <MultiSelect
+            only-select-one
+            key-id="id"
+            key-name="position_name"
+            id="hrPositionAnalysis"
+            :options="customers"
+            :value="selectedCustomers"
+            :placeholder="'Nhập tên'"
+            :hasSearch="true"
+            @change="handleSelectCustomer"
+          />
+          <div class="flex h-full items-center ml-2">
+            <p v-if="!!customerMessageError" class="text-red-500">{{ customerMessageError }}</p>
+          </div>
+        </div>
+        <div v-show="!customerMessageError">{{ selectedCustomers[0]?.customer_name }}</div>
       </div>
       <div class="w-1/2 h-full p-5">
         <TabsWrapper>
@@ -81,7 +86,7 @@ export default {
     const store = useStore()
     const formData = ref({})
     const categories = ref({})
-    const customers = ref({})
+    const customers = ref([])
     const selectedCustomers = ref([])
     const products = ref({})
     const productsByCategory = ref({})
@@ -137,9 +142,9 @@ export default {
     }
     const getListCustomer = async () => {
       const res = await getListCustomerFromApi();
-      customers.value = {
+      customers.value = [
         ...res.data
-      }
+      ]
       store.state[MODULE_STORE.ORDER.NAME].customers = res.data
     }
     const handleOnChangeCategorySelect = () => {
@@ -171,8 +176,12 @@ export default {
       customerMessageError.value = value
     }
 
-    const handleSelectCustomer = () => {
+    const handleSelectCustomer = (ids) => {
       customerMessageError.value = false
+      selectedCustomers.value = customers.value.filter((e) => {
+        return e.customer_id === ids[0]
+      })
+      console.log(selectedCustomers.value[0])
     }
 
     getListCategory()

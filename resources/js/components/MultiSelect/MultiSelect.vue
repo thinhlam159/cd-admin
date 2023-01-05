@@ -4,16 +4,16 @@
     :id="id"
     :class="['anchor-search', isFocusClass]"
     :style="{ border: hasSearch ? '' : 'none' }"
-    v-click-outside="onClickOutside"
   >
-    <div v-if="hasSearch" class="search-icon">
+    <div v-if="hasSearch" class="flex justify-center items-center">
       <SearchIcon />
     </div>
 
     <div class="flex flex-wrap" @click="onFocusSearch" :class="[onlySelectOne ? 'handle-wrap' : '']">
 <!--      <div-->
-<!--        v-for="(item, index) in options"-->
+<!--        v-for="(item, index) in options.filter(e => listSelected.includes(e.customer_id))"-->
 <!--        :key="index"-->
+<!--        class="inline-block"-->
 <!--      >-->
 <!--        <div-->
 <!--          class="selected-item"-->
@@ -47,7 +47,7 @@
         :key="indexOption"
         class="list-option__element border border-gray-400 bg-[#d6d6d6] cursor-pointer h-[36px] px-2 py-1"
         :class="{ selected: onSelected(option) }"
-        @click="handleSelected(option, option[keyActive])"
+        @click="handleSelected(option)"
         :title="option.customer_name"
       >
         {{ option.customer_name }}
@@ -65,23 +65,22 @@ import CloseIconBold from "@/components/MultiSelect/CloseIconBold.vue";
 
 const props = defineProps({
   value: Array,
-  options: {
-    type: Array,
-    required: true,
-    default: Array,
-  },
+  options: Array,
   disabled: Boolean,
   placeholder: String,
   keyId: String,
   // keyName: String,
   keyActive: String,
   id: String,
-  hasSearch: Boolean,
+  hasSearch: {
+    type: Boolean,
+    default: true,
+  },
   onlySelectOne: {
     type: Boolean,
-    default: false,
+    default: true,
   },
-});
+})
 
 const emit = defineEmits(['change'])
 
@@ -97,25 +96,26 @@ const { options, value, id, keyId, onlySelectOne, hasSearch } = toRefs(props)
 const handleSelected = (option) => {
   const listId = listSelected.value
   // remove item selected
-  if (listId.includes(option[keyId.value])) {
-    const index = listId.indexOf(option[keyId.value])
+
+  if (listId.includes(option.customer_id)) {
+    const index = listId.indexOf(option.customer_id)
     // case only select one
     if (onlySelectOne.value) {
-      this.listSelected = []
-      this.toggleOptions = false
+      listSelected.value = []
+      toggleOptions.value = false
     } else listSelected.value.splice(index, 1)
   }
   // add item selected
   else {
     // case only select one
     if (onlySelectOne.value) {
-      this.listSelected = [option[keyId.value]]
-      this.toggleOptions = false
-    } else onlySelectOne.value.push(option[keyId.value])
+      listSelected.value = [option.customer_id]
+      toggleOptions.value = false
+    } else listSelected.value.push(option.customer_id)
   }
-  this.textSearch = ''
+  textSearch.value = ''
   setTimeout(() => {
-    this.setPositionOptions()
+    setPositionOptions()
   }, 1)
   emit('change', listSelected.value)
 }
@@ -126,10 +126,11 @@ const onSelected = (option) => {
 }
 
 const onSearchItem = (e) => {
-  if (e.target.value)
-    optionsRender.value = options.value.filter(item =>
-      item[keyName.value].includes(e.target.value),
-    )
+  if (e.target.value) {
+    optionsRender.value = options.value.filter(item => {
+      return item.customer_name.includes(e.target.value)
+    })
+  }
   else {
     optionsRender.value = options.value
   }
@@ -145,7 +146,6 @@ const onFocusSearch = () => {
 }
 
 const onClickOutside = () => {
-  console.log(123)
   toggleOptions.value = false
   isFocus.value = false
   setTimeout(() => {
@@ -190,16 +190,17 @@ const setPositionOptions = () => {
   }
 }
 
-onUpdated(() => {
-  listSelected.value = JSON.parse(JSON.stringify(value.value))
-  optionsRender.value = JSON.parse(JSON.stringify(options.value))
-})
 watch(value, () => {
-  listSelected.value = JSON.parse(JSON.stringify(value.value))
 })
 watch(options, () => {
   optionsRender.value = JSON.parse(JSON.stringify(options.value))
 })
+
+const init = () => {
+  listSelected.value = value.value
+  optionsRender.value = options.value
+}
+init();
 
 // onClickOutside(target, (event) => console.log(event))
 
@@ -210,7 +211,7 @@ watch(options, () => {
   background-color: #ffffff;
   border: 1px solid #dcdcdc;
   border-radius: 4px;
-  padding: 4px 12px 0;
+  padding: 4px 12px;
   display: flex;
   gap: 14px;
   position: relative;
