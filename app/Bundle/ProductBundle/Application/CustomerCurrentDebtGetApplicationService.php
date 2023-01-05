@@ -54,7 +54,7 @@ class CustomerCurrentDebtGetApplicationService
      * @return CustomerDebtHistoryListGetResult
      * @throws InvalidArgumentException
      */
-    public function handle(CustomerCurrentDebtGetCommand $command): CustomerDebtHistoryListGetResult
+    public function handle(CustomerCurrentDebtGetCommand $command): CustomerCurrentDebtGetResult
     {
         $customerId = new CustomerId($command->customerId);
         $customer = $this->customerRepository->findById($customerId);
@@ -63,25 +63,24 @@ class CustomerCurrentDebtGetApplicationService
         }
         $debt = $this->debtHistoryRepository->findCurrentDebtByCustomerId($customerId);
 
-            $debtResults[] = new CustomerCurrentDebtGetResult(
-                $debt->getDebtHistoryId()->asString(),
-                $customer->getCustomerId()->asString(),
-                $customer->getCustomerName(),
-                $debt->getTotalDebt(),
-                $debt->getTotalPayment(),
-                $debt->isCurrent(),
-                $debt->getDebtHistoryUpdateType()->getValue(),
-                !is_null($debt->getOrderId()) ? $debt->getOrderId()->asString() : null,
-                !is_null($debt->getContainerOrderId()) ? $debt->getContainerOrderId()->asString() : null,
-                !is_null($debt->getVatId()) ? $debt->getVatId()->asString() : null,
-                !is_null($debt->getPaymentId()) ? $debt->getPaymentId()->asString() : null,
-                !is_null($debt->getOtherDebtId()) ? $debt->getOtherDebtId()->asString() : null,
-                $debt->getNumberOfMoney(),
-                $debt->getUpdateDate(),
-                $debt->getMonetaryUnitType()->getValue(),
-                $debt->getVersion()
-            );
-
-        return new CustomerDebtHistoryListGetResult($debtResults, $paginationResult);
+        return new CustomerCurrentDebtGetResult(
+            $debt->getDebtHistoryId()->asString(),
+            $customer->getCustomerId()->asString(),
+            $customer->getCustomerName(),
+            $debt->getTotalDebt(),
+            $debt->getTotalPayment(),
+            $debt->getRestDebt(),
+            $debt->isCurrent(),
+            $debt->getDebtHistoryUpdateType()->getValue(),
+            !is_null($debt->getOrderId()) ? $debt->getOrderId()->asString() : null,
+            !is_null($debt->getContainerOrderId()) ? $debt->getContainerOrderId()->asString() : null,
+            !is_null($debt->getVatId()) ? $debt->getVatId()->asString() : null,
+            !is_null($debt->getPaymentId()) ? $debt->getPaymentId()->asString() : null,
+            !is_null($debt->getOtherDebtId()) ? $debt->getOtherDebtId()->asString() : null,
+            $debt->getNumberOfMoney(),
+            $debt->getUpdateDate(),
+            $debt->getMonetaryUnitType()->getValue(),
+            $debt->getVersion()
+        );
     }
 }
