@@ -72,6 +72,7 @@ class PaymentPostApplicationService
             $userId,
             !is_null($currentDebt) ? $currentDebt->getTotalDebt() : 0,
             !is_null($currentDebt) ? $currentDebt->getTotalPayment() + $command->cost : $command->cost,
+            !is_null($currentDebt) ? $currentDebt->getRestDebt() - $command->cost : 0,
             true,
             DebtHistoryUpdateType::fromType(DebtHistoryUpdateType::PAYMENT),
             null,
@@ -96,7 +97,7 @@ class PaymentPostApplicationService
         } catch (Exception $e) {
             DB::rollBack();
             Log::error($e);
-            throw new TransactionException('Create Payment Fail!');
+            throw new TransactionException($e->getMessage());
         }
 
         return new PaymentPostResult($paymentId->__toString());

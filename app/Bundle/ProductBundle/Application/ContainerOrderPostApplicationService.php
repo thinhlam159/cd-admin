@@ -74,6 +74,7 @@ class ContainerOrderPostApplicationService
             $userId,
             !is_null($currentDebt) ? $currentDebt->getTotalDebt() + $command->cost : $command->cost,
             !is_null($currentDebt) ? $currentDebt->getTotalPayment() : 0,
+            !is_null($currentDebt) ? $currentDebt->getRestDebt() + $command->cost : $command->cost,
             true,
             DebtHistoryUpdateType::fromType(DebtHistoryUpdateType::CONTAINER_ORDER),
             null,

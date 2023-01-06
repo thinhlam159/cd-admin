@@ -46,6 +46,7 @@ export default {
 
     LIST_DEBT: 'admin/debt/list-debt',
     LIST_CUSTOMER_DEBT: 'admin/debt/list-customer-debt',
+    CUSTOMER_CURRENT_DEBT: 'admin/debt/customer-current-debt',
     CREATE_CONTAINER_ORDER: 'admin/debt/create-container-order',
     CREATE_VAT_DEBT: 'admin/debt/create-vat-debt',
     CREATE_PAYMENT: 'admin/debt/create-payment',

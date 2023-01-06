@@ -164,11 +164,12 @@ export default [
                 component: ListDebt,
               },
               {
-                path: ROUTER_PATH.ADD,
+                path: ROUTER_PATH.ADD + '/:id',
                 component: CreateDebt,
+                name: 'CreatePayment'
               },
               {
-                path: ROUTER_PATH.PAYMENT + '/' +ROUTER_PATH.ADD,
+                path: ROUTER_PATH.PAYMENT + '/' +ROUTER_PATH.ADD + '/:id',
                 component: CreatePayment,
               },
               {

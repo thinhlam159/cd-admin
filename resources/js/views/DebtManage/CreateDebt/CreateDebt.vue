@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import {useRouter} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import {useStore} from "vuex";
 import {ref, onMounted} from "vue";
 import {
@@ -83,6 +83,7 @@ export default {
   },
   setup() {
     const router = useRouter()
+    const route = useRoute()
     const store = useStore()
     const formData = ref({})
     const categories = ref({})

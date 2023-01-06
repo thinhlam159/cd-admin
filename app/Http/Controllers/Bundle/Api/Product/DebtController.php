@@ -6,6 +6,8 @@ use App\Bundle\Admin\Infrastructure\CustomerRepository;
 use App\Bundle\Admin\Infrastructure\UserRepository;
 use App\Bundle\ProductBundle\Application\ContainerOrderPostApplicationService;
 use App\Bundle\ProductBundle\Application\ContainerOrderPostCommand;
+use App\Bundle\ProductBundle\Application\CustomerCurrentDebtGetApplicationService;
+use App\Bundle\ProductBundle\Application\CustomerCurrentDebtGetCommand;
 use App\Bundle\ProductBundle\Application\CustomerDebtHistoryListGetApplicationService;
 use App\Bundle\ProductBundle\Application\CustomerDebtHistoryListGetCommand;
 use App\Bundle\ProductBundle\Application\DebtListGetApplicationService;
@@ -209,50 +211,33 @@ class DebtController extends BaseController
      */
     public function getCustomerCurrentDebtDetail(Request $request)
     {
-        $applicationService = new CustomerDebtHistoryListGetApplicationService(
+        $applicationService = new CustomerCurrentDebtGetApplicationService(
             new DebtHistoryRepository(),
             new CustomerRepository(),
             new UserRepository()
         );
 
-        $command = new CustomerDebtHistoryListGetCommand(
-            $request->id,
-            !empty($request->keyword) ? $request->keyword : null,
-        );
+        $command = new CustomerCurrentDebtGetCommand($request->id);
 
         $result = $applicationService->handle($command);
-        $data = [];
-        foreach ($result->debtResults as $debtResult) {
-            $data[] = [
-                'debt_history_id' => $debtResult->debtHistoryId,
-                'customer_id' => $debtResult->customerId,
-                'customer_name' => $debtResult->customerName,
-                'user_id' => $debtResult->userId,
-                'user_name' => $debtResult->userName,
-                'total_debt' => $debtResult->totalDebt,
-                'total_payment' => $debtResult->totalPayment,
-                'updated_date' => $debtResult->updateDate,
-                'monetary_unit_type' => $debtResult->monetaryUnitType,
-                'update_type' => $debtResult->debtHistoryUpdateType,
-                'order_id' => $debtResult->orderId,
-                'container_order_id' => $debtResult->containerOrderId,
-                'vat_id' => $debtResult->vatId,
-                'payment_id' => $debtResult->paymentId,
-                'other_debt_id' => $debtResult->otherDebtId,
-                'number_of_money' => $debtResult->numberOfMoney,
-            ];
-        }
-
-        $paginationResult = $result->paginationResult;
-        $response = [
-            'data' => $data,
-            'pagination' => [
-                'total_page' => $paginationResult->totalPage,
-                'per_page' => $paginationResult->perPage,
-                'current_page' => $paginationResult->currentPage,
-            ],
+        $data = [
+            'debt_history_id' => $result->debtHistoryId,
+            'customer_id' => $result->customerId,
+            'customer_name' => $result->customerName,
+            'total_debt' => $result->totalDebt,
+            'total_payment' => $result->totalPayment,
+            'rest_debt' => $result->restDebt,
+            'updated_date' => $result->updateDate,
+            'monetary_unit_type' => $result->monetaryUnitType,
+            'update_type' => $result->debtHistoryUpdateType,
+            'order_id' => $result->orderId,
+            'container_order_id' => $result->containerOrderId,
+            'vat_id' => $result->vatId,
+            'payment_id' => $result->paymentId,
+            'other_debt_id' => $result->otherDebtId,
+            'number_of_money' => $result->numberOfMoney,
         ];
 
-        return response()->json($response, 200);
+        return response()->json(['data' => $data], 200);
     }
 }

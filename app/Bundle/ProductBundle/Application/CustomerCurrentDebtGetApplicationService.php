@@ -5,16 +5,9 @@ namespace App\Bundle\ProductBundle\Application;
 use App\Bundle\Admin\Domain\Model\CustomerId;
 use App\Bundle\Admin\Domain\Model\ICustomerRepository;
 use App\Bundle\Admin\Domain\Model\IUserRepository;
-use App\Bundle\Admin\Domain\Model\UserId;
-use App\Bundle\Common\Application\PaginationResult;
 use App\Bundle\Common\Constants\MessageConst;
 use App\Bundle\Common\Domain\Model\InvalidArgumentException;
-use App\Bundle\ProductBundle\Domain\Model\CustomerDebtHistoryCriteria;
-use App\Bundle\ProductBundle\Domain\Model\DebtHistory;
-use App\Bundle\ProductBundle\Domain\Model\DebtHistoryId;
-use App\Bundle\ProductBundle\Domain\Model\DebtHistoryUpdateType;
 use App\Bundle\ProductBundle\Domain\Model\IDebtHistoryRepository;
-use App\Bundle\ProductBundle\Domain\Model\MonetaryUnitType;
 
 class CustomerCurrentDebtGetApplicationService
 {

@@ -70,7 +70,7 @@ export default {
     const customerMessageError = ref(null)
     const priceMessageError = ref(null)
     const price = ref(null)
-    const comment = ref(null)
+    const comment = ref('')
     const picked = ref(new Date())
     const toast = inject('$toast')
     const styleDatePicker = ref({
@@ -157,6 +157,7 @@ export default {
       price,
       styleDatePicker,
       picked,
+      comment,
       handleSubmit,
       handleOnChangeCategorySelect,
       handleCustomerIdError,

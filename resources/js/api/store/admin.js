@@ -70,3 +70,4 @@ export const getListDealerFromApi = async (page) => api.get(`${apiConstants.ADMI
 
 export const getListDebtFromApi = async (params) => api.get(`${apiConstants.ADMIN.LIST_DEBT}`, {params})
 export const getListCustomerDebtFromApi = async (id, params) => api.get(`${apiConstants.ADMIN.LIST_CUSTOMER_DEBT}/${id}`, {params})
+export const getCustomerCurrentDebtFromApi = async (id) => api.get(`${apiConstants.ADMIN.CUSTOMER_CURRENT_DEBT}/${id}`)

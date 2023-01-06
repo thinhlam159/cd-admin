@@ -32,6 +32,11 @@ final class DebtHistory
     private int $totalPayment;
 
     /**
+     * @var int
+     */
+    private int $restDebt;
+
+    /**
      * @var bool
      */
     private bool $isCurrent;
@@ -92,6 +97,7 @@ final class DebtHistory
      * @param UserId $userId
      * @param int $totalDebt
      * @param int $totalPayment
+     * @param int $restDebt
      * @param bool $isCurrent
      * @param DebtHistoryUpdateType $debtHistoryUpdateType
      * @param OrderId|null $orderId
@@ -104,13 +110,14 @@ final class DebtHistory
      * @param MonetaryUnitType $monetaryUnitType
      * @param int $version
      */
-    public function __construct(DebtHistoryId $debtHistoryId, CustomerId $customerId, UserId $userId, int $totalDebt, int $totalPayment, bool $isCurrent, DebtHistoryUpdateType $debtHistoryUpdateType, ?OrderId $orderId, ?ContainerOrderId $containerOrderId, ?VatId $vatId, ?PaymentId $paymentId, ?OtherDebtId $otherDebtId, int $numberOfMoney, int $updateDate, MonetaryUnitType $monetaryUnitType, int $version)
+    public function __construct(DebtHistoryId $debtHistoryId, CustomerId $customerId, UserId $userId, int $totalDebt, int $totalPayment, int $restDebt, bool $isCurrent, DebtHistoryUpdateType $debtHistoryUpdateType, ?OrderId $orderId, ?ContainerOrderId $containerOrderId, ?VatId $vatId, ?PaymentId $paymentId, ?OtherDebtId $otherDebtId, int $numberOfMoney, int $updateDate, MonetaryUnitType $monetaryUnitType, int $version)
     {
         $this->debtHistoryId = $debtHistoryId;
         $this->customerId = $customerId;
         $this->userId = $userId;
         $this->totalDebt = $totalDebt;
         $this->totalPayment = $totalPayment;
+        $this->restDebt = $restDebt;
         $this->isCurrent = $isCurrent;
         $this->debtHistoryUpdateType = $debtHistoryUpdateType;
         $this->orderId = $orderId;
@@ -162,6 +169,14 @@ final class DebtHistory
     public function getTotalPayment(): int
     {
         return $this->totalPayment;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRestDebt(): int
+    {
+        return $this->restDebt;
     }
 
     /**

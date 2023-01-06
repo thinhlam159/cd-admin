@@ -5,21 +5,21 @@
         <ButtonAddNew @clickBtn="goToCreateDebt" :text="addNewDebt"/>
       </div>
       <div class="ml-2">
-        <ButtonAddNew @clickBtn="goToCreatePaymnet" :text="addNewPayment"/>
+        <ButtonAddNew @clickBtn="goToCreatePayment" :text="addNewPayment"/>
       </div>
     </div>
     <div class="w-full px-3 h-auto">
       <div class="">
         <span class="text-lg text-gray-400">Khách hàng: </span>
-        <span class="text-2xl">{{ customerName }}</span>
+        <span class="text-2xl">{{ customerCurrentDebt.customerName }}</span>
       </div>
       <div class="">
         <span class="text-lg text-gray-400">Tổng công nợ: </span>
-        <span class="text-2xl">{{ customerName }}</span>
+        <span class="text-2xl">{{ customerCurrentDebt.totalDebt?.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</span>
       </div>
       <div class="">
         <span class="text-lg text-gray-400">Nợ phải thu: </span>
-        <span class="text-2xl">{{ customerName }}</span>
+        <span class="text-2xl">{{ customerCurrentDebt.restDebt?.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</span>
       </div>
     </div>
     <!-- *********** -->
@@ -124,7 +124,7 @@ import {useRoute, useRouter} from "vue-router";
 import {useStore} from "vuex";
 import {MODULE_STORE, PAGE_DEFAULT, ROUTER_PATH} from "@/const";
 import {
-  getCustomerDetailFromApi,
+  getCustomerCurrentDebtFromApi,
   getListCustomerDebtFromApi
 } from "@/api";
 import { convertDateByTimestamp } from '@/utils'
@@ -140,7 +140,7 @@ const orderDetail = "Chi tiết";
 const exportExcel = "Xuất excel";
 const addNewPayment = "Tạo thanh toán";
 const customerId = ref(route.params.id)
-const customerName = ref('')
+const customerCurrentDebt = ref({})
 
 const pageCurrent = computed(() => {
   if (!route.query.page) {
@@ -164,18 +164,33 @@ const getListCustomerDebt = async (customerId, page) => {
   }
 }
 
-const getCustomerDetail = async (customerId) => {
+const getCustomerCurrentDebt = async (customerId) => {
   try {
     store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = true;
-    const response = await getCustomerDetailFromApi(customerId);
-    customerName.value = response.customer_name
-    console.log(response)
+    const response = await getCustomerCurrentDebtFromApi(customerId);
+    const data = response.data
+
+    customerCurrentDebt.value = {
+      ...data,
+      customerName: data.customer_name,
+      totalDebt: data.total_debt,
+      restDebt: data.rest_debt
+    }
+
   } catch (errors) {
     const error = errors.message
     toast.error(error);
   } finally {
     store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
   }
+}
+
+const goToCreateDebt = () => {
+  router.push({name: 'CreatePayment', params: {id: customerId.value}});
+}
+
+const goToCreatePayment = () => {
+  router.push({path: `${ROUTER_PATH.DEBT_MANAGE}/${ROUTER_PATH.PAYMENT}/${ROUTER_PATH.ADD}`, replace: true});
 }
 
 const handleBackPage = (page) => {
@@ -186,7 +201,7 @@ const handleNextPage = (page) => {
 }
 
 getListCustomerDebt(customerId.value, pageCurrent.value);
-getCustomerDetail(customerId.value);
+getCustomerCurrentDebt(customerId.value);
 
 </script>
 
