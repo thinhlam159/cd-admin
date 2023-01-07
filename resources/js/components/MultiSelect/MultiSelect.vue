@@ -122,7 +122,7 @@ const handleSelected = (option) => {
 
 const onSelected = (option) => {
   if (listSelected.value?.length) return false
-  return listSelected.value.includes(option[keyId.value])
+  // return listSelected.value.includes(option[keyId.value])
 }
 
 const onSearchItem = (e) => {

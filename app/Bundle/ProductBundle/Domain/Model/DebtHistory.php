@@ -87,6 +87,11 @@ final class DebtHistory
     private MonetaryUnitType $monetaryUnitType;
 
     /**
+     * @var string|null
+     */
+    private ?string $comment;
+
+    /**
      * @var int
      */
     private int $version;
@@ -108,9 +113,10 @@ final class DebtHistory
      * @param int $numberOfMoney
      * @param int $updateDate
      * @param MonetaryUnitType $monetaryUnitType
+     * @param string|null $comment
      * @param int $version
      */
-    public function __construct(DebtHistoryId $debtHistoryId, CustomerId $customerId, UserId $userId, int $totalDebt, int $totalPayment, int $restDebt, bool $isCurrent, DebtHistoryUpdateType $debtHistoryUpdateType, ?OrderId $orderId, ?ContainerOrderId $containerOrderId, ?VatId $vatId, ?PaymentId $paymentId, ?OtherDebtId $otherDebtId, int $numberOfMoney, int $updateDate, MonetaryUnitType $monetaryUnitType, int $version)
+    public function __construct(DebtHistoryId $debtHistoryId, CustomerId $customerId, UserId $userId, int $totalDebt, int $totalPayment, int $restDebt, bool $isCurrent, DebtHistoryUpdateType $debtHistoryUpdateType, ?OrderId $orderId, ?ContainerOrderId $containerOrderId, ?VatId $vatId, ?PaymentId $paymentId, ?OtherDebtId $otherDebtId, int $numberOfMoney, int $updateDate, MonetaryUnitType $monetaryUnitType, ?string $comment, int $version)
     {
         $this->debtHistoryId = $debtHistoryId;
         $this->customerId = $customerId;
@@ -128,6 +134,7 @@ final class DebtHistory
         $this->numberOfMoney = $numberOfMoney;
         $this->updateDate = $updateDate;
         $this->monetaryUnitType = $monetaryUnitType;
+        $this->comment = $comment;
         $this->version = $version;
     }
 
@@ -257,6 +264,14 @@ final class DebtHistory
     public function getMonetaryUnitType(): MonetaryUnitType
     {
         return $this->monetaryUnitType;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getComment(): ?string
+    {
+        return $this->comment;
     }
 
     /**

@@ -45,22 +45,22 @@
           <th class="border py-1 w-[9%]">
             Thay đổi
           </th>
-          <th class="border py-1 w-[9%]">
+          <th class="border py-1 w-[6%]">
             Thanh toán
           </th>
           <th class="border py-1 w-[9%]">
             Đơn thông thường
           </th>
-          <th class="border py-1 w-[9%]">
+          <th class="border py-1 w-[6%]">
             Container
           </th>
-          <th class="border py-1 w-[9%]">
+          <th class="border py-1 w-[4%]">
             Vat
           </th>
-          <th class="border py-1 w-[9%]">
+          <th class="border py-1 w-[5%]">
             Khác
           </th>
-          <th class="border py-1 w-[9%]">
+          <th class="border py-1 w-[20%]">
             Ghi Chú
           </th>
         </tr>

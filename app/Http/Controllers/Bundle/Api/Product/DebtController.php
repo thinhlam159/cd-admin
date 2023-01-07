@@ -190,6 +190,7 @@ class DebtController extends BaseController
                 'payment_id' => $debtResult->paymentId,
                 'other_debt_id' => $debtResult->otherDebtId,
                 'number_of_money' => $debtResult->numberOfMoney,
+                'comment' => $debtResult->comment,
             ];
         }
 

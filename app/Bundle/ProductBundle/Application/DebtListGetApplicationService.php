@@ -82,6 +82,7 @@ class DebtListGetApplicationService
                 $debt->getNumberOfMoney(),
                 $debt->getUpdateDate(),
                 $debt->getMonetaryUnitType()->getValue(),
+                $debt->getComment(),
                 $debt->getVersion()
             );
         }

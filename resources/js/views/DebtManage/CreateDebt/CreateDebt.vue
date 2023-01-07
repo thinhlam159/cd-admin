@@ -7,11 +7,6 @@
       </div>
       <div class="mr-4 w-full mb-5">
         <label for="customer" class="block mb-1 font-bold text-sm">Khách hàng</label>
-<!--        <select name="customer" class="p-3 w-full" v-model="formData.customerId" @change="handleSelectCustomer">-->
-<!--          <option v-for="item in customers" :value="item.customer_id"-->
-<!--                  class="w-full h-10 px-3 text-base text-gray-700">{{ item.customer_name }}-->
-<!--          </option>-->
-<!--        </select>-->
         <div class="flex items-center">
           <MultiSelect
             only-select-one
@@ -19,7 +14,7 @@
             key-name="position_name"
             id="hrPositionAnalysis"
             :options="customers"
-            :value="selectedCustomers"
+            :value="selectedCustomer"
             :placeholder="'Nhập tên'"
             :hasSearch="true"
             @change="handleSelectCustomer"
@@ -28,7 +23,7 @@
             <p v-if="!!customerMessageError" class="text-red-500">{{ customerMessageError }}</p>
           </div>
         </div>
-        <div v-show="!customerMessageError">{{ selectedCustomers[0]?.customer_name }}</div>
+        <div v-show="!customerMessageError">{{ selectedCustomer.customer_name }}</div>
       </div>
       <div class="w-1/2 h-full p-5">
         <TabsWrapper>
@@ -48,13 +43,9 @@
 <script>
 import {useRoute, useRouter} from "vue-router";
 import {useStore} from "vuex";
-import {ref, onMounted} from "vue";
+import {ref, inject} from "vue";
 import {
-  createOrderFromApi,
-  createProductFromApi,
-  getListCategoryFromApi,
   getListCustomerFromApi,
-  getListProductFromApi
 } from "@/api";
 import {MODULE_STORE, ROUTER_PATH} from "@/const";
 import InputItem from "@/views/OrderManage/CreateOrder/InputItem";
@@ -86,91 +77,17 @@ export default {
     const route = useRoute()
     const store = useStore()
     const formData = ref({})
-    const categories = ref({})
     const customers = ref([])
-    const selectedCustomers = ref([])
-    const products = ref({})
-    const productsByCategory = ref({})
-    const productSelected = ref({})
-    const productAttributeValues = ref({})
-    const productAttributeValuesByProduct = ref({})
-    const listInputItem = ref(store.state[MODULE_STORE.ORDER.NAME].orderPostData)
+    const selectedCustomer = ref({})
     const customerMessageError = ref(null)
+    const customerName = ref('')
+    const customerId = ref('')
 
-    const handleSubmit = async (data) => {
-      try {
-        const orderPostData = [...store.state[MODULE_STORE.ORDER.NAME].orderPostData]
-        const bodyFormData = new FormData()
-        bodyFormData.append('customer_id', data.customerId);
-        // bodyFormData.append('order_products', orderPostData);
-        const postData = {
-          customer_id: data.customerId,
-          order_products: orderPostData
-        }
-        const res = await createOrderFromApi(postData)
-      } catch (errors) {
-        const error = errors.message;
-        // this.$toast.error(error);
-      } finally {
-        store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
-      }
-    }
-
-    const getListCategory = async () => {
-      try {
-        const res = await getListCategoryFromApi()
-        categories.value = res.data.reduce( (option, data) => {
-          return [
-            ...option,
-            {
-              name: data.name,
-              id: data.category_id
-            }
-          ]
-        }, [])
-        formData.value.category = res.data[0].category_id
-        store.state[MODULE_STORE.ORDER.NAME].categories = res.data
-      } catch (errors) {
-        // const error = errors.message;
-        // console.log(error)
-      }
-    }
-
-    const getListProduct = async () => {
-      const res = await getListProductFromApi();
-      products.value = res.data
-      store.state[MODULE_STORE.ORDER.NAME].products = res.data
-    }
     const getListCustomer = async () => {
       const res = await getListCustomerFromApi();
       customers.value = [
         ...res.data
       ]
-      store.state[MODULE_STORE.ORDER.NAME].customers = res.data
-    }
-    const handleOnChangeCategorySelect = () => {
-      productsByCategory.value = products.value.filter((product) => {
-        return product.category_id === formData.value.category
-      })
-    }
-    const handleOnChangeProductSelect = () => {
-      productSelected.value = products.value.filter((product) => {
-        return product.product_id === formData.value.product
-      })[0]
-
-      productAttributeValuesByProduct.value = productSelected.value.product_attribute_values
-    }
-    const handleAddToOrder = () => {
-      const index = store.state[MODULE_STORE.ORDER.NAME].orderPostData.length
-      store.commit(`${MODULE_STORE.ORDER.NAME}/${MODULE_STORE.ORDER.MUTATIONS.ADD_ORDER_DATA}`, {index})
-      // listInputItem.value = store.state[MODULE_STORE.ORDER.NAME].orderPostData
-    }
-    const handleRemoveInputItem = (item) => {
-      store.commit(`${MODULE_STORE.ORDER.NAME}/${MODULE_STORE.ORDER.MUTATIONS.REMOVE_ORDER_DATA_ITEM}`, item)
-      // listInputItem.value = store.state[MODULE_STORE.ORDER.NAME].orderPostData
-    }
-    const updateDisplay = () => {
-      listInputItem.value = store.state[MODULE_STORE.ORDER.NAME].orderPostData
     }
 
     const handleCustomerIdError = (value) => {
@@ -179,34 +96,22 @@ export default {
 
     const handleSelectCustomer = (ids) => {
       customerMessageError.value = false
-      selectedCustomers.value = customers.value.filter((e) => {
+      selectedCustomer.value = customers.value.filter((e) => {
         return e.customer_id === ids[0]
       })
-      console.log(selectedCustomers.value[0])
     }
 
-    getListCategory()
     getListCustomer()
-    getListProduct()
 
     return {
       formData,
-      categories,
       customers,
-      products,
-      productAttributeValuesByProduct,
-      productsByCategory,
-      listInputItem,
       customerMessageError,
-      selectedCustomers,
-      handleSubmit,
-      handleOnChangeCategorySelect,
-      handleOnChangeProductSelect,
-      handleAddToOrder,
-      handleRemoveInputItem,
+      selectedCustomer,
+      customerName,
+      customerId,
       handleCustomerIdError,
       handleSelectCustomer,
-      updateDisplay
     }
   }
 }

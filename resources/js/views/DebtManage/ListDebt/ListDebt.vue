@@ -1,6 +1,6 @@
 <template>
   <div class="p-5">
-    <div class="w-full h-8 flex justify-between">
+    <div class="w-full h-8 flex justify-start">
       <input type="text" @input="onInput" class="outline-none w-[150px] h-full border border-gray-200" placeholder="Tìm khách hàng">
       <div class="ml-2">
         <ButtonFilter @clickBtn="sortByTotalDebt" :text="sortTotalDebt"/>
@@ -8,12 +8,12 @@
       <div class="ml-2">
         <ButtonFilter @clickBtn="sortByRestDebt" :text="sortRestDebt"/>
       </div>
-      <div class="ml-2">
-        <ButtonAddNew @clickBtn="goToCreateDebt" :text="addNewDebt"/>
-      </div>
-      <div class="ml-2">
-        <ButtonAddNew @clickBtn="goToCreatePayment" :text="addNewPayment"/>
-      </div>
+<!--      <div class="ml-2">-->
+<!--        <ButtonAddNew @clickBtn="goToCreateDebt" :text="addNewDebt"/>-->
+<!--      </div>-->
+<!--      <div class="ml-2">-->
+<!--        <ButtonAddNew @clickBtn="goToCreatePayment" :text="addNewPayment"/>-->
+<!--      </div>-->
     </div>
 
     <!-- *********** -->

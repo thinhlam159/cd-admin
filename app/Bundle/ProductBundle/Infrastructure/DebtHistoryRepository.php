@@ -43,6 +43,7 @@ class DebtHistoryRepository implements IDebtHistoryRepository
             'update_date' => $debtHistory->getUpdateDate(),
             'number_of_money' => $debtHistory->getNumberOfMoney(),
             'monetary_unit_type' => $debtHistory->getMonetaryUnitType()->getType(),
+            'comment' => $debtHistory->getComment(),
             'version' => $debtHistory->getVersion(),
     	]);
         if (!$result) {
@@ -83,6 +84,7 @@ class DebtHistoryRepository implements IDebtHistoryRepository
             $entity->number_of_money,
             $entity->update_date,
             MonetaryUnitType::fromType($entity->monetary_unit_type),
+            $entity->comment,
             $entity->version
         );
     }
@@ -123,6 +125,7 @@ class DebtHistoryRepository implements IDebtHistoryRepository
                 $entity->number_of_money,
                 $entity->update_date,
                 MonetaryUnitType::fromType($entity->monetary_unit_type),
+                $entity->comment,
                 $entity->version
             );
         }
@@ -164,6 +167,7 @@ class DebtHistoryRepository implements IDebtHistoryRepository
                 $entity->number_of_money,
                 $entity->update_date,
                 MonetaryUnitType::fromType($entity->monetary_unit_type),
+                $entity->comment,
                 $entity->version
             );
         }

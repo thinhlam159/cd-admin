@@ -85,6 +85,7 @@ class ContainerOrderPostApplicationService
             $command->cost,
             $command->date,
             MonetaryUnitType::fromValue($command->monetaryUnitType),
+            $command->comment,
             !is_null($currentDebt) ? $currentDebt->getVersion() + 1 : 1
         );
 
