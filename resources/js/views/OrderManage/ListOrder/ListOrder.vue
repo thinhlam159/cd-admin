@@ -140,7 +140,6 @@ export default {
     }
 
     const exportOrder = async (id) => {
-      console.log(12313)
       const excelRes = await exportOrderFromApi({order_id: id})
       const url = URL.createObjectURL(new Blob([excelRes], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'

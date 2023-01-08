@@ -1,12 +1,7 @@
 <template>
   <div class="p-5">
-    <div class="w-full h-8 flex justify-between">
-      <div class="ml-2">
-        <ButtonAddNew @clickBtn="goToCreateDebt" :text="addNewDebt"/>
-      </div>
-      <div class="ml-2">
-        <ButtonAddNew @clickBtn="goToCreatePayment" :text="addNewPayment"/>
-      </div>
+    <div class="p-5">
+      <h1 class="text-2xl text-gray-700">Công nợ khách hàng</h1>
     </div>
     <div class="w-full px-3 h-auto">
       <div class="">
@@ -105,14 +100,27 @@
         </tbody>
       </table>
     </div>
+    <div class="flex justify-center items-center p-3">
+      <div class="w-full h-8 flex">
+        <div class="ml-2">
+          <ButtonAddNew @clickBtn="goToCreateDebt" :text="addNewDebt"/>
+        </div>
+        <div class="ml-2">
+          <ButtonAddNew @clickBtn="goToCreatePayment" :text="addNewPayment"/>
+        </div>
+        <div class="ml-2">
+          <ButtonEdit @clickBtn="exportCustomerDebt(customerId)" :text="exportExcel"/>
+        </div>
+      </div>
+      <Pagination
+        v-if="pagination"
+        :pageCurrent="pagination.current_page"
+        :totalPage="pagination.total"
+        @onBack="handleBackPage"
+        @onNext="handleNextPage"
+      />
+    </div>
 
-    <Pagination
-      v-if="pagination"
-      :pageCurrent="pagination.current_page"
-      :totalPage="pagination.total"
-      @onBack="handleBackPage"
-      @onNext="handleNextPage"
-    />
   </div>
 </template>
 
@@ -124,10 +132,12 @@ import {useRoute, useRouter} from "vue-router";
 import {useStore} from "vuex";
 import {MODULE_STORE, PAGE_DEFAULT, ROUTER_PATH} from "@/const";
 import {
+  exportCustomerDebtHistoryFromApi, exportOrderFromApi,
   getCustomerCurrentDebtFromApi,
   getListCustomerDebtFromApi
 } from "@/api";
 import { convertDateByTimestamp } from '@/utils'
+import ButtonEdit from "@/components/Buttons/ButtonEdit/ButtonEdit.vue";
 
 const listDebt = ref([]);
 const route = useRoute();
@@ -181,16 +191,16 @@ const getCustomerCurrentDebt = async (customerId) => {
     const error = errors.message
     toast.error(error);
   } finally {
-    store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
+    store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false
   }
 }
 
 const goToCreateDebt = () => {
-  router.push({name: 'CreatePayment', params: {id: customerId.value}});
+  router.push({name: 'CreateDebt', params: {id: customerId.value}})
 }
 
 const goToCreatePayment = () => {
-  router.push({path: `${ROUTER_PATH.DEBT_MANAGE}/${ROUTER_PATH.PAYMENT}/${ROUTER_PATH.ADD}`, replace: true});
+  router.push({name: `CreatePayment`, params: {id: customerId.value}})
 }
 
 const handleBackPage = (page) => {
@@ -198,6 +208,19 @@ const handleBackPage = (page) => {
 }
 const handleNextPage = (page) => {
   getListCustomerDebt({page})
+}
+
+const exportCustomerDebt = async (customerId) => {
+  const excelRes = await exportCustomerDebtHistoryFromApi({customer_id: customerId})
+  const url = URL.createObjectURL(new Blob([excelRes], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  }))
+  const link = document.createElement('a')
+  link.href = url
+  link.setAttribute('download', 'fileName')
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
 }
 
 getListCustomerDebt(customerId.value, pageCurrent.value);

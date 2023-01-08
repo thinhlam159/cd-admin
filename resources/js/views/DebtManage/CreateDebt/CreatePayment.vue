@@ -6,13 +6,26 @@
         <hr>
       </div>
       <div class="mr-4 w-[14%] mb-5">
-        <label for="customer" class="block mb-1 font-bold text-sm">Khách hàng</label>
-        <select name="customer" class="p-3 w-full" v-model="formData.customerId" @change="handleSelectCustomer">
-          <option v-for="item in customers" :value="item.customer_id"
-                  class="w-full h-10 px-3 text-base text-gray-700">{{ item.customer_name }}
-          </option>
-        </select>
-        <p v-if="!!customerMessageError" class="text-red-500">{{ customerMessageError }}</p>
+        <div class="flex items-end mb-2">
+          <label for="customer" class="block mb-1 font-bold text-sm">Khách hàng: </label>
+          <span v-show="!customerMessageError" class="text-lg text-gray-400 ml-1">{{ currentCustomer.customer_name }}</span>
+        </div>
+        <div class="flex items-center">
+          <MultiSelect
+            only-select-one
+            key-id="id"
+            key-name="position_name"
+            id="hrPositionAnalysis"
+            :options="customers"
+            :value="selectedCustomers"
+            :placeholder="'Nhập tên'"
+            :hasSearch="true"
+            @change="handleSelectCustomer"
+          />
+          <div class="flex h-full items-center ml-2">
+            <p v-if="!!customerMessageError" class="text-red-500">{{ customerMessageError }}</p>
+          </div>
+        </div>
       </div>
       <div class="w-1/2 h-full p-5">
         <form
@@ -36,7 +49,6 @@
             <label for="" class="font-bold mb-3 text-lg text-gray-500">Ghi chú</label>
             <textarea class="w-full h-auto border border-gray-200 min-h-[80px] outline-none text-sm" v-model="comment"></textarea>
           </div>
-
           <button class="submit-btn border border-gray-200 p-3 max-w-[80px]" type="submit">Submit</button>
         </form>
       </div>
@@ -45,7 +57,7 @@
 </template>
 
 <script>
-import {useRouter} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import {useStore} from "vuex";
 import {inject, ref} from "vue";
 import {
@@ -58,15 +70,17 @@ import ButtonAddNew from "@/components/Buttons/ButtonAddNew";
 import CurrencyInput from "@/views/DebtManage/CreateDebt/CurrencyInput.vue";
 import Datepicker from 'vue3-datepicker'
 import * as Yup from 'yup';
+import MultiSelect from "@/components/MultiSelect/MultiSelect.vue";
 
 export default {
   name: "CreateDebt",
-  components: {CurrencyInput, InputItem, ButtonAddNew, Datepicker },
+  components: {MultiSelect, CurrencyInput, InputItem, ButtonAddNew, Datepicker },
   setup(emit) {
     const router = useRouter()
-    const store = useStore()
-    const formData = ref({})
-    const customers = ref({})
+    const route = useRoute()
+    const customers = ref([])
+    const selectedCustomers = ref([])
+    const currentCustomer = ref({})
     const customerMessageError = ref(null)
     const priceMessageError = ref(null)
     const price = ref(null)
@@ -95,16 +109,16 @@ export default {
       "--vdp-divider-color": "#ffffff"
     })
 
-    const handleSubmit = async (data) => {
+    const handleSubmit = async () => {
       try {
-        await schema.validate({ price: price.value, customerId: formData.value.customerId });
+        await schema.validate({ price: price.value, customerId: currentCustomer.value.customer_id });
         priceMessageError.value = ''
         const postData = {
           cost: price.value,
           comment: comment.value,
           date: picked.value.getTime() / 1000 | 0,
           monetary_unit_type: 'vnd',
-          customer_id: formData.value.customerId
+          customer_id: currentCustomer.value.customer_id
         }
         const res = await createPaymentFromApi(postData)
         toast.success("Tạo đơn container thành công!", {duration:3000})
@@ -123,14 +137,11 @@ export default {
 
     const getListCustomer = async () => {
       const res = await getListCustomerFromApi();
-      customers.value = {
+      customers.value = [
         ...res.data
-      }
-      store.state[MODULE_STORE.ORDER.NAME].customers = res.data
-    }
-    const handleOnChangeCategorySelect = () => {
-      productsByCategory.value = products.value.filter((product) => {
-        return product.category_id === formData.value.category
+      ]
+      currentCustomer.value = customers.value.find(e => {
+        return e.customer_id === route.params.id
       })
     }
 
@@ -138,8 +149,12 @@ export default {
       customerMessageError.value = value
     }
 
-    const handleSelectCustomer = () => {
+    const handleSelectCustomer = (ids) => {
       customerMessageError.value = false
+      currentCustomer.value = customers.value.find((e) => {
+        return e.customer_id === ids[0]
+      })
+      selectedCustomers.value = ids
     }
 
     const schema = Yup.object().shape({
@@ -150,8 +165,9 @@ export default {
     getListCustomer()
 
     return {
-      formData,
       customers,
+      selectedCustomers,
+      currentCustomer,
       customerMessageError,
       priceMessageError,
       price,
@@ -159,7 +175,6 @@ export default {
       picked,
       comment,
       handleSubmit,
-      handleOnChangeCategorySelect,
       handleCustomerIdError,
       handleSelectCustomer
     }
