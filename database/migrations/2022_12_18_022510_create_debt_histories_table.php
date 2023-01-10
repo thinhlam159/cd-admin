@@ -30,6 +30,7 @@ class CreateDebtHistoriesTable extends Migration
             $table->integer('update_date');
             $table->integer('number_of_money');
             $table->integer('monetary_unit_type');
+            $table->string('comment');
             $table->integer('version');
             $table->timestamps();
             $table->foreign('customer_id')->references('id')->on('customers')->onDelete('cascade');

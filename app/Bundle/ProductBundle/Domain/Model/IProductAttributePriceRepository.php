@@ -45,4 +45,10 @@ interface IProductAttributePriceRepository
      * @return ProductAttributePrice|null
      */
     public function findById(ProductAttributePriceId $productAttributePriceId): ?ProductAttributePrice;
+
+    /**
+     * @param ProductAttributePrice[] $productAttributePrices
+     * @return bool
+     */
+    public function updateOldPrice(array $productAttributePrices): bool;
 }

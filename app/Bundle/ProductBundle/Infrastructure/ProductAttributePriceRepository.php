@@ -25,7 +25,7 @@ final class ProductAttributePriceRepository implements IProductAttributePriceRep
             'is_current' => $productAttributePrice->isCurrent(),
         ]);
 
-        if(!$result) {
+        if (!$result) {
             throw new \Exception();
         }
 
@@ -168,5 +168,23 @@ final class ProductAttributePriceRepository implements IProductAttributePriceRep
             NoticePriceType::fromType((int)$entity['notice_price_type']),
             $entity['is_current']
         );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function updateOldPrice(array $productAttributePrices): bool
+    {
+        foreach ($productAttributePrices as $productAttributePrice) {
+            $entity = ModelProductAttributePrice::find($productAttributePrice->getProductAttributePriceId());
+            $result = $entity->update([
+                'is_current' => $productAttributePrice->isCurrent(),
+            ]);
+            if (!$result) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

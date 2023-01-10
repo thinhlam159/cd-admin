@@ -6,13 +6,14 @@ use App\Bundle\Admin\Domain\Model\CustomerId;
 use App\Bundle\Admin\Domain\Model\ICustomerRepository;
 use App\Bundle\Admin\Domain\Model\IUserRepository;
 use App\Bundle\Admin\Domain\Model\UserId;
-use App\Bundle\Common\Application\PaginationResult;
 use App\Bundle\Common\Constants\MessageConst;
 use App\Bundle\Common\Domain\Model\InvalidArgumentException;
-use App\Bundle\ProductBundle\Domain\Model\CustomerDebtHistoryCriteria;
+use App\Bundle\Common\Domain\Model\TransactionException;
+use App\Bundle\ProductBundle\Domain\Model\DebtsCustomerExcelCriteria;
 use App\Bundle\ProductBundle\Domain\Model\IDebtHistoryRepository;
+use App\Bundle\ProductBundle\Domain\Model\SettingDate;
 
-class CustomerDebtHistoryListGetApplicationService
+class DebtsCustomerExcelExportPostApplicationService
 {
     /**
      * @var IDebtHistoryRepository
@@ -30,8 +31,8 @@ class CustomerDebtHistoryListGetApplicationService
     private IUserRepository $userRepository;
 
     /**
-     * @param IDebtHistoryRepository $debtHistoryRepository
-     * @param ICustomerRepository $customerRepository
+     * @param IDebtHistoryRepository $debtHistoryRepository debtHistoryRepository
+     * @param ICustomerRepository $customerRepository customerRepository
      * @param IUserRepository $userRepository
      */
     public function __construct(
@@ -46,25 +47,25 @@ class CustomerDebtHistoryListGetApplicationService
     }
 
     /**
-     * @param CustomerDebtHistoryListGetCommand $command
-     * @return CustomerDebtHistoryListGetResult
+     * @param DebtsCustomerExcelExportPostCommand $command
+     * @return DebtsCustomerExcelOrderExportPostResult
      * @throws InvalidArgumentException
+     * @throws TransactionException
      */
-    public function handle(CustomerDebtHistoryListGetCommand $command): CustomerDebtHistoryListGetResult
+    public function handle(DebtsCustomerExcelExportPostCommand $command): DebtsCustomerExcelOrderExportPostResult
     {
         $customerId = new CustomerId($command->customerId);
         $customer = $this->customerRepository->findById($customerId);
         if (!$customer) {
             throw new InvalidArgumentException(MessageConst::NO_RECORD['message']);
         }
-        $criteria = new CustomerDebtHistoryCriteria(
+        $criteria = new DebtsCustomerExcelCriteria(
             $customerId,
-            $command->keyword,
+            !is_null($command->startDate) ? SettingDate::fromYmdHis($command->startDate) : null,
+            !is_null($command->endDate) ? SettingDate::fromYmdHis($command->endDate) : null,
         );
-        [$debtHistories, $pagination] = $this->debtHistoryRepository->findAllHistoryByCustomerId($criteria);
+        $debtHistories = $this->debtHistoryRepository->findAllHistoryByCustomerId2($criteria);
         $debtResults = [];
-        $totalDebt = 0;
-        $totalPayment = 0;
         foreach ($debtHistories as $debt) {
             $customer = $this->customerRepository->findById($debt->getCustomerId());
             $user = $this->userRepository->findById(new UserId($debt->getUserId()->asString()));
@@ -74,8 +75,8 @@ class CustomerDebtHistoryListGetApplicationService
                 $customer->getCustomerName(),
                 $user->getUserId()->asString(),
                 $user->getUserName(),
-                $debt->calculateTotalDebt($totalDebt),
-                $debt->calculateTotalPayment($totalPayment),
+                $debt->getTotalDebt(),
+                $debt->getTotalPayment(),
                 $debt->isCurrent(),
                 $debt->getDebtHistoryUpdateType()->getValue(),
                 !is_null($debt->getOrderId()) ? $debt->getOrderId()->asString() : null,
@@ -89,16 +90,8 @@ class CustomerDebtHistoryListGetApplicationService
                 $debt->getComment(),
                 $debt->getVersion()
             );
-            $totalDebt = $debt->calculateTotalDebt($totalDebt);
-            $totalPayment = $debt->calculateTotalPayment($totalPayment);
         }
 
-        $paginationResult = new PaginationResult(
-            $pagination->getTotalPages(),
-            $pagination->getPerPage(),
-            $pagination->getCurrentPage(),
-        );
-
-        return new CustomerDebtHistoryListGetResult($debtResults, $paginationResult);
+        return new DebtsCustomerExcelOrderExportPostResult($debtResults);
     }
 }

@@ -21,6 +21,9 @@ final class DebtHistoryUpdateType
     /** @var int */
     public const OTHER_DEBT = 5;
 
+    /** @var int */
+    public const INIT = 6;
+
     /** @var array<int,string> */
     private const VALUES = [
         self::ORDER => 'order',
@@ -28,6 +31,7 @@ final class DebtHistoryUpdateType
         self::VAT => 'vat',
         self::PAYMENT => 'payment',
         self::OTHER_DEBT => 'other_debt',
+        self::INIT => 'init',
     ];
     private int $type;
 

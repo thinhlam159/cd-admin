@@ -77,9 +77,9 @@ final class DebtHistory
     private int $numberOfMoney;
 
     /**
-     * @var int
+     * @var SettingDate
      */
-    private int $updateDate;
+    private SettingDate $updateDate;
 
     /**
      * @var MonetaryUnitType
@@ -111,12 +111,12 @@ final class DebtHistory
      * @param PaymentId|null $paymentId
      * @param OtherDebtId|null $otherDebtId
      * @param int $numberOfMoney
-     * @param int $updateDate
+     * @param SettingDate $updateDate
      * @param MonetaryUnitType $monetaryUnitType
      * @param string|null $comment
      * @param int $version
      */
-    public function __construct(DebtHistoryId $debtHistoryId, CustomerId $customerId, UserId $userId, int $totalDebt, int $totalPayment, int $restDebt, bool $isCurrent, DebtHistoryUpdateType $debtHistoryUpdateType, ?OrderId $orderId, ?ContainerOrderId $containerOrderId, ?VatId $vatId, ?PaymentId $paymentId, ?OtherDebtId $otherDebtId, int $numberOfMoney, int $updateDate, MonetaryUnitType $monetaryUnitType, ?string $comment, int $version)
+    public function __construct(DebtHistoryId $debtHistoryId, CustomerId $customerId, UserId $userId, int $totalDebt, int $totalPayment, int $restDebt, bool $isCurrent, DebtHistoryUpdateType $debtHistoryUpdateType, ?OrderId $orderId, ?ContainerOrderId $containerOrderId, ?VatId $vatId, ?PaymentId $paymentId, ?OtherDebtId $otherDebtId, int $numberOfMoney, SettingDate $updateDate, MonetaryUnitType $monetaryUnitType, ?string $comment, int $version)
     {
         $this->debtHistoryId = $debtHistoryId;
         $this->customerId = $customerId;
@@ -251,9 +251,9 @@ final class DebtHistory
     }
 
     /**
-     * @return int
+     * @return SettingDate
      */
-    public function getUpdateDate(): int
+    public function getUpdateDate(): SettingDate
     {
         return $this->updateDate;
     }
@@ -280,5 +280,31 @@ final class DebtHistory
     public function getVersion(): int
     {
         return $this->version;
+    }
+
+    /**
+     * @param int $oldTotal
+     * @return int
+     */
+    public function calculateTotalDebt(int $oldTotal): int
+    {
+        if ($this->debtHistoryUpdateType->getType() !== DebtHistoryUpdateType::PAYMENT) {
+            $oldTotal += $this->numberOfMoney;
+        }
+
+        return $oldTotal;
+    }
+
+    /**
+     * @param int $oldTotal
+     * @return int
+     */
+    public function calculateTotalPayment(int $oldTotal): int
+    {
+        if ($this->debtHistoryUpdateType->getType() === DebtHistoryUpdateType::PAYMENT) {
+            $oldTotal += $this->numberOfMoney;
+        }
+
+        return $oldTotal;
     }
 }

@@ -17,6 +17,7 @@ use App\Bundle\ProductBundle\Domain\Model\MonetaryUnitType;
 use App\Bundle\ProductBundle\Domain\Model\OrderPaymentStatus;
 use App\Bundle\ProductBundle\Domain\Model\Payment;
 use App\Bundle\ProductBundle\Domain\Model\PaymentId;
+use App\Bundle\ProductBundle\Domain\Model\SettingDate;
 use App\Bundle\ProductBundle\Domain\Model\UserId;
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -83,7 +84,7 @@ class ContainerOrderPostApplicationService
             null,
             null,
             $command->cost,
-            $command->date,
+            SettingDate::fromTimeStamps($command->date),
             MonetaryUnitType::fromValue($command->monetaryUnitType),
             $command->comment,
             !is_null($currentDebt) ? $currentDebt->getVersion() + 1 : 1

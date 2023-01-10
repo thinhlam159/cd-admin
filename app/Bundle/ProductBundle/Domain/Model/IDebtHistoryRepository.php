@@ -35,4 +35,22 @@ interface IDebtHistoryRepository
      * @return bool
      */
     public function updateCurrentDebtHistory(DebtHistoryId $debtHistoryId): bool;
+
+    /**
+     * @param DebtHistory $debtHistory
+     * @return DebtHistoryId|null
+     */
+    public function update(DebtHistory $debtHistory): ?DebtHistoryId;
+
+    /**
+     * @param DebtHistory $debtHistory
+     * @return DebtHistoryId|null
+     */
+    public function initCustomerDebtHistory(DebtHistory $debtHistory): ?DebtHistoryId;
+
+    /**
+     * @param DebtsCustomerExcelCriteria $criteria
+     * @return DebtHistory[]
+     */
+    public function findAllHistoryByCustomerId2(DebtsCustomerExcelCriteria $criteria): array;
 }

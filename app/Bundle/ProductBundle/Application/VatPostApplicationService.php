@@ -12,6 +12,7 @@ use App\Bundle\ProductBundle\Domain\Model\IDebtHistoryRepository;
 use App\Bundle\ProductBundle\Domain\Model\IVatRepository;
 use App\Bundle\ProductBundle\Domain\Model\MonetaryUnitType;
 use App\Bundle\ProductBundle\Domain\Model\OrderPaymentStatus;
+use App\Bundle\ProductBundle\Domain\Model\SettingDate;
 use App\Bundle\ProductBundle\Domain\Model\UserId;
 use App\Bundle\ProductBundle\Domain\Model\Vat;
 use App\Bundle\ProductBundle\Domain\Model\VatId;
@@ -80,7 +81,7 @@ class VatPostApplicationService
             null,
             null,
             $command->cost,
-            $command->date,
+            SettingDate::fromTimeStamps($command->date),
             MonetaryUnitType::fromValue($command->monetaryUnitType),
             $command->comment,
             !is_null($currentDebt) ? $currentDebt->getVersion() + 1 : 1

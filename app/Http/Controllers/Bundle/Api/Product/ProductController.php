@@ -357,9 +357,7 @@ class ProductController extends BaseController
     {
         $applicationService = new ProductAttributePriceListPutApplicationService(
             new ProductAttributeValueRepository(),
-            new ProductAttributePriceRepository(),
-            new ProductInventoryRepository(),
-            new ProductAttributeRepository(),
+            new ProductAttributePriceRepository()
         );
         $productAttributeValuePriceCommands = [];
         $productAttributeValuePrices = !empty($request->product_attribute_value_price) ? $request->product_attribute_value_price : [];

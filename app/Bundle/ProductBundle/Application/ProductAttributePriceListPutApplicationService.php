@@ -5,14 +5,10 @@ namespace App\Bundle\ProductBundle\Application;
 use App\Bundle\Common\Domain\Model\InvalidArgumentException;
 use App\Bundle\Common\Domain\Model\TransactionException;
 use App\Bundle\ProductBundle\Domain\Model\IProductAttributePriceRepository;
-use App\Bundle\ProductBundle\Domain\Model\IProductAttributeRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductAttributeValueRepository;
-use App\Bundle\ProductBundle\Domain\Model\IProductInventoryRepository;
 use App\Bundle\ProductBundle\Domain\Model\MonetaryUnitType;
-use App\Bundle\ProductBundle\Domain\Model\NoticePriceType;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributePrice;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributePriceId;
-use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValueCriteria;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValueId;
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -31,32 +27,18 @@ class ProductAttributePriceListPutApplicationService
     private IProductAttributePriceRepository $productAttributePriceRepository;
 
     /**
-     * @var IProductInventoryRepository
-     */
-    private IProductInventoryRepository $productInventoryRepository;
-
-    /**
-     * @var IProductAttributeRepository
-     */
-    private IProductAttributeRepository $productAttributeRepository;
-
-    /**
      * @param IProductAttributeValueRepository $productAttributeValueRepository
      * @param IProductAttributePriceRepository $productAttributePriceRepository
-     * @param IProductInventoryRepository $productInventoryRepository
-     * @param IProductAttributeRepository $productAttributeRepository
+
      */
     public function __construct(
         IProductAttributeValueRepository $productAttributeValueRepository,
-        IProductAttributePriceRepository $productAttributePriceRepository,
-        IProductInventoryRepository $productInventoryRepository,
-        IProductAttributeRepository $productAttributeRepository
+        IProductAttributePriceRepository $productAttributePriceRepository
     )
     {
         $this->productAttributeValueRepository = $productAttributeValueRepository;
         $this->productAttributePriceRepository = $productAttributePriceRepository;
-        $this->productInventoryRepository = $productInventoryRepository;
-        $this->productAttributeRepository = $productAttributeRepository;
+
     }
 
     /**
@@ -70,20 +52,22 @@ class ProductAttributePriceListPutApplicationService
         $oldPrices = [];
         $newPrices = [];
         foreach ($command->productAttributePriceCommands as $priceCommand) {
+            $productAttributeValue = $this->productAttributeValueRepository->findById(new ProductAttributeValueId($priceCommand->productAttributeValueId));
+            $productAttributePriceCurrent = $this->productAttributePriceRepository->findById(new ProductAttributePriceId($priceCommand->productAttributePriceId));
             $newPrices = new ProductAttributePrice(
                 ProductAttributePriceId::newId(),
-                new ProductAttributeValueId($priceCommand->productAttributeValueId),
+                $productAttributeValue->getProductAttributeValueId(),
                 $priceCommand->price,
                 MonetaryUnitType::fromType(MonetaryUnitType::VND),
-                NoticePriceType::fromValue($priceCommand->noticePriceType),
+                $productAttributePriceCurrent->getNoticePriceType(),
                 true
             );
             $oldPrices = new ProductAttributePrice(
-                new ProductAttributePriceId($priceCommand->productAttributePriceId),
+                $productAttributePriceCurrent->getProductAttributePriceId(),
                 new ProductAttributeValueId($priceCommand->productAttributeValueId),
-                $priceCommand->price,
+                $productAttributePriceCurrent->getPrice(),
                 MonetaryUnitType::fromType(MonetaryUnitType::VND),
-                NoticePriceType::fromValue($priceCommand->noticePriceType),
+                $productAttributePriceCurrent->getNoticePriceType(),
                 false
             );
         }
@@ -91,8 +75,8 @@ class ProductAttributePriceListPutApplicationService
         DB::beginTransaction();
         try {
             $createIds = $this->productAttributePriceRepository->createMany($newPrices);
-            $updateIds = $this->productAttributePriceRepository->updateMany($oldPrices);
-            if (empty($createIds) || empty($updateIds)) {
+            $updateResult = $this->productAttributePriceRepository->updateOldPrice($oldPrices);
+            if (empty($createIds) || !$updateResult) {
                 throw new Exception();
             }
 
@@ -100,7 +84,7 @@ class ProductAttributePriceListPutApplicationService
         } catch (Exception $e) {
             DB::rollBack();
             Log::error($e);
-            throw new TransactionException('update product price fail!');
+            throw new TransactionException($e->getMessage());
         }
 
         return new ProductAttributePriceListPutResult();

@@ -71,7 +71,7 @@ class CustomerCurrentDebtGetApplicationService
             !is_null($debt->getPaymentId()) ? $debt->getPaymentId()->asString() : null,
             !is_null($debt->getOtherDebtId()) ? $debt->getOtherDebtId()->asString() : null,
             $debt->getNumberOfMoney(),
-            $debt->getUpdateDate(),
+            $debt->getUpdateDate()->asTimeStamps(),
             $debt->getMonetaryUnitType()->getValue(),
             $debt->getVersion()
         );

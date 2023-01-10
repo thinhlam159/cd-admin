@@ -12,6 +12,8 @@ use App\Bundle\ProductBundle\Application\CustomerDebtHistoryListGetApplicationSe
 use App\Bundle\ProductBundle\Application\CustomerDebtHistoryListGetCommand;
 use App\Bundle\ProductBundle\Application\DebtListGetApplicationService;
 use App\Bundle\ProductBundle\Application\DebtListGetCommand;
+use App\Bundle\ProductBundle\Application\DebtsCustomerExcelExportPostApplicationService;
+use App\Bundle\ProductBundle\Application\DebtsCustomerExcelExportPostCommand;
 use App\Bundle\ProductBundle\Application\PaymentPostApplicationService;
 use App\Bundle\ProductBundle\Application\PaymentPostCommand;
 use App\Bundle\ProductBundle\Application\VatPostApplicationService;
@@ -240,5 +242,168 @@ class DebtController extends BaseController
         ];
 
         return response()->json(['data' => $data], 200);
+    }
+
+    public function exportCustomerDebtsExcel(Request $request)
+    {
+        $application = new DebtsCustomerExcelExportPostApplicationService(
+            new DebtHistoryRepository(),
+            new CustomerRepository(),
+            new UserRepository()
+        );
+
+        $command = new DebtsCustomerExcelExportPostCommand(
+            $request->customer_id,
+            !empty($request->startDate) ? $request->startDate : null,
+            !empty($request->endDate) ? $request->endDate : null
+        );
+
+        $result = $application->handle($command);
+        $customerName = "Tên khách hàng: $result->customerName";
+
+        $template = [
+            [
+                0 => "CÔNG TY TNHH SẢN XUẤT VÀ XUẤT NHẬP KHẨU HƯNG THỊNH - NH",
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null,
+            ],
+            [
+                0 => "CHUYÊN SẢN XUẤT CÁC LOẠI BĂNG DÍNH",
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null,
+            ],
+            [
+                0 => "Địa chỉ: Số 145, Đường Đình Xuyên, Xã Đình Xuyên, Huyện Gia Lâm, TP. Hà Nội",
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null,
+            ],
+            [
+                0 => "ĐT: 0988.397.883 - 0987.594.704",
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null,
+            ],
+            [
+                0 => "STK: 100000958649 - Ngân hàng Viettinbank, CN Đông Hà Nội - Người thụ hưởng: Thạch Thị Thùy Hương",
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null,
+            ],
+            [
+                0 => null,
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null,
+            ],
+            [
+                0 => null,
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null,
+            ],
+            [
+                0 => "HÓA ĐƠN BÁN HÀNG",
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null,
+            ],
+            [
+                0 => $customerName,
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => "Điện thoại:",
+            ],
+            [
+                0 => "Địa chỉ:",
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null,
+            ],
+            [
+                0 => "STT",
+                1 => "Tên sản phẩm",
+                2 => 'ĐVT',
+                3 => 'Số lượng',
+                4 => 'Đơn giá',
+                5 => 'Thành tiền',
+            ]
+        ];
+        foreach ($result->debtResults as $key => $debtResult) {
+            $key ++;
+            $template[] = [
+                0 => $key,
+                1 => "$debtResult->productCode $orderProduct->productAttributeValueCode$orderProduct->attributeDisplayIndex",
+                2 => $debtResult->measureUnitType,
+                3 => $debtResult->weight,
+                4 => $debtResult->productAttributePriceStandard,
+                5 => $debtResult->productOrderCost,
+            ];
+        }
+        $footer = [
+            [
+                0 => "Tổng cộng",
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => $result->totalCost
+            ],
+            [
+                0 => "Số tiền bằng chữ",
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null
+            ],
+            [
+                0 => null,
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null
+            ],
+            [
+                0 => null,
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => "Ngày tháng năm 2022",
+                5 => null
+            ],
+            [
+                0 => null,
+                1 => 'Người mua hàng',
+                2 => null,
+                3 => null,
+                4 => 'Người bán hàng',
+                5 => null
+            ],
+        ];
+        $template = array_merge($template, $footer);
     }
 }
