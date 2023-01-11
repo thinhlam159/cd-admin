@@ -23,7 +23,7 @@ export const getCustomerDetailFromApi = async (customerId) => api.get(`${apiCons
 export const updateCustomerFormApi = async (userId, data) => api.put(`${apiConstants.ADMIN.UPDATE_CUSTOMER}/${userId}`, data)
 
 // product manage
-export const getListProductFromApi = async (page, category) => api.get(`${apiConstants.ADMIN.LIST_PRODUCT}?page=${page}&category=${category}`)
+export const getListProductFromApi = async (page, category) => api.get(`${apiConstants.ADMIN.LIST_PRODUCT}?page=${page}`, category)
 export const createProductFromApi = async (data) => await api.post(apiConstants.ADMIN.CREATE_PRODUCT, data, {
     headers: {
         "Content-Type": "multipart/form-data",
@@ -50,3 +50,25 @@ export const createProductAttributeValueFromApi = async (data) => await api.post
 //order
 export const getListOrderFromApi = async (page) => api.get(`${apiConstants.ADMIN.LIST_ORDER}?page=${page}`)
 export const createOrderFromApi = async (data) => await api.post(apiConstants.ADMIN.CREATE_ORDER, data)
+export const getOrderDetailFromApi = async (id) => await api.get(`${apiConstants.ADMIN.DETAIL_ORDER}/${id}`)
+
+// product attribute price
+export const getListProductAttributePriceFromApi = async () => api.get(`${apiConstants.ADMIN.LIST_PRODUCT_ATTRIBUTE_PRICES}`)
+
+export const exportOrderFromApi = async (data) => await api.post(apiConstants.ADMIN.EXPORT_ORDER, data,{responseType: 'blob'})
+
+export const getListImportGoodFromApi = async (params) => api.get(`${apiConstants.ADMIN.LIST_IMPORT_GOOD}`, {params})
+export const createImportGoodFromApi = async (data) => api.post(`${apiConstants.ADMIN.CREATE_IMPORT_GOOD}`, data)
+export const restoreImportGoodFromApi = async (id) => api.delete(`${apiConstants.ADMIN.RESTORE_IMPORT_GOOD}/${id}`)
+export const getImportGoodDetailFromApi = async (id) => await api.get(`${apiConstants.ADMIN.DETAIL_IMPORT_GOOD}/${id}`)
+export const createContainerOrderFromApi = async (data) => api.post(`${apiConstants.ADMIN.CREATE_CONTAINER_ORDER}`, data)
+export const createVatFromApi = async (data) => api.post(`${apiConstants.ADMIN.CREATE_VAT_DEBT}`, data)
+export const createPaymentFromApi = async (data) => api.post(`${apiConstants.ADMIN.CREATE_PAYMENT}`, data)
+
+// dealer
+export const getListDealerFromApi = async (page) => api.get(`${apiConstants.ADMIN.LIST_DEALER}?page=${page}`)
+
+export const getListDebtFromApi = async (params) => api.get(`${apiConstants.ADMIN.LIST_DEBT}`, {params})
+export const getListCustomerDebtFromApi = async (id, params) => api.get(`${apiConstants.ADMIN.LIST_CUSTOMER_DEBT}/${id}`, {params})
+export const getCustomerCurrentDebtFromApi = async (id) => api.get(`${apiConstants.ADMIN.CUSTOMER_CURRENT_DEBT}/${id}`)
+export const exportCustomerDebtHistoryFromApi = async (data) => api.get(`${apiConstants.ADMIN.CUSTOMER_CURRENT_DEBT}/${id}`)

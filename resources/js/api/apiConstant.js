@@ -28,10 +28,28 @@ export default {
 
     LIST_PRODUCT_ATTRIBUTE: 'admin/product-attributes',
     LIST_MEASURE_UNIT: 'admin/measure-unit',
+    LIST_PRODUCT_ATTRIBUTE_PRICES: 'admin/product-attribute-prices',
     CREATE_PRODUCT_ATTRIBUTE_VALUE: 'admin/product-attribute-value',
+    DOWNLOAD_USER_EXCEL: 'admin/users/export',
+    EXPORT_ORDER: 'admin/order/export-order',
 
     LIST_ORDER: 'admin/order/list-order',
-    CREATE_ORDER: 'admin/order/create-order'
+    CREATE_ORDER: 'admin/order/create-order',
+    DETAIL_ORDER: 'admin/order/detail-order',
+
+    LIST_IMPORT_GOOD: 'admin/import-good/import-goods',
+    CREATE_IMPORT_GOOD: 'admin/import-good/import-good',
+    RESTORE_IMPORT_GOOD: 'admin/import-good/restore-import-good',
+    DETAIL_IMPORT_GOOD: 'admin/import-good/detail-import-good',
+
+    LIST_DEALER: 'admin/dealer/dealers',
+
+    LIST_DEBT: 'admin/debt/list-debt',
+    LIST_CUSTOMER_DEBT: 'admin/debt/list-customer-debt',
+    CUSTOMER_CURRENT_DEBT: 'admin/debt/customer-current-debt',
+    CREATE_CONTAINER_ORDER: 'admin/debt/create-container-order',
+    CREATE_VAT_DEBT: 'admin/debt/create-vat-debt',
+    CREATE_PAYMENT: 'admin/debt/create-payment',
   }
 
   // ADMIN: "/admin/customer/user-manage",

@@ -25,7 +25,7 @@ final class ProductAttributePriceRepository implements IProductAttributePriceRep
             'is_current' => $productAttributePrice->isCurrent(),
         ]);
 
-        if(!$result) {
+        if (!$result) {
             throw new \Exception();
         }
 
@@ -123,5 +123,68 @@ final class ProductAttributePriceRepository implements IProductAttributePriceRep
         }
 
         return $productAttributePriceIds;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function findAll(): array
+    {
+        $entities = ModelProductAttributePrice::where('is_current', true)->get();
+        if (!$entities) {
+            return [];
+        }
+
+        $productAttributePrices = [];
+        foreach ($entities as $entity) {
+            $productAttributePrices[] = new ProductAttributePrice(
+                new ProductAttributePriceId($entity['id']),
+                new ProductAttributeValueId($entity['product_attribute_value_id']),
+                $entity['price'],
+                MonetaryUnitType::fromType((int)$entity['monetary_unit_type']),
+                NoticePriceType::fromType((int)$entity['notice_price_type']),
+                $entity['is_current']
+            );
+        }
+
+        return $productAttributePrices;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function findById(ProductAttributePriceId $productAttributePriceId): ?ProductAttributePrice
+    {
+        $entity = ModelProductAttributePrice::find($productAttributePriceId->asString());
+        if (!$entity) {
+            return null;
+        }
+
+        return new ProductAttributePrice(
+            new ProductAttributePriceId($entity['id']),
+            new ProductAttributeValueId($entity['product_attribute_value_id']),
+            $entity['price'],
+            MonetaryUnitType::fromType((int)$entity['monetary_unit_type']),
+            NoticePriceType::fromType((int)$entity['notice_price_type']),
+            $entity['is_current']
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function updateOldPrice(array $productAttributePrices): bool
+    {
+        foreach ($productAttributePrices as $productAttributePrice) {
+            $entity = ModelProductAttributePrice::find($productAttributePrice->getProductAttributePriceId());
+            $result = $entity->update([
+                'is_current' => $productAttributePrice->isCurrent(),
+            ]);
+            if (!$result) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

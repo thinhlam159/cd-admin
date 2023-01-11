@@ -105,4 +105,9 @@ final class ProductAttributePrice
     {
         return $this->isCurrent;
     }
+
+    public function getStandardPrice() : int
+    {
+        return $this->price / $this->noticePriceType->getAmountValue();
+    }
 }

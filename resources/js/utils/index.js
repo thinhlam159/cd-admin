@@ -16,7 +16,7 @@ export const convertFormData = (FormData, obj, object, nameObj) => {
 };
 
 export const convertDateByTimestamp = (timestamp) => {
-    return moment.unix(timestamp).format("YYYY年M月D日 (ddd) HH時mm分");
+    return moment.unix(timestamp).format('DD-MM-YYYY');
 };
 export const convertDate = (date) => {
     return moment(date).format("YYYY年M月D日 HH時mm分");

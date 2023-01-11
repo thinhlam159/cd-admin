@@ -2,16 +2,22 @@
 
 namespace App\Http\Controllers\Bundle\Api\Product;
 
-use App\Bundle\Admin\Application\CustomerDeleteCommand;
 use App\Bundle\Admin\Infrastructure\CustomerRepository;
+use App\Bundle\Admin\Infrastructure\DealerRepository;
 use App\Bundle\Admin\Infrastructure\UserRepository;
-use App\Bundle\Common\Domain\Model\InvalidArgumentException;
 use App\Bundle\ProductBundle\Application\DeliveryStatusPutApplicationService;
 use App\Bundle\ProductBundle\Application\DeliveryStatusPutCommand;
-use App\Bundle\ProductBundle\Application\MeasureUnitListGetApplicationService;
-use App\Bundle\ProductBundle\Application\MeasureUnitListGetCommand;
+use App\Bundle\ProductBundle\Application\ImportGoodGetApplicationService;
+use App\Bundle\ProductBundle\Application\ImportGoodGetCommand;
+use App\Bundle\ProductBundle\Application\ImportGoodListGetApplicationService;
+use App\Bundle\ProductBundle\Application\ImportGoodListGetCommand;
+use App\Bundle\ProductBundle\Application\ImportGoodPostApplicationService;
+use App\Bundle\ProductBundle\Application\ImportGoodPostCommand;
+use App\Bundle\ProductBundle\Application\ImportGoodProductCommand;
 use App\Bundle\ProductBundle\Application\OrderCancelPostApplicationService;
 use App\Bundle\ProductBundle\Application\OrderCancelPostCommand;
+use App\Bundle\ProductBundle\Application\OrderExportPostApplicationService;
+use App\Bundle\ProductBundle\Application\OrderExportPostCommand;
 use App\Bundle\ProductBundle\Application\OrderGetApplicationService;
 use App\Bundle\ProductBundle\Application\OrderGetCommand;
 use App\Bundle\ProductBundle\Application\OrderListGetApplicationService;
@@ -19,33 +25,22 @@ use App\Bundle\ProductBundle\Application\OrderListGetCommand;
 use App\Bundle\ProductBundle\Application\OrderPostApplicationService;
 use App\Bundle\ProductBundle\Application\OrderPostCommand;
 use App\Bundle\ProductBundle\Application\OrderProductCommand;
-use App\Bundle\ProductBundle\Application\ProductAttributeListGetApplicationService;
-use App\Bundle\ProductBundle\Application\ProductAttributeListGetCommand;
-use App\Bundle\ProductBundle\Application\ProductAttributePriceCommand;
-use App\Bundle\ProductBundle\Application\ProductAttributePriceListPutApplicationService;
-use App\Bundle\ProductBundle\Application\ProductAttributePriceListPutCommand;
-use App\Bundle\ProductBundle\Application\ProductAttributeValueListGetApplicationService;
-use App\Bundle\ProductBundle\Application\ProductAttributeValueListGetCommand;
-use App\Bundle\ProductBundle\Application\ProductAttributeValuePostApplicationService;
-use App\Bundle\ProductBundle\Application\ProductAttributeValuePostCommand;
-use App\Bundle\ProductBundle\Application\ProductPutApplicationService;
-use App\Bundle\ProductBundle\Application\ProductPutCommand;
-use App\Bundle\ProductBundle\Infrastructure\CategoryRepository;
-use App\Bundle\ProductBundle\Infrastructure\FeatureImagePathRepository;
-use App\Bundle\ProductBundle\Infrastructure\MeasureUnitRepository;
+use App\Bundle\ProductBundle\Application\RestoreImportGoodPutApplicationService;
+use App\Bundle\ProductBundle\Application\RestoreImportGoodPutCommand;
+use App\Bundle\ProductBundle\Infrastructure\DebtHistoryRepository;
+use App\Bundle\ProductBundle\Infrastructure\ImportGoodRepository;
 use App\Bundle\ProductBundle\Infrastructure\OrderRepository;
 use App\Bundle\ProductBundle\Infrastructure\ProductAttributePriceRepository;
-use App\Bundle\ProductBundle\Infrastructure\ProductAttributeRepository;
 use App\Bundle\ProductBundle\Infrastructure\ProductAttributeValueRepository;
 use App\Bundle\ProductBundle\Infrastructure\ProductInventoryRepository;
 use App\Bundle\ProductBundle\Infrastructure\ProductRepository;
+use App\Exports\OrderExport;
 use App\Http\Controllers\Bundle\Api\Common\BaseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
 
-final class OrderController extends BaseController
+class OrderController extends BaseController
 {
     /**
      * @param Request $request request
@@ -56,8 +51,9 @@ final class OrderController extends BaseController
             new OrderRepository(),
             new CustomerRepository(),
             new UserRepository(),
-            new ProductAttributeValueRepository(),
+            new ProductAttributePriceRepository(),
             new ProductInventoryRepository(),
+            new DebtHistoryRepository()
         );
 
         $orderProducts = $request->order_products;
@@ -66,14 +62,18 @@ final class OrderController extends BaseController
             $orderProductCommands[] = new OrderProductCommand(
                 $orderProduct['product_id'],
                 $orderProduct['product_attribute_value_id'],
+                (int)$orderProduct['attribute_display_index'],
                 $orderProduct['product_attribute_price_id'],
-                $orderProduct['count'],
+                (int)$orderProduct['count'],
+                $orderProduct['measure_unit_type'],
+                (int)$orderProduct['weight'],
             );
         }
 
         $command = new OrderPostCommand(
             $request->customer_id,
             Auth::id(),
+            $request->date,
             $orderProductCommands
         );
 
@@ -95,7 +95,8 @@ final class OrderController extends BaseController
             new CustomerRepository(),
             new UserRepository(),
             new ProductAttributeValueRepository(),
-            new ProductInventoryRepository(),
+            new ProductAttributePriceRepository(),
+            new ProductRepository(),
         );
 
         $command = new OrderListGetCommand();
@@ -112,7 +113,16 @@ final class OrderController extends BaseController
                     'product_id' => $orderProductResult->productId,
                     'product_attribute_value_id' => $orderProductResult->productAttributeValueId,
                     'product_attribute_price_id' => $orderProductResult->productAttributePriceId,
+                    'measure_unit_type' => $orderProductResult->measureUnitType,
+                    'weight' => $orderProductResult->weight,
+                    'attribute_display_index' => $orderProductResult->count,
+                    'notice_price_type' => $orderProductResult->noticePriceType,
+                    'price' => $orderProductResult->price,
+                    'cost' => $orderProductResult->cost,
                     'count' => $orderProductResult->count,
+                    'product_attribute_value_code' => $orderProductResult->productAttributeValueCode,
+                    'product_name' => $orderProductResult->productName,
+                    'product_code' => $orderProductResult->productCode,
                 ];
             }
             $data[] = [
@@ -121,8 +131,11 @@ final class OrderController extends BaseController
                 'user_id' => $orderResult->userId,
                 'delivery_status' => $orderResult->deliveryStatus,
                 'payment_status' => $orderResult->paymentStatus,
+                'updated_at' => $orderResult->updatedAt,
+                'customer_name' => $orderResult->customerName,
+                'user_name' => $orderResult->userName,
                 'order_products' => $orderProducts,
-                'update_at' => $orderResult->updateAt,
+                'total_cost' => $orderResult->totalCost
             ];
         }
         $response = [
@@ -148,11 +161,12 @@ final class OrderController extends BaseController
             new CustomerRepository(),
             new UserRepository(),
             new ProductAttributeValueRepository(),
-            new ProductInventoryRepository(),
+            new ProductAttributePriceRepository(),
+            new ProductRepository(),
         );
 
         $command = new OrderGetCommand(
-            $request->order_id
+            $request->id
         );
         $result = $applicationService->handle($command);
 
@@ -164,17 +178,29 @@ final class OrderController extends BaseController
                     'product_id' => $orderProductResult->productId,
                     'product_attribute_value_id' => $orderProductResult->productAttributeValueId,
                     'product_attribute_price_id' => $orderProductResult->productAttributePriceId,
+                    'measure_unit_type' => $orderProductResult->measureUnitType,
+                    'weight' => $orderProductResult->weight,
+                    'attribute_display_index' => $orderProductResult->attributeDisplayIndex,
+                    'notice_price_type' => $orderProductResult->noticePriceType,
+                    'price' => $orderProductResult->price,
+                    'cost' => $orderProductResult->cost,
                     'count' => $orderProductResult->count,
+                    'product_attribute_value_code' => $orderProductResult->productAttributeValueCode,
+                    'product_name' => $orderProductResult->productName,
+                    'product_code' => $orderProductResult->productCode,
                 ];
             }
-            $data[] = [
+            $data = [
                 'order_id' => $result->orderId,
                 'customer_id' => $result->customerId,
+                'customer_name' => $result->customerName,
                 'user_id' => $result->userId,
+                'user_name' => $result->userName,
                 'delivery_status' => $result->deliveryStatus,
                 'payment_status' => $result->paymentStatus,
+                'update_at' => $result->updatedAt,
                 'order_products' => $orderProducts,
-                'update_at' => $result->updateAt,
+                'total_cost' => $result->totalCost,
             ];
 
         return response()->json(['data' => $data], 200);
@@ -252,121 +278,38 @@ final class OrderController extends BaseController
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      * @throws \App\Bundle\Common\Domain\Model\RecordNotFoundException
-     * @throws \App\Bundle\Common\Domain\Model\TransactionException
      */
-    public function updateProduct(Request $request) {
-        $applicationService = new ProductPutApplicationService(
-            new ProductRepository(),
-            new ProductAttributeValueRepository(),
-            new ProductAttributePriceRepository(),
-            new ProductInventoryRepository(),
-            new CategoryRepository()
-        );
-
-        //handle image
-        $base64File = $request->file;
-        $extension = explode('/', explode(':', substr($base64File, 0, strpos($base64File, ';')))[1])[1];
-        $replace = substr($base64File, 0, strpos($base64File, ',')+1);
-        $image = str_replace($replace, '', $base64File);
-        $image = str_replace(' ', '+', $image);
-        $imageName = 'images/'.Str::random(10).'.'.$extension;
-        Storage::disk('public')->put($imageName, base64_decode($image));
-        $url = Storage::url($imageName);
-        $path = Storage::path($imageName);
-
-        $isAvatar = true;
-        $command = new ProductPutCommand(
-            $request->id,
-            $request->name,
-            $request->code,
-            $request->description,
-            $request->price,
-            $request->monetary_unit,
-            $request->category_id,
-            $request->measure_unit_id,
-            $request->product_attribute_id,
-            $request->product_attribute_value,
-            $request->product_attribute_code,
-            $path,
-            $isAvatar
-        );
-        $result = $applicationService->handle($command);
-
-        return response()->json(['product_id' => $result->productId], 200);
-    }
-
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \App\Bundle\Common\Domain\Model\RecordNotFoundException
-     * @throws \App\Bundle\Common\Domain\Model\TransactionException
-     */
-    public function deleteProduct(Request $request) {
-        $applicationService = new ProductDeleteApplicationService(
-            new ProductRepository(),
-        );
-        $command = new CustomerDeleteCommand($request->id);
-
-        $result = $applicationService->handle($command);
-
-        return response()->json(['data' => []], 200);
-    }
-
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \App\Bundle\Common\Domain\Model\RecordNotFoundException
-     * @throws \App\Bundle\Common\Domain\Model\TransactionException
-     */
-    public function getProductAttributes(Request $request) {
-        $applicationService = new ProductAttributeListGetApplicationService(
-            new ProductAttributeRepository()
-        );
-
-        $command = new ProductAttributeListGetCommand();
-        $result = $applicationService->handle($command);
-
-        $data = [];
-        foreach ($result->productAttributeResults as $productAttributeResult) {
-            $data[] = [
-                'id' => $productAttributeResult->productAttributeId,
-                'name' => $productAttributeResult->name,
-            ];
-        }
-
-        return response()->json(['data' => $data], 200);
-    }
-
-    public function createAttributeValueForProduct(Request $request)
+    public function createImportGood(Request $request)
     {
-        $applicationService = new ProductAttributeValuePostApplicationService(
-            new ProductAttributeValueRepository(),
-            new FeatureImagePathRepository(),
-            new ProductAttributePriceRepository(),
+        $applicationService = new ImportGoodPostApplicationService(
+            new ImportGoodRepository(),
             new ProductInventoryRepository()
         );
-        $file = $request->file('file');
-        if (!$file) {
-            throw new InvalidArgumentException();
-        }
-        $file->hashName();
-        $path = Storage::put('/public/'. Auth::id(), $file);
-        $url = Storage::url($path);
 
-        $command = new ProductAttributeValuePostCommand(
-            $request->product_id,
-            $request->product_attribute_id,
-            $request->measure_unit_id,
-            $request->value,
-            $request->code,
-            $url,
-            (int)$request->price,
-            (int)$request->count,
+        $importGoodProducts = $request->import_good_products;
+        $importGoodProductCommands = [];
+        foreach ($importGoodProducts as $importGoodProduct) {
+            $importGoodProductCommands[] = new ImportGoodProductCommand(
+                $importGoodProduct['product_id'],
+                $importGoodProduct['product_attribute_value_id'],
+//                $importGoodProduct['price'],
+                1,
+//                $importGoodProduct['monetary_unit_type'],
+                'vnd',
+                $importGoodProduct['count'],
+                $importGoodProduct['measure_unit_type'],
+            );
+        }
+        $command = new ImportGoodPostCommand(
+            Auth::id(),
+            $importGoodProductCommands,
+            $request->date
         );
 
         $result = $applicationService->handle($command);
-        $data = [
-            'id' => $result->productAttributeValueId,
+
+        $data[] = [
+            'import_good_id' => $result->importGoodId,
         ];
 
         return response()->json(['data' => $data], 200);
@@ -376,92 +319,305 @@ final class OrderController extends BaseController
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      * @throws \App\Bundle\Common\Domain\Model\RecordNotFoundException
-     * @throws \App\Bundle\Common\Domain\Model\TransactionException
      */
-    public function getMeasureUnit(Request $request) {
-        $applicationService = new MeasureUnitListGetApplicationService(
-            new MeasureUnitRepository()
-        );
-
-        $command = new MeasureUnitListGetCommand();
-        $result = $applicationService->handle($command);
-
-        $data = [];
-        foreach ($result->measureUnitResults as $measureUnitResult) {
-            $data[] = [
-                'id' => $measureUnitResult->measureUnitId,
-                'name' => $measureUnitResult->name,
-            ];
-        }
-
-        return response()->json(['data' => $data], 200);
-    }
-
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function getProductAttributeValues(Request $request) {
-        $applicationService = new ProductAttributeValueListGetApplicationService(
-            new ProductAttributeValueRepository(),
-            new ProductAttributePriceRepository(),
-            new ProductInventoryRepository(),
-            new ProductAttributeRepository(),
-        );
-
-        $command = new ProductAttributeValueListGetCommand(
-            $request->productId ?? null
-        );
-        $result = $applicationService->handle($command);
-
-        $data = [];
-        foreach ($result->productAttributeValueResults as $productAttributeValueResult) {
-            $data[] = [
-                'id' => $productAttributeValueResult->productAttributeValueId,
-                'product_id' => $productAttributeValueResult->productId,
-                'product_attribute_name' => $productAttributeValueResult->productAttributeName,
-                'product_attribute_value' => $productAttributeValueResult->productAttributeValue,
-                'code' => $productAttributeValueResult->code,
-                'measure_unit' => $productAttributeValueResult->measureUnit,
-                'inventory_count' => $productAttributeValueResult->productInventoryCount,
-                'price' => $productAttributeValueResult->price,
-                'monetary' => $productAttributeValueResult->monetaryUnit,
-                'notice_price_type' => $productAttributeValueResult->noticePriceType,
-            ];
-        }
-
-        return response()->json(['data' => $data], 200);
-    }
-
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     * @throws InvalidArgumentException
-     * @throws \App\Bundle\Common\Domain\Model\TransactionException
-     */
-    public function updateProductAttributeValuePrice(Request $request)
+    public function getImportGoods(Request $request)
     {
-        $applicationService = new ProductAttributePriceListPutApplicationService(
-            new ProductAttributeValueRepository(),
-            new ProductAttributePriceRepository(),
+        $applicationService = new ImportGoodListGetApplicationService(
+            new ImportGoodRepository(),
             new ProductInventoryRepository(),
-            new ProductAttributeRepository(),
+            new ProductAttributeValueRepository(),
+            new ProductRepository(),
+            new DealerRepository(),
+            new UserRepository(),
         );
-        $productAttributeValuePriceCommands = [];
-        $productAttributeValuePrices = !empty($request->product_attribute_value_price) ? $request->product_attribute_value_price : [];
-        foreach ($productAttributeValuePrices as $productAttributeValuePrice) {
-            $productAttributeValuePriceCommands[] = new ProductAttributePriceCommand(
-                $productAttributeValuePrice->product_attribute_price_id,
-                $productAttributeValuePrice->product_attribute_value_id,
-                $productAttributeValuePrice->price,
-                $productAttributeValuePrice->notice_price_type,
-            );
-        }
-        $command = new ProductAttributePriceListPutCommand(
-            $productAttributeValuePriceCommands
+
+        $command = new ImportGoodListGetCommand(
+            !empty($request->product_id) ? $request->product_id : null,
+            !empty($request->dealer_id) ? $request->dealer_id : null,
+            !empty($request->product_attribute_value_id) ? $request->product_attribute_value_id : null,
+            !empty($request->keyword) ? $request->keyword : null,
+            !empty($request->sort) ? $request->sort : null,
+            !empty($request->order) ? $request->order : null,
+            !empty($request->start_date) ? $request->start_date : null,
+            !empty($request->end_date) ? $request->end_date : null,
         );
         $result = $applicationService->handle($command);
 
-        return response()->json(['data' => []], 200);
+        $data = [];
+        foreach ($result->importGoodResults as $importGoodResult) {
+            $importGoodProducts = [];
+            foreach ($importGoodResult->importGoodProductResults as $importGoodProductResult) {
+                $importGoodProducts[] = [
+                    'import_good_product_id' => $importGoodProductResult->importGoodProductId,
+                    'product_id' => $importGoodProductResult->productId,
+                    'product_name' => $importGoodProductResult->productName,
+                    'product_code' => $importGoodProductResult->productCode,
+                    'product_attribute_value_id' => $importGoodProductResult->productAttributeValueId,
+                    'product_attribute_value_name' => $importGoodProductResult->productName,
+                    'product_attribute_value_code' => $importGoodProductResult->productAttributeValueCode,
+                    'import_good_product_price' => $importGoodProductResult->importGoodPrice,
+                    'monetary_unit_type' => $importGoodProductResult->monetaryUnitType,
+                    'count' => $importGoodProductResult->count,
+                    'measure_unit_type' => $importGoodProductResult->measureUnitType,
+                ];
+            }
+            $data[] = [
+                'import_good_id' => $importGoodResult->importGoodId,
+                'dealer_id' => $importGoodResult->dealerId,
+                'dealer_name' => $importGoodResult->dealerName,
+                'user_id' => $importGoodResult->userId,
+                'user_name' => $importGoodResult->userName,
+                'import_good_date' => $importGoodResult->importGoodDate,
+                'import_good_products' => $importGoodProducts
+            ];
+        }
+        $paginationResult = $result->paginationResult;
+
+        $response = [
+            'data' => $data,
+            'pagination' => [
+                'total_page' => $paginationResult->totalPage,
+                'per_page' => $paginationResult->perPage,
+                'current_page' => $paginationResult->currentPage,
+            ],
+        ];
+
+        return response()->json($response, 200);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \App\Bundle\Common\Domain\Model\RecordNotFoundException
+     */
+    public function getImportGood(Request $request)
+    {
+        $applicationService = new ImportGoodGetApplicationService(
+            new ImportGoodRepository(),
+            new ProductInventoryRepository(),
+            new ProductAttributeValueRepository(),
+            new ProductRepository(),
+            new DealerRepository(),
+            new UserRepository(),
+        );
+
+        $command = new ImportGoodGetCommand($request->id);
+        $result = $applicationService->handle($command);
+
+        $importGoodProducts = [];
+        foreach ($result->importGoodProductResults as $importGoodProductResult) {
+            $importGoodProducts[] = [
+                'import_good_product_id' => $importGoodProductResult->importGoodProductId,
+                'product_id' => $importGoodProductResult->productId,
+                'product_name' => $importGoodProductResult->productName,
+                'product_code' => $importGoodProductResult->productCode,
+                'product_attribute_value_id' => $importGoodProductResult->productAttributeValueId,
+                'product_attribute_value_name' => $importGoodProductResult->productName,
+                'product_attribute_value_code' => $importGoodProductResult->productAttributeValueCode,
+                'import_good_product_price' => $importGoodProductResult->importGoodPrice,
+                'monetary_unit_type' => $importGoodProductResult->monetaryUnitType,
+                'count' => $importGoodProductResult->count,
+                'measure_unit_type' => $importGoodProductResult->measureUnitType,
+            ];
+        }
+        $data = [
+            'import_good_id' => $result->importGoodId,
+            'dealer_id' => $result->dealerId,
+            'dealer_name' => $result->dealerName,
+            'user_id' => $result->userId,
+            'user_name' => $result->userName,
+            'import_good_date' => $result->importGoodDate,
+            'import_good_products' => $importGoodProducts
+        ];
+
+        return response()->json(['data' => $data], 200);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \App\Bundle\Common\Domain\Model\InvalidArgumentException
+     * @throws \App\Bundle\Common\Domain\Model\TransactionException
+     */
+    public function restoreImportGood(Request $request)
+    {
+        $applicationService = new RestoreImportGoodPutApplicationService(
+            new ImportGoodRepository(),
+            new ProductInventoryRepository()
+        );
+
+        $command = new RestoreImportGoodPutCommand($request->id);
+        $result = $applicationService->handle($command);
+
+        $data[] = [
+            'import_good_id' => $result->importGood,
+        ];
+
+        return response()->json(['data' => $data], 200);
+    }
+
+    public function exportOrder(Request $request)
+    {
+        $applicationService = new OrderExportPostApplicationService(
+            new OrderRepository(),
+            new CustomerRepository(),
+            new ProductAttributeValueRepository(),
+            new ProductAttributePriceRepository(),
+            new ProductRepository()
+        );
+
+        $command = new OrderExportPostCommand(
+            $request->order_id,
+        );
+
+        $result = $applicationService->handle($command);
+        $customerName = "Tên khách hàng: $result->customerName";
+
+        $template = [
+            [
+                0 => "CÔNG TY TNHH SẢN XUẤT VÀ XUẤT NHẬP KHẨU HƯNG THỊNH - NH",
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null,
+            ],
+            [
+                0 => "CHUYÊN SẢN XUẤT CÁC LOẠI BĂNG DÍNH",
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null,
+            ],
+            [
+                0 => "Địa chỉ: Số 145, Đường Đình Xuyên, Xã Đình Xuyên, Huyện Gia Lâm, TP. Hà Nội",
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null,
+            ],
+            [
+                0 => "ĐT: 0988.397.883 - 0987.594.704",
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null,
+            ],
+            [
+                0 => "STK: 100000958649 - Ngân hàng Viettinbank, CN Đông Hà Nội - Người thụ hưởng: Thạch Thị Thùy Hương",
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null,
+            ],
+            [
+                0 => null,
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null,
+            ],
+            [
+                0 => null,
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null,
+            ],
+            [
+                0 => "HÓA ĐƠN BÁN HÀNG",
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null,
+            ],
+            [
+                0 => $customerName,
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => "Điện thoại:",
+            ],
+            [
+                0 => "Địa chỉ:",
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null,
+            ],
+            [
+                0 => "STT",
+                1 => "Tên sản phẩm",
+                2 => 'ĐVT',
+                3 => 'Số lượng',
+                4 => 'Đơn giá',
+                5 => 'Thành tiền',
+            ]
+        ];
+        foreach ($result->orderProductExportResults as $key => $orderProduct) {
+            $key ++;
+            $template[] = [
+                0 => $key,
+                1 => "$orderProduct->productCode $orderProduct->productAttributeValueCode$orderProduct->attributeDisplayIndex",
+                2 => $orderProduct->measureUnitType,
+                3 => $orderProduct->weight,
+                4 => $orderProduct->productAttributePriceStandard,
+                5 => $orderProduct->productOrderCost,
+            ];
+        }
+        $footer = [
+            [
+                0 => "Tổng cộng",
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => $result->totalCost
+            ],
+            [
+                0 => "Số tiền bằng chữ",
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null
+            ],
+            [
+                0 => null,
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null
+            ],
+            [
+                0 => null,
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => "Ngày tháng năm 2022",
+                5 => null
+            ],
+            [
+                0 => null,
+                1 => 'Người mua hàng',
+                2 => null,
+                3 => null,
+                4 => 'Người bán hàng',
+                5 => null
+            ],
+        ];
+        $template = array_merge($template, $footer);
+        $orderExport = new OrderExport($template);
+        return Excel::download($orderExport, "dfsf.xlsx");
     }
 }

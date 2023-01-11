@@ -5,6 +5,7 @@ import auth from "./modules/auth";
 import common from "./modules/common";
 import product from "./modules/product";
 import order from "@/store/modules/order";
+import importGood from "@/store/modules/importGood";
 
 const store = createStore({
     modules: {
@@ -13,6 +14,7 @@ const store = createStore({
         [MODULE_STORE.COMMON.NAME]: common,
         [MODULE_STORE.PRODUCT.NAME]: product,
         [MODULE_STORE.ORDER.NAME]: order,
+        [MODULE_STORE.IMPORT_GOOD.NAME]: importGood,
     },
 });
 

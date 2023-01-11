@@ -22,7 +22,6 @@ final class ProductAttributeValueRepository implements IProductAttributeValueRep
             'id' => $productAttributeValue->getProductAttributeValueId()->asString(),
             'product_id' => $productAttributeValue->getProductId()->asString(),
             'product_attribute_id' => $productAttributeValue->getProductAttributeId()->asString(),
-            'measure_unit_id' => $productAttributeValue->getMeasureUnitId()->asString(),
             'value' => $productAttributeValue->getValue(),
             'code' => $productAttributeValue->getCode(),
         ]);
@@ -39,16 +38,14 @@ final class ProductAttributeValueRepository implements IProductAttributeValueRep
     public function findById(ProductAttributeValueId $productAttributeValueId): ?ProductAttributeValue
     {
         $entity = ModelProductAttributeValue::find($productAttributeValueId->asString());
-
         if (!$entity) {
             return null;
         }
 
         return new ProductAttributeValue(
             new ProductAttributeValueId($entity['id']),
-            new ProductId($entity['id']),
-            new ProductAttributeId($entity['id']),
-            new MeasureUnitId($entity['id']),
+            new ProductId($entity['product_id']),
+            new ProductAttributeId($entity['product_attribute_id']),
             $entity['value'],
             $entity['code'],
             null,
@@ -69,7 +66,6 @@ final class ProductAttributeValueRepository implements IProductAttributeValueRep
                 new ProductAttributeValueId($entity['id']),
                 new ProductId($entity['product_id']),
                 new ProductAttributeId($entity['product_attribute_id']),
-                new MeasureUnitId($entity['measure_unit_id']),
                 $entity['value'],
                 $entity['code'],
                 null,

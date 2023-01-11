@@ -33,9 +33,54 @@ class OrderProductResult
     public string $productAttributePriceId;
 
     /**
+     * @var int
+     */
+    public int $count;
+
+    /**
      * @var string
      */
-    public string $count;
+    public string $measureUnitType;
+
+    /**
+     * @var int
+     */
+    public int $weight;
+
+    /**
+     * @var int
+     */
+    public int $attributeDisplayIndex;
+
+    /**
+     * @var string
+     */
+    public string $noticePriceType;
+
+    /**
+     * @var int
+     */
+    public int $price;
+
+    /**
+     * @var int
+     */
+    public int $cost;
+
+    /**
+     * @var string
+     */
+    public string $productAttributeValueCode;
+
+    /**
+     * @var string
+     */
+    public string $productName;
+
+    /**
+     * @var string
+     */
+    public string $productCode;
 
     /**
      * @param string $orderProductId
@@ -43,9 +88,18 @@ class OrderProductResult
      * @param string $productId
      * @param string $productAttributeValueId
      * @param string $productAttributePriceId
-     * @param string $count
+     * @param int $count
+     * @param string $measureUnitType
+     * @param int $weight
+     * @param int $attributeDisplayIndex
+     * @param string $noticePriceType
+     * @param int $price
+     * @param int $cost
+     * @param string $productAttributeValueCode
+     * @param string $productName
+     * @param string $productCode
      */
-    public function __construct(string $orderProductId, string $orderId, string $productId, string $productAttributeValueId, string $productAttributePriceId, string $count)
+    public function __construct(string $orderProductId, string $orderId, string $productId, string $productAttributeValueId, string $productAttributePriceId, int $count, string $measureUnitType, int $weight, int $attributeDisplayIndex, string $noticePriceType, int $price, int $cost, string $productAttributeValueCode, string $productName, string $productCode)
     {
         $this->orderProductId = $orderProductId;
         $this->orderId = $orderId;
@@ -53,5 +107,14 @@ class OrderProductResult
         $this->productAttributeValueId = $productAttributeValueId;
         $this->productAttributePriceId = $productAttributePriceId;
         $this->count = $count;
+        $this->measureUnitType = $measureUnitType;
+        $this->weight = $weight;
+        $this->attributeDisplayIndex = $attributeDisplayIndex;
+        $this->noticePriceType = $noticePriceType;
+        $this->price = $price;
+        $this->cost = $cost;
+        $this->productAttributeValueCode = $productAttributeValueCode;
+        $this->productName = $productName;
+        $this->productCode = $productCode;
     }
 }

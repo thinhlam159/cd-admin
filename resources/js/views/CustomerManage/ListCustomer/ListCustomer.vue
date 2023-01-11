@@ -16,7 +16,7 @@
         <thead>
           <tr class="">
             <th class="border py-1 w-[5%]">
-                id
+                #
             </th>
             <th class="border py-1 w-[20%]">
               Tên
@@ -43,35 +43,35 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="item in listCustomer" :key="item.id">
-              <td class="border text-center">{{ item.user_id }}</td>
-              <td class="border text-center">{{ item.user_name }}</td>
-              <td class="border text-center">
-              <span class="text-[#337ab7] cursor-pointer break-all" @click="() => goToAdd(item.user_id)">
-                {{ item.user_email }}
-              </span>
-              </td>
-              <td class="border text-center">{{ item.phone }}</td>
-              <td class="border text-center">{{ item.status ? 'Hoạt động' : '-' }}</td>
-<!--            <td class="border text-center">-->
-<!--              {{ $t(`list_user_manage_page.${item.user_type}`) }}-->
-<!--            </td>-->
-<!--            <td class="border text-center">-->
-<!--              <span class="text-[green]" v-if="item.user_active">{{ $t("common.effectiveness") }}</span>-->
-<!--              <span class="text-[red]" v-else>{{ $t("common.invalid") }}</span>-->
-<!--            </td>-->
-<!--            <td class="border text-center p-2">-->
-<!--              {{ item.register_date }}-->
-<!--            </td>-->
-<!--            <td class="border text-center p-2">-->
-<!--              {{ item.login_last_date }}-->
-<!--            </td>-->
-<!--            <td class="border text-center">{{ item.field9 }}</td>-->
-            <td class="border text-center">
-                <div class="flex justify-center ">
-                    <ButtonEdit @clickBtn="() => goToAdd(item.user_id)" :text="editUser"/>
-                </div>
-            </td>
+        <tr v-for="(item, index) in listCustomer" :key="index">
+          <td class="border text-center">{{ ++index }}</td>
+          <td class="border text-center">{{ item.customer_name }}</td>
+          <td class="border text-center">
+            <span class="text-[#337ab7] cursor-pointer break-all" @click="() => goToAdd(item.customer_id)">
+              {{ item.customer_email }}
+            </span>
+          </td>
+          <td class="border text-center">{{ item.phone }}</td>
+          <td class="border text-center">{{ item.status ? 'Hoạt động' : '-' }}</td>
+          <!--            <td class="border text-center">-->
+          <!--              {{ $t(`list_user_manage_page.${item.user_type}`) }}-->
+          <!--            </td>-->
+          <!--            <td class="border text-center">-->
+          <!--              <span class="text-[green]" v-if="item.user_active">{{ $t("common.effectiveness") }}</span>-->
+          <!--              <span class="text-[red]" v-else>{{ $t("common.invalid") }}</span>-->
+          <!--            </td>-->
+          <!--            <td class="border text-center p-2">-->
+          <!--              {{ item.register_date }}-->
+          <!--            </td>-->
+          <!--            <td class="border text-center p-2">-->
+          <!--              {{ item.login_last_date }}-->
+          <!--            </td>-->
+          <!--            <td class="border text-center">{{ item.field9 }}</td>-->
+          <td class="border text-center">
+            <div class="flex justify-center ">
+              <ButtonEdit @clickBtn="() => goToAdd(item.user_id)" :text="editUser"/>
+            </div>
+          </td>
           </tr>
         </tbody>
       </table>

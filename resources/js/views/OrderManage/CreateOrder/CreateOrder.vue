@@ -1,6 +1,6 @@
 <template>
-  <div class="w-full h-full relative">
-    <div class="w-full pt-14 h-full absolute left-20">
+  <div class="w-full h-full">
+    <div class="w-full pt-14 h-full pl-10">
       <div class="w-full py-6 py-auto text-xl">
         <span class="text-gray-500">Thêm sản phẩm</span>
         <hr>
@@ -22,49 +22,38 @@
           <div class="mr-4 w-[14%]">
             <span>Sản phẩm</span>
           </div>
-          <div class="mr-4 w-[14%]">
+          <div class="mr-4 w-[10%]">
             <span>Mã sản phẩm</span>
           </div>
-          <div class="mr-4 w-[14%]">
-            <span>Báo giá</span>
+          <div class="mr-4 w-[10%]">
+            <span>Tên sản phẩm</span>
           </div>
-          <div class="mr-4 w-[14%]">
+          <div class="mr-4 w-[5%]">
+            <span>Giá</span>
+          </div>
+          <div class="mr-4 w-[10%]">
             <span>Số lượng</span>
           </div>
-          <div class="mr-4 w-[14%]">
+          <div class="mr-4 w-[10%]">
             <span>Thành tiền</span>
           </div>
           <div class="mr-4 w-[5%]">
             <span>Xóa sp</span>
           </div>
         </div>
-<!--        <div class="h-48 my-4">-->
-<!--          <img class="h-full w-auto .object-contain" id="blah" :src="imageUrl" alt="your image" />-->
-<!--        </div>-->
-<!--        <div>-->
-<!--          <input-->
-<!--            type="file"-->
-<!--            @change="onFileChanged"-->
-<!--            accept="image/*"-->
-<!--            ref="file"-->
-<!--          />-->
-<!--        </div>-->
-<!--        <div>-->
-<!--          <label for="description" class="block mb-1 font-bold text-sm">Mô tả</label>-->
-<!--          <textarea name="price" placeholder="Nhập giá sp" v-model="formData.description"-->
-<!--                    class="w-full h-10 px-3 text-base text-gray-700 placeholder-gray-400 border border-gray-400"-->
-<!--          ></textarea>-->
-<!--        </div>-->
-        <input-item v-for="(item, index) in listInputItem" key="index"
-                    :categories="categories"
-                    :customers="customers"
-                    :products="products"
-                    @handle-remove-input-item="handleRemoveInputItem(item, index)"
-                    :index="index"
-        />
+        <div v-if="renderComponent">
+          <input-item v-for="(item, index) in listInputItem" :key="index"
+                      @handle-remove-input-item="handleRemoveInputItem({item, index})"
+                      @update-display="forceUpdate"
+                      :item="item"
+                      :index="index"
+                      :categories="categories"
+                      :products="products"
+          />
+        </div>
 
         <div class="ml-2 my-4">
-          <ButtonAddNew @clickBtn="handleAddToOrder" :text="' '"/>
+          <ButtonAddNew @clickBtn="handleAddToOrder" :text="'Sản phẩm'"/>
         </div>
         <div class="pr-4">
           <input class="w-25 h-10 mt-5 px-3 text-base text-gray-700 placeholder-gray-400 bg-green-400 cursor-pointer" type="submit" value="Tạo đơn">
@@ -77,8 +66,7 @@
 <script>
 import {useRouter} from "vue-router";
 import {useStore} from "vuex";
-import {ref} from "vue";
-import logoTimeSharing from "@/assets/images/default-thumbnail.jpg";
+import {ref, nextTick} from "vue";
 import {
   createOrderFromApi,
   createProductFromApi,
@@ -93,11 +81,23 @@ import ButtonAddNew from "@/components/Buttons/ButtonAddNew";
 export default {
   name: "CreateOrder",
   components: { InputItem, ButtonAddNew },
+  methods: {
+    forceUpdate() {
+      this.renderComponent = false
+      this.$nextTick(() => {
+        this.renderComponent = true
+      })
+    }
+  },
+  data() {
+    return {
+      renderComponent: true
+    }
+  },
   setup() {
     const router = useRouter()
     const store = useStore()
     const formData = ref({})
-    const file = ref(null)
     const categories = ref({})
     const customers = ref({})
     const products = ref({})
@@ -105,9 +105,7 @@ export default {
     const productSelected = ref({})
     const productAttributeValues = ref({})
     const productAttributeValuesByProduct = ref({})
-    const listInputItem = ref([
-      {}
-    ])
+    const listInputItem = ref(store.state[MODULE_STORE.ORDER.NAME].orderPostData)
 
     const handleSubmit = async (data) => {
       try {
@@ -142,6 +140,7 @@ export default {
           ]
         }, [])
         formData.value.category = res.data[0].category_id
+        store.state[MODULE_STORE.ORDER.NAME].categories = res.data
       } catch (errors) {
         // const error = errors.message;
         // console.log(error)
@@ -151,12 +150,14 @@ export default {
     const getListProduct = async () => {
       const res = await getListProductFromApi();
       products.value = res.data
+      store.state[MODULE_STORE.ORDER.NAME].products = res.data
     }
     const getListCustomer = async () => {
       const res = await getListCustomerFromApi();
       customers.value = {
         ...res.data
       }
+      store.state[MODULE_STORE.ORDER.NAME].customers = res.data
     }
     const handleOnChangeCategorySelect = () => {
       productsByCategory.value = products.value.filter((product) => {
@@ -171,17 +172,26 @@ export default {
       productAttributeValuesByProduct.value = productSelected.value.product_attribute_values
     }
     const handleAddToOrder = () => {
-      listInputItem.value.push({})
-    }
-    const handleRemoveInputItem = (item, index) => {
-      console.log('remove item:' + index)
-      if (listInputItem.value[index] === item) {
-        listInputItem.value.splice(index, 1)
-      } else {
-        let found = listInputItem.value.indexOf(item)
-        listInputItem.value.splice(found, 1)
+      const payload = {
+        category_id: '',
+        product_id: '',
+        product_attribute_value_id: '',
+        product_attribute_price_id: '',
+        count: '',
+        weight: '',
+        price: '',
+        total: '',
+        measure_unit_type: '',
+        checked: false
       }
-      store.commit(`${MODULE_STORE.ORDER.NAME}/${MODULE_STORE.ORDER.MUTATIONS.REMOVE_ORDER_DATA_ITEM}`, index)
+      store.commit(`${MODULE_STORE.ORDER.NAME}/${MODULE_STORE.ORDER.MUTATIONS.ADD_ORDER_DATA}`, payload)
+      listInputItem.value = [];
+      nextTick(() => {listInputItem.value = store.state[MODULE_STORE.ORDER.NAME].orderPostData})
+    }
+    const handleRemoveInputItem = (item) => {
+      store.commit(`${MODULE_STORE.ORDER.NAME}/${MODULE_STORE.ORDER.MUTATIONS.REMOVE_ORDER_DATA_ITEM}`, item)
+      listInputItem.value = [];
+      nextTick(() => {listInputItem.value = store.state[MODULE_STORE.ORDER.NAME].orderPostData})
     }
 
     getListCategory()
@@ -200,7 +210,7 @@ export default {
       handleOnChangeCategorySelect,
       handleOnChangeProductSelect,
       handleAddToOrder,
-      handleRemoveInputItem
+      handleRemoveInputItem,
     }
   }
 }

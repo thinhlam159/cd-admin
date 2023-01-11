@@ -20,6 +20,16 @@ import AddProductAttributeValue from "@/views/ProductManage/AddProductAttributeV
 import OrderManage from "@/views/OrderManage";
 import ListOrder from "@/views/OrderManage/ListOrder";
 import CreateOrder from "@/views/OrderManage/CreateOrder";
+import DetailOrder from "@/views/OrderManage/DetailOrder";
+import ImportGoodManage from "@/views/ImportGoodManage";
+import ListImportGood from "@/views/ImportGoodManage/ListImportGood";
+import CreateImportGood from "@/views/ImportGoodManage/CreateOrder";
+import DetailImportGood from "@/views/ImportGoodManage/DetailOrder";
+import DebtManage from "@/views/DebtManage";
+import ListDebt from "@/views/DebtManage/ListDebt";
+import CreateDebt from "@/views/DebtManage/CreateDebt";
+import CreatePayment from "@/views/DebtManage/CreateDebt/CreatePayment.vue";
+import ListCustomerDebt from "@/views/DebtManage/ListDebt/ListCustomerDebt.vue";
 
 export default [
     // ROUTER_ADMIN
@@ -121,8 +131,54 @@ export default [
                         path: ROUTER_PATH.ADD,
                         component: CreateOrder,
                     },
+                    {
+                      path: ROUTER_PATH.DETAIL_ID,
+                      component: DetailOrder,
+                    },
                 ]
-            }
+            },
+          {
+            path: ROUTER_PATH.IMPORT_GOOD_MANAGE,
+            component: ImportGoodManage,
+            children: [
+              {
+                path: ROUTER_PATH.EMPTY,
+                component: ListImportGood,
+              },
+              {
+                path: ROUTER_PATH.ADD,
+                component: CreateImportGood,
+              },
+              {
+                path: ROUTER_PATH.DETAIL_ID,
+                component: DetailImportGood,
+              },
+            ]
+          },
+          {
+            path: ROUTER_PATH.DEBT_MANAGE,
+            component: DebtManage,
+            children: [
+              {
+                path: ROUTER_PATH.EMPTY,
+                component: ListDebt,
+              },
+              {
+                path: ROUTER_PATH.ADD + '/:id',
+                component: CreateDebt,
+                name: 'CreateDebt'
+              },
+              {
+                path: ROUTER_PATH.PAYMENT + '/' +ROUTER_PATH.ADD + '/:id',
+                component: CreatePayment,
+                name: 'CreatePayment'
+              },
+              {
+                path: ROUTER_PATH.LIST_CUSTOMER_DEBT_ID,
+                component: ListCustomerDebt,
+              },
+            ]
+          },
         ]
     },
 ]

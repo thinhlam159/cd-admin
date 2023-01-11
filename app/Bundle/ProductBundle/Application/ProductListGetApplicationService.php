@@ -18,6 +18,8 @@ use App\Bundle\ProductBundle\Domain\Model\IProductAttributeRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductAttributeValueRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductInventoryRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductRepository;
+use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValueId;
+use App\Bundle\ProductBundle\Domain\Model\ProductCriteria;
 use App\Bundle\ProductBundle\Infrastructure\FeatureImagePathRepository;
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -104,12 +106,19 @@ class ProductListGetApplicationService
      */
     public function handle(ProductListGetCommand $command): ProductListGetResult
     {
-        [$products, $pagination] = $this->productRepository->findAll();
+        $productAttributeValueIds = [];
+        foreach ($command->productAttributeValueIds as $productAttributeValueId) {
+            $productAttributeValueIds[] = new ProductAttributeValueId($productAttributeValueId);
+        }
+        $productCriteria = new ProductCriteria(
+            $productAttributeValueIds,
+        );
+        [$products, $pagination] = $this->productRepository->findAll($productCriteria);
 
         $productResults = [];
         foreach ($products as $product) {
             $category = $this->categoryRepository->findById($product->getCategoryId());
-            $featureImagePath = $this->featureImagePathRepository->findByProductId($product->getProductId());
+//            $featureImagePath = $this->featureImagePathRepository->findByProductId($product->getProductId());
             $productAttributeValues = $this->productAttributeValueRepository->findByProductId($product->getProductId());
 
             $productAttributeValueResults = [];
@@ -118,7 +127,8 @@ class ProductListGetApplicationService
                 $productInventory = $this->productInventoryRepository->findByProductAttributeValueId($productAttributePrice->getProductAttributeValueId());
                 $productAttribute = $this->productAttributeRepository->findById($productAttributeValue->getProductAttributeId());
 //                $measureUnit = $this->measureUnitRepository->findById($productAttributeValue->getMeasureUnitId());
-
+                $standardPrice = $productAttributePrice->getPrice() / $productAttributePrice->getNoticePriceType()->getAmountValue();
+                $standardPrice = floor($standardPrice);
                 $productAttributeValueResults[] = new ProductAttributeValueResult(
                     $productAttributeValue->getProductAttributeValueId()->asString(),
                     $productAttributeValue->getProductId()->asString(),
@@ -130,7 +140,8 @@ class ProductListGetApplicationService
                     $productAttributePrice->getPrice(),
                     $productAttributePrice->getMonetaryUnitType()->getValue(),
                     $productAttributePrice->getNoticePriceType()->getValue(),
-                    $productAttributePrice->getProductAttributePriceId()
+                    $productAttributePrice->getProductAttributePriceId(),
+                    $standardPrice
                 );
             }
 
@@ -141,7 +152,6 @@ class ProductListGetApplicationService
                 $product->getDescription(),
                 $product->getCategoryId()->__toString(),
                 $category->getName(),
-                $featureImagePath->getPath(),
                 $productAttributeValueResults
             );
         }

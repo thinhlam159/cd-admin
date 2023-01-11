@@ -5,7 +5,6 @@ use App\Bundle\Common\Domain\Model\Pagination;
 
 interface IProductAttributePriceRepository
 {
-
     /**
      * @param ProductAttributePrice $productAttributePrice
      * @return ProductAttributePriceId|null
@@ -35,4 +34,21 @@ interface IProductAttributePriceRepository
      * @return ProductAttributePriceId[]
      */
     public function createMany(array $productAttributePrices): array;
+
+    /**
+     * @return ProductAttributePrice[]
+     */
+    public function findAll(): array;
+
+    /**
+     * @param ProductAttributePriceId $productAttributePriceId
+     * @return ProductAttributePrice|null
+     */
+    public function findById(ProductAttributePriceId $productAttributePriceId): ?ProductAttributePrice;
+
+    /**
+     * @param ProductAttributePrice[] $productAttributePrices
+     * @return bool
+     */
+    public function updateOldPrice(array $productAttributePrices): bool;
 }

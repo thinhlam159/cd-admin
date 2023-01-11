@@ -17,9 +17,10 @@ class CreateProductAttributePricesTable extends Migration
             $table->string('id')->primary();
             $table->string('product_attribute_value_id');
             $table->integer('price');
-            $table->string('monetary_unit');
+            $table->integer('monetary_unit_type');
             $table->integer('notice_price_type');
             $table->boolean('is_current');
+            $table->foreign('product_attribute_value_id')->references('id')->on('product_attribute_values')->onDelete('cascade');
             $table->timestamps();
         });
     }

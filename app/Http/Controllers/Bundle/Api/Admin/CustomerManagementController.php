@@ -13,6 +13,7 @@ use App\Bundle\Admin\Application\CustomerPostCommand;
 use App\Bundle\Admin\Application\CustomerPutApplicationService;
 use App\Bundle\Admin\Application\CustomerPutCommand;
 use App\Bundle\Admin\Infrastructure\CustomerRepository;
+use App\Bundle\ProductBundle\Infrastructure\DebtHistoryRepository;
 use App\Http\Controllers\Bundle\Api\Common\BaseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -24,8 +25,10 @@ class CustomerManagementController extends BaseController
      */
     public function createCustomer(Request $request)
     {
-        $customerRepository = new CustomerRepository();
-        $applicationService = new CustomerPostApplicationService($customerRepository);
+        $applicationService = new CustomerPostApplicationService(
+            new CustomerRepository(),
+            new DebtHistoryRepository()
+        );
 
         $command = new CustomerPostCommand(
             $request->customer_name,

@@ -4,11 +4,13 @@ namespace App\Bundle\ProductBundle\Application;
 
 class ProductListGetCommand
 {
-    /**
-     * @noparam
-     */
-    public function __construct()
-    {
+    public array $productAttributeValueIds;
 
+    /**
+     * @param array $productAttributeValueIds
+     */
+    public function __construct(array $productAttributeValueIds)
+    {
+        $this->productAttributeValueIds = $productAttributeValueIds;
     }
 }

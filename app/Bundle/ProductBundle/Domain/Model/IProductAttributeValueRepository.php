@@ -6,10 +6,10 @@ use App\Bundle\Common\Domain\Model\Pagination;
 interface IProductAttributeValueRepository
 {
     /**
-     * @param ProductAttributeValue $productAttribute
+     * @param ProductAttributeValue $productAttributeValue
      * @return ProductAttributeValueId|null
      */
-    public function create(ProductAttributeValue $productAttribute): ?ProductAttributeValueId;
+    public function create(ProductAttributeValue $productAttributeValue): ?ProductAttributeValueId;
 
     /**
      * @param ProductAttributeValueId $productAttributeValueId

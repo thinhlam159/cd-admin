@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateFeatureImagePathsTable extends Migration
+class CreateDealersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,13 @@ class CreateFeatureImagePathsTable extends Migration
      */
     public function up()
     {
-        Schema::create('feature_image_paths', function (Blueprint $table) {
+        Schema::create('dealers', function (Blueprint $table) {
             $table->string('id')->primary();
-            $table->string('product_id');
-            $table->string('product_attribute_value_id');
-            $table->tinyInteger('is_avatar');
+            $table->string('name');
+            $table->string('email');
+            $table->string('password');
+            $table->string('phone');
+            $table->tinyInteger('is_active');
             $table->timestamps();
         });
     }
@@ -29,6 +31,6 @@ class CreateFeatureImagePathsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('feature_image_paths');
+        Schema::dropIfExists('dealers');
     }
 }

@@ -24,6 +24,10 @@ class MeasureUnitSeeder extends Seeder
                 'id' => '01GF2VAS2RBQ14MPW4CY844FBG',
                 'name' => 'Met',
             ],
+            [
+                'id' => '01GF2VASCY844FBG2RBQ14MPW4',
+                'name' => 'role',
+            ],
         ];
         foreach($defaults as $v){
             DB::table('measure_units')->insert($v);
