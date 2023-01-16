@@ -169,6 +169,6 @@ final class OrderRepository implements IOrderRepository
      */
     public function findByProductSale(StatisticalProductSaleCriteria $criteria): array
     {
-        
+
     }
 }
