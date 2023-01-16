@@ -7,6 +7,7 @@ use App\Http\Controllers\Bundle\Api\Product\CategoryController;
 use App\Http\Controllers\Bundle\Api\Product\DebtController;
 use App\Http\Controllers\Bundle\Api\Product\OrderController;
 use App\Http\Controllers\Bundle\Api\Product\ProductController;
+use App\Http\Controllers\Bundle\Api\Product\StatisticalController;
 use App\Http\Controllers\Bundle\Auth\AdminAuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -93,4 +94,6 @@ Route::group([
     Route::post('/debt/create-container-order', [DebtController::class, 'createContainerOrderDebt'])->middleware('auth:api');
     Route::post('/debt/create-vat-debt', [DebtController::class, 'createVatDebt'])->middleware('auth:api');
     Route::post('/debt/create-payment', [DebtController::class, 'createPayment'])->middleware('auth:api');
+
+    Route::get('/statistical/revenues', [StatisticalController::class, 'getRevenues'])->middleware('auth:api');
 });

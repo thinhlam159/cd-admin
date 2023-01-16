@@ -40,4 +40,10 @@ interface IOrderRepository
      * @return bool
      */
     public function updateDeliveryStatus(Order $order): bool;
+
+    /**
+     * @param StatisticalProductSaleCriteria $criteria
+     * @return Order[]
+     */
+    public function findByProductSale(StatisticalProductSaleCriteria $criteria): array;
 }

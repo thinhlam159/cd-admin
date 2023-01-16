@@ -18,6 +18,7 @@ use App\Bundle\ProductBundle\Domain\Model\ProductAttributePriceId;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValueId;
 use App\Bundle\ProductBundle\Domain\Model\ProductId;
 use App\Bundle\ProductBundle\Domain\Model\SettingDate;
+use App\Bundle\ProductBundle\Domain\Model\StatisticalProductSaleCriteria;
 use App\Bundle\UserBundle\Domain\Model\Pagination;
 use App\Models\Order as ModelOrder;
 use App\Models\OrderProduct as ModelOrderProduct;
@@ -161,5 +162,13 @@ final class OrderRepository implements IOrderRepository
         }
 
         return true;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function findByProductSale(StatisticalProductSaleCriteria $criteria): array
+    {
+        
     }
 }

@@ -2,14 +2,8 @@
 
 namespace App\Bundle\ProductBundle\Application;
 
-use App\Bundle\Admin\Domain\Model\CustomerId;
-use App\Bundle\Admin\Domain\Model\ICustomerRepository;
-use App\Bundle\Admin\Domain\Model\IUserRepository;
-use App\Bundle\Admin\Domain\Model\UserId;
-use App\Bundle\Common\Application\PaginationResult;
 use App\Bundle\Common\Domain\Model\InvalidArgumentException;
 use App\Bundle\Common\Domain\Model\TransactionException;
-use App\Bundle\ProductBundle\Domain\Model\DebtHistoryCriteria;
 use App\Bundle\ProductBundle\Domain\Model\IDebtHistoryRepository;
 use App\Bundle\ProductBundle\Domain\Model\SettingDate;
 use App\Bundle\ProductBundle\Domain\Model\StatisticalDebtCriteria;
@@ -31,28 +25,26 @@ class StatisticalDebtListGetApplicationService
 
     /**
      * @param StatisticalDebtListGetCommand $command
-     * @return DebtListGetResult
+     * @return StatisticalDebtListGetResult
      * @throws InvalidArgumentException
      * @throws TransactionException
      */
-    public function handle(StatisticalDebtListGetCommand $command): DebtListGetResult
+    public function handle(StatisticalDebtListGetCommand $command): StatisticalDebtListGetResult
     {
         $criteria = new StatisticalDebtCriteria(
             !is_null($command->date) ? SettingDate::fromTimeStamps($command->date) : null,
             !is_null($command->startDate) ? SettingDate::fromTimeStamps($command->startDate) : null,
             !is_null($command->endDate) ? SettingDate::fromTimeStamps($command->endDate) : null,
         );
-        $debts = $this->debtHistoryRepository->findAllCurrentByCustomer($criteria);
+        $debts = $this->debtHistoryRepository->findAllByStatistical($criteria);
         $debtResults = [];
         foreach ($debts as $debt) {
-            $customer = $this->customerRepository->findById($debt->getCustomerId());
-            $user = $this->userRepository->findById(new UserId($debt->getUserId()->asString()));
             $debtResults[] = new DebtResult(
                 $debt->getDebtHistoryId()->asString(),
-                $customer->getCustomerId()->asString(),
-                $customer->getCustomerName(),
-                $user->getUserId()->asString(),
-                $user->getUserName(),
+                '',
+                '',
+                '',
+                '',
                 $debt->getTotalDebt(),
                 $debt->getTotalPayment(),
                 $debt->isCurrent(),
@@ -70,12 +62,6 @@ class StatisticalDebtListGetApplicationService
             );
         }
 
-        $paginationResult = new PaginationResult(
-            $pagination->getTotalPages(),
-            $pagination->getPerPage(),
-            $pagination->getCurrentPage(),
-        );
-
-        return new DebtListGetResult($debtResults, $paginationResult);
+        return new StatisticalDebtListGetResult($debtResults);
     }
 }

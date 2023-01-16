@@ -16,6 +16,7 @@ use App\Bundle\ProductBundle\Domain\Model\OrderId;
 use App\Bundle\ProductBundle\Domain\Model\OtherDebtId;
 use App\Bundle\ProductBundle\Domain\Model\PaymentId;
 use App\Bundle\ProductBundle\Domain\Model\SettingDate;
+use App\Bundle\ProductBundle\Domain\Model\StatisticalDebtCriteria;
 use App\Bundle\ProductBundle\Domain\Model\UserId;
 use App\Bundle\ProductBundle\Domain\Model\VatId;
 use App\Bundle\UserBundle\Domain\Model\Pagination;
@@ -271,6 +272,51 @@ class DebtHistoryRepository implements IDebtHistoryRepository
         $entities = ModelDebtHistory::where([
             ['customer_id', '=', $criteria->getCustomerId()->asString(),]
         ])->paginate(PaginationConst::PAGINATE_ROW);
+
+        $debts = [];
+        foreach ($entities as $entity) {
+            $debts[] = new DebtHistory(
+                new DebtHistoryId($entity->id),
+                new CustomerId($entity->customer_id),
+                new UserId($entity->user_id),
+                $entity->total_debt,
+                $entity->total_payment,
+                $entity->rest_debt,
+                $entity->is_current,
+                DebtHistoryUpdateType::fromType($entity->update_type),
+                !is_null($entity->order_id) ? new OrderId($entity->order_id) : null,
+                !is_null($entity->container_order_id) ? new ContainerOrderId($entity->container_order_id) : null,
+                !is_null($entity->vat_id) ? new VatId($entity->vat_id) : null,
+                !is_null($entity->payment_id) ? new PaymentId($entity->payment_id) : null,
+                !is_null($entity->other_debt_id) ? new OtherDebtId($entity->other_debt_id) : null,
+                $entity->number_of_money,
+                SettingDate::fromTimeStamps($entity->update_date),
+                MonetaryUnitType::fromType($entity->monetary_unit_type),
+                $entity->comment,
+                $entity->version
+            );
+        }
+
+        return $debts;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function findAllByStatistical(StatisticalDebtCriteria $criteria): array
+    {
+        $conditions = [];
+        if (!is_null($criteria->getDate())) {
+            $conditions[] = ['updated_date', '=', $criteria->getDate()->asString()];
+        }
+        if (!is_null($criteria->getStartDate())) {
+            $conditions[] = ['updated_date', '>=', $criteria->getDate()->asString()];
+        }
+        if (!is_null($criteria->getEndDate())) {
+            $conditions[] = ['updated_date', '<=', $criteria->getDate()->asString()];
+        }
+
+        $entities = ModelDebtHistory::where($conditions)->get();
 
         $debts = [];
         foreach ($entities as $entity) {
