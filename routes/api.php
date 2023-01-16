@@ -96,4 +96,5 @@ Route::group([
     Route::post('/debt/create-payment', [DebtController::class, 'createPayment'])->middleware('auth:api');
 
     Route::get('/statistical/revenues', [StatisticalController::class, 'getRevenues'])->middleware('auth:api');
+    Route::get('/statistical/product-sale', [StatisticalController::class, 'getStatisticalProductSaleByCategory'])->middleware('auth:api');
 });

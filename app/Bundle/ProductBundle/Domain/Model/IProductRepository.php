@@ -28,4 +28,10 @@ interface IProductRepository
      * @return ProductId
      */
     public function update(Product $product): ProductId;
+
+    /**
+     * @param CategoryId $categoryId
+     * @return Product[]
+     */
+    public function findByCategoryId(CategoryId $categoryId): array;
 }

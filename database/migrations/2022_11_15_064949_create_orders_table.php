@@ -19,6 +19,7 @@ class CreateOrdersTable extends Migration
             $table->string('user_id');
             $table->string('delivery_status');
             $table->string('payment_status');
+            $table->date('order_date');
             $table->foreign('customer_id')->references('id')->on('customers')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();

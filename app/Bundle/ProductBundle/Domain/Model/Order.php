@@ -43,6 +43,11 @@ final class Order
     private ?SettingDate $createdAt;
 
     /**
+     * @var SettingDate|null
+     */
+    private ?SettingDate $orderDate;
+
+    /**
      * @param OrderId $orderId
      * @param \App\Bundle\Admin\Domain\Model\CustomerId $customerId
      * @param \App\Bundle\Admin\Domain\Model\UserId $userId
@@ -134,6 +139,22 @@ final class Order
     public function setCreatedAt(?SettingDate $createdAt): void
     {
         $this->createdAt = $createdAt;
+    }
+
+    /**
+     * @return SettingDate|null
+     */
+    public function getOrderDate(): ?SettingDate
+    {
+        return $this->orderDate;
+    }
+
+    /**
+     * @param SettingDate|null $orderDate
+     */
+    public function setOrderDate(?SettingDate $orderDate): void
+    {
+        $this->orderDate = $orderDate;
     }
 
     /**

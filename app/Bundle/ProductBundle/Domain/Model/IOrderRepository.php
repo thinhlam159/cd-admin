@@ -45,5 +45,5 @@ interface IOrderRepository
      * @param StatisticalProductSaleCriteria $criteria
      * @return Order[]
      */
-    public function findByProductSale(StatisticalProductSaleCriteria $criteria): array;
+    public function findAllByProductSale(StatisticalProductSaleCriteria $criteria): array;
 }

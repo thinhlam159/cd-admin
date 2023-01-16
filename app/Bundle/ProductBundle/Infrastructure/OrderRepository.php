@@ -167,8 +167,37 @@ final class OrderRepository implements IOrderRepository
     /**
      * @inheritDoc
      */
-    public function findByProductSale(StatisticalProductSaleCriteria $criteria): array
+    public function findAllByProductSale(StatisticalProductSaleCriteria $criteria): array
     {
+        $conditions = [];
+        if (!is_null($criteria->getCategoryId())) {
+            $conditions[] = ['category_id', '=', $criteria->getCategoryId()];
+        }
+        if (!is_null($criteria->getProductAttributeValueId())) {
+            $conditions[] = ['product_attribute_value_id', '=', $criteria->getProductAttributeValueId()];
+        }
 
+        if (!is_null($criteria->getStartDate())) {
+            $conditions[] = ['created_date', '>=', $criteria->getStartDate()];
+            $conditions[] = ['created_date', '<=', $criteria->getEndDate()];
+        }
+
+        $entities = ModelOrder::where($conditions)->get();
+
+        $orders = [];
+        foreach ($entities as $entity) {
+            $order = new Order(
+                new OrderId($entity->id),
+                new CustomerId($entity->customer_id),
+                new UserId($entity->user_id),
+                OrderDeliveryStatus::fromStatus($entity->order_delivery_status),
+                OrderPaymentStatus::fromStatus($entity->order_payment_status),
+            );
+            $order->setOrderDate(SettingDate::fromYmdHis($entity->order_date));
+
+            $orders[] = $order;
+        }
+
+        return $orders;
     }
 }

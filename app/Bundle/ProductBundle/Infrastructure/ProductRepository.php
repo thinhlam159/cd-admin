@@ -110,4 +110,27 @@ class ProductRepository implements IProductRepository
 
         return $productId;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function findByCategoryId(CategoryId $categoryId): array
+    {
+        $entities = ModelProduct::where([
+            ['category_id', '=', $categoryId->asString()]
+        ])->get();
+
+        $products = [];
+        foreach ($entities as $entity) {
+            $products[] = new Product(
+                new ProductId($entity['id']),
+                $entity['name'],
+                $entity['code'],
+                $entity['description'],
+                $categoryId,
+            );
+        }
+
+        return $products;
+    }
 }

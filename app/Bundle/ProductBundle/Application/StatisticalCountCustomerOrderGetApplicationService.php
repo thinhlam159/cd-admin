@@ -2,7 +2,6 @@
 
 namespace App\Bundle\ProductBundle\Application;
 
-use App\Bundle\Admin\Domain\Model\CustomerId;
 use App\Bundle\Admin\Domain\Model\ICustomerRepository;
 use App\Bundle\Common\Constants\MessageConst;
 use App\Bundle\Common\Domain\Model\InvalidArgumentException;
@@ -16,13 +15,8 @@ use App\Bundle\ProductBundle\Domain\Model\SettingDate;
 use App\Bundle\ProductBundle\Domain\Model\StatisticalCountCustomerOrderCriteria;
 use App\Bundle\ProductBundle\Domain\Model\StatisticalProductSaleCriteria;
 
-class StatisticalProductSaleListGetApplicationService
+class StatisticalCountCustomerOrderGetApplicationService
 {
-    /**
-     * @var ICategoryRepository
-     */
-    private ICategoryRepository $categoryRepository;
-
     /**
      * @var IOrderRepository
      */
@@ -34,52 +28,30 @@ class StatisticalProductSaleListGetApplicationService
     private ICustomerRepository $customerRepository;
 
     /**
-     * @var IProductRepository
-     */
-    private IProductRepository $productRepository;
-
-    /**
-     * @var IProductAttributeValueRepository
-     */
-    private IProductAttributeValueRepository $productAttributeValueRepository;
-
-    /**
-     * @param ICategoryRepository $categoryRepository
      * @param IOrderRepository $orderRepository
      * @param ICustomerRepository $customerRepository
-     * @param IProductRepository $productRepository
-     * @param IProductAttributeValueRepository $productAttributeValueRepository
      */
     public function __construct(
-        ICategoryRepository $categoryRepository,
         IOrderRepository $orderRepository,
-        ICustomerRepository $customerRepository,
-        IProductRepository $productRepository,
-        IProductAttributeValueRepository $productAttributeValueRepository
+        ICustomerRepository $customerRepository
     )
     {
-        $this->categoryRepository = $categoryRepository;
         $this->orderRepository = $orderRepository;
         $this->customerRepository = $customerRepository;
-        $this->productRepository = $productRepository;
-        $this->productAttributeValueRepository = $productAttributeValueRepository;
     }
 
     /**
-     * @param StatisticalCountCustomerOrderGetCommand $command
+     * @param StatisticalProductSaleListGetCommand $command
      * @return StatisticalProductSaleListGetResult
      */
-    public function handle(StatisticalCountCustomerOrderGetCommand $command): StatisticalProductSaleListGetResult
+    public function handle(StatisticalProductSaleListGetCommand $command): StatisticalProductSaleListGetResult
     {
         $criteria = new StatisticalCountCustomerOrderCriteria(
-            !is_null($command->customerId) ? new CustomerId($command->customerId) : null,
+            !is_null($command->categoryId) ? new CategoryId($command->categoryId) : null,
             !is_null($command->startDate) ? SettingDate::fromTimeStamps($command->startDate) : null,
             !is_null($command->endDate) ? SettingDate::fromTimeStamps($command->endDate) : null,
         );
-        $category = $this->categoryRepository->findById(new CategoryId($command->categoryId));
-        if (!$category) {
-            throw new InvalidArgumentException(MessageConst::NO_RECORD['message']);
-        }
+
         $products = $this->productRepository->findByCategoryId($category->getCategoryId());
         $orders = $this->orderRepository->findAllByProductSale($criteria);
         $orderResults = [];
