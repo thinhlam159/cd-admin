@@ -2,18 +2,12 @@
 
 namespace App\Bundle\ProductBundle\Application;
 
+use App\Bundle\Admin\Domain\Model\CustomerId;
 use App\Bundle\Admin\Domain\Model\ICustomerRepository;
 use App\Bundle\Common\Constants\MessageConst;
 use App\Bundle\Common\Domain\Model\InvalidArgumentException;
-use App\Bundle\ProductBundle\Domain\Model\CategoryId;
-use App\Bundle\ProductBundle\Domain\Model\ICategoryRepository;
 use App\Bundle\ProductBundle\Domain\Model\IOrderRepository;
-use App\Bundle\ProductBundle\Domain\Model\IProductAttributeValueRepository;
-use App\Bundle\ProductBundle\Domain\Model\IProductRepository;
-use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValueId;
 use App\Bundle\ProductBundle\Domain\Model\SettingDate;
-use App\Bundle\ProductBundle\Domain\Model\StatisticalCountCustomerOrderCriteria;
-use App\Bundle\ProductBundle\Domain\Model\StatisticalProductSaleCriteria;
 
 class StatisticalCountCustomerOrderGetApplicationService
 {
@@ -41,18 +35,21 @@ class StatisticalCountCustomerOrderGetApplicationService
     }
 
     /**
-     * @param StatisticalProductSaleListGetCommand $command
+     * @param StatisticalCountCustomerOrderGetCommand $command
      * @return StatisticalProductSaleListGetResult
      */
-    public function handle(StatisticalProductSaleListGetCommand $command): StatisticalProductSaleListGetResult
+    public function handle(StatisticalCountCustomerOrderGetCommand $command): StatisticalProductSaleListGetResult
     {
-        $criteria = new StatisticalCountCustomerOrderCriteria(
-            !is_null($command->categoryId) ? new CategoryId($command->categoryId) : null,
+        $customer = $this->customerRepository->findById(new CustomerId($command->customerId));
+        if (!$customer) {
+            throw new InvalidArgumentException(MessageConst::NO_RECORD['message']);
+        }
+        $criteria = new StatisticalCountCustomerOrderGetCommand(
+            $command->customerId,
             !is_null($command->startDate) ? SettingDate::fromTimeStamps($command->startDate) : null,
             !is_null($command->endDate) ? SettingDate::fromTimeStamps($command->endDate) : null,
         );
 
-        $products = $this->productRepository->findByCategoryId($category->getCategoryId());
         $orders = $this->orderRepository->findAllByProductSale($criteria);
         $orderResults = [];
         $productIds = [];

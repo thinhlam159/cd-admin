@@ -18,6 +18,7 @@ use App\Bundle\ProductBundle\Domain\Model\ProductAttributePriceId;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValueId;
 use App\Bundle\ProductBundle\Domain\Model\ProductId;
 use App\Bundle\ProductBundle\Domain\Model\SettingDate;
+use App\Bundle\ProductBundle\Domain\Model\StatisticalCountCustomerOrderCriteria;
 use App\Bundle\ProductBundle\Domain\Model\StatisticalProductSaleCriteria;
 use App\Bundle\UserBundle\Domain\Model\Pagination;
 use App\Models\Order as ModelOrder;
@@ -199,5 +200,20 @@ final class OrderRepository implements IOrderRepository
         }
 
         return $orders;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function countCustomerOrders(StatisticalCountCustomerOrderCriteria $criteria): int
+    {
+        $conditions = [];
+        $conditions[] = ['customer_id', '=', $criteria->getCustomerId()->asString()];
+        if (!is_null($criteria->getStartDate())) {
+            $conditions[] = ['order_date', '>=', $criteria->getStartDate()->asString()];
+            $conditions[] = ['order_date', '<=', $criteria->getEndDate()->asString()];
+        }
+
+        return ModelOrder::where($conditions)->count();
     }
 }

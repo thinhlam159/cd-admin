@@ -46,4 +46,10 @@ interface IOrderRepository
      * @return Order[]
      */
     public function findAllByProductSale(StatisticalProductSaleCriteria $criteria): array;
+
+    /**
+     * @param StatisticalCountCustomerOrderCriteria $criteria
+     * @return int
+     */
+    public function countCustomerOrders(StatisticalCountCustomerOrderCriteria $criteria): int;
 }

@@ -66,13 +66,14 @@ class StatisticalProductSaleListGetApplicationService
     }
 
     /**
-     * @param StatisticalCountCustomerOrderGetCommand $command
+     * @param StatisticalProductSaleListGetCommand $command
      * @return StatisticalProductSaleListGetResult
      */
-    public function handle(StatisticalCountCustomerOrderGetCommand $command): StatisticalProductSaleListGetResult
+    public function handle(StatisticalProductSaleListGetCommand $command): StatisticalProductSaleListGetResult
     {
-        $criteria = new StatisticalCountCustomerOrderCriteria(
-            !is_null($command->customerId) ? new CustomerId($command->customerId) : null,
+        $criteria = new StatisticalProductSaleCriteria(
+            !is_null($command->categoryId) ? new CustomerId($command->categoryId) : null,
+            !is_null($command->productAttributeValueId) ? new CustomerId($command->productAttributeValueId) : null,
             !is_null($command->startDate) ? SettingDate::fromTimeStamps($command->startDate) : null,
             !is_null($command->endDate) ? SettingDate::fromTimeStamps($command->endDate) : null,
         );
