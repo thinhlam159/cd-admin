@@ -123,15 +123,12 @@ export default {
       }
       return Number(route.query.page);
     });
-
     const goToCreateDebt = () => {
       router.push(`${ROUTER_PATH.DEBT_MANAGE}/${ROUTER_PATH.ADD}`);
     }
-
     const goToCreatePayment = () => {
       router.push(`${ROUTER_PATH.DEBT_MANAGE}/${ROUTER_PATH.PAYMENT}/${ROUTER_PATH.ADD}`);
     }
-
     const getListDebt = async (page, keyword = '',order = '', sort = '') => {
       try {
         const res = await getListDebtFromApi({page, keyword, order, sort})

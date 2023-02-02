@@ -32,11 +32,12 @@ class StatisticalDebtListGetApplicationService
     public function handle(StatisticalDebtListGetCommand $command): StatisticalDebtListGetResult
     {
         $criteria = new StatisticalDebtCriteria(
-            !is_null($command->date) ? SettingDate::fromTimeStamps($command->date) : null,
-            !is_null($command->startDate) ? SettingDate::fromTimeStamps($command->startDate) : null,
-            !is_null($command->endDate) ? SettingDate::fromTimeStamps($command->endDate) : null,
+            !is_null($command->date) ? SettingDate::fromYmdHis($command->date) : null,
+            !is_null($command->startDate) ? SettingDate::fromYmdHis($command->startDate) : null,
+            !is_null($command->endDate) ? SettingDate::fromYmdHis($command->endDate) : null,
         );
         $debts = $this->debtHistoryRepository->findAllByStatistical($criteria);
+
         $debtResults = [];
         foreach ($debts as $debt) {
             $debtResults[] = new DebtResult(
