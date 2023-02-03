@@ -11,7 +11,9 @@ use App\Bundle\ProductBundle\Domain\Model\ICategoryRepository;
 use App\Bundle\ProductBundle\Domain\Model\IOrderRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductAttributeValueRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductRepository;
+use App\Bundle\ProductBundle\Domain\Model\Product;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValueId;
+use App\Bundle\ProductBundle\Domain\Model\ProductId;
 use App\Bundle\ProductBundle\Domain\Model\SettingDate;
 use App\Bundle\ProductBundle\Domain\Model\StatisticalCountCustomerOrderCriteria;
 use App\Bundle\ProductBundle\Domain\Model\StatisticalProductSaleCriteria;
@@ -72,10 +74,10 @@ class StatisticalProductSaleListGetApplicationService
     public function handle(StatisticalProductSaleListGetCommand $command): StatisticalProductSaleListGetResult
     {
         $criteria = new StatisticalProductSaleCriteria(
-            !is_null($command->categoryId) ? new CustomerId($command->categoryId) : null,
-            !is_null($command->productAttributeValueId) ? new CustomerId($command->productAttributeValueId) : null,
-            !is_null($command->startDate) ? SettingDate::fromTimeStamps($command->startDate) : null,
-            !is_null($command->endDate) ? SettingDate::fromTimeStamps($command->endDate) : null,
+            !is_null($command->categoryId) ? new CategoryId($command->categoryId) : null,
+            !is_null($command->productAttributeValueId) ? new ProductAttributeValueId($command->productAttributeValueId) : null,
+            !is_null($command->startDate) ? SettingDate::fromYmdHis($command->startDate) : null,
+            !is_null($command->endDate) ? SettingDate::fromYmdHis($command->endDate) : null,
         );
         $category = $this->categoryRepository->findById(new CategoryId($command->categoryId));
         if (!$category) {
@@ -88,6 +90,7 @@ class StatisticalProductSaleListGetApplicationService
         foreach ($products as $product) {
             $productIds[] = $product->getProductId()->asString();
         }
+        $numberOfProducts = [];
         foreach ($orders as $order) {
             $customer = $this->customerRepository->findById($order->getCustomerId());
             $orderProducts = $this->orderRepository->findOrderProductsByOrderId($order->getOrderId());
@@ -102,15 +105,19 @@ class StatisticalProductSaleListGetApplicationService
                     '',
                     $orderProduct->getCount(),
                     '',
-                    '',
-                    '',
-                    '',
-                    '',
-                    '',
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
                     '',
                     '',
                     ''
                 );
+                $numberOfProducts[$orderProduct->getProductId()->asString()] =
+                    !empty($numberOfProducts[$orderProduct->getProductId()->asString()])
+                        ? $numberOfProducts[$orderProduct->getProductId()->asString()] + $orderProduct->getCount()
+                        : $orderProduct->getCount();
             }
             $orderResults[] = new OrderResult(
                 $order->getOrderId()->asString(),
@@ -123,10 +130,20 @@ class StatisticalProductSaleListGetApplicationService
                 $orderProductResults,
                 '',
                 $order->getOrderDate()->asString(),
-                '',
+                0,
+            );
+        }
+        $statisticalProductSaleResults = [];
+        foreach ($numberOfProducts as $productId => $numberOfProduct) {
+            $product = $this->productRepository->findById(new ProductId($productId));
+            $statisticalProductSaleResults[] = new StatisticalProductSaleResult(
+                $product->getProductId()->asString(),
+                $product->getName(),
+                $product->getCode(),
+                $numberOfProduct
             );
         }
 
-        return new StatisticalProductSaleListGetResult($orderResults);
+        return new StatisticalProductSaleListGetResult($statisticalProductSaleResults);
     }
 }

@@ -59,4 +59,10 @@ interface IDebtHistoryRepository
      * @return DebtHistory[]
      */
     public function findAllByStatistical(StatisticalDebtCriteria $criteria): array;
+
+    /**
+     * @param StatisticalDebtCriteria $criteria
+     * @return DebtHistory[]
+     */
+    public function findAllByPeriodRevenue(StatisticalDebtCriteria $criteria): array;
 }

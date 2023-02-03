@@ -51,6 +51,8 @@ export default {
     CREATE_VAT_DEBT: 'admin/debt/create-vat-debt',
     CREATE_PAYMENT: 'admin/debt/create-payment',
 
-    STATISTICAL_REVENUES: 'admin/statistical/revenues'
+    STATISTICAL_REVENUES: 'admin/statistical/revenues',
+    STATISTICAL_PERIOD_REVENUES: 'admin/statistical/period-revenues',
+    STATISTICAL_PRODUCT_SALE: 'admin/statistical/product-sale-statistical',
   }
 };

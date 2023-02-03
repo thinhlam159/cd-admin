@@ -345,4 +345,47 @@ class DebtHistoryRepository implements IDebtHistoryRepository
 
         return $debts;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function findAllByPeriodRevenue(StatisticalDebtCriteria $criteria): array
+    {
+        $conditions = [];
+        $conditions[] = ['update_type', '!=', DebtHistoryUpdateType::PAYMENT];
+        if (!is_null($criteria->getStartDate())) {
+            $conditions[] = ['updated_date', '>=', $criteria->getStartDate()->asString()];
+        }
+        if (!is_null($criteria->getEndDate())) {
+            $conditions[] = ['updated_date', '<=', $criteria->getEndDate()->asString()];
+        }
+
+        $entities = ModelDebtHistory::where($conditions)->get();
+
+        $debts = [];
+        foreach ($entities as $entity) {
+            $debts[] = new DebtHistory(
+                new DebtHistoryId($entity->id),
+                new CustomerId($entity->customer_id),
+                new UserId($entity->user_id),
+                $entity->total_debt,
+                $entity->total_payment,
+                $entity->rest_debt,
+                $entity->is_current,
+                DebtHistoryUpdateType::fromType($entity->update_type),
+                !is_null($entity->order_id) ? new OrderId($entity->order_id) : null,
+                !is_null($entity->container_order_id) ? new ContainerOrderId($entity->container_order_id) : null,
+                !is_null($entity->vat_id) ? new VatId($entity->vat_id) : null,
+                !is_null($entity->payment_id) ? new PaymentId($entity->payment_id) : null,
+                !is_null($entity->other_debt_id) ? new OtherDebtId($entity->other_debt_id) : null,
+                $entity->number_of_money,
+                SettingDate::fromYmdHis($entity->updated_date),
+                MonetaryUnitType::fromType($entity->monetary_unit_type),
+                $entity->comment,
+                $entity->version
+            );
+        }
+
+        return $debts;
+    }
 }

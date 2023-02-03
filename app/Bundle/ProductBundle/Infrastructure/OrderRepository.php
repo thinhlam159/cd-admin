@@ -171,16 +171,16 @@ final class OrderRepository implements IOrderRepository
     public function findAllByProductSale(StatisticalProductSaleCriteria $criteria): array
     {
         $conditions = [];
-        if (!is_null($criteria->getCategoryId())) {
-            $conditions[] = ['category_id', '=', $criteria->getCategoryId()];
-        }
+//        if (!is_null($criteria->getCategoryId())) {
+//            $conditions[] = ['category_id', '=', $criteria->getCategoryId()];
+//        }
         if (!is_null($criteria->getProductAttributeValueId())) {
             $conditions[] = ['product_attribute_value_id', '=', $criteria->getProductAttributeValueId()];
         }
 
         if (!is_null($criteria->getStartDate())) {
-            $conditions[] = ['created_date', '>=', $criteria->getStartDate()];
-            $conditions[] = ['created_date', '<=', $criteria->getEndDate()];
+            $conditions[] = ['order_date', '>=', $criteria->getStartDate()];
+            $conditions[] = ['order_date', '<=', $criteria->getEndDate()];
         }
 
         $entities = ModelOrder::where($conditions)->get();
@@ -191,8 +191,8 @@ final class OrderRepository implements IOrderRepository
                 new OrderId($entity->id),
                 new CustomerId($entity->customer_id),
                 new UserId($entity->user_id),
-                OrderDeliveryStatus::fromStatus($entity->order_delivery_status),
-                OrderPaymentStatus::fromStatus($entity->order_payment_status),
+                OrderDeliveryStatus::fromStatus($entity->delivery_status),
+                OrderPaymentStatus::fromStatus($entity->payment_status),
             );
             $order->setOrderDate(SettingDate::fromYmdHis($entity->order_date));
 

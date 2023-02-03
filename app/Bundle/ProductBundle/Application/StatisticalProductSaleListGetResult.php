@@ -7,15 +7,15 @@ use App\Bundle\Common\Application\PaginationResult;
 final class StatisticalProductSaleListGetResult
 {
     /**
-     * @var OrderResult[]
+     * @var StatisticalProductSaleResult[]
      */
-    public array $orderResults;
+    public array $statisticalProductSaleResults;
 
     /**
-     * @param OrderResult[] $orderResults
+     * @param StatisticalProductSaleResult[] $statisticalProductSaleResults
      */
-    public function __construct(array $orderResults)
+    public function __construct(array $statisticalProductSaleResults)
     {
-        $this->orderResults = $orderResults;
+        $this->statisticalProductSaleResults = $statisticalProductSaleResults;
     }
 }

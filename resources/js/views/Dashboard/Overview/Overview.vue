@@ -16,20 +16,23 @@
 <!--      />-->
 <!--    </div>-->
   </div>
-  <div class="p-2">
+  <div class="pt-2">
     <PeriodRevenue />
+  </div>
+  <div class="pt-2">
+    <StatisticalJumbo />
   </div>
 </template>
 
 <script setup>
 import {MODULE_STORE} from "@/const";
-import {getCustomerCurrentDebtFromApi, getRevenuesFromApi} from "@/api";
+import {getRevenuesFromApi} from "@/api";
 import {inject, ref, watch} from "vue";
 import {useStore} from "vuex";
-import { Bar } from 'vue-chartjs'
-import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
+import {BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title, Tooltip} from 'chart.js'
 import Datepicker from 'vue3-datepicker'
 import PeriodRevenue from "@/views/Dashboard/Overview/PeriodRevenue.vue";
+import StatisticalJumbo from "@/views/Dashboard/Overview/StatisticalJumbo.vue";
 
 const toast = inject('$toast');
 const store = useStore();
@@ -66,7 +69,7 @@ const styleDatePicker = ref({
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
-const getRevenueByDay = async (customerId) => {
+const getRevenueByDay = async () => {
   try {
     store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = true
     const year = picked.value.getFullYear()
@@ -75,8 +78,7 @@ const getRevenueByDay = async (customerId) => {
     const date = `${year}-${month}-${day}`
     const res = await getRevenuesFromApi({date: date})
     const data = res.data
-    const totalRevenueDebt = res.total
-    totalDebtByDay.value = totalRevenueDebt
+    totalDebtByDay.value = res.total
 
     // customerCurrentDebt.value = {
     //   ...data,
