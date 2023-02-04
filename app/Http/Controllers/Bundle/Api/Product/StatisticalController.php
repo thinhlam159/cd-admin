@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Bundle\Api\Product;
 
 use App\Bundle\Admin\Infrastructure\CustomerRepository;
+use App\Bundle\ProductBundle\Application\StatisticalCustomerOrderAmountListGetApplicationService;
+use App\Bundle\ProductBundle\Application\StatisticalCustomerOrderAmountListGetCommand;
 use App\Bundle\ProductBundle\Application\StatisticalDebtListGetApplicationService;
 use App\Bundle\ProductBundle\Application\StatisticalDebtListGetCommand;
 use App\Bundle\ProductBundle\Application\StatisticalPeriodRevenueGetApplicationService;
@@ -117,6 +119,41 @@ class StatisticalController extends BaseController
                 'name' => $statisticalProductSaleResult->productName,
                 'code' => $statisticalProductSaleResult->productCode,
                 'count' => $statisticalProductSaleResult->count,
+            ];
+        }
+
+        return response()->json(['data' => $data], 200);
+    }
+
+    /**
+     * @param Request $request request
+     */
+    public function getCustomerOrderAmount(Request $request)
+    {
+        $applicationService = new StatisticalCustomerOrderAmountListGetApplicationService(
+            new CategoryRepository(),
+            new OrderRepository(),
+            new CustomerRepository(),
+            new ProductRepository(),
+            new ProductAttributeValueRepository()
+        );
+
+        $command = new StatisticalCustomerOrderAmountListGetCommand(
+            !empty($request->customer_id) ? $request->customer_id : null,
+            !empty($request->keyword) ? $request->keyword : '',
+            !empty($request->order) ? $request->order : null,
+            !empty($request->sort) ? $request->sort : null,
+            !empty($request->start_date) ? $request->start_date : null,
+            !empty($request->end_date) ? $request->end_date : null
+        );
+
+        $result = $applicationService->handle($command);
+        $data = [];
+        foreach ($result->statisticalCustomerOrderAmountResults as $statisticalCustomerOrderAmountResult) {
+            $data[] = [
+                'customer_id' => $statisticalCustomerOrderAmountResult->customerId,
+                'name' => $statisticalCustomerOrderAmountResult->customerName,
+                'count' => $statisticalCustomerOrderAmountResult->count,
             ];
         }
 

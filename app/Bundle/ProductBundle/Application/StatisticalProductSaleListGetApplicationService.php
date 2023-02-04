@@ -2,7 +2,6 @@
 
 namespace App\Bundle\ProductBundle\Application;
 
-use App\Bundle\Admin\Domain\Model\CustomerId;
 use App\Bundle\Admin\Domain\Model\ICustomerRepository;
 use App\Bundle\Common\Constants\MessageConst;
 use App\Bundle\Common\Domain\Model\InvalidArgumentException;
@@ -11,11 +10,9 @@ use App\Bundle\ProductBundle\Domain\Model\ICategoryRepository;
 use App\Bundle\ProductBundle\Domain\Model\IOrderRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductAttributeValueRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductRepository;
-use App\Bundle\ProductBundle\Domain\Model\Product;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValueId;
 use App\Bundle\ProductBundle\Domain\Model\ProductId;
 use App\Bundle\ProductBundle\Domain\Model\SettingDate;
-use App\Bundle\ProductBundle\Domain\Model\StatisticalCountCustomerOrderCriteria;
 use App\Bundle\ProductBundle\Domain\Model\StatisticalProductSaleCriteria;
 
 class StatisticalProductSaleListGetApplicationService

@@ -22,6 +22,9 @@
   <div class="pt-2">
     <StatisticalJumbo />
   </div>
+  <div class="pt-2">
+    <CustomerOrderAmount />
+  </div>
 </template>
 
 <script setup>
@@ -33,6 +36,7 @@ import {BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title,
 import Datepicker from 'vue3-datepicker'
 import PeriodRevenue from "@/views/Dashboard/Overview/PeriodRevenue.vue";
 import StatisticalJumbo from "@/views/Dashboard/Overview/StatisticalJumbo.vue";
+import CustomerOrderAmount from "@/views/Dashboard/Overview/CustomerOrderAmount.vue";
 
 const toast = inject('$toast');
 const store = useStore();

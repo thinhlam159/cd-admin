@@ -120,9 +120,7 @@ class CustomerRepository implements ICustomerRepository
     }
 
     /**
-     * @param string $email
-     * @param CustomerId|null $customerId
-     * @return bool
+     * @inheritDoc
      */
     public function checkExistingEmail(string $email, ?CustomerId $customerId = null): bool
     {
@@ -136,5 +134,29 @@ class CustomerRepository implements ICustomerRepository
         }
 
         return !$entities->contains(ModelCustomer::find($customerId->__toString()));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function findAllByKeyword(string $keyword): array
+    {
+        $entities = ModelCustomer::where([['name', 'like', "%$keyword%"]])->get();
+
+        /** @var \App\Bundle\Admin\Domain\Model\User[] $result */
+        $customers = [];
+        foreach ($entities as $entity) {
+            $customer = new Customer(
+                new CustomerId($entity->id),
+                $entity->name,
+                $entity->email
+            );
+            $customer->setPhone($entity->phone);
+            $customer->setIsActive($entity->is_active);
+
+            $customers[] = $customer;
+        }
+
+        return $customers;
     }
 }

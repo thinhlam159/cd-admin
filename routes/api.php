@@ -98,5 +98,5 @@ Route::group([
     Route::get('/statistical/revenues', [StatisticalController::class, 'getRevenues'])->middleware('auth:api');
     Route::get('/statistical/period-revenues', [StatisticalController::class, 'getPeriodRevenues'])->middleware('auth:api');
     Route::get('/statistical/product-sale-statistical', [StatisticalController::class, 'getStatisticalProductSaleByCategory'])->middleware('auth:api');
-    Route::get('/statistical/count-customer-order', [StatisticalController::class, 'countCustomerOrders'])->middleware('auth:api');
+    Route::get('/statistical/count-customer-order', [StatisticalController::class, 'getCustomerOrderAmount'])->middleware('auth:api');
 });

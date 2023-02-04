@@ -77,3 +77,4 @@ export const exportCustomerDebtHistoryFromApi = async (data) => api.get(`${apiCo
 export const getRevenuesFromApi = async (params) => api.get(apiConstants.ADMIN.STATISTICAL_REVENUES, {params})
 export const getPeriodRevenuesFromApi = async (params) => api.get(apiConstants.ADMIN.STATISTICAL_PERIOD_REVENUES, {params})
 export const getProductSaleStatisticalFromApi = async (params) => api.get(apiConstants.ADMIN.STATISTICAL_PRODUCT_SALE, {params})
+export const getCountCustomerOrderFromApi = async (params) => api.get(apiConstants.ADMIN.STATISTICAL_COUNT_ORDER, {params})

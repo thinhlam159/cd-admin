@@ -54,5 +54,6 @@ export default {
     STATISTICAL_REVENUES: 'admin/statistical/revenues',
     STATISTICAL_PERIOD_REVENUES: 'admin/statistical/period-revenues',
     STATISTICAL_PRODUCT_SALE: 'admin/statistical/product-sale-statistical',
+    STATISTICAL_COUNT_ORDER: 'admin/statistical/count-customer-order',
   }
 };

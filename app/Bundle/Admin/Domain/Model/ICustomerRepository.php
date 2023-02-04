@@ -33,4 +33,10 @@ interface ICustomerRepository
      * @return bool
      */
     public function delete(CustomerId $customerId): bool;
+
+    /**
+     * @param string $keyword
+     * @return \App\Bundle\Admin\Domain\Model\Customer[]
+     */
+    public function findAllByKeyword(string $keyword): array;
 }
