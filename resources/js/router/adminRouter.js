@@ -32,6 +32,8 @@ import CreatePayment from "@/views/DebtManage/CreateDebt/CreatePayment.vue";
 import ListCustomerDebt from "@/views/DebtManage/ListDebt/ListCustomerDebt.vue";
 import Dashboard from "@/views/Dashboard";
 import Overview from "@/views/Dashboard/Overview/Overview.vue";
+import AddCategory from "@/views/CategoryManage/AddCategory/AddCategory.vue";
+import EditCategory from "@/views/CategoryManage/EditCategory/EditCategory.vue";
 
 export default [
     // ROUTER_ADMIN
@@ -118,6 +120,14 @@ export default [
                     {
                         path: ROUTER_PATH.EMPTY,
                         component: ListCategory,
+                    },
+                    {
+                        path: ROUTER_PATH.ADD,
+                        component: AddCategory,
+                    },
+                    {
+                        path: ROUTER_PATH.EDIT_ID,
+                        component: EditCategory,
                     },
                 ]
             },

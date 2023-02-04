@@ -33,6 +33,9 @@ export const getProductDetailFromApi = async (productId) => api.get(`${apiConsta
 
 // category manage
 export const getListCategoryFromApi = async (page) => api.get(`${apiConstants.ADMIN.LIST_CATEGORY}?page=${page}`)
+export const createCategoryFromApi = async (data) => api.post(apiConstants.ADMIN.CREATE_CATEGORY, data)
+export const getCategoryDetailFromApi = async (categoryId) => api.get(`${apiConstants.ADMIN.CATEGORY_DETAIL}/${categoryId}`)
+export const updateCategoryFromApi = async (categoryId, data) => api.put(`${apiConstants.ADMIN.UPDATE_CATEGORY}/${categoryId}`, data)
 
 // product attribute
 export const getListProductAttributeFromApi = async (page) => api.get(`${apiConstants.ADMIN.LIST_PRODUCT_ATTRIBUTE}?page=${page}`)
