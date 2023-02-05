@@ -1,7 +1,7 @@
 <template>
   <div class="p-5">
     <div class="w-full h-8 flex justify-end">
-      <ButtonAddNew @clickBtn="handleAddUserManage" :text="addNewUser" />
+      <ButtonAddNew @clickBtn="handleAddUserManage" :text="addNewCustomer" />
     </div>
 
 <!--    &lt;!&ndash; *********** &ndash;&gt;-->
@@ -47,7 +47,7 @@
           <td class="border text-center">{{ ++index }}</td>
           <td class="border text-center">{{ item.customer_name }}</td>
           <td class="border text-center">
-            <span class="text-[#337ab7] cursor-pointer break-all" @click="() => goToAdd(item.customer_id)">
+            <span class="text-[#337ab7] cursor-pointer break-all" @click="() => goToUpdate(item.customer_id)">
               {{ item.customer_email }}
             </span>
           </td>
@@ -69,7 +69,7 @@
           <!--            <td class="border text-center">{{ item.field9 }}</td>-->
           <td class="border text-center">
             <div class="flex justify-center ">
-              <ButtonEdit @clickBtn="() => goToAdd(item.user_id)" :text="editUser"/>
+              <ButtonEdit @clickBtn="() => goToUpdate(item.customer_id)" :text="editCustomer"/>
             </div>
           </td>
           </tr>
@@ -87,7 +87,7 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import Datepicker from "vue3-datepicker";
 import { ROUTER_PATH, MODULE_STORE, PAGE_DEFAULT } from "@/const";
 import ButtonAddNew from "@/components/Buttons/ButtonAddNew";
@@ -100,106 +100,71 @@ import { ref, computed, watch, inject } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useStore } from "vuex";
 import Pagination from "@/components/Pagination";
-import { useI18n } from "vue-i18n";
 
-export default {
-  name: "ListCustomer",
-  components: {
-    Datepicker,
-    ButtonAddNew,
-    ButtonFilter,
-    ButtonDownloadCSV,
-    ButtonEdit,
-    Pagination,
-  },
+const filterKey = ref({});
+const isShowSort = ref(false);
+const timeDatePicker = ref(new Date());
+const listCustomer = ref([]);
+const route = useRoute();
+const router = useRouter();
+const store = useStore();
+const toast = inject("$toast");
+const pagination = ref(null);
+const addNewCustomer = "Thêm người dùng";
+const editCustomer = "Cập nhật";
 
-  setup() {
-    const filterKey = ref({});
-    const isShowSort = ref(false);
-    const timeDatePicker = ref(new Date());
-    const listCustomer = ref([]);
-    const route = useRoute();
-    const router = useRouter();
-    const store = useStore();
-    const { t } = useI18n();
-    const toast = inject("$toast");
-    const pagination = ref(null);
-    const addNewUser = "Thêm người dùng";
-    const editUser = "Cập nhật";
+const pageCurrent = computed(() => {
+  if (!route.query.page) {
+    return PAGE_DEFAULT;
+  }
+  return Number(route.query.page);
+});
 
-    const pageCurrent = computed(() => {
-      if (!route.query.page) {
-        return PAGE_DEFAULT;
-      }
-      return Number(route.query.page);
-    });
-
-    const handleClickSortFn = () => {
-      isShowSort.value = !isShowSort.value;
-    };
-    const handleAddUserManage = () => {
-      router.push(`${ROUTER_PATH.CUSTOMER_MANAGE}/${ROUTER_PATH.ADD}`);
-    };
-    const goToAdd = (id) => {
-      router.push(`${ROUTER_PATH.CUSTOMER_MANAGE}/${ROUTER_PATH.EDIT}/` + id);
-    };
-    const getListCustomer = async (page) => {
-      try {
-
-        store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = true;
-        const response = await getListCustomerFromApi(page);
-        pagination.value = response.pagination;
-          listCustomer.value = {
-          ...response.data,
-        };
-
-
-
-        // listUserManage.value = response.data.map((item) => {
-        //   return {
-        //     ...item,
-        //     register_date: convertDateByTimestamp(item.register_date),
-        //     login_last_date: convertDateByTimestamp(item.login_last_date),
-        //   };
-        // });
-      } catch (errors) {
-        const error = errors.message;
-        // toast.error(error);
-      } finally {
-        store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
-      }
-    };
-
-    // watch(pageCurrent, (page) => {
-    //   if (route.path == ROUTER_PATH.USER_MANAGER) {
-    //     getListUserManager(page);
-    //   }
-    // });
-    const handleBackPage = (page) => {
-      router.push(`${ROUTER_PATH.USER_MANAGER}?page=${page}`);
-    };
-    const handleNextPage = (page) => {
-      router.push(`${ROUTER_PATH.USER_MANAGER}?page=${page}`);
-    };
-    getListCustomer(pageCurrent.value);
-
-    return {
-      filterKey,
-      isShowSort,
-      timeDatePicker,
-      listCustomer,
-      handleClickSortFn,
-      handleAddUserManage,
-      goToAdd,
-      getListCustomer,
-      pagination,
-      handleBackPage,
-      handleNextPage,
-      addNewUser,
-      editUser
-    };
-  },
+const handleClickSortFn = () => {
+  isShowSort.value = !isShowSort.value;
 };
+const handleAddUserManage = () => {
+  router.push(`${ROUTER_PATH.CUSTOMER_MANAGE}/${ROUTER_PATH.ADD}`);
+};
+const goToUpdate = (id) => {
+  router.push(`${ROUTER_PATH.CUSTOMER_MANAGE}/${ROUTER_PATH.EDIT}/` + id);
+};
+const getListCustomer = async (page) => {
+  try {
+
+    store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = true;
+    const response = await getListCustomerFromApi(page);
+    pagination.value = response.pagination;
+    listCustomer.value = {
+      ...response.data,
+    };
+
+    // listUserManage.value = response.data.map((item) => {
+    //   return {
+    //     ...item,
+    //     register_date: convertDateByTimestamp(item.register_date),
+    //     login_last_date: convertDateByTimestamp(item.login_last_date),
+    //   };
+    // });
+  } catch (errors) {
+    toast.error(errors.message)
+  } finally {
+    store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
+  }
+};
+
+// watch(pageCurrent, (page) => {
+//   if (route.path == ROUTER_PATH.USER_MANAGER) {
+//     getListUserManager(page);
+//   }
+// });
+const handleBackPage = (page) => {
+  router.push(`${ROUTER_PATH.USER_MANAGER}?page=${page}`);
+};
+const handleNextPage = (page) => {
+  router.push(`${ROUTER_PATH.USER_MANAGER}?page=${page}`);
+};
+getListCustomer(pageCurrent.value);
 </script>
 
 <style scoped></style>

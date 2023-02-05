@@ -102,7 +102,7 @@ class CustomerManagementController extends BaseController
             'status' => $customer->isActive,
         ];
 
-        return response()->json($data, 200);
+        return response()->json(['data' => $data], 200);
     }
 
     /**
@@ -119,7 +119,7 @@ class CustomerManagementController extends BaseController
 
         $command = new CustomerPutCommand(
             $request->id,
-            $request->user_name,
+            $request->customer_name,
             $request->email,
             (int)$request->phone,
             $request->status
