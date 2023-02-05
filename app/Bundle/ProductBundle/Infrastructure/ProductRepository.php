@@ -39,13 +39,18 @@ class ProductRepository implements IProductRepository
     public function findAll(ProductCriteria $criteria): array
     {
         $productAttributeValueIds = [];
+        $conditions = [];
         foreach ($criteria->getProductAttributeValueIds() as $productAttributeValueId) {
             $productAttributeValueIds[] = $productAttributeValueId->asString();
         }
+        if (!is_null($criteria->getKeyword())) {
+            $keyword = $criteria->getKeyword();
+            $conditions[] = ['name', 'like', "%$keyword%"];
+        }
         if (empty($productAttributeValueIds)) {
-            $entities = ModelProduct::paginate(PaginationConst::PAGINATE_ROW);
+            $entities = ModelProduct::where($conditions)->paginate(PaginationConst::PAGINATE_ROW);
         } else {
-            $entities = ModelProduct::whereIn('category_id', $productAttributeValueIds)->paginate(PaginationConst::PAGINATE_ROW);
+            $entities = ModelProduct::whereIn('category_id', $productAttributeValueIds)->where($conditions)->paginate(PaginationConst::PAGINATE_ROW);
         }
         $products = [];
 

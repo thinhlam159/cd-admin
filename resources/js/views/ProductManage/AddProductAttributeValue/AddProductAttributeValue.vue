@@ -81,9 +81,9 @@
   </div>
 </template>
 
-<script>
+<script setup>
 // import FormUserManage from "@/components/FormUserManage";
-import {ref} from "vue";
+import {inject, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {useStore} from "vuex";
 import {MODULE_STORE, ROUTER_PATH} from "@/const";
@@ -96,112 +96,96 @@ import {
 } from "@/api";
 import logoTimeSharing from "@/assets/images/default-thumbnail.jpg";
 
-export default {
-  name: "AddProductAttributeValue",
-  components: {},
-  setup() {
-    const router = useRouter()
-    const route = useRoute()
-    const store = useStore()
-    const formData = ref({})
-    const imageUrl = ref(logoTimeSharing)
-    const imageBuffer = ref(null)
-    const file = ref(null)
-    const product = ref({})
-    const productId = ref(route.params.id)
-    const measures = ref([])
-    const productAttributes = ref([])
-    const noticePrice = ref([
-      '298kg',
-      '273kg',
-      '248kg',
-      '224kg',
-      '214kg',
-      '290kg',
-    ])
+const router = useRouter()
+const route = useRoute()
+const store = useStore()
+const toast = inject('$toast')
+const formData = ref({})
+const imageUrl = ref(logoTimeSharing)
+const imageBuffer = ref(null)
+const file = ref(null)
+const product = ref({})
+const productId = ref(route.params.id)
+const measures = ref([])
+const productAttributes = ref([])
+const noticePrice = ref([
+  '298kg',
+  '273kg',
+  '248kg',
+  '224kg',
+  '214kg',
+  '290kg',
+])
 
-    const handleSubmit = async (data) => {
-      try {
-        const bodyFormData = new FormData()
-        bodyFormData.append('product_id', productId.value);
-        bodyFormData.append('product_attribute_id', data.product_attribute_id);
-        bodyFormData.append('measure_unit_id', data.measure_unit_type);
-        bodyFormData.append('value', data.value);
-        bodyFormData.append('code', data.code);
-        bodyFormData.append('price', data.price);
-        bodyFormData.append('count', data.count);
-        bodyFormData.append('notice_price_type', data.notice_price_type);
-        const res = await createProductAttributeValueFromApi(bodyFormData)
-        router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.PRODUCT_MANAGE}`)
-      } catch (errors) {
-        const error = errors.message;
-        // this.$toast.error(error);
-      } finally {
-        store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
-      }
-    }
-
-    const getProduct = async (id) => {
-      try {
-        const res = await getProductDetailFromApi(id)
-        product.value = {
-          ...res.data
-        }
-      } catch (errors) {
-        const error = errors.message;
-      }
-    }
-
-    const getProductAttributes = async (page) => {
-      try {
-        const res = await getListProductAttributeFromApi(page)
-        productAttributes.value = res.data
-      } catch (errors) {
-        const error = errors.message;
-      }
-    }
-
-    const getMeasureUnits = async (page) => {
-      try {
-        const res = await getListMeasureUnitFromApi(page)
-        console.log(res.data)
-        measures.value = res.data
-      } catch (errors) {
-        const error = errors.message;
-      }
-    }
-
-    const onFileChanged = () => {
-      let image = file.value.files[0];
-      imageUrl.value = URL.createObjectURL(image)
-      createImage(image)
-    }
-
-    const createImage = (file) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        imageBuffer.value = e.target.result
-      }
-      reader.readAsDataURL(file)
-    }
-
-    getProduct(productId.value)
-    getProductAttributes('')
-    getMeasureUnits('')
-
-    return {
-      formData,
-      handleSubmit,
-      onFileChanged,
-      imageUrl,
-      file,
-      product,
-      productAttributes,
-      measures,
-      noticePrice
-    }
+const handleSubmit = async (data) => {
+  try {
+    const bodyFormData = new FormData()
+    bodyFormData.append('product_id', productId.value);
+    bodyFormData.append('product_attribute_id', data.product_attribute_id);
+    bodyFormData.append('measure_unit_id', data.measure_unit_type);
+    bodyFormData.append('value', data.value);
+    bodyFormData.append('code', data.code);
+    bodyFormData.append('price', data.price);
+    bodyFormData.append('count', data.count);
+    bodyFormData.append('notice_price_type', data.notice_price_type);
+    const res = await createProductAttributeValueFromApi(bodyFormData)
+    await router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.PRODUCT_MANAGE}`)
+    toast.success('Thêm mã sản phẩm thành công', {duration: 3000});
+  } catch (errors) {
+    const error = errors.message;
+    toast.error(error);
+  } finally {
+    store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
   }
-};
+}
+
+const getProduct = async (id) => {
+  try {
+    const res = await getProductDetailFromApi(id)
+    product.value = {
+      ...res.data
+    }
+  } catch (errors) {
+    const error = errors.message;
+  }
+}
+
+const getProductAttributes = async (page) => {
+  try {
+    const res = await getListProductAttributeFromApi(page)
+    productAttributes.value = res.data
+  } catch (errors) {
+    const error = errors.message;
+  }
+}
+
+const getMeasureUnits = async (page) => {
+  try {
+    const res = await getListMeasureUnitFromApi(page)
+    console.log(res.data)
+    measures.value = res.data
+  } catch (errors) {
+    const error = errors.message;
+  }
+}
+
+const onFileChanged = () => {
+  let image = file.value.files[0];
+  imageUrl.value = URL.createObjectURL(image)
+  createImage(image)
+}
+
+const createImage = (file) => {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    imageBuffer.value = e.target.result
+  }
+  reader.readAsDataURL(file)
+}
+
+getProduct(productId.value)
+getProductAttributes('')
+getMeasureUnits('')
 </script>
 
 <style scoped></style>

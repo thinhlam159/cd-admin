@@ -82,7 +82,10 @@ class ProductController extends BaseController
             new MeasureUnitRepository(),
         );
 
-        $command = new ProductListGetCommand(!empty($request->category_ids) ? $request->category_ids : []);
+        $command = new ProductListGetCommand(
+            !empty($request->category_ids) ? $request->category_ids : [],
+            !empty($request->keyword) ? $request->keyword : '',
+        );
         $result = $applicationService->handle($command);
         $productResults = $result->productResults;
         $paginationResult = $result->paginationResult;
@@ -363,10 +366,10 @@ class ProductController extends BaseController
         $productAttributeValuePrices = !empty($request->product_attribute_value_price) ? $request->product_attribute_value_price : [];
         foreach ($productAttributeValuePrices as $productAttributeValuePrice) {
             $productAttributeValuePriceCommands[] = new ProductAttributePriceCommand(
-                $productAttributeValuePrice->product_attribute_price_id,
-                $productAttributeValuePrice->product_attribute_value_id,
-                $productAttributeValuePrice->price,
-                $productAttributeValuePrice->notice_price_type,
+                $productAttributeValuePrice['product_attribute_price_id'],
+                $productAttributeValuePrice['product_attribute_value_id'],
+                $productAttributeValuePrice['price'],
+                $productAttributeValuePrice['notice_price_type'],
             );
         }
         $command = new ProductAttributePriceListPutCommand(

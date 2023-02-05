@@ -20,6 +20,7 @@ export default {
     CREATE_PRODUCT: 'admin/create-product',
     PRODUCT_DETAIL: 'admin/product-detail',
     UPDATE_PRODUCT: 'admin/update-product',
+    UPDATE_PRODUCT_ATTRIBUTE_PRICE: 'admin/product-attribute-prices',
 
     LIST_CATEGORY: 'admin/list-category',
     CREATE_CATEGORY: 'admin/create-category',

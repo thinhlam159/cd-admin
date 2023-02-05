@@ -54,7 +54,7 @@ class ProductAttributePriceListPutApplicationService
         foreach ($command->productAttributePriceCommands as $priceCommand) {
             $productAttributeValue = $this->productAttributeValueRepository->findById(new ProductAttributeValueId($priceCommand->productAttributeValueId));
             $productAttributePriceCurrent = $this->productAttributePriceRepository->findById(new ProductAttributePriceId($priceCommand->productAttributePriceId));
-            $newPrices = new ProductAttributePrice(
+            $newPrices[] = new ProductAttributePrice(
                 ProductAttributePriceId::newId(),
                 $productAttributeValue->getProductAttributeValueId(),
                 $priceCommand->price,
@@ -62,7 +62,7 @@ class ProductAttributePriceListPutApplicationService
                 $productAttributePriceCurrent->getNoticePriceType(),
                 true
             );
-            $oldPrices = new ProductAttributePrice(
+            $oldPrices[] = new ProductAttributePrice(
                 $productAttributePriceCurrent->getProductAttributePriceId(),
                 new ProductAttributeValueId($priceCommand->productAttributeValueId),
                 $productAttributePriceCurrent->getPrice(),

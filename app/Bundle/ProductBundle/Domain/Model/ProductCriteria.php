@@ -10,11 +10,18 @@ final class ProductCriteria
     private array $productAttributeValueIds;
 
     /**
-     * @param ProductAttributeValueId[] $productAttributeValueIds
+     * @var string|null
      */
-    public function __construct(array $productAttributeValueIds)
+    private ?string $keyword;
+
+    /**
+     * @param ProductAttributeValueId[] $productAttributeValueIds
+     * @param string|null $keyword
+     */
+    public function __construct(array $productAttributeValueIds, ?string $keyword)
     {
         $this->productAttributeValueIds = $productAttributeValueIds;
+        $this->keyword = $keyword;
     }
 
     /**
@@ -23,5 +30,13 @@ final class ProductCriteria
     public function getProductAttributeValueIds(): array
     {
         return $this->productAttributeValueIds;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getKeyword(): ?string
+    {
+        return $this->keyword;
     }
 }

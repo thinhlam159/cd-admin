@@ -2,14 +2,9 @@
 
 namespace App\Bundle\ProductBundle\Application;
 
-use App\Bundle\Admin\Domain\Model\Customer;
-use App\Bundle\Admin\Domain\Model\CustomerId;
-use App\Bundle\Admin\Domain\Model\ICustomerRepository;
 use App\Bundle\Common\Application\PaginationResult;
 use App\Bundle\Common\Domain\Model\InvalidArgumentException;
 use App\Bundle\Common\Domain\Model\TransactionException;
-use App\Bundle\ProductBundle\Domain\Model\Category;
-use App\Bundle\ProductBundle\Domain\Model\CategoryId;
 use App\Bundle\ProductBundle\Domain\Model\ICategoryRepository;
 use App\Bundle\ProductBundle\Domain\Model\IFeatureImagePathRepository;
 use App\Bundle\ProductBundle\Domain\Model\IMeasureUnitRepository;
@@ -20,10 +15,6 @@ use App\Bundle\ProductBundle\Domain\Model\IProductInventoryRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductRepository;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValueId;
 use App\Bundle\ProductBundle\Domain\Model\ProductCriteria;
-use App\Bundle\ProductBundle\Infrastructure\FeatureImagePathRepository;
-use Exception;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class ProductListGetApplicationService
 {
@@ -112,21 +103,20 @@ class ProductListGetApplicationService
         }
         $productCriteria = new ProductCriteria(
             $productAttributeValueIds,
+            $command->keyword
         );
         [$products, $pagination] = $this->productRepository->findAll($productCriteria);
 
         $productResults = [];
         foreach ($products as $product) {
             $category = $this->categoryRepository->findById($product->getCategoryId());
-//            $featureImagePath = $this->featureImagePathRepository->findByProductId($product->getProductId());
             $productAttributeValues = $this->productAttributeValueRepository->findByProductId($product->getProductId());
 
             $productAttributeValueResults = [];
             foreach ($productAttributeValues as $productAttributeValue) {
                 $productAttributePrice = $this->productAttributePriceRepository->findByProductAttributeValueId($productAttributeValue->getProductAttributeValueId());
-                $productInventory = $this->productInventoryRepository->findByProductAttributeValueId($productAttributePrice->getProductAttributeValueId());
+                $productInventory = $this->productInventoryRepository->findByProductAttributeValueId($productAttributeValue->getProductAttributeValueId());
                 $productAttribute = $this->productAttributeRepository->findById($productAttributeValue->getProductAttributeId());
-//                $measureUnit = $this->measureUnitRepository->findById($productAttributeValue->getMeasureUnitId());
                 $standardPrice = $productAttributePrice->getPrice() / $productAttributePrice->getNoticePriceType()->getAmountValue();
                 $standardPrice = floor($standardPrice);
                 $productAttributeValueResults[] = new ProductAttributeValueResult(

@@ -23,13 +23,14 @@ export const getCustomerDetailFromApi = async (customerId) => api.get(`${apiCons
 export const updateCustomerFormApi = async (customerId, data) => api.put(`${apiConstants.ADMIN.UPDATE_CUSTOMER}/${customerId}`, data)
 
 // product manage
-export const getListProductFromApi = async (page, category) => api.get(`${apiConstants.ADMIN.LIST_PRODUCT}?page=${page}`, category)
+export const getListProductFromApi = async (page, config) => api.get(`${apiConstants.ADMIN.LIST_PRODUCT}?page=${page}`, config)
 export const createProductFromApi = async (data) => await api.post(apiConstants.ADMIN.CREATE_PRODUCT, data, {
     headers: {
         "Content-Type": "multipart/form-data",
     },
 })
 export const getProductDetailFromApi = async (productId) => api.get(`${apiConstants.ADMIN.PRODUCT_DETAIL}/${productId}`)
+export const updateProductAttributePriceFromApi = async (data) => api.put(apiConstants.ADMIN.UPDATE_PRODUCT_ATTRIBUTE_PRICE, data)
 
 // category manage
 export const getListCategoryFromApi = async (page) => api.get(`${apiConstants.ADMIN.LIST_CATEGORY}?page=${page}`)
