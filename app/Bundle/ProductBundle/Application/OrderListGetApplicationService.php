@@ -10,7 +10,6 @@ use App\Bundle\Common\Domain\Model\TransactionException;
 use App\Bundle\ProductBundle\Domain\Model\IOrderRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductAttributePriceRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductAttributeValueRepository;
-use App\Bundle\ProductBundle\Domain\Model\IProductInventoryRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductRepository;
 use App\Bundle\ProductBundle\Domain\Model\OrderCriteria;
 
@@ -122,6 +121,7 @@ class OrderListGetApplicationService
                 $order->getOrderPaymentStatus()->getValue(),
                 $orderProductResults,
                 $order->getUpdatedAt()->asString(),
+                $order->getOrderDate()->asString(),
                 $totalCost
             );
         }

@@ -2,18 +2,15 @@
   <div class="w-full h-full">
     <div class="w-full pt-14 h-full pl-10">
       <div class="w-full py-6 py-auto text-xl">
-        <span class="text-gray-500">Thêm sản phẩm</span>
+        <span class="text-gray-500">Tạo đơn hàng</span>
         <hr>
       </div>
+      <div class="mr-4 w-[14%] mb-5">
+        <label for="customer" class="block mb-1 font-bold text-sm">Khách hàng</label>
+        <SelectBoxWithSearch :options="customers" @option-selected="handleSelectCustomer" />
+      </div>
       <form @submit.prevent="handleSubmit(formData)">
-        <div class="mr-4 w-[14%] mb-5">
-          <label for="customer" class="block mb-1 font-bold text-sm">Khách hàng</label>
-          <select name="customer" class="p-3 w-full" v-model="formData.customerId">
-            <option v-for="item in customers" :value="item.customer_id"
-                    class="w-full h-10 px-3 text-base text-gray-700">{{ item.customer_name }}
-            </option>
-          </select>
-        </div>
+
         <hr>
         <div class="mt-5 py-3 flex">
           <div class="mr-4 w-[14%]">
@@ -77,10 +74,12 @@ import {
 import {MODULE_STORE, ROUTER_PATH} from "@/const";
 import InputItem from "@/views/OrderManage/CreateOrder/InputItem";
 import ButtonAddNew from "@/components/Buttons/ButtonAddNew";
+import SelectBoxWithSearch from "@/components/MultiSelect/SelectBoxWithSearch.vue";
+import MultiSelect from "@/components/MultiSelect/MultiSelect.vue";
 
 export default {
   name: "CreateOrder",
-  components: { InputItem, ButtonAddNew },
+  components: {MultiSelect, SelectBoxWithSearch, InputItem, ButtonAddNew },
   methods: {
     forceUpdate() {
       this.renderComponent = false
@@ -99,13 +98,16 @@ export default {
     const store = useStore()
     const formData = ref({})
     const categories = ref({})
-    const customers = ref({})
+    const customers = ref([])
     const products = ref({})
     const productsByCategory = ref({})
     const productSelected = ref({})
     const productAttributeValues = ref({})
     const productAttributeValuesByProduct = ref({})
     const listInputItem = ref(store.state[MODULE_STORE.ORDER.NAME].orderPostData)
+    const selectedCustomer = ref(null)
+    const currentCustomer = ref({})
+    const customerMessageError = ref(null)
 
     const handleSubmit = async (data) => {
       try {
@@ -154,9 +156,15 @@ export default {
     }
     const getListCustomer = async () => {
       const res = await getListCustomerFromApi();
-      customers.value = {
-        ...res.data
-      }
+      console.log(res.data)
+      customers.value = [
+        ...res.data.map(item => {
+          return {
+            ...item,
+            text: item.customer_name
+          }
+        })
+      ]
       store.state[MODULE_STORE.ORDER.NAME].customers = res.data
     }
     const handleOnChangeCategorySelect = () => {
@@ -193,6 +201,14 @@ export default {
       listInputItem.value = [];
       nextTick(() => {listInputItem.value = store.state[MODULE_STORE.ORDER.NAME].orderPostData})
     }
+    const handleSelectCustomer = (selectedItem) => {
+      customerMessageError.value = false
+      // currentCustomer.value = customers.value.find((e) => {
+      //   return e.customer_id === ids[0]
+      // })
+      selectedCustomer.value = selectedItem
+      console.log(selectedItem)
+    }
 
     getListCategory()
     getListCustomer()
@@ -206,11 +222,13 @@ export default {
       productAttributeValuesByProduct,
       productsByCategory,
       listInputItem,
+      selectedCustomer,
       handleSubmit,
       handleOnChangeCategorySelect,
       handleOnChangeProductSelect,
       handleAddToOrder,
       handleRemoveInputItem,
+      handleSelectCustomer,
     }
   }
 }

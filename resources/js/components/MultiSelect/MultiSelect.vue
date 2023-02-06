@@ -10,20 +10,18 @@
     </div>
 
     <div class="flex flex-wrap" @click="onFocusSearch" :class="[onlySelectOne ? 'handle-wrap' : '']">
-<!--      <div-->
-<!--        v-for="(item, index) in options.filter(e => listSelected.includes(e.customer_id))"-->
-<!--        :key="index"-->
-<!--        class="inline-block"-->
-<!--      >-->
-<!--        <div-->
-<!--          class="selected-item"-->
-<!--        >-->
-<!--          <div :title="item.customer_name">{{ item.customer_name }}</div>-->
-<!--          <div v-if="hasSearch" class="close-icon" @click="handleDeleteItem(item)">-->
-<!--            <CloseIconBold />-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </div>-->
+      <div
+        v-for="(item, index) in options.filter(e => listSelected.includes(e.customer_id))"
+        :key="index"
+        class="inline-block"
+      >
+        <div class="selected-item">
+          <div :title="item.customer_name">{{ item.customer_name }}</div>
+          <div v-if="hasSearch" class="close-icon" @click="handleDeleteItem(item)">
+            <CloseIconBold />
+          </div>
+        </div>
+      </div>
       <div v-if="hasSearch" class="inline-block max-w-[300px]" :style="{ flex: '1 1 0%' }">
         <input
           type="text"

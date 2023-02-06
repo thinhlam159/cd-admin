@@ -87,6 +87,7 @@ final class OrderRepository implements IOrderRepository
                 OrderPaymentStatus::fromStatus($entity->payment_status)
             );
             $order->setUpdatedAt(SettingDate::fromYmdHis($entity->updated_at));
+            $order->setOrderDate(SettingDate::fromYmdHis($entity->order_date));
 
             $orders[] = $order;
         }
