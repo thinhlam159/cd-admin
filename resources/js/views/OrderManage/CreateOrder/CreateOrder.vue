@@ -10,7 +10,6 @@
         <SelectBoxWithSearch :options="customers" @option-selected="handleSelectCustomer" />
       </div>
       <form @submit.prevent="handleSubmit(formData)">
-
         <hr>
         <div class="mt-5 py-3 flex">
           <div class="mr-4 w-[14%]">
@@ -57,6 +56,11 @@
         </div>
       </form>
     </div>
+    <AddOrderItemModal
+      v-if="showModal"
+      @close="showModal = false"
+      @addProductItem="handleAddProductItem"
+    />
   </div>
 </template>
 
@@ -66,7 +70,6 @@ import {useStore} from "vuex";
 import {ref, nextTick} from "vue";
 import {
   createOrderFromApi,
-  createProductFromApi,
   getListCategoryFromApi,
   getListCustomerFromApi,
   getListProductFromApi
@@ -76,10 +79,11 @@ import InputItem from "@/views/OrderManage/CreateOrder/InputItem";
 import ButtonAddNew from "@/components/Buttons/ButtonAddNew";
 import SelectBoxWithSearch from "@/components/MultiSelect/SelectBoxWithSearch.vue";
 import MultiSelect from "@/components/MultiSelect/MultiSelect.vue";
+import AddOrderItemModal from "@/views/OrderManage/CreateOrder/AddOrderItemModal.vue";
 
 export default {
   name: "CreateOrder",
-  components: {MultiSelect, SelectBoxWithSearch, InputItem, ButtonAddNew },
+  components: {AddOrderItemModal, MultiSelect, SelectBoxWithSearch, InputItem, ButtonAddNew },
   methods: {
     forceUpdate() {
       this.renderComponent = false
@@ -108,6 +112,7 @@ export default {
     const selectedCustomer = ref(null)
     const currentCustomer = ref({})
     const customerMessageError = ref(null)
+    const showModal = ref(true);
 
     const handleSubmit = async (data) => {
       try {
@@ -156,7 +161,6 @@ export default {
     }
     const getListCustomer = async () => {
       const res = await getListCustomerFromApi();
-      console.log(res.data)
       customers.value = [
         ...res.data.map(item => {
           return {
@@ -209,10 +213,13 @@ export default {
       selectedCustomer.value = selectedItem
       console.log(selectedItem)
     }
+    const handleAddProductItem = (item) => {
+      console.log(item)
+    }
 
-    getListCategory()
+    // getListCategory()
     getListCustomer()
-    getListProduct()
+    // getListProduct()
 
     return {
       formData,
@@ -223,12 +230,14 @@ export default {
       productsByCategory,
       listInputItem,
       selectedCustomer,
+      showModal,
       handleSubmit,
       handleOnChangeCategorySelect,
       handleOnChangeProductSelect,
       handleAddToOrder,
       handleRemoveInputItem,
       handleSelectCustomer,
+      handleAddProductItem,
     }
   }
 }
