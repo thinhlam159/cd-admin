@@ -19,6 +19,7 @@ const importGood = {
     [MODULE_STORE.IMPORT_GOOD.MUTATIONS.ADD_IMPORT_GOOD_DATA](state, payload) {
       return state.importGoodPostData.push(payload)
     },
+
     [MODULE_STORE.IMPORT_GOOD.MUTATIONS.REMOVE_IMPORT_GOOD_DATA_ITEM](state, payload) {
       if (state.importGoodPostData[payload.index] === payload.item) {
         state.importGoodPostData.splice(payload.index, 1)
@@ -37,6 +38,12 @@ const importGood = {
 
       return state.importGoodPostData;
     },
+    [MODULE_STORE.IMPORT_GOOD.MUTATIONS.CLEAR_IMPORT_GOOD_DATA_ITEM](state, payload) {
+      state.importGoodPostData = [...payload]
+
+      return state.importGoodPostData;
+    },
+
   },
 };
 

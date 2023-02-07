@@ -20,6 +20,9 @@
           <th rowspan="2" class="border py-1 w-[9%]">
             Ngày tạo đơn
           </th>
+          <th rowspan="2" class="border py-1 w-[9%]">
+            Tên container
+          </th>
           <th colspan="2" class="border py-1 w-[20%]">
             Chi Tiết
           </th>
@@ -38,6 +41,7 @@
             <td class="border text-center">{{ ++index }}</td>
             <td class="border text-center">{{ item.user_name }}</td>
             <td class="border text-center">{{ item.date }}</td>
+            <td class="border text-center">{{ item.containerName }}</td>
             <td class="border text-center">
               <div class="flex justify-center ">
                 <ButtonEdit @clickBtn="() => goToDetail(item.order_id)" :text="orderDetail"/>
@@ -63,7 +67,9 @@
             <td v-if="subIndex === 0" :rowspan="item.import_good_products.length" class="border text-center">
               {{ item.data }}
             </td>
-
+            <td v-if="subIndex === 0" :rowspan="item.import_good_products.length" class="border text-center">
+              {{ item.containerName }}
+            </td>
             <td class="border text-center h-full m-0 p-0">
               {{ `${subItem.product_code} ${subItem.product_attribute_value_code}` }}
             </td>
@@ -72,7 +78,7 @@
             </td>
             <td v-if="subIndex === 0" :rowspan="item.import_good_products.length" class="border text-center">
               <div class="flex justify-center ">
-                <ButtonEdit @clickBtn="() => goToDetail(item.import_good_id)" :text="editUser"/>
+                <ButtonEdit @clickBtn="() => goToDetail(item.import_good_id)" text="Cập nhật"/>
               </div>
             </td>
           </tr>
@@ -164,7 +170,8 @@ export default {
         listImportGood.value = res.data.map((item) => {
           return {
             ...item,
-            data: convertDateByTimestamp(item.import_good_date),
+            data: item.import_good_date,
+            containerName: item.container_name ? item.container_name : '-',
             importGoodProducts: item.import_good_products.map( product =>  {
               return {
                 ...product,

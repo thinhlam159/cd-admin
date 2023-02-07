@@ -6,7 +6,7 @@
         <span class="text-gray-500">Chi tiết đơn hàng</span>
       </div>
       <div class="w-full py-1 text-sm flex justify-between items-center">
-        <span class="text-gray-900">Tên khách hàng: {{ importGoodDetail.customer_name }}</span>
+        <span class="text-gray-900">Tên container: {{ importGoodDetail.container_name }}</span>
         <div class="flex items-center">
           <span>
             Ngày tạo đơn:
@@ -23,26 +23,17 @@
           <div class="inline-block w-[22%]"><span>Tên sản phẩm</span></div>
           <div class="inline-block w-[8%]"><span>ĐVT</span></div>
           <div class="inline-block w-[20%]"><span>Số lượng</span></div>
-<!--          <div class="inline-block w-[20%]"><span>Đơn giá</span></div>-->
-<!--          <div class="inline-block w-[22%]"><span>Thành tiền</span></div>-->
         </div>
         <div v-for="(item, index) in importGoodProduct" class="w-full py-2 flex border-b border-gray-50">
           <div class="inline-block w-[4%]"><span>{{ ++index }}</span></div>
           <div class="inline-block w-[22%]"><span>{{ item.product_name + ' ' + item.product_attribute_value_code }}</span></div>
           <div class="inline-block w-[8%]"><span>{{ item.measure_unit_type }}</span></div>
           <div class="inline-block w-[20%]"><span>{{ item.count }}</span></div>
-<!--          <div class="inline-block w-[20%]"><span>{{ item.weight }}</span></div>-->
-<!--          <div class="inline-block w-[20%]"><span>{{ item.price.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</span></div>-->
-<!--          <div class="inline-block w-[22%]"><span>{{ item.cost.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</span></div>-->
         </div>
-<!--        <div class="flex justify-end mt-5"><span>Tổng cộng: {{ importGoodDetail.total_cost.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</span></div>-->
       </div>
       <div>
         <div class="ml-2 my-4">
           <ButtonAddNew @clickBtn="handleRestoreImportGood(importGoodDetail.import_good_id)" :text="'Xóa đơn nhập kho'"/>
-        </div>
-        <div class="ml-2 my-4">
-          <ButtonAddNew @clickBtn="handleUpdateImportGood" :text="'Cập nhật nhập kho'"/>
         </div>
       </div>
     </div>
@@ -53,16 +44,10 @@
 import {inject, ref} from "vue";
 import { useRoute,useRouter } from 'vue-router'
 import {MODULE_STORE, ROUTER_PATH} from "@/const";
-import {
-  getCustomerDetailFromApi,
-  updateCustomerFormApi,
-  getOrderDetailFromApi,
-  getImportGoodDetailFromApi, restoreImportGoodFromApi
-} from "@/api";
+import {getImportGoodDetailFromApi, restoreImportGoodFromApi} from "@/api";
 import {useStore} from "vuex";
 import Datepicker from "vue3-datepicker";
 import ButtonAddNew from "@/components/Buttons/ButtonAddNew";
-
 export default {
   name: "DetailImportGood",
   components: { Datepicker, ButtonAddNew },
@@ -113,8 +98,7 @@ export default {
             ...response.data,
           };
           importGoodProduct.value = [...response.data.import_good_products]
-          picked.value = new Date(response.data.import_good_date * 1000)
-          console.log(response.data.import_good_date * 1000)
+          picked.value = new Date(response.data.import_good_date)
         } catch (errors) {
           const error = errors.message || this.$t("common.has_error");
           toast.error(error);
@@ -122,20 +106,15 @@ export default {
           store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
         }
       }
-
-      const handleRestoreImportGood = async  (id) => {
+      const handleRestoreImportGood = async (id) => {
         try {
           const res = await restoreImportGoodFromApi(id)
-          router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.IMPORT_GOOD_MANAGE}`)
+          await router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.IMPORT_GOOD_MANAGE}`)
           toast.success("Hủy đơn nhập hàng thành công!", {duration:3000})
         } catch (errors) {
-          const error = errors.message || this.$t("common.has_error");
+          const error = errors.message;
           toast.error(error);
         }
-      }
-
-      const handleUpdateImportGood = () => {
-
       }
 
       getImportGoodDetail(importGoodId.value)
@@ -147,7 +126,6 @@ export default {
         picked,
         styleDatePicker,
         handleRestoreImportGood,
-        handleUpdateImportGood,
       }
     }
 };

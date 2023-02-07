@@ -46,9 +46,16 @@
                       :products="products"
           />
         </div>
-        <Datepicker class="p-2 border border-gray-200 mt-3" v-model="picked" :style="styleDatePicker" />
         <div class="ml-2 my-4">
           <ButtonAddNew @clickBtn="handleAddToImportGood" :text="'Sản phẩm'"/>
+        </div>
+        <div class="flex mt-3 items-end">
+          <span>Ngày nhập: </span>
+          <Datepicker class="p-2 border border-gray-300 ml-3 min-w-[150px]" v-model="picked" :style="styleDatePicker" />
+        </div>
+        <div class="flex mt-3 items-end">
+          <span>Tên container: </span>
+          <input type="text" class="outline-none border-gray-300 border ml-3 min-w-[150px] p-2" v-model="containerName">
         </div>
         <div>
           <input class="w-25 h-10 mt-5 px-3 text-base text-gray-700 placeholder-gray-400 bg-green-400 cursor-pointer" type="submit" value="Tạo đơn nhập hàng">
@@ -61,7 +68,7 @@
 <script>
 import {useRouter} from "vue-router";
 import {useStore} from "vuex";
-import {ref, nextTick, inject} from "vue";
+import {ref, nextTick, inject, onUnmounted} from "vue";
 import {
   createImportGoodFromApi,
   getListCategoryFromApi,
@@ -70,7 +77,7 @@ import {
 } from "@/api";
 import {MODULE_STORE, ROUTER_PATH} from "@/const";
 import ButtonAddNew from "@/components/Buttons/ButtonAddNew";
-import ImportGoodItem from "@/views/ImportGoodManage/CreateOrder/ImportGoodItem.vue";
+import ImportGoodItem from "@/views/ImportGoodManage/CreateImportGood/ImportGoodItem.vue";
 import Datepicker from 'vue3-datepicker'
 
 import {convertDateByTimestamp} from "@/utils";
@@ -96,6 +103,7 @@ export default {
     const productAttributeValuesByProduct = ref({})
     const listImportGoodItem = ref(store.state[MODULE_STORE.IMPORT_GOOD.NAME].importGoodPostData)
     const importGoodItemErrors = ref([])
+    const containerName = ref('')
     const toast = inject("$toast");
     const picked = ref(new Date())
     const styleDatePicker = ref({
@@ -124,14 +132,19 @@ export default {
       try {
         store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = true
         const orderPostData = [...store.state[MODULE_STORE.IMPORT_GOOD.NAME].importGoodPostData]
+        const year = picked.value.getFullYear()
+        const month = ('0' + (picked.value.getMonth() + 1)).slice(-2)
+        const day = ('0' + picked.value.getDate()).slice(-2)
+        const date = `${year}-${month}-${day}`
         const postData = {
           import_good_products: orderPostData,
-          date: picked.value.getTime() / 1000 | 0
+          date: date,
+          container_name: containerName.value
         }
         const res = await createImportGoodFromApi(postData)
-        console.log(res)
         toast.success("Tạo đơn nhập thành công!", {duration:3000})
-        router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.IMPORT_GOOD_MANAGE}`)
+        store.commit(`${MODULE_STORE.IMPORT_GOOD.NAME}/${MODULE_STORE.IMPORT_GOOD.MUTATIONS.CLEAR_IMPORT_GOOD_DATA_ITEM}`, [])
+        await router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.IMPORT_GOOD_MANAGE}`)
         store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false
       } catch (errors) {
         const error = errors.message;
@@ -212,6 +225,9 @@ export default {
     //     importGoodItemErrors.value.splice(error.index, 1)
     //   }
     // }
+    onUnmounted(() => {
+      store.commit(`${MODULE_STORE.IMPORT_GOOD.NAME}/${MODULE_STORE.IMPORT_GOOD.MUTATIONS.CLEAR_IMPORT_GOOD_DATA_ITEM}`, [])
+    })
 
     getListCategory()
     getListDealer()
@@ -227,6 +243,7 @@ export default {
       listImportGoodItem,
       picked,
       styleDatePicker,
+      containerName,
       handleSubmit,
       handleOnChangeCategorySelect,
       handleOnChangeProductSelect,

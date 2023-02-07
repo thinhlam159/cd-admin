@@ -20,7 +20,7 @@ class CreatePaymentsTable extends Migration
             $table->string('comment')->nullable();
             $table->string('customer_id');
             $table->string('user_id');
-            $table->integer('payment_date');
+            $table->date('payment_date');
             $table->timestamps();
             $table->foreign('customer_id')->references('id')->on('customers')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

@@ -19,6 +19,7 @@ use App\Bundle\ProductBundle\Domain\Model\ProductId;
 use App\Bundle\ProductBundle\Domain\Model\ProductInventoryId;
 use App\Bundle\ProductBundle\Domain\Model\ProductInventoryImportGood;
 use App\Bundle\ProductBundle\Domain\Model\ProductInventoryUpdateType;
+use App\Bundle\ProductBundle\Domain\Model\SettingDate;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -61,7 +62,8 @@ class ImportGoodPostApplicationService
             $importGoodId,
             null,
             new UserId($command->userId),
-            $command->date
+            SettingDate::fromYmdHis($command->date),
+            $command->containerName
         );
 
         $importGoodProducts = [];

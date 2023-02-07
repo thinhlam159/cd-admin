@@ -18,6 +18,8 @@ class CreateImportGoodsTable extends Migration
             $table->string('dealer_id')->nullable();
             $table->string('user_id');
             $table->tinyInteger('is_restore')->nullable();
+            $table->date('import_good_date');
+            $table->string('container_name')->nullable();
             $table->timestamps();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('dealer_id')->references('id')->on('dealers')->onDelete('cascade');

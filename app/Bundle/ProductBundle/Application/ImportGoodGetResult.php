@@ -25,9 +25,13 @@ class ImportGoodGetResult
      */
     public string $userName;
     /**
-     * @var int
+     * @var string
      */
-    public int $importGoodDate;
+    public string $importGoodDate;
+    /**
+     * @var string|null
+     */
+    public ?string $containerName;
     /**
      * @var ImportGoodProductResult[]
      */
@@ -39,10 +43,11 @@ class ImportGoodGetResult
      * @param string|null $dealerName
      * @param string $userId
      * @param string $userName
-     * @param int $importGoodDate
+     * @param string $importGoodDate
+     * @param string|null $containerName
      * @param ImportGoodProductResult[] $importGoodProductResults
      */
-    public function __construct(string $importGoodId, ?string $dealerId, ?string $dealerName, string $userId, string $userName, int $importGoodDate, array $importGoodProductResults)
+    public function __construct(string $importGoodId, ?string $dealerId, ?string $dealerName, string $userId, string $userName, string $importGoodDate, ?string $containerName, array $importGoodProductResults)
     {
         $this->importGoodId = $importGoodId;
         $this->dealerId = $dealerId;
@@ -50,6 +55,7 @@ class ImportGoodGetResult
         $this->userId = $userId;
         $this->userName = $userName;
         $this->importGoodDate = $importGoodDate;
+        $this->containerName = $containerName;
         $this->importGoodProductResults = $importGoodProductResults;
     }
 }

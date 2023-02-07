@@ -123,7 +123,8 @@ class ImportGoodListGetApplicationService
                 !is_null($dealer) ? $dealer->getName() : null,
                 $importGood->getUserId(),
                 $user->getUserName(),
-                $importGood->getDate(),
+                $importGood->getDate()->asString(),
+                $importGood->getContainerName(),
                 $importGoodProductResults
             );
         }

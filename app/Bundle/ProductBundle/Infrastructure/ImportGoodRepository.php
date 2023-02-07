@@ -15,6 +15,7 @@ use App\Bundle\ProductBundle\Domain\Model\MeasureUnitType;
 use App\Bundle\ProductBundle\Domain\Model\MonetaryUnitType;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValueId;
 use App\Bundle\ProductBundle\Domain\Model\ProductId;
+use App\Bundle\ProductBundle\Domain\Model\SettingDate;
 use App\Bundle\UserBundle\Domain\Model\Pagination;
 use App\Models\ImportGood as ModelImportGood;
 use App\Models\ImportGoodProduct as ModelImportGoodProduct;
@@ -31,6 +32,7 @@ class ImportGoodRepository implements IImportGoodRepository
             'dealer_id' => !is_null($importGood->getDealerId()) ? $importGood->getDealerId()->asString() : null,
             'user_id' => $importGood->getUserId()->asString(),
             'import_good_date' => $importGood->getDate(),
+            'container_name' => $importGood->getContainerName(),
         ]);
 
         if (!$result) {
@@ -79,7 +81,8 @@ class ImportGoodRepository implements IImportGoodRepository
             $importGoodId,
             !is_null($entity['dealer_id']) ? new DealerId($entity['dealer_id']) : null,
             new UserId(($entity['user_id'])),
-            $entity['import_good_date']
+            SettingDate::fromYmdHis($entity['import_good_date']),
+            $entity['container_name']
         );
     }
 
@@ -135,7 +138,8 @@ class ImportGoodRepository implements IImportGoodRepository
                 new ImportGoodId($entity['id']),
                 !is_null($entity['dealer_id']) ? new DealerId($entity['dealer_id']) : null,
                 new UserId(($entity['user_id'])),
-                $entity['import_good_date']
+                SettingDate::fromYmdHis($entity['import_good_date']),
+                $entity['container_name']
             );
         }
 

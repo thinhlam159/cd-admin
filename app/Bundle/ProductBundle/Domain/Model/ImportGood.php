@@ -19,22 +19,29 @@ final class ImportGood
      */
     private UserId $userId;
     /**
-     * @var int
+     * @var SettingDate
      */
-    private int $date;
+    private SettingDate $date;
+
+    /**
+     * @var string|null
+     */
+    private ?string $containerName;
 
     /**
      * @param ImportGoodId $importGoodId
      * @param DealerId|null $dealerId
      * @param UserId $userId
-     * @param int $date
+     * @param SettingDate $date
+     * @param string|null $containerName
      */
-    public function __construct(ImportGoodId $importGoodId, ?DealerId $dealerId, UserId $userId, int $date)
+    public function __construct(ImportGoodId $importGoodId, ?DealerId $dealerId, UserId $userId, SettingDate $date, ?string $containerName)
     {
         $this->importGoodId = $importGoodId;
         $this->dealerId = $dealerId;
         $this->userId = $userId;
         $this->date = $date;
+        $this->containerName = $containerName;
     }
 
     /**
@@ -62,10 +69,18 @@ final class ImportGood
     }
 
     /**
-     * @return int
+     * @return SettingDate
      */
-    public function getDate(): int
+    public function getDate(): SettingDate
     {
         return $this->date;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getContainerName(): ?string
+    {
+        return $this->containerName;
     }
 }

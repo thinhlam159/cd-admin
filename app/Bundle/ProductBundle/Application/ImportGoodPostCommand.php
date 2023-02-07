@@ -15,19 +15,26 @@ class ImportGoodPostCommand
     public array $importGoodProductCommands;
 
     /**
-     * @var int
+     * @var string
      */
-    public int $date;
+    public string $date;
+
+    /**
+     * @var string|null
+     */
+    public ?string $containerName;
 
     /**
      * @param string $userId
      * @param ImportGoodProductCommand[] $importGoodProductCommands
-     * @param int $date
+     * @param string $date
+     * @param string|null $containerName
      */
-    public function __construct(string $userId, array $importGoodProductCommands, int $date)
+    public function __construct(string $userId, array $importGoodProductCommands, string $date, ?string $containerName)
     {
         $this->userId = $userId;
         $this->importGoodProductCommands = $importGoodProductCommands;
         $this->date = $date;
+        $this->containerName = $containerName;
     }
 }

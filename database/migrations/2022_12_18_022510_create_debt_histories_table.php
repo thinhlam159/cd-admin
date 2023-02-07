@@ -40,7 +40,6 @@ class CreateDebtHistoriesTable extends Migration
             $table->foreign('vat_id')->references('id')->on('vats')->onDelete('cascade');
             $table->foreign('other_debt_id')->references('id')->on('other_debts')->onDelete('cascade');
             $table->foreign('payment_id')->references('id')->on('payments')->onDelete('cascade');
-
         });
     }
 
