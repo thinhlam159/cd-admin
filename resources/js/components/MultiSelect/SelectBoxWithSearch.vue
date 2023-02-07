@@ -1,5 +1,5 @@
 <template>
-  <div class="relative flex m-4 items-center border border-gray-400 rounded-sm p-1 w-max w-max" ref="selectWithSearchRef">
+  <div class="relative flex my-4 items-center border border-gray-400 rounded-sm p-1 w-max w-max" ref="selectWithSearchRef">
     <div class="flex justify-center items-center">
       <SearchIcon />
     </div>

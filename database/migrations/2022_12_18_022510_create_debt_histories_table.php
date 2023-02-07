@@ -27,7 +27,7 @@ class CreateDebtHistoriesTable extends Migration
             $table->string('vat_id')->nullable();
             $table->string('other_debt_id')->nullable();
             $table->string('payment_id')->nullable();
-            $table->date('update_date');
+            $table->date('updated_date');
             $table->integer('number_of_money');
             $table->integer('monetary_unit_type');
             $table->string('comment');

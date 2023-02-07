@@ -5,69 +5,71 @@
         <span class="text-gray-500">Tạo đơn hàng</span>
         <hr>
       </div>
-      <div class="mr-4 w-[14%] mb-5">
-        <label for="customer" class="block mb-1 font-bold text-sm">Khách hàng</label>
-        <SelectBoxWithSearch :options="customers" @option-selected="handleSelectCustomer" />
+      <div class="mr-4 w-[14%] mb-5 flex justify-between">
+        <div>
+          <label for="customer" class="block mb-1 font-bold text-sm">Khách hàng</label>
+          <SelectBoxWithSearch :options="customers" @option-selected="handleSelectCustomer" />
+        </div>
+        <div>
+          <Datepicker class="p-2 border border-gray-200 mt-3" v-model="picked" :style="styleDatePicker" />
+        </div>
       </div>
-      <form @submit.prevent="handleSubmit(formData)">
-        <hr>
-        <div class="mt-5 py-3 flex">
-          <div class="mr-4 w-[14%]">
-            <span>Danh mục</span>
-          </div>
-          <div class="mr-4 w-[14%]">
-            <span>Sản phẩm</span>
-          </div>
-          <div class="mr-4 w-[10%]">
-            <span>Mã sản phẩm</span>
-          </div>
-          <div class="mr-4 w-[10%]">
-            <span>Tên sản phẩm</span>
-          </div>
-          <div class="mr-4 w-[5%]">
-            <span>Giá</span>
-          </div>
-          <div class="mr-4 w-[10%]">
-            <span>Số lượng</span>
-          </div>
-          <div class="mr-4 w-[10%]">
-            <span>Thành tiền</span>
-          </div>
-          <div class="mr-4 w-[5%]">
-            <span>Xóa sp</span>
-          </div>
+      <div class="border-b border-t border-gray-400">
+        <AddOrderItemModal @addProductItem="handleAddProductItem" />
+      </div>
+      <div>
+        <div class="flex py-2 text-md items-center">
+          <span class="mr-3 w-[10%]">STT</span>
+          <span class="mr-3 w-[25%]">Mã</span>
+          <span class="mr-3 w-[10%]">Tên</span>
+          <span class="mr-3 w-[10%]">Đơn giá</span>
+          <span class="mr-3 w-[10%]">Số lượng</span>
+          <span class="mr-3 w-[20%]">Thành tiền</span>
+          <span class="mr-3 w-[10%]">Xóa</span>
         </div>
-        <div v-if="renderComponent">
-          <input-item v-for="(item, index) in listInputItem" :key="index"
-                      @handle-remove-input-item="handleRemoveInputItem({item, index})"
-                      @update-display="forceUpdate"
-                      :item="item"
-                      :index="index"
-                      :categories="categories"
-                      :products="products"
-          />
+        <div class="py-2 text-md">
+          <form @submit.prevent="handleSubmit()">
+            <div v-for="(orderItem, index) in listOrderItem" :key="index" class="flex items-center mb-2">
+              <div class="mr-3 w-[10%]">{{ index + 1 }}</div>
+              <div class="mr-3 w-[25%]">{{
+                  `${orderItem.productCode} ${orderItem.code} x ${orderItem.noticePriceType} x ${orderItem.price.toLocaleString('it-IT', {
+                    style: 'currency',
+                    currency: 'VND'
+                  })}`
+                }}
+              </div>
+              <div class="mr-3 w-[10%]">{{ orderItem.code + orderItem.order }}</div>
+              <div class="mr-3 w-[10%]">{{ orderItem.standardPrice }}</div>
+              <div class="mr-3 w-[10%]">
+                <input type="number" class="outline-none border-b border-gray-400 w-1/2" min="0"
+                       v-model="orderItem.weight">
+              </div>
+              <div class="mr-3 w-[20%]">{{
+                  (orderItem.standardPrice * orderItem.weight).toLocaleString('it-IT', {
+                    style: 'currency',
+                    currency: 'VND'
+                  })
+                }}
+              </div>
+              <div class="mr-3 w-[10%]">
+                <ButtonRemove @clickBtn="handleRemoveOrderItem(index)" text='Xóa'/>
+              </div>
+            </div>
+            <hr>
+            <div class="mt-2">
+              <button type="submit" class="border-gray-400 border hover:bg-[#d6d5d5] p-2 rounded-md">Tạo đơn</button>
+            </div>
+          </form>
         </div>
-
-        <div class="ml-2 my-4">
-          <ButtonAddNew @clickBtn="handleAddToOrder" :text="'Sản phẩm'"/>
-        </div>
-        <div class="pr-4">
-          <input class="w-25 h-10 mt-5 px-3 text-base text-gray-700 placeholder-gray-400 bg-green-400 cursor-pointer" type="submit" value="Tạo đơn">
-        </div>
-      </form>
+      </div>
     </div>
-    <AddOrderItemModal
-      v-if="showModal"
-      @close="showModal = false"
-      @addProductItem="handleAddProductItem"
-    />
   </div>
 </template>
 
 <script>
 import {useRouter} from "vue-router";
 import {useStore} from "vuex";
-import {ref, nextTick} from "vue";
+import {ref, nextTick, inject} from "vue";
 import {
   createOrderFromApi,
   getListCategoryFromApi,
@@ -80,55 +82,78 @@ import ButtonAddNew from "@/components/Buttons/ButtonAddNew";
 import SelectBoxWithSearch from "@/components/MultiSelect/SelectBoxWithSearch.vue";
 import MultiSelect from "@/components/MultiSelect/MultiSelect.vue";
 import AddOrderItemModal from "@/views/OrderManage/CreateOrder/AddOrderItemModal.vue";
+import ButtonRemove from "@/components/Buttons/ButtonRemove/ButtonRemove.vue";
+import Datepicker from 'vue3-datepicker'
 
 export default {
   name: "CreateOrder",
-  components: {AddOrderItemModal, MultiSelect, SelectBoxWithSearch, InputItem, ButtonAddNew },
-  methods: {
-    forceUpdate() {
-      this.renderComponent = false
-      this.$nextTick(() => {
-        this.renderComponent = true
-      })
-    }
-  },
-  data() {
-    return {
-      renderComponent: true
-    }
-  },
+  components: {ButtonRemove, AddOrderItemModal, MultiSelect, SelectBoxWithSearch, InputItem, ButtonAddNew, Datepicker },
   setup() {
     const router = useRouter()
     const store = useStore()
+    const toast = inject('$toast')
     const formData = ref({})
     const categories = ref({})
     const customers = ref([])
     const products = ref({})
     const productsByCategory = ref({})
     const productSelected = ref({})
-    const productAttributeValues = ref({})
     const productAttributeValuesByProduct = ref({})
     const listInputItem = ref(store.state[MODULE_STORE.ORDER.NAME].orderPostData)
     const selectedCustomer = ref(null)
-    const currentCustomer = ref({})
     const customerMessageError = ref(null)
-    const showModal = ref(true);
+    const listOrderItem = ref([])
+    const picked = ref(new Date())
+    const styleDatePicker = ref({
+      "--vdp-bg-color": "#ffffff",
+      "--vdp-text-color": "#e21818",
+      "--vdp-box-shadow": "0 4px 10px 0 rgba(128, 144, 160, 0.1), 0 0 1px 0 rgba(128, 144, 160, 0.81)",
+      "--vdp-border-radius": "10px",
+      "--vdp-heading-size": "2.5em",
+      "--vdp-heading-weight": "bold",
+      "--vdp-heading-hover-color": "#eeeeee",
+      "--vdp-arrow-color": "currentColor",
+      "--vdp-elem-color": "currentColor",
+      "--vdp-disabled-color": "#d5d9e0",
+      "--vdp-hover-color": "#ffffff",
+      "--vdp-hover-bg-color": "#0baf74",
+      "--vdp-selected-color": "#ffffff",
+      "--vdp-selected-bg-color": "#0baf74",
+      "--vdp-current-date-outline-color": "#888888",
+      "--vdp-current-date-font-weight": "bold",
+      "--vdp-elem-font-size": "1em",
+      "--vdp-elem-border-radius": "3px",
+      "--vdp-divider-color": "#ffffff"
+    })
 
-    const handleSubmit = async (data) => {
+    const handleSubmit = async () => {
       try {
-        const orderPostData = [...store.state[MODULE_STORE.ORDER.NAME].orderPostData]
-        const bodyFormData = new FormData()
-        bodyFormData.append('customer_id', data.customerId);
-        // bodyFormData.append('order_products', orderPostData);
+        const orderPostData = listOrderItem.value.map(orderItem => {
+          return {
+            product_id: orderItem.productId,
+            product_attribute_value_id: orderItem.productAttributeValueId,
+            product_attribute_price_id: orderItem.productAttributePriceId,
+            attribute_display_index: orderItem.order,
+            count: 1,
+            measure_unit_type: orderItem.measureUnitName,
+            weight: orderItem.weight,
+          }
+        })
+        const year = picked.value.getFullYear()
+        const month = ('0' + (picked.value.getMonth() + 1)).slice(-2)
+        const day = ('0' + picked.value.getDate()).slice(-2)
+        const date = `${year}-${month}-${day}`
         const postData = {
-          customer_id: data.customerId,
-          order_products: orderPostData
+          customer_id: selectedCustomer.value.customer_id,
+          order_products: orderPostData,
+          date: date
         }
         const res = await createOrderFromApi(postData)
-        // router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.PRODUCT_MANAGE}`)
+        await router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.PRODUCT_MANAGE}`)
+        toast.success('Tạo đơn hàng thành công', {duration: 3500})
       } catch (errors) {
         const error = errors.message;
-        // this.$toast.error(error);
+        toast.error(error);
       } finally {
         store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
       }
@@ -149,15 +174,38 @@ export default {
         formData.value.category = res.data[0].category_id
         store.state[MODULE_STORE.ORDER.NAME].categories = res.data
       } catch (errors) {
-        // const error = errors.message;
-        // console.log(error)
+        const error = errors.message;
+        toast.error(error)
       }
     }
 
     const getListProduct = async () => {
-      const res = await getListProductFromApi();
-      products.value = res.data
-      store.state[MODULE_STORE.ORDER.NAME].products = res.data
+      try {
+        const res = await getListProductFromApi();
+        const data = res.data
+        products.value = res.data
+        store.state[MODULE_STORE.ORDER.NAME].products = res.data
+        data.forEach(product => {
+          product.product_attribute_values.forEach(attributeValue => {
+            const payload = {
+              productAttributeValueId: attributeValue.product_attribute_value_id,
+              code: attributeValue.code,
+              measureUnitName: attributeValue.measure_unit_name,
+              monetaryUnitName: attributeValue.monetary_unit_name,
+              noticePriceType: attributeValue.notice_price_type,
+              price: attributeValue.price,
+              standardPrice: attributeValue.standard_price,
+              productId: product.product_id,
+              productName: product.name,
+              productCode: product.code,
+              productAttributePriceId: product.product_attribute_price_id,
+            }
+            store.commit(`${MODULE_STORE.ORDER.NAME}/${MODULE_STORE.ORDER.MUTATIONS.ADD_PRODUCT_ATTRIBUTE_VALUE}`, payload)
+          })
+        })
+      } catch (errors) {
+        toast.error(errors.message)
+      }
     }
     const getListCustomer = async () => {
       const res = await getListCustomerFromApi();
@@ -183,43 +231,37 @@ export default {
 
       productAttributeValuesByProduct.value = productSelected.value.product_attribute_values
     }
-    const handleAddToOrder = () => {
-      const payload = {
-        category_id: '',
-        product_id: '',
-        product_attribute_value_id: '',
-        product_attribute_price_id: '',
-        count: '',
-        weight: '',
-        price: '',
-        total: '',
-        measure_unit_type: '',
-        checked: false
-      }
-      store.commit(`${MODULE_STORE.ORDER.NAME}/${MODULE_STORE.ORDER.MUTATIONS.ADD_ORDER_DATA}`, payload)
-      listInputItem.value = [];
-      nextTick(() => {listInputItem.value = store.state[MODULE_STORE.ORDER.NAME].orderPostData})
-    }
-    const handleRemoveInputItem = (item) => {
-      store.commit(`${MODULE_STORE.ORDER.NAME}/${MODULE_STORE.ORDER.MUTATIONS.REMOVE_ORDER_DATA_ITEM}`, item)
-      listInputItem.value = [];
-      nextTick(() => {listInputItem.value = store.state[MODULE_STORE.ORDER.NAME].orderPostData})
-    }
     const handleSelectCustomer = (selectedItem) => {
       customerMessageError.value = false
-      // currentCustomer.value = customers.value.find((e) => {
-      //   return e.customer_id === ids[0]
-      // })
-      selectedCustomer.value = selectedItem
-      console.log(selectedItem)
+      selectedCustomer.value = {...selectedItem}
     }
     const handleAddProductItem = (item) => {
-      console.log(item)
+      const listProductAttributeValue = [...store.state[MODULE_STORE.ORDER.NAME].productAttributeValues]
+      const itemOrder = listProductAttributeValue.find(i => i.productAttributeValueId === item.id)
+      for(let i = 0; i < item.amount; i++) {
+        const lastItemOfSameAttributeValue = listOrderItem.value.slice().reverse().find(i => i.productAttributeValueId === item.id)
+        const order = lastItemOfSameAttributeValue ? lastItemOfSameAttributeValue.order + 1 : 1
+        listOrderItem.value.push({
+          ...itemOrder,
+          weight: 0,
+          cost: 0,
+          order: order
+        })
+      }
+      listOrderItem.value.sort((a, b) => {
+        if (a.productAttributeValueId === b.productAttributeValueId) {
+          return a.order - b.order;
+        }
+        return a.productAttributeValueId.localeCompare(b.productAttributeValueId);
+      })
+    }
+    const handleRemoveOrderItem = (index) => {
+      listOrderItem.value.splice(index, 1)
     }
 
-    // getListCategory()
+    getListCategory()
     getListCustomer()
-    // getListProduct()
+    getListProduct()
 
     return {
       formData,
@@ -230,14 +272,15 @@ export default {
       productsByCategory,
       listInputItem,
       selectedCustomer,
-      showModal,
+      listOrderItem,
+      picked,
+      styleDatePicker,
       handleSubmit,
       handleOnChangeCategorySelect,
       handleOnChangeProductSelect,
-      handleAddToOrder,
-      handleRemoveInputItem,
       handleSelectCustomer,
       handleAddProductItem,
+      handleRemoveOrderItem,
     }
   }
 }

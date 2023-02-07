@@ -29,9 +29,9 @@ final class ProductInventoryOrder
     private ProductInventoryUpdateType $productInventoryUpdateType;
 
     /**
-     * @var \App\Bundle\ProductBundle\Domain\Model\OrderId
+     * @var \App\Bundle\ProductBundle\Domain\Model\OrderProductId
      */
-    private OrderId $orderId;
+    private OrderProductId $orderProductId;
 
     /**
      * @var int
@@ -49,7 +49,7 @@ final class ProductInventoryOrder
      * @param int $count
      * @param MeasureUnitType $measureUnitType
      * @param ProductInventoryUpdateType $productInventoryUpdateType
-     * @param OrderId $orderId
+     * @param OrderProductId $orderProductId
      * @param int $numberOfUpdate
      * @param bool $isCurrent
      */
@@ -59,7 +59,7 @@ final class ProductInventoryOrder
         int $count,
         MeasureUnitType $measureUnitType,
         ProductInventoryUpdateType $productInventoryUpdateType,
-        OrderId $orderId,
+        OrderProductId $orderProductId,
         int $numberOfUpdate,
         bool $isCurrent
     )
@@ -69,7 +69,7 @@ final class ProductInventoryOrder
         $this->count = $count;
         $this->measureUnitType = $measureUnitType;
         $this->productInventoryUpdateType = $productInventoryUpdateType;
-        $this->orderId = $orderId;
+        $this->orderProductId = $orderProductId;
         $this->numberOfUpdate = $numberOfUpdate;
         $this->isCurrent = $isCurrent;
     }
@@ -131,10 +131,10 @@ final class ProductInventoryOrder
     }
 
     /**
-     * @return OrderId
+     * @return OrderProductId
      */
-    public function getOrderId(): OrderId
+    public function getOrderProductId(): OrderProductId
     {
-        return $this->orderId;
+        return $this->orderProductId;
     }
 }

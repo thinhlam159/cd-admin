@@ -20,9 +20,9 @@ class OrderProductCommand
     public int $attributeDisplayIndex;
 
     /**
-     * @var string
+     * @var string|null
      */
-    public string $productAttributePriceId;
+    public ?string $productAttributePriceId;
 
     /**
      * @var int
@@ -43,12 +43,12 @@ class OrderProductCommand
      * @param string $productId
      * @param string $productAttributeValueId
      * @param int $attributeDisplayIndex
-     * @param string $productAttributePriceId
+     * @param string|null $productAttributePriceId
      * @param int $count
      * @param string $measureUnitType
      * @param int $weight
      */
-    public function __construct(string $productId, string $productAttributeValueId, int $attributeDisplayIndex, string $productAttributePriceId, int $count, string $measureUnitType, int $weight)
+    public function __construct(string $productId, string $productAttributeValueId, int $attributeDisplayIndex, ?string $productAttributePriceId, int $count, string $measureUnitType, int $weight)
     {
         $this->productId = $productId;
         $this->productAttributeValueId = $productAttributeValueId;

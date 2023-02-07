@@ -1,8 +1,6 @@
 <template>
-  <div class="modal-overlay" @click="$emit('close')"></div>
-  <div class="modal-content w-[80%] h-4/5 relative p-5">
-    <button @click="$emit('close')">Close</button>
-    <div class="px-3 m-2 flex text-lg">
+  <div class="w-full relative p-5">
+    <div class="px-3 m-2 flex text-md">
       <div class="mr-4 w-[30%]">
         <span>Danh mục</span>
       </div>
@@ -16,7 +14,7 @@
         <span>Số lượng</span>
       </div>
     </div>
-    <div class="flex py-1 border border-gray-200 p-3 text-xl">
+    <div class="flex py-1 border border-gray-200 p-3 text-md">
       <div class="mr-4 w-[30%] flex items-center flex-wrap">
         <div class="inline p-0 mb-2" v-for="(item, index) in categories" :key="index">
           <input class="hidden" name="category" type="radio" :id="item.name" :value="item.category_id" v-model="categorySelectedId" @change="handleSelectCategory">
@@ -54,7 +52,7 @@ const props = defineProps({
 })
 
 const toast = inject('$toast')
-const emit = defineEmits(['close', 'update', 'addProductItem'])
+const emit = defineEmits(['addProductItem'])
 const categories = ref([])
 const categorySelectedId = ref('')
 const products = ref([])
@@ -69,7 +67,6 @@ const getListCategory = async () => {
   try {
     const res = await getListCategoryFromApi()
     categories.value = res.data
-    console.log(categories.value)
   } catch (errors) {
     const error = errors.message;
     toast.error(error)
@@ -87,6 +84,7 @@ const handleSelectCategory = () => {
   productsByCategory.value = []
   productAttributeValuesByProduct.value = []
   productAttributeValueSelectedId.value = ''
+  disableSubmit.value = productAttributeValueSelectedId.value !== '' && amount.value !== 0
   productsByCategory.value = products.value.filter((product) => {
     return product.category_id === categorySelectedId.value
   })
@@ -94,6 +92,7 @@ const handleSelectCategory = () => {
 }
 const handleSelectProduct = () => {
   productAttributeValueSelectedId.value = ''
+  disableSubmit.value = productAttributeValueSelectedId.value !== '' && amount.value !== 0
   const productSelected = products.value.find((product) => {
     return product.product_id === productSelectedId.value
   })

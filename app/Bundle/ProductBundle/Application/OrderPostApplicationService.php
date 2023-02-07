@@ -6,6 +6,7 @@ use App\Bundle\Admin\Domain\Model\CustomerId;
 use App\Bundle\Admin\Domain\Model\ICustomerRepository;
 use App\Bundle\Admin\Domain\Model\IUserRepository;
 use App\Bundle\Admin\Domain\Model\UserId;
+use App\Bundle\ProductBundle\Domain\Model\SettingDate;
 use App\Bundle\ProductBundle\Domain\Model\UserId as ProductBundleUserId;
 use App\Bundle\Common\Domain\Model\InvalidArgumentException;
 use App\Bundle\Common\Domain\Model\TransactionException;
@@ -125,15 +126,16 @@ class OrderPostApplicationService
         $totalOrderCost = 0;
         foreach ($command->orderProductCommands as $orderProductCommand) {
             $productAttributeValueId = $orderProductCommand->productAttributeValueId;
-            $productAttributePrice = $this->productAttributePriceRepository->findById(new ProductAttributePriceId($orderProductCommand->productAttributePriceId));
+            $productAttributePrice = $this->productAttributePriceRepository->findByProductAttributeValueId(new ProductAttributeValueId($productAttributeValueId));
             $orderProductCost = $productAttributePrice->getStandardPrice() * $orderProductCommand->weight;
             $totalOrderCost += $orderProductCost;
+            $orderProduct = OrderProductId::newId();
             $orderProducts[] = new OrderProduct(
-                OrderProductId::newId(),
+                $orderProduct,
                 $orderId,
                 new ProductId($orderProductCommand->productId),
                 new ProductAttributeValueId($productAttributeValueId),
-                new ProductAttributePriceId($orderProductCommand->productAttributePriceId),
+                $productAttributePrice->getProductAttributePriceId(),
                 $orderProductCommand->count,
                 MeasureUnitType::fromType(MeasureUnitType::KG),
                 $orderProductCommand->attributeDisplayIndex,
@@ -146,6 +148,7 @@ class OrderPostApplicationService
             ? $newProductInventories[$productAttributeValueId]['count'] += $orderProductCommand->count
             : $orderProductCommand->count;
             $newProductInventories[$productAttributeValueId]['measure_unit_type'] = $orderProductCommand->measureUnitType;
+            $newProductInventories[$productAttributeValueId]['order_product_id'] = $orderProduct;
         }
 
         $saveNewProductInventories = [];
@@ -160,7 +163,7 @@ class OrderPostApplicationService
                 $newCount,
                 MeasureUnitType::fromValue($newProductInventory['measure_unit_type']),
                 ProductInventoryUpdateType::fromType(ProductInventoryUpdateType::ORDER),
-                $orderId,
+                new OrderProductId($newProductInventory['order_product_id']),
                 $newProductInventory['count'],
                 true,
             );
@@ -175,6 +178,7 @@ class OrderPostApplicationService
             new ProductBundleUserId($userId->asString()),
             !is_null($currentDebt) ? $currentDebt->getTotalDebt() + $totalOrderCost : $totalOrderCost,
             !is_null($currentDebt) ? $currentDebt->getTotalPayment() : 0,
+            !is_null($currentDebt) ? $currentDebt->getRestDebt() : $totalOrderCost,
             true,
             DebtHistoryUpdateType::fromType(DebtHistoryUpdateType::CONTAINER_ORDER),
             $orderId,
@@ -183,8 +187,9 @@ class OrderPostApplicationService
             null,
             null,
             $totalOrderCost,
-            $command->date,
-            MonetaryUnitType::fromValue($command->orderProductCommands[0]->measureUnitType),
+            SettingDate::fromYmdHis($command->date),
+            MonetaryUnitType::fromType(MonetaryUnitType::VND),
+            null,
             !is_null($currentDebt) ? $currentDebt->getVersion() + 1 : 1
         );
 

@@ -63,7 +63,7 @@ class OrderController extends BaseController
                 $orderProduct['product_id'],
                 $orderProduct['product_attribute_value_id'],
                 (int)$orderProduct['attribute_display_index'],
-                $orderProduct['product_attribute_price_id'],
+                !empty($orderProduct['product_attribute_price_id']) ? $orderProduct['product_attribute_price_id'] : null,
                 (int)$orderProduct['count'],
                 $orderProduct['measure_unit_type'],
                 (int)$orderProduct['weight'],

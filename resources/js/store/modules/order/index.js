@@ -8,6 +8,7 @@ const product = {
       categories: [],
       products: [],
       customers: [],
+      productAttributeValues: []
     };
   },
   getters: {
@@ -72,6 +73,9 @@ const product = {
 
       return state.orderPostData;
     },
+    [MODULE_STORE.ORDER.MUTATIONS.ADD_PRODUCT_ATTRIBUTE_VALUE](state, payload) {
+      return state.productAttributeValues.push(payload)
+    }
   },
 };
 

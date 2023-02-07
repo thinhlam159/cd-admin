@@ -79,7 +79,7 @@ final class DebtHistory
     /**
      * @var SettingDate
      */
-    private SettingDate $updateDate;
+    private SettingDate $updatedDate;
 
     /**
      * @var MonetaryUnitType
@@ -111,12 +111,12 @@ final class DebtHistory
      * @param PaymentId|null $paymentId
      * @param OtherDebtId|null $otherDebtId
      * @param int $numberOfMoney
-     * @param SettingDate $updateDate
+     * @param SettingDate $updatedDate
      * @param MonetaryUnitType $monetaryUnitType
      * @param string|null $comment
      * @param int $version
      */
-    public function __construct(DebtHistoryId $debtHistoryId, CustomerId $customerId, UserId $userId, int $totalDebt, int $totalPayment, int $restDebt, bool $isCurrent, DebtHistoryUpdateType $debtHistoryUpdateType, ?OrderId $orderId, ?ContainerOrderId $containerOrderId, ?VatId $vatId, ?PaymentId $paymentId, ?OtherDebtId $otherDebtId, int $numberOfMoney, SettingDate $updateDate, MonetaryUnitType $monetaryUnitType, ?string $comment, int $version)
+    public function __construct(DebtHistoryId $debtHistoryId, CustomerId $customerId, UserId $userId, int $totalDebt, int $totalPayment, int $restDebt, bool $isCurrent, DebtHistoryUpdateType $debtHistoryUpdateType, ?OrderId $orderId, ?ContainerOrderId $containerOrderId, ?VatId $vatId, ?PaymentId $paymentId, ?OtherDebtId $otherDebtId, int $numberOfMoney, SettingDate $updatedDate, MonetaryUnitType $monetaryUnitType, ?string $comment, int $version)
     {
         $this->debtHistoryId = $debtHistoryId;
         $this->customerId = $customerId;
@@ -132,7 +132,7 @@ final class DebtHistory
         $this->paymentId = $paymentId;
         $this->otherDebtId = $otherDebtId;
         $this->numberOfMoney = $numberOfMoney;
-        $this->updateDate = $updateDate;
+        $this->updatedDate = $updatedDate;
         $this->monetaryUnitType = $monetaryUnitType;
         $this->comment = $comment;
         $this->version = $version;
@@ -255,7 +255,7 @@ final class DebtHistory
      */
     public function getUpdateDate(): SettingDate
     {
-        return $this->updateDate;
+        return $this->updatedDate;
     }
 
     /**

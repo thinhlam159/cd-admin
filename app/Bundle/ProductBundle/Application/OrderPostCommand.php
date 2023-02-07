@@ -15,9 +15,9 @@ class OrderPostCommand
     public string $userId;
 
     /**
-     * @var int
+     * @var string
      */
-    public int $date;
+    public string $date;
 
     /**
      * @var OrderProductCommand[]
@@ -27,10 +27,10 @@ class OrderPostCommand
     /**
      * @param string $customerId
      * @param string $userId
-     * @param int $date
+     * @param string $date
      * @param OrderProductCommand[] $orderProductCommands
      */
-    public function __construct(string $customerId, string $userId, int $date, array $orderProductCommands)
+    public function __construct(string $customerId, string $userId, string $date, array $orderProductCommands)
     {
         $this->customerId = $customerId;
         $this->userId = $userId;
