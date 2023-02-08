@@ -1,8 +1,8 @@
 <?php
 namespace Database\Seeders;
 
+use App\Models\Category;
 use Illuminate\Database\Seeder;
-use App\Models\User;
 
 class CategoriesTableSeeder extends Seeder
 {
@@ -16,8 +16,8 @@ class CategoriesTableSeeder extends Seeder
         $defaults = [
             [
                 'id' => '01GF2WV4414C8MYFAGPB4BQS2R',
-                'name' => 'jumbo',
-                'slug' => 'jumbo',
+                'name' => 'Jumbo',
+                'slug' => 'Jumbo',
                 'parent_id' => '01GF2WV4414C8MYFAGPB4BQS2R',
             ],
             [
@@ -34,7 +34,7 @@ class CategoriesTableSeeder extends Seeder
             ]
         ];
         foreach($defaults as $v){
-            User::create($v);
+            Category::create($v);
         }
     }
 }

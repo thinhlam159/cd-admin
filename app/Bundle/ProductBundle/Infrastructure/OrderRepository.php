@@ -37,6 +37,7 @@ final class OrderRepository implements IOrderRepository
             'user_id' => $order->getUserId()->asString(),
             'delivery_status' => $order->getOrderDeliveryStatus()->getStatus(),
             'payment_status' => $order->getOrderPaymentStatus()->getStatus(),
+            'order_date' => $order->getOrderDate(),
     	]);
         if (!$result) {
             return null;
@@ -84,7 +85,8 @@ final class OrderRepository implements IOrderRepository
                 new CustomerId($entity->customer_id),
                 new UserId($entity->user_id),
                 OrderDeliveryStatus::fromStatus($entity->delivery_status),
-                OrderPaymentStatus::fromStatus($entity->payment_status)
+                OrderPaymentStatus::fromStatus($entity->payment_status),
+                SettingDate::fromYmdHis($entity->order_date)
             );
             $order->setUpdatedAt(SettingDate::fromYmdHis($entity->updated_at));
             $order->setOrderDate(SettingDate::fromYmdHis($entity->order_date));
@@ -141,7 +143,8 @@ final class OrderRepository implements IOrderRepository
             new CustomerId($entity->customer_id),
             new UserId($entity->user_id),
             OrderDeliveryStatus::fromStatus($entity->delivery_status),
-            OrderPaymentStatus::fromStatus($entity->payment_status)
+            OrderPaymentStatus::fromStatus($entity->payment_status),
+            SettingDate::fromYmdHis($entity->order_date)
         );
         $order->setUpdatedAt(SettingDate::fromYmdHis($entity->updated_at));
         $order->setCreatedAt(SettingDate::fromYmdHis($entity->created_at));
@@ -194,6 +197,7 @@ final class OrderRepository implements IOrderRepository
                 new UserId($entity->user_id),
                 OrderDeliveryStatus::fromStatus($entity->delivery_status),
                 OrderPaymentStatus::fromStatus($entity->payment_status),
+                SettingDate::fromYmdHis($entity->order_date)
             );
             $order->setOrderDate(SettingDate::fromYmdHis($entity->order_date));
 

@@ -37,9 +37,9 @@ final class Payment
     private UserId $userId;
 
     /**
-     * @var int
+     * @var SettingDate
      */
-    private int $date;
+    private SettingDate $date;
 
     /**
      * @param PaymentId $paymentId
@@ -48,9 +48,9 @@ final class Payment
      * @param string|null $comment
      * @param CustomerId $customerId
      * @param UserId $userId
-     * @param int $date
+     * @param SettingDate $date
      */
-    public function __construct(PaymentId $paymentId, int $cost, MonetaryUnitType $monetaryUnitType, ?string $comment, CustomerId $customerId, UserId $userId, int $date)
+    public function __construct(PaymentId $paymentId, int $cost, MonetaryUnitType $monetaryUnitType, ?string $comment, CustomerId $customerId, UserId $userId, SettingDate $date)
     {
         $this->paymentId = $paymentId;
         $this->cost = $cost;
@@ -110,9 +110,9 @@ final class Payment
     }
 
     /**
-     * @return int
+     * @return SettingDate
      */
-    public function getDate(): int
+    public function getDate(): SettingDate
     {
         return $this->date;
     }

@@ -67,6 +67,7 @@ class OrderController extends BaseController
                 (int)$orderProduct['count'],
                 $orderProduct['measure_unit_type'],
                 (int)$orderProduct['weight'],
+                $orderProduct['notice_price_type'],
             );
         }
 

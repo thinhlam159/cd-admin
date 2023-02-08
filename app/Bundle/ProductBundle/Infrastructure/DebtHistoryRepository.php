@@ -251,7 +251,7 @@ class DebtHistoryRepository implements IDebtHistoryRepository
             'vat_id' => !is_null($debtHistory->getVatId()) ? $debtHistory->getVatId()->asString() : null,
             'other_debt_id' => !is_null($debtHistory->getOtherDebtId()) ? $debtHistory->getDebtHistoryId()->asString() : null,
             'payment_id' => !is_null($debtHistory->getPaymentId()) ? $debtHistory->getPaymentId()->asString() : null,
-            'update_date' => $debtHistory->getUpdateDate()->asTimeStamps(),
+            'updated_date' => $debtHistory->getUpdateDate()->asString(),
             'number_of_money' => $debtHistory->getNumberOfMoney(),
             'monetary_unit_type' => $debtHistory->getMonetaryUnitType()->getType(),
             'comment' => $debtHistory->getComment(),

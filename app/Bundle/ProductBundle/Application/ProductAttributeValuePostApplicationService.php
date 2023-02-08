@@ -18,6 +18,7 @@ use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValueId;
 use App\Bundle\ProductBundle\Domain\Model\ProductId;
 use App\Bundle\ProductBundle\Domain\Model\ProductInventory;
 use App\Bundle\ProductBundle\Domain\Model\ProductInventoryId;
+use App\Bundle\ProductBundle\Domain\Model\ProductInventoryUpdateType;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -81,7 +82,8 @@ class ProductAttributeValuePostApplicationService
             ProductInventoryId::newId(),
             $productAttributeValueId,
             $command->count,
-            MeasureUnitType::fromValue($command->measureUnitId),
+            MeasureUnitType::fromValue($command->measureUnitType),
+            ProductInventoryUpdateType::fromType(ProductInventoryUpdateType::INITIALIZATION),
             true
         );
 

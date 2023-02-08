@@ -273,7 +273,7 @@ class ProductController extends BaseController
         $command = new ProductAttributeValuePostCommand(
             $request->product_id,
             $request->product_attribute_id,
-            $request->measure_unit_id,
+            $request->measure_unit_type,
             $request->value,
             $request->code,
             (int)$request->price,

@@ -6,6 +6,7 @@ use App\Bundle\Admin\Domain\Model\CustomerId;
 use App\Bundle\Admin\Domain\Model\ICustomerRepository;
 use App\Bundle\Admin\Domain\Model\IUserRepository;
 use App\Bundle\Admin\Domain\Model\UserId;
+use App\Bundle\ProductBundle\Domain\Model\NoticePriceType;
 use App\Bundle\ProductBundle\Domain\Model\SettingDate;
 use App\Bundle\ProductBundle\Domain\Model\UserId as ProductBundleUserId;
 use App\Bundle\Common\Domain\Model\InvalidArgumentException;
@@ -25,7 +26,6 @@ use App\Bundle\ProductBundle\Domain\Model\OrderId;
 use App\Bundle\ProductBundle\Domain\Model\OrderPaymentStatus;
 use App\Bundle\ProductBundle\Domain\Model\OrderProduct;
 use App\Bundle\ProductBundle\Domain\Model\OrderProductId;
-use App\Bundle\ProductBundle\Domain\Model\ProductAttributePriceId;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValueId;
 use App\Bundle\ProductBundle\Domain\Model\ProductId;
 use App\Bundle\ProductBundle\Domain\Model\ProductInventoryId;
@@ -119,6 +119,7 @@ class OrderPostApplicationService
             $userId,
             OrderDeliveryStatus::fromStatus(OrderDeliveryStatus::IN_PROGRESS),
             OrderPaymentStatus::fromStatus(OrderPaymentStatus::PLANNING),
+            SettingDate::fromYmdHis($command->date)
         );
 
         $orderProducts = [];
@@ -130,6 +131,10 @@ class OrderPostApplicationService
             $orderProductCost = $productAttributePrice->getStandardPrice() * $orderProductCommand->weight;
             $totalOrderCost += $orderProductCost;
             $orderProduct = OrderProductId::newId();
+            $amount = $orderProductCommand->count;
+            if($orderProductCommand->noticePriceType === NoticePriceType::fromType(NoticePriceType::DEFAULT)->getValue()) {
+                $amount = $orderProductCommand->weight;
+            }
             $orderProducts[] = new OrderProduct(
                 $orderProduct,
                 $orderId,
@@ -137,7 +142,7 @@ class OrderPostApplicationService
                 new ProductAttributeValueId($productAttributeValueId),
                 $productAttributePrice->getProductAttributePriceId(),
                 $orderProductCommand->count,
-                MeasureUnitType::fromType(MeasureUnitType::KG),
+                MeasureUnitType::fromValue($orderProductCommand->measureUnitType),
                 $orderProductCommand->attributeDisplayIndex,
                 $orderProductCommand->weight,
                 $orderProductCost
@@ -145,8 +150,8 @@ class OrderPostApplicationService
 
             $newProductInventories[$productAttributeValueId]['count'] =
                 isset($newProductInventories[$productAttributeValueId]['count'])
-            ? $newProductInventories[$productAttributeValueId]['count'] += $orderProductCommand->count
-            : $orderProductCommand->count;
+            ? $newProductInventories[$productAttributeValueId]['count'] += $amount
+            : $amount;
             $newProductInventories[$productAttributeValueId]['measure_unit_type'] = $orderProductCommand->measureUnitType;
             $newProductInventories[$productAttributeValueId]['order_product_id'] = $orderProduct;
         }
@@ -203,12 +208,12 @@ class OrderPostApplicationService
             if (!$updateCurrentInventoryResult) {
                 throw new InvalidArgumentException('customer not exist!');
             }
-            $createInventoryProductResult = $this->productInventoryRepository->createMultiProductInventoryByOrder($saveNewProductInventories);
-            if (!$createInventoryProductResult) {
-                throw new InvalidArgumentException('customer not exist!');
-            }
             $result = $this->orderRepository->createOrderProducts($orderProducts);
             if (!$result) {
+                throw new InvalidArgumentException('customer not exist!');
+            }
+            $createInventoryProductResult = $this->productInventoryRepository->createMultiProductInventoryByOrder($saveNewProductInventories);
+            if (!$createInventoryProductResult) {
                 throw new InvalidArgumentException('customer not exist!');
             }
             if ($currentDebt) {

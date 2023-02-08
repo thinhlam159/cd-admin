@@ -62,7 +62,7 @@ class PaymentPostApplicationService
             $command->comment,
             $customerId,
             $userId,
-            $command->date
+            SettingDate::fromYmdHis($command->date)
         );
         $currentDebt = $this->debtHistoryRepository->findCurrentDebtByCustomerId($customerId);
 
@@ -82,7 +82,7 @@ class PaymentPostApplicationService
             $paymentId,
             null,
             $command->cost,
-            SettingDate::fromTimeStamps($command->date),
+            SettingDate::fromYmdHis($command->date),
             MonetaryUnitType::fromValue($command->monetaryUnitType),
             $command->comment,
             !is_null($currentDebt) ? $currentDebt->getVersion() + 1 : 1

@@ -109,6 +109,7 @@ const productId = ref(route.params.id)
 const measures = ref([])
 const productAttributes = ref([])
 const noticePrice = ref([
+  'Mặc định',
   '298kg',
   '273kg',
   '248kg',
@@ -119,10 +120,13 @@ const noticePrice = ref([
 
 const handleSubmit = async (data) => {
   try {
+    if (data.notice_price_type === 'Mặc định') {
+      data.notice_price_type = 'default'
+    }
     const bodyFormData = new FormData()
     bodyFormData.append('product_id', productId.value);
     bodyFormData.append('product_attribute_id', data.product_attribute_id);
-    bodyFormData.append('measure_unit_id', data.measure_unit_type);
+    bodyFormData.append('measure_unit_type', data.measure_unit_type);
     bodyFormData.append('value', data.value);
     bodyFormData.append('code', data.code);
     bodyFormData.append('price', data.price);
@@ -162,7 +166,6 @@ const getProductAttributes = async (page) => {
 const getMeasureUnits = async (page) => {
   try {
     const res = await getListMeasureUnitFromApi(page)
-    console.log(res.data)
     measures.value = res.data
   } catch (errors) {
     const error = errors.message;

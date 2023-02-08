@@ -137,6 +137,7 @@ export default {
             count: 1,
             measure_unit_type: orderItem.measureUnitName,
             weight: orderItem.weight,
+            notice_price_type: orderItem.noticePriceType,
           }
         })
         const year = picked.value.getFullYear()

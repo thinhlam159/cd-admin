@@ -20,7 +20,7 @@ class CreateProductInventoriesTable extends Migration
             $table->integer('measure_unit_type');
             $table->string('import_good_product_id')->nullable();
             $table->string('order_product_id')->nullable();
-            $table->string('update_type');
+            $table->integer('update_type');
             $table->integer('number_of_update');
             $table->boolean('is_current');
             $table->foreign('product_attribute_value_id')->references('id')->on('product_attribute_values')->onDelete('cascade');

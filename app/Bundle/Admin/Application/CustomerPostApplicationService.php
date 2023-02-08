@@ -55,7 +55,7 @@ class CustomerPostApplicationService
         );
         $customer->setPassword($command->password);
         $customer->setPhone($command->phone);
-        $customer->setIsActive(false);
+        $customer->setIsActive(true);
 
         $debtHistory = new DebtHistory(
             DebtHistoryId::newId(),
@@ -74,7 +74,7 @@ class CustomerPostApplicationService
             0,
             SettingDate::now(),
             MonetaryUnitType::fromType(MonetaryUnitType::VND),
-            null,
+            '',
             0
         );
 
@@ -86,7 +86,7 @@ class CustomerPostApplicationService
         } catch (Exception $e) {
             DB::rollBack();
             Log::error($e);
-            throw new TransactionException('Add customer fail!');
+            throw new TransactionException($e->getMessage());
         }
 
         return new CustomerPostResult($customerId->__toString());

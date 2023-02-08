@@ -50,7 +50,7 @@
             <th colspan="3" class="border py-1 w-[14%]">
               Dòng sản phẩm
             </th>
-            <th class="border py-1 w-[5%]">
+            <th rowspan="2" class="border py-1 w-[5%]">
               Cập nhật
             </th>
           </tr>
@@ -69,7 +69,6 @@
             <td class="border text-center">{{ item.name }}</td>
             <td class="border text-center">{{ item.code }}</td>
             <td class="border text-center">{{ item.category_name }}</td>
-            <td class="border text-center"></td>
             <td class="border text-center"></td>
             <td class="border text-center"></td>
             <td class="border text-center"></td>

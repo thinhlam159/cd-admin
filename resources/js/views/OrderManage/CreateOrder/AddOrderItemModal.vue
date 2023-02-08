@@ -44,7 +44,7 @@
 </template>
 
 <script setup>
-import {inject, ref} from "vue";
+import {inject, nextTick, ref} from "vue";
 import {getListCategoryFromApi, getListProductFromApi} from "@/api";
 
 const props = defineProps({
@@ -85,18 +85,21 @@ const handleSelectCategory = () => {
   productAttributeValuesByProduct.value = []
   productAttributeValueSelectedId.value = ''
   disableSubmit.value = productAttributeValueSelectedId.value !== '' && amount.value !== 0
-  productsByCategory.value = products.value.filter((product) => {
-    return product.category_id === categorySelectedId.value
+  nextTick(() => {
+    productsByCategory.value = products.value.filter((product) => {
+      return product.category_id === categorySelectedId.value
+    })
   })
-  console.log(categorySelectedId.value)
 }
 const handleSelectProduct = () => {
   productAttributeValueSelectedId.value = ''
   disableSubmit.value = productAttributeValueSelectedId.value !== '' && amount.value !== 0
-  const productSelected = products.value.find((product) => {
-    return product.product_id === productSelectedId.value
+  nextTick(() => {
+    const productSelected = products.value.find((product) => {
+      return product.product_id === productSelectedId.value
+    })
+    productAttributeValuesByProduct.value = productSelected.product_attribute_values
   })
-  productAttributeValuesByProduct.value = productSelected.product_attribute_values
 }
 const handleSelectProductAttribute = () => {
   disableSubmit.value = productAttributeValueSelectedId.value !== '' && amount.value !== 0

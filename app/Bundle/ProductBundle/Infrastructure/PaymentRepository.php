@@ -1,8 +1,6 @@
 <?php
 namespace App\Bundle\ProductBundle\Infrastructure;
 
-use App\Bundle\ProductBundle\Domain\Model\Category;
-use App\Bundle\ProductBundle\Domain\Model\CategoryId;
 use App\Bundle\ProductBundle\Domain\Model\IPaymentRepository;
 use App\Bundle\ProductBundle\Domain\Model\Payment;
 use App\Bundle\ProductBundle\Domain\Model\PaymentId;
@@ -22,7 +20,7 @@ class PaymentRepository implements IPaymentRepository
             'comment' => $payment->getComment(),
             'customer_id' => $payment->getCustomerId()->asString(),
             'user_id' => $payment->getUserId()->asString(),
-            'payment_date' => $payment->getDate(),
+            'payment_date' => $payment->getDate()->asString(),
     	]);
         if (!$result) {
             return null;

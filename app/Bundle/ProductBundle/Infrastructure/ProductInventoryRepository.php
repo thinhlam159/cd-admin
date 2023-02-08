@@ -6,6 +6,7 @@ use App\Bundle\ProductBundle\Domain\Model\MeasureUnitType;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValueId;
 use App\Bundle\ProductBundle\Domain\Model\ProductInventory;
 use App\Bundle\ProductBundle\Domain\Model\ProductInventoryId;
+use App\Bundle\ProductBundle\Domain\Model\ProductInventoryUpdateType;
 use App\Models\ProductInventory as ModelProductInventory;
 
 final class ProductInventoryRepository implements IProductInventoryRepository
@@ -28,6 +29,7 @@ final class ProductInventoryRepository implements IProductInventoryRepository
             $productAttributeValueId,
             $entity['count'],
             MeasureUnitType::fromType($entity['measure_unit_type']),
+            ProductInventoryUpdateType::fromType($entity['update_type']),
             $entity['is_current']
         );
     }
@@ -43,6 +45,7 @@ final class ProductInventoryRepository implements IProductInventoryRepository
             'count' => $productInventory->getCount(),
             'number_of_update' => $productInventory->getCount(),
             'measure_unit_type' => $productInventory->getMeasureUnitType()->getType(),
+            'update_type' => $productInventory->getUpdateType()->getType(),
             'is_current' => $productInventory->isCurrent(),
         ]);
         if (!$result) {

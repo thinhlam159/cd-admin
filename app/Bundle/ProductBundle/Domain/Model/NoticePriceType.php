@@ -23,7 +23,7 @@ final class NoticePriceType
 
     /** @var array<int,string> */
     private const VALUES = [
-        self::DEFAULT => '',
+        self::DEFAULT => 'default',
         self::KG298 => '298kg',
         self::KG273 => '273kg',
         self::KG248 => '248kg',

@@ -24,6 +24,9 @@ final class ProductInventoryUpdateType
     /** @var int */
     public const UPDATE_IMPORT_GOOD = 6;
 
+    /** @var int */
+    public const INITIALIZATION = 7;
+
     /** @var array<int,string> */
     private const VALUES = [
         self::ORDER => 'order',
@@ -32,6 +35,7 @@ final class ProductInventoryUpdateType
         self::IMPORT_GOOD => 'import_good',
         self::RESTORE_IMPORT_GOOD => 'restore_import_good',
         self::UPDATE_IMPORT_GOOD => 'update_import_good',
+        self::INITIALIZATION => 'initialization',
     ];
     private int $type;
 

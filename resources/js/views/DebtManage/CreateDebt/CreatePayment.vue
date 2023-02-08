@@ -113,10 +113,14 @@ export default {
       try {
         await schema.validate({ price: price.value, customerId: currentCustomer.value.customer_id });
         priceMessageError.value = ''
+        const year = picked.value.getFullYear()
+        const month = ('0' + (picked.value.getMonth() + 1)).slice(-2)
+        const day = ('0' + picked.value.getDate()).slice(-2)
+        const date = `${year}-${month}-${day}`
         const postData = {
           cost: price.value,
           comment: comment.value,
-          date: picked.value.getTime() / 1000 | 0,
+          date: date,
           monetary_unit_type: 'vnd',
           customer_id: currentCustomer.value.customer_id
         }

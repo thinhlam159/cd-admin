@@ -43,9 +43,9 @@ final class Order
     private ?SettingDate $createdAt;
 
     /**
-     * @var SettingDate|null
+     * @var SettingDate
      */
-    private ?SettingDate $orderDate;
+    private SettingDate $orderDate;
 
     /**
      * @param OrderId $orderId
@@ -53,13 +53,15 @@ final class Order
      * @param \App\Bundle\Admin\Domain\Model\UserId $userId
      * @param OrderDeliveryStatus $orderDeliveryStatus
      * @param OrderPaymentStatus $orderPaymentStatus
+     * @param SettingDate $orderDate
      */
     public function __construct(
         OrderId $orderId,
         CustomerId $customerId,
         UserId $userId,
         OrderDeliveryStatus $orderDeliveryStatus,
-        OrderPaymentStatus $orderPaymentStatus
+        OrderPaymentStatus $orderPaymentStatus,
+        SettingDate $orderDate
     )
     {
         $this->orderId = $orderId;
@@ -67,6 +69,7 @@ final class Order
         $this->userId = $userId;
         $this->orderDeliveryStatus = $orderDeliveryStatus;
         $this->orderPaymentStatus = $orderPaymentStatus;
+        $this->orderDate = $orderDate;
     }
 
     /**

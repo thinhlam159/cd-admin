@@ -15,11 +15,15 @@ final class MeasureUnitType
     /** @var int */
     public const ROLL = 3;
 
+    /** @var int */
+    public const UNIT = 4;
+
     /** @var array<int,string> */
     private const VALUES = [
         self::KG => 'kg',
         self::MET => 'met',
         self::ROLL => 'roll',
+        self::UNIT => 'unit',
     ];
     private int $type;
 

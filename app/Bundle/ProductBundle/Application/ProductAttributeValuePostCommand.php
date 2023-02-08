@@ -6,7 +6,7 @@ class ProductAttributeValuePostCommand
 {
     public string $productId;
     public string $productAttributeId;
-    public string $measureUnitId;
+    public string $measureUnitType;
     public string $value;
     public string $code;
     public int $price;
@@ -16,18 +16,18 @@ class ProductAttributeValuePostCommand
     /**
      * @param string $productId
      * @param string $productAttributeId
-     * @param string $measureUnitId
+     * @param string $measureUnitType
      * @param string $value
      * @param string $code
      * @param int $price
      * @param int $count
      * @param string $noticePriceType
      */
-    public function __construct(string $productId, string $productAttributeId, string $measureUnitId, string $value, string $code, int $price, int $count, string $noticePriceType)
+    public function __construct(string $productId, string $productAttributeId, string $measureUnitType, string $value, string $code, int $price, int $count, string $noticePriceType)
     {
         $this->productId = $productId;
         $this->productAttributeId = $productAttributeId;
-        $this->measureUnitId = $measureUnitId;
+        $this->measureUnitType = $measureUnitType;
         $this->value = $value;
         $this->code = $code;
         $this->price = $price;

@@ -145,6 +145,7 @@ class ProductListGetApplicationService
                 $productAttributeValueResults
             );
         }
+
         $paginationResult = new PaginationResult(
             $pagination->getTotalPages(),
             $pagination->getPerPage(),
