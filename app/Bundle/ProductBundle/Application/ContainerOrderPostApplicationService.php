@@ -64,7 +64,7 @@ class ContainerOrderPostApplicationService
             $customerId,
             $userId,
             OrderPaymentStatus::fromStatus(OrderPaymentStatus::PENDING),
-            $command->date,
+            SettingDate::fromYmdHis($command->date),
         );
         $currentDebt = $this->debtHistoryRepository->findCurrentDebtByCustomerId($customerId);
 
@@ -84,7 +84,7 @@ class ContainerOrderPostApplicationService
             null,
             null,
             $command->cost,
-            SettingDate::fromTimeStamps($command->date),
+            SettingDate::fromYmdHis($command->date),
             MonetaryUnitType::fromValue($command->monetaryUnitType),
             $command->comment,
             !is_null($currentDebt) ? $currentDebt->getVersion() + 1 : 1

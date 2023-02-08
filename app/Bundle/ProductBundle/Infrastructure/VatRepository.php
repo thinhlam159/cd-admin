@@ -20,7 +20,7 @@ class VatRepository implements IVatRepository
             'comment' => $vat->getComment(),
             'customer_id' => $vat->getCustomerId()->asString(),
             'user_id' => $vat->getUserId()->asString(),
-            'arising_date' => $vat->getArisingDate(),
+            'arising_date' => $vat->getArisingDate()->asString(),
             'payment_status' => $vat->getPaymentStatus()->getStatus(),
     	]);
         if (!$result) {

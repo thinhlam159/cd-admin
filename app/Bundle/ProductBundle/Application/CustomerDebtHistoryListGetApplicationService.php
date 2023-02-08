@@ -84,7 +84,7 @@ class CustomerDebtHistoryListGetApplicationService
                 !is_null($debt->getPaymentId()) ? $debt->getPaymentId()->asString() : null,
                 !is_null($debt->getOtherDebtId()) ? $debt->getOtherDebtId()->asString() : null,
                 $debt->getNumberOfMoney(),
-                $debt->getUpdateDate()->asTimeStamps(),
+                $debt->getUpdateDate()->asString(),
                 $debt->getMonetaryUnitType()->getValue(),
                 $debt->getComment(),
                 $debt->getVersion()

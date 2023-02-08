@@ -41,9 +41,9 @@ final class Vat
     private OrderPaymentStatus $paymentStatus;
 
     /**
-     * @var int
+     * @var SettingDate
      */
-    private int $arisingDate;
+    private SettingDate $arisingDate;
 
     /**
      * @param VatId $vatId
@@ -53,9 +53,9 @@ final class Vat
      * @param CustomerId $customerId
      * @param UserId $userId
      * @param OrderPaymentStatus $paymentStatus
-     * @param int $arisingDate
+     * @param SettingDate $arisingDate
      */
-    public function __construct(VatId $vatId, int $cost, MonetaryUnitType $monetaryUnitType, ?string $comment, CustomerId $customerId, UserId $userId, OrderPaymentStatus $paymentStatus, int $arisingDate)
+    public function __construct(VatId $vatId, int $cost, MonetaryUnitType $monetaryUnitType, ?string $comment, CustomerId $customerId, UserId $userId, OrderPaymentStatus $paymentStatus, SettingDate $arisingDate)
     {
         $this->vatId = $vatId;
         $this->cost = $cost;
@@ -124,9 +124,9 @@ final class Vat
     }
 
     /**
-     * @return int
+     * @return SettingDate
      */
-    public function getArisingDate(): int
+    public function getArisingDate(): SettingDate
     {
         return $this->arisingDate;
     }

@@ -80,9 +80,9 @@ class DebtResult
     public int $numberOfMoney;
 
     /**
-     * @var int
+     * @var string
      */
-    public int $updateDate;
+    public string $updatedDate;
 
     /**
      * @var string
@@ -115,12 +115,12 @@ class DebtResult
      * @param string|null $paymentId
      * @param string|null $otherDebtId
      * @param int $numberOfMoney
-     * @param int $updateDate
+     * @param string $updatedDate
      * @param string $monetaryUnitType
      * @param string|null $comment
      * @param int $version
      */
-    public function __construct(string $debtHistoryId, string $customerId, string $customerName, string $userId, string $userName, int $totalDebt, int $totalPayment, bool $isCurrent, string $debtHistoryUpdateType, ?string $orderId, ?string $containerOrderId, ?string $vatId, ?string $paymentId, ?string $otherDebtId, int $numberOfMoney, int $updateDate, string $monetaryUnitType, ?string $comment, int $version)
+    public function __construct(string $debtHistoryId, string $customerId, string $customerName, string $userId, string $userName, int $totalDebt, int $totalPayment, bool $isCurrent, string $debtHistoryUpdateType, ?string $orderId, ?string $containerOrderId, ?string $vatId, ?string $paymentId, ?string $otherDebtId, int $numberOfMoney, string $updatedDate, string $monetaryUnitType, ?string $comment, int $version)
     {
         $this->debtHistoryId = $debtHistoryId;
         $this->customerId = $customerId;
@@ -137,7 +137,7 @@ class DebtResult
         $this->paymentId = $paymentId;
         $this->otherDebtId = $otherDebtId;
         $this->numberOfMoney = $numberOfMoney;
-        $this->updateDate = $updateDate;
+        $this->updatedDate = $updatedDate;
         $this->monetaryUnitType = $monetaryUnitType;
         $this->comment = $comment;
         $this->version = $version;

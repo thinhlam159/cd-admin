@@ -82,16 +82,20 @@ async function handleSubmit() {
   try {
     await schema.validate({ price: price.value, customerId: props.customerId });
     priceMessageError.value = ''
+    const year = picked.value.getFullYear()
+    const month = ('0' + (picked.value.getMonth() + 1)).slice(-2)
+    const day = ('0' + picked.value.getDate()).slice(-2)
+    const date = `${year}-${month}-${day}`
     const postData = {
       cost: price.value,
       comment: comment.value,
-      date: picked.value.getTime() / 1000 | 0,
+      date: date,
       monetary_unit_type: 'vnd',
       customer_id: props.customerId
     }
     const res = await createContainerOrderFromApi(postData)
     toast.success("Tạo đơn container thành công!", {duration:3000})
-    router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.DEBT_MANAGE}`)
+    await router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.DEBT_MANAGE}`)
   } catch (err) {
     switch (err.path) {
       case 'price':
@@ -111,61 +115,6 @@ function onInvalidSubmit() {
     submitBtn.classList.remove('invalid');
   }, 1000);
 }
-
-// export default {
-//   name: "ContainerOrderItem",
-//   components: {Form, Field, ErrorMessage, CurrencyInput},
-//   setup() {
-//     const price = ref(0)
-//     const handleSubmit = () => {
-//       console.log('Submitting :(');
-//     }
-//     //
-//     // const formatPrice = () => {
-//     //   price.value.toLocaleString('it-IT', {style : 'currency', currency : 'VND'})
-//     // }
-//     //
-//     // const validatePrice = (value) => {
-//     //   // if the field is empty
-//     //   if (!value) {
-//     //     return 'This field is required';
-//     //   }
-//     //   // if the field is not a valid email
-//     //   const regex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
-//     //   if (!regex.test(value)) {
-//     //     return 'This field must be a valid email';
-//     //   }
-//     //   // All is good
-//     //   return true;
-//     // }
-//
-//     const onInvalidSubmit = () => {
-//       const submitBtn = document.querySelector('.submit-btn');
-//       submitBtn.classList.add('invalid');
-//       setTimeout(() => {
-//         submitBtn.classList.remove('invalid');
-//       }, 1000);
-//     }
-//
-//     const validateComment = () => {
-//
-//     }
-//
-//     const schema = Yup.object().shape({
-//       price: Yup.number().required(),
-//     });
-//
-//     return {
-//       price,
-//       schema,
-//       handleSubmit,
-//       onInvalidSubmit,
-//       // validatePrice,
-//       // formatPrice,
-//       validateComment
-//     }
-//   }
-// }
 </script>
 
 <style scoped>

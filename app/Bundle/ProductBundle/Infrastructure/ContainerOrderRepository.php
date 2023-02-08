@@ -21,7 +21,7 @@ class ContainerOrderRepository implements IContainerOrderRepository
             'customer_id' => $containerOrder->getCustomerId()->asString(),
             'user_id' => $containerOrder->getUserId()->asString(),
             'payment_status' => $containerOrder->getPaymentStatus()->getStatus(),
-            'arising_date' => $containerOrder->getArisingDate(),
+            'arising_date' => $containerOrder->getArisingDate()->asString(),
     	]);
         if (!$result) {
             return null;

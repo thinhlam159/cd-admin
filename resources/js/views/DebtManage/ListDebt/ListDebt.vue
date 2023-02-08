@@ -52,7 +52,7 @@
             <td class="border text-center">{{ item.total_debt.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
             <td class="border text-center">{{ item.total_payment.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
             <td class="border text-center">{{ (item.total_debt - item.total_payment).toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
-            <td class="border text-center">{{ convertDateByTimestamp()(item.updated_date) }}</td>
+            <td class="border text-center">{{ item.updated_date }}</td>
             <td class="border text-center">
               <div class="flex justify-center">
                 <ButtonEdit @clickBtn="() => goToCustomerDebtList(item.customer_id)" :text="DebtDetail"/>

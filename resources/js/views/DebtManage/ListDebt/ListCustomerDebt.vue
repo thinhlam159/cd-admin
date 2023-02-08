@@ -44,7 +44,7 @@
             Thanh toán
           </th>
           <th class="border py-1 w-[9%]">
-            Đơn thông thường
+            Đơn lẻ
           </th>
           <th class="border py-1 w-[6%]">
             Container
@@ -67,7 +67,7 @@
             <td class="border text-center">{{ item.total_debt.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
             <td class="border text-center">{{ item.total_payment.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
             <td class="border text-center">{{ (item.total_debt - item.total_payment).toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
-            <td class="border text-center">{{ convertDateByTimestamp(item.updated_date) }}</td>
+            <td class="border text-center">{{ item.updated_date }}</td>
             <td class="border text-center">{{ item.number_of_money.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
             <td class="border text-center">
               <div class="flex w-full h-full items-center justify-center" v-show="!!item.payment_id">
@@ -120,7 +120,6 @@
         @onNext="handleNextPage"
       />
     </div>
-
   </div>
 </template>
 
@@ -139,12 +138,12 @@ import {
 import { convertDateByTimestamp } from '@/utils'
 import ButtonEdit from "@/components/Buttons/ButtonEdit/ButtonEdit.vue";
 
-const listDebt = ref([]);
 const route = useRoute();
 const router = useRouter();
 const store = useStore();
 const pagination = ref(null);
 const toast = inject('$toast');
+const listDebt = ref([]);
 const addNewDebt = "Thêm công nợ";
 const orderDetail = "Chi tiết";
 const exportExcel = "Xuất excel";

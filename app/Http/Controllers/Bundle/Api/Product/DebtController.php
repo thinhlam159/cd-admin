@@ -138,7 +138,7 @@ class DebtController extends BaseController
                 'user_name' => $debtResult->userName,
                 'total_debt' => $debtResult->totalDebt,
                 'total_payment' => $debtResult->totalPayment,
-                'updated_date' => $debtResult->updateDate,
+                'updated_date' => $debtResult->updatedDate,
                 'monetary_unit_type' => $debtResult->monetaryUnitType,
             ];
         }
@@ -183,7 +183,7 @@ class DebtController extends BaseController
                 'user_name' => $debtResult->userName,
                 'total_debt' => $debtResult->totalDebt,
                 'total_payment' => $debtResult->totalPayment,
-                'updated_date' => $debtResult->updateDate,
+                'updated_date' => $debtResult->updatedDate,
                 'monetary_unit_type' => $debtResult->monetaryUnitType,
                 'update_type' => $debtResult->debtHistoryUpdateType,
                 'order_id' => $debtResult->orderId,

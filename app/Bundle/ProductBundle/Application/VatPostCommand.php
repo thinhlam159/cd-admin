@@ -30,9 +30,9 @@ class VatPostCommand
     public string $userId;
 
     /**
-     * @var int
+     * @var string
      */
-    public int $date;
+    public string $date;
 
     /**
      * @param int $cost
@@ -40,9 +40,9 @@ class VatPostCommand
      * @param string|null $comment
      * @param string $customerId
      * @param string $userId
-     * @param int $date
+     * @param string $date
      */
-    public function __construct(int $cost, string $monetaryUnitType, ?string $comment, string $customerId, string $userId, int $date)
+    public function __construct(int $cost, string $monetaryUnitType, ?string $comment, string $customerId, string $userId, string $date)
     {
         $this->cost = $cost;
         $this->monetaryUnitType = $monetaryUnitType;

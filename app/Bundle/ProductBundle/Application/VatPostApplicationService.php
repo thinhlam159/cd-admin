@@ -61,7 +61,7 @@ class VatPostApplicationService
             $customerId,
             $userId,
             OrderPaymentStatus::fromStatus(OrderPaymentStatus::PENDING),
-            $command->date,
+            SettingDate::fromYmdHis($command->date),
         );
         $currentDebt = $this->debtHistoryRepository->findCurrentDebtByCustomerId($customerId);
 
@@ -81,7 +81,7 @@ class VatPostApplicationService
             null,
             null,
             $command->cost,
-            SettingDate::fromTimeStamps($command->date),
+            SettingDate::fromYmdHis($command->date),
             MonetaryUnitType::fromValue($command->monetaryUnitType),
             $command->comment,
             !is_null($currentDebt) ? $currentDebt->getVersion() + 1 : 1
