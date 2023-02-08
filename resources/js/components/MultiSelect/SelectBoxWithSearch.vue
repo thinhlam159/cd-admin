@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import {ref, computed, onMounted, nextTick} from 'vue';
+import {ref, computed, onMounted, nextTick, onUnmounted} from 'vue';
 import CloseIconBold from "@/components/MultiSelect/CloseIconBold.vue";
 import SearchIcon from "@/components/icons/SearchIcon.vue";
 
@@ -65,13 +65,20 @@ export default {
       })
     }
 
+    const handleClickOutside = (event) => {
+      if (!selectWithSearchRef.value.contains(event.target)) {
+        showDropdown.value = false
+      }
+    }
+
     onMounted(() => {
-      document.addEventListener('click', (event) => {
-        if (!selectWithSearchRef.value.contains(event.target)) {
-          showDropdown.value = false
-        }
-      });
+      document.addEventListener('click', handleClickOutside)
     })
+
+    onUnmounted(() => {
+      document.removeEventListener('click', handleClickOutside)
+    })
+
 
     return {
       selectedOption,

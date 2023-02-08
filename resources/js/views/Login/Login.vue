@@ -105,6 +105,7 @@ export default {
     background: url("../../assets/images/background/login-bg.jpg");
     background-size: cover;
     background-position: center;
+    max-width: 100%;
 }
 .form{
     position: relative;
