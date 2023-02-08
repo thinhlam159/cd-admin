@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\MeasureUnit;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -22,11 +21,11 @@ class MeasureUnitSeeder extends Seeder
             ],
             [
                 'id' => '01GF2VAS2RBQ14MPW4CY844FBG',
-                'name' => 'Met',
+                'name' => 'met',
             ],
             [
                 'id' => '01GF2VASCY844FBG2RBQ14MPW4',
-                'name' => 'role',
+                'name' => 'roll',
             ],
         ];
         foreach($defaults as $v){

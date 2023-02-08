@@ -273,20 +273,20 @@ const listByCategory = async (category) => {
     case 'jumbo':
       res = await getListProductFromApi(pageCurrent.value, {
           params: {
-            category_ids: ["01GFYRT4343YMNC6ZEJK7K7F54"]}
+            category_ids: ["01GF2WV4414C8MYFAGPB4BQS2R"]}
         }
       )
       break
     case 'finishedProduct':
       res = await getListProductFromApi(pageCurrent.value, {
         params: {
-          category_ids: ["01GFYRT43ZEJ443YMNC6K7K7F5"]}
+          category_ids: ["01GF2WV441GPB4BQS2R4C8MYFA"]}
       })
       break
     case 'other':
       res = await getListProductFromApi(pageCurrent.value, {
         params: {
-          category_ids: ["01GFYRT43ZEJK7K7F5443YMNC6"]}
+          category_ids: ["01GF2W4BQS2R4C8MYFAV441GPB"]}
       })
       break
   }
