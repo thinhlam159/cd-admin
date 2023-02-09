@@ -1,29 +1,30 @@
 <template>
-  <h2>Dashboard</h2>
-  <hr>
-  <div class="p-2">
-    <div class="p-3">
-      <p class="text-2xl">1. Doanh thu trong ngày Jumbo + hàng thành phẩm</p>
-      <span>Chọn ngày: </span>
-      <Datepicker class="p-2 border border-gray-200 mt-3" v-model="picked" :style="styleDatePicker" />
-      <span class="text-gray-700 text-xl mt-2">Tổng cộng: {{totalDebtByDay.toLocaleString('it-IT', {style : 'currency', currency : 'VND'})}}</span>
+  <div class="bg-white px-5">
+    <div class="p-3 text-2xl bg-gray-50">
+      <p>Thống kê</p>
     </div>
-<!--    <div class="p-3 mt-2 w-1/2">-->
-<!--      <Bar-->
-<!--        id="my-chart-id"-->
-<!--        :options="chartOptions"-->
-<!--        :data="chartData"-->
-<!--      />-->
-<!--    </div>-->
-  </div>
-  <div class="pt-2">
-    <PeriodRevenue />
-  </div>
-  <div class="pt-2">
-    <StatisticalJumbo />
-  </div>
-  <div class="pt-2">
-    <CustomerOrderAmount />
+    <div class="p-2 mt-2 bg-gray-50">
+      <p class="text-xl">1. Doanh thu trong ngày Jumbo + hàng thành phẩm</p>
+      <div class="mt-1 flex justify-start items-end">
+        <span>Chọn ngày: </span>
+        <Datepicker class="px-2 py-1 border border-gray-200 ml-1" v-model="picked" :style="styleDatePicker"/>
+      </div>
+      <p class="text-gray-700 text-lg mt-2">Tổng cộng: {{
+          totalDebtByDay.toLocaleString('it-IT', {
+            style: 'currency',
+            currency: 'VND'
+          })
+        }}</p>
+    </div>
+    <div class="pt-2 mt-2">
+      <PeriodRevenue />
+    </div>
+    <div class="pt-2 mt-2">
+      <StatisticalJumbo />
+    </div>
+    <div class="pt-2 mt-2">
+      <CustomerOrderAmount />
+    </div>
   </div>
 </template>
 
@@ -83,14 +84,6 @@ const getRevenueByDay = async () => {
     const res = await getRevenuesFromApi({date: date})
     const data = res.data
     totalDebtByDay.value = res.total
-
-    // customerCurrentDebt.value = {
-    //   ...data,
-    //   customerName: data.customer_name,
-    //   totalDebt: data.total_debt,
-    //   restDebt: data.rest_debt
-    // }
-
   } catch (errors) {
     const error = errors.message
     toast.error(error);

@@ -15,7 +15,7 @@
         </div>
       </div>
       <div class="border-b border-t border-gray-400">
-        <AddOrderItemModal @addProductItem="handleAddProductItem" />
+        <AddOrderItemBlock @addProductItem="handleAddProductItem" />
       </div>
       <div>
         <div class="flex py-2 text-md items-center">
@@ -81,13 +81,13 @@ import InputItem from "@/views/OrderManage/CreateOrder/InputItem";
 import ButtonAddNew from "@/components/Buttons/ButtonAddNew";
 import SelectBoxWithSearch from "@/components/MultiSelect/SelectBoxWithSearch.vue";
 import MultiSelect from "@/components/MultiSelect/MultiSelect.vue";
-import AddOrderItemModal from "@/views/OrderManage/CreateOrder/AddOrderItemModal.vue";
+import AddOrderItemBlock from "@/views/OrderManage/CreateOrder/AddOrderItemBlock.vue";
 import ButtonRemove from "@/components/Buttons/ButtonRemove/ButtonRemove.vue";
 import Datepicker from 'vue3-datepicker'
 
 export default {
   name: "CreateOrder",
-  components: {ButtonRemove, AddOrderItemModal, MultiSelect, SelectBoxWithSearch, InputItem, ButtonAddNew, Datepicker },
+  components: {ButtonRemove, AddOrderItemBlock, MultiSelect, SelectBoxWithSearch, InputItem, ButtonAddNew, Datepicker },
   setup() {
     const router = useRouter()
     const store = useStore()

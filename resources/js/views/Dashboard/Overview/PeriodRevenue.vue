@@ -1,28 +1,30 @@
 <template>
-  <div class="p-2">
-    <div class="p-3">
-      <p class="text-2xl">2. Doanh thu theo khoảng thời gian</p>
-      <div class="flex">
-        <span>Từ ngày: </span>
-        <Datepicker
-          class="p-2 border border-gray-200 mt-3"
-          v-model="pickedFrom"
-          :upper-limit="pickedTo"
-          :style="styleDatePicker"
-        />
-      </div>
-      <div class="flex">
-        <span>Đến ngày: </span>
-        <Datepicker
-          class="p-2 border border-gray-200 mt-3"
-          v-model="pickedTo"
-          :lower-limit="pickedFrom"
-          :style="styleDatePicker"
-        />
-      </div>
-
-      <span class="text-gray-700 text-xl">Tổng cộng: {{totalPeriodDebt.toLocaleString('it-IT', {style : 'currency', currency : 'VND'})}}</span>
+  <div class="p-2 bg-gray-50">
+    <p class="text-xl">2. Doanh thu theo khoảng thời gian</p>
+    <div class="flex mt-1 justify-start items-end">
+      <span>Từ ngày: </span>
+      <Datepicker
+        class="px-2 py-1 border border-gray-200 ml-1"
+        v-model="pickedFrom"
+        :upper-limit="pickedTo"
+        :style="styleDatePicker"
+      />
     </div>
+    <div class="flex mt-1 justify-start items-end">
+      <span>Đến ngày: </span>
+      <Datepicker
+        class="px-2 py-1 border border-gray-200 ml-1"
+        v-model="pickedTo"
+        :lower-limit="pickedFrom"
+        :style="styleDatePicker"
+      />
+    </div>
+    <p class="text-gray-700 text-lg mt-2">Tổng cộng: {{
+        totalPeriodDebt.toLocaleString('it-IT', {
+          style: 'currency',
+          currency: 'VND'
+        })
+      }}</p>
   </div>
 </template>
 
