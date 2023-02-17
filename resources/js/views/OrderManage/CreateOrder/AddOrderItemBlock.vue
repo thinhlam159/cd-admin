@@ -1,44 +1,46 @@
 <template>
-  <div class="w-full relative p-5">
-    <div class="px-3 m-2 flex text-md">
-      <div class="mr-4 w-[30%]">
+  <div class="w-full p-1">
+    <div class="flex p-1 text-md">
+      <div class="mr-1 py-1 bg-white w-[30%]">
         <span>Danh mục</span>
       </div>
-      <div class="mr-4 w-[30%]">
+      <div class="mr-1 py-1 bg-white w-[25%]">
         <span>Sản phẩm</span>
       </div>
-      <div class="mr-4 w-[30%]">
+      <div class="mr-1 py-1 bg-white w-[25%]">
         <span>Mã sản phẩm</span>
       </div>
-      <div class="mr-4 w-[10%]">
+      <div class="mr-1 py-1 bg-white w-[10%]">
         <span>Số lượng</span>
       </div>
+      <div class="py-1 w-[5%]">
+      </div>
     </div>
-    <div class="flex py-1 border border-gray-200 p-3 text-md">
-      <div class="mr-4 w-[30%] flex items-center flex-wrap">
-        <div class="inline p-0 mb-2" v-for="(item, index) in categories" :key="index">
+    <div class="flex px-1 text-md mt-1">
+      <div class="mr-1 bg-white w-[30%] flex items-center flex-wrap">
+        <div class="inline m-1" v-for="(item, index) in categories" :key="index">
           <input class="hidden" name="category" type="radio" :id="item.name" :value="item.category_id" v-model="categorySelectedId" @change="handleSelectCategory">
-          <label class="mr-1 p-1 min-w-[60px] category-radio-label border border-gray-500 rounded-full cursor-pointer focus:bg-[#d9d9d9]" :for="item.name">{{ item.name }}</label><br>
+          <label class="p-1 min-w-[60px] category-radio-label border border-gray-500 rounded-full cursor-pointer focus:bg-[#d9d9d9]" :for="item.name">{{ item.name }}</label><br>
         </div>
       </div>
-      <div class="mr-4 w-[30%] flex items-center flex-wrap">
-        <div class="inline p-0" v-for="(item, index) in productsByCategory" :key="index">
+      <div class="mr-1 bg-white w-[25%] flex items-center flex-wrap">
+        <div class="inline m-1" v-for="(item, index) in productsByCategory" :key="index">
           <input class="hidden" name="product" type="radio" :id="item.name" :value="item.product_id" v-model="productSelectedId" @change="handleSelectProduct">
           <label class="mr-1 p-1 min-w-[60px] category-radio-label border border-gray-500 rounded-full cursor-pointer" :for="item.name">{{ item.name }}</label><br>
         </div>
       </div>
-      <div class="mr-4 w-[30%] flex items-center flex-wrap">
-        <div class="inline p-0" v-for="(item, index) in productAttributeValuesByProduct" :key="index">
+      <div class="mr-1 bg-white w-[25%] flex items-center flex-wrap">
+        <div class="inline m-1" v-for="(item, index) in productAttributeValuesByProduct" :key="index">
           <input class="hidden" name="attribute" type="radio" :id="item.code" :value="item.product_attribute_value_id" v-model="productAttributeValueSelectedId" @change="handleSelectProductAttribute">
           <label class="mr-1 p-1 px-3 min-w-[60px] category-radio-label border border-gray-500 rounded-full cursor-pointer" :for="item.code">{{ item.code }}</label><br>
         </div>
       </div>
-      <div class="w-[10%] flex items-center">
-        <input type="number" class="outline-none border-gray-400 border text-lg p-3 w-full" min="0" placeholder="Số lượng" v-model="amount" @change="handleChangeAmount">
+      <div class="mr-1 w-[10%] flex items-center">
+        <input type="number" class="outline-none border-gray-400 border text-md p-2 w-full max-h-[45px]" min="0" placeholder="Số lượng" v-model="amount" @change="handleChangeAmount">
       </div>
-    </div>
-    <div class="w-full">
-      <button @click="handleAddItem" :disabled="!disableSubmit" class="p-2 hover:bg-[#d9d9d9] mt-2 border border-gray-400 rounded-md cursor-pointer">Thêm sản phẩm</button>
+      <div class="m4-1 w-[5%] flex items-center">
+        <button @click="handleAddItem" :disabled="!disableSubmit" class="p-2 hover:bg-[#d9d9d9] border border-gray-400 rounded-md cursor-pointer max-h-[45px]">Tạo</button>
+      </div>
     </div>
   </div>
 </template>

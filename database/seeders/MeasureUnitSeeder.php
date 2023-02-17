@@ -28,8 +28,16 @@ class MeasureUnitSeeder extends Seeder
                 'name' => 'roll',
             ],
             [
-                'id' => '01GF2WVMP4CY844AS2RBQ14FBG',
+                'id' => '01GF2WBQ14FBGVMP4CY844AS2R',
                 'name' => 'unit',
+            ],
+            [
+                'id' => '01GF2WB44AS2RQ14FBGVMP4CY8',
+                'name' => 'tube',
+            ],
+            [
+                'id' => '01GF2WBVMP4AS2RQ14FBG4CY84',
+                'name' => 'tree',
             ],
         ];
         foreach($defaults as $v){

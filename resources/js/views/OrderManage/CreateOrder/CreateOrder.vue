@@ -1,24 +1,26 @@
 <template>
-  <div class="w-full h-full">
-    <div class="w-full pt-14 h-full pl-10">
-      <div class="w-full py-6 py-auto text-xl">
-        <span class="text-gray-500">Tạo đơn hàng</span>
-        <hr>
-      </div>
-      <div class="mr-4 w-[14%] mb-5 flex justify-between">
-        <div>
-          <label for="customer" class="block mb-1 font-bold text-sm">Khách hàng</label>
-          <SelectBoxWithSearch :options="customers" @option-selected="handleSelectCustomer" />
-        </div>
-        <div>
-          <Datepicker class="p-2 border border-gray-200 mt-3" v-model="picked" :style="styleDatePicker" />
-        </div>
-      </div>
-      <div class="border-b border-t border-gray-400">
-        <AddOrderItemBlock @addProductItem="handleAddProductItem" />
-      </div>
+  <div class="w-full h-full bg-white px-5">
+    <div class="w-full py-6 py-auto text-xl p-3 text-2xl bg-gray-50">
+      <p class="text-gray-500">Tạo đơn hàng</p>
+    </div>
+    <div class="pl-5 pt-3 mt-3 bg-gray-50">
       <div>
-        <div class="flex py-2 text-md items-center">
+        <div class="flex items-end">
+          <SelectBoxWithSearch :options="customers" @option-selected="handleSelectCustomer"/>
+          <p class="ml-2 font-bold text-lg">Khách hàng: {{ selectedCustomer ? selectedCustomer.customer_name : ''}}</p>
+        </div>
+        <div class="flex items-end text-md">
+          <p>Ngày tạo đơn:</p>
+          <Datepicker class="p-2 border border-gray-200 mt-3 ml-2" v-model="picked" :style="styleDatePicker"/>
+        </div>
+      </div>
+    </div>
+    <div class="pl-2 p-3 mt-3 bg-gray-50">
+      <AddOrderItemBlock @addProductItem="handleAddProductItem"/>
+    </div>
+    <div class="mt-5 py-4 px-3 bg-gray-50">
+      <div class="bg-white py-2 rounded-lg">
+        <div class="flex px-2 text-md items-center">
           <span class="mr-3 w-[10%]">STT</span>
           <span class="mr-3 w-[25%]">Mã</span>
           <span class="mr-3 w-[10%]">Tên</span>
@@ -27,7 +29,7 @@
           <span class="mr-3 w-[20%]">Thành tiền</span>
           <span class="mr-3 w-[10%]">Xóa</span>
         </div>
-        <div class="py-2 text-md">
+        <div class="px-2 text-md">
           <form @submit.prevent="handleSubmit()">
             <div v-for="(orderItem, index) in listOrderItem" :key="index" class="flex items-center mb-2">
               <div class="mr-3 w-[10%]">{{ index + 1 }}</div>
