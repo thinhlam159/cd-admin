@@ -1,5 +1,5 @@
 <template>
-    <div class="text-xs">
+    <div class="text-xs min-h-screen bg-[#f3f3f3]">
         <SpinLoading v-if="isLoading" />
         <div v-if="isShowLayout" class="">
             <Layout>
@@ -27,13 +27,13 @@ export default {
     },
     setup() {
         const store = useStore();
-        // const isLoading = computed(
-        //     () => store.getters[`${MODULE_STORE.COMMON.NAME}/${MODULE_STORE.COMMON.GETTERS.GET_IS_LOADING}`]
-        // );
-        // const isShowLayout = computed(() => store.state[MODULE_STORE.AUTH.NAME].isAuthenticated);
-        const isShowLayout = true;
-        // return { isLoading, isShowLayout };
-        return { isShowLayout };
+        const isLoading = computed(
+            () => store.getters[`${MODULE_STORE.COMMON.NAME}/${MODULE_STORE.COMMON.GETTERS.GET_IS_LOADING}`]
+        );
+        const isShowLayout = computed(() => store.state[MODULE_STORE.AUTH.NAME].isAuthenticated);
+        // const isShowLayout = true;
+        return { isLoading, isShowLayout };
+        // return { isShowLayout };
     },
 }
 </script>

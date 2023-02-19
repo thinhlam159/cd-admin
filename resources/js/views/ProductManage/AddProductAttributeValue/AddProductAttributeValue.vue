@@ -109,13 +109,11 @@ const productId = ref(route.params.id)
 const measures = ref([])
 const productAttributes = ref([])
 const noticePrice = ref([
-  'Mặc định',
   '298kg',
   '273kg',
   '248kg',
   '224kg',
   '214kg',
-  '290kg',
 ])
 
 const handleSubmit = async (data) => {

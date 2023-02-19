@@ -1,10 +1,10 @@
 <template>
-  <Header :isShowHeader="isShowHeader" />
   <div class="flex w-full min-h-screen">
     <div class="w-[14%] bg-[rgba(0,0,0,.02)]">
       <SideBar />
     </div>
-    <div class="flex w-[86%]">
+    <div class="w-[86%]">
+      <Header :isShowHeader="isShowHeader" />
       <slot></slot>
     </div>
   </div>

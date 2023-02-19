@@ -1,10 +1,10 @@
 import { createI18n } from "vue-i18n";
-import langJa from "../locales/ja.json";
+import langVi from "../locales/vi.json";
 const i18n = createI18n({
   legacy: false,
-  locale: "ja",
+  locale: "vi",
   messages: {
-    ja: langJa,
+    vi: langVi,
   },
 });
 export default i18n;
