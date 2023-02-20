@@ -93,7 +93,6 @@ class ProductListGetApplicationService
      * @param ProductListGetCommand $command
      * @return ProductListGetResult
      * @throws InvalidArgumentException
-     * @throws TransactionException
      */
     public function handle(ProductListGetCommand $command): ProductListGetResult
     {

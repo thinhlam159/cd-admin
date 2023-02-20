@@ -161,6 +161,7 @@ class ProductController extends BaseController
                 'product_inventory_count' => $productAttributeValueResult->productInventoryCount,
                 'measure_unit' => $productAttributeValueResult->measureUnit,
                 'price' => $productAttributeValueResult->price,
+                'notice_price_type' => $productAttributeValueResult->noticePriceType,
                 'monetary_unit' => $productAttributeValueResult->monetaryUnit,
             ];
         }

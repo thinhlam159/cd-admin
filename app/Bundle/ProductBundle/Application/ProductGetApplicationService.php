@@ -17,6 +17,7 @@ use App\Bundle\ProductBundle\Domain\Model\IProductAttributeRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductAttributeValueRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductInventoryRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductRepository;
+use App\Bundle\ProductBundle\Domain\Model\MeasureUnitType;
 use App\Bundle\ProductBundle\Domain\Model\ProductId;
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -90,8 +91,6 @@ class ProductGetApplicationService
     /**
      * @param ProductGetCommand $command
      * @return ProductGetResult
-     * @throws InvalidArgumentException
-     * @throws TransactionException
      */
     public function handle(ProductGetCommand $command): ProductGetResult
     {
@@ -107,7 +106,6 @@ class ProductGetApplicationService
             $productAttributePrice = $this->productAttributePriceRepository->findByProductAttributeValueId($productAttributeValue->getProductAttributeValueId());
             $productInventory = $this->productInventoryRepository->findByProductAttributeValueId($productAttributePrice->getProductAttributeValueId());
             $productAttribute = $this->productAttributeRepository->findById($productAttributeValue->getProductAttributeId());
-            $measureUnit = $this->measureUnitRepository->findById($productAttributeValue->getMeasureUnitId());
 
             $productAttributeValueResults[] = new ProductAttributeValueResult(
                 $productAttributeValue->getProductAttributeValueId()->asString(),
@@ -115,10 +113,13 @@ class ProductGetApplicationService
                 $productAttribute->getName(),
                 $productAttributeValue->getValue(),
                 $productAttributeValue->getCode(),
-                $measureUnit->getName(),
+                $productInventory->getMeasureUnitType()->getValue(),
                 $productInventory->getCount(),
                 $productAttributePrice->getPrice(),
                 $productAttributePrice->getMonetaryUnitType()->getValue(),
+                $productAttributePrice->getNoticePriceType()->getValue(),
+                $productAttributePrice->getProductAttributePriceId()->asString(),
+                $productAttributePrice->getStandardPrice(),
             );
         }
 

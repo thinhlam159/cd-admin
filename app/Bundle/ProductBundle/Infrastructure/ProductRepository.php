@@ -52,8 +52,8 @@ class ProductRepository implements IProductRepository
         } else {
             $entities = ModelProduct::whereIn('category_id', $productAttributeValueIds)->where($conditions)->paginate(PaginationConst::PAGINATE_ROW);
         }
-        $products = [];
 
+        $products = [];
         foreach ($entities as $entity) {
             $products[] = new Product(
                 new ProductId($entity['id']),

@@ -39,16 +39,13 @@
               Tên sản phẩm
             </th>
             <th rowspan="2" class="border py-1 w-[5%]">
-              Mã sản phẩm
-            </th>
-            <th rowspan="2" class="border py-1 w-[5%]">
               Danh mục
             </th>
-            <th colspan="2" class="border py-1 w-[10%]">
+            <th colspan="3" class="border py-1 w-[10%]">
               Báo giá
             </th>
-            <th colspan="3" class="border py-1 w-[14%]">
-              Dòng sản phẩm
+            <th colspan="2" class="border py-1 w-[14%]">
+              Mã sản phẩm
             </th>
             <th rowspan="2" class="border py-1 w-[5%]">
               Cập nhật
@@ -56,10 +53,10 @@
           </tr>
           <tr>
             <th class="border py-1">Giá</th>
+            <th class="border py-1">Đơn giá / kg</th>
             <th class="border py-1">Sửa</th>
             <th class="border py-1">Mã</th>
             <th class="border py-1">Tồn kho</th>
-            <th class="border py-1">Đơn giá / kg</th>
           </tr>
         </thead>
         <tbody>
@@ -67,7 +64,6 @@
           <tr v-if="item.product_attribute_values.length === 0">
             <td class="border text-center">{{ ++index }}</td>
             <td class="border text-center">{{ item.name }}</td>
-            <td class="border text-center">{{ item.code }}</td>
             <td class="border text-center">{{ item.category_name }}</td>
             <td class="border text-center"></td>
             <td class="border text-center"></td>
@@ -77,7 +73,7 @@
             <td class="border text-center">
               <div class="flex justify-center ">
                 <ButtonAddNew @clickBtn="() => goToAddProductAttributeValue(item.product_id)" text='Thêm mã'/>
-                <ButtonEdit @clickBtn="() => goToAdd(item.product_id)" :text="editProduct"/>
+<!--                <ButtonEdit @clickBtn="() => goToAdd(item.product_id)" :text="editProduct"/>-->
               </div>
             </td>
           </tr>
@@ -90,18 +86,15 @@
               {{ item.name }}
             </td>
             <td v-if="subIndex === 0" :rowspan="item.product_attribute_values.length" class="border text-center">
-              {{ item.code }}
-            </td>
-            <td v-if="subIndex === 0" :rowspan="item.product_attribute_values.length" class="border text-center">
               {{ item.category_name }}
             </td>
-<!--            <td v-if="subIndex === 0" :rowspan="item.product_attribute_values.length" class="border text-center">-->
-<!--              {{ item.description }}-->
-<!--            </td>-->
-            <td class="border text-center h-full m-0 py-1">
+            <td v-if="subIndex === 0" :rowspan="item.product_attribute_values.length" class="border text-center h-full m-0 py-1">
               {{ `${item.name} ${subItem.code} x ${subItem.notice_price_type} x ${subItem.price}` }}
             </td>
-            <td class="border text-center h-full m-0 py-1">
+            <td v-if="subIndex === 0" :rowspan="item.product_attribute_values.length" class="border text-center h-full m-0 py-1">
+              {{ `${subItem.standard_price.toLocaleString('it-IT', {style : 'currency', currency : 'VND'})}` }}
+            </td>
+            <td v-if="subIndex === 0" :rowspan="item.product_attribute_values.length" class="border text-center h-full m-0 py-1">
               <div class="flex justify-center ">
                 <ButtonEdit
                   @clickBtn="() => openQuoteModal(subItem.product_attribute_price_id, item.name, subItem.code, subItem.notice_price_type, subItem.originPrice, subItem.product_attribute_value_id)"
@@ -113,15 +106,12 @@
               {{ `${item.code} ${subItem.code}` }}
             </td>
             <td class="border text-center h-full m-0 py-1">
-              {{ `${subItem.count} ${subItem.measure_unit_name}` }}
-            </td>
-            <td class="border text-center h-full m-0 py-1">
-              {{ `${subItem.standard_price.toLocaleString('it-IT', {style : 'currency', currency : 'VND'})}` }}
+              {{ subItem.count + ' ' + t(`measure_unit_type.${subItem.measure_unit_name}`) }}
             </td>
             <td v-if="subIndex === 0" :rowspan="item.product_attribute_values.length" class="border text-center">
               <div class="flex justify-center ">
                 <ButtonAddNew @clickBtn="() => goToAddProductAttributeValue(item.product_id)" text="Thêm mã"/>
-                <ButtonEdit @clickBtn="() => goToAdd(item.product_id)" :text="editProduct"/>
+<!--                <ButtonEdit @clickBtn="() => goToAdd(item.product_id)" :text="editProduct"/>-->
               </div>
             </td>
           </tr>

@@ -59,7 +59,11 @@ final class ProductAttributeValueRepository implements IProductAttributeValueRep
      */
     public function findByProductId(ProductId $productId): array
     {
-        $entities = ModelProductAttributeValue::where('product_id', $productId->asString())->get();
+        $conditions = [
+            ['is_original', '=', false,],
+            ['product_id', '=', $productId->asString(),],
+        ];
+        $entities = ModelProductAttributeValue::where($conditions)->get();
 
         $productAttributeValues = [];
         foreach ($entities as $entity) {
