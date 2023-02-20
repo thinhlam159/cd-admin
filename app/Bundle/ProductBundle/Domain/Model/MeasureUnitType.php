@@ -18,12 +18,20 @@ final class MeasureUnitType
     /** @var int */
     public const UNIT = 4;
 
+    /** @var int */
+    public const TREE = 5;
+
+    /** @var int */
+    public const TUBE = 6;
+
     /** @var array<int,string> */
     private const VALUES = [
         self::KG => 'kg',
         self::MET => 'met',
         self::ROLL => 'roll',
         self::UNIT => 'unit',
+        self::TREE => 'tree',
+        self::TUBE => 'tube',
     ];
     private int $type;
 

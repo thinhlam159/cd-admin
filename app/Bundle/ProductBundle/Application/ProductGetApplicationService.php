@@ -104,8 +104,8 @@ class ProductGetApplicationService
 
         $productAttributeValueResults = [];
         foreach ($productAttributeValues as $productAttributeValue) {
-            $productAttributePrice = $this->productAttributePriceRepository->findByAttributeValueId($productAttributeValue->getProductAttributeValueId());
-            $productInventory = $this->productInventoryRepository->findByProductId($productAttributePrice->getProductAttributeValueId());
+            $productAttributePrice = $this->productAttributePriceRepository->findByProductAttributeValueId($productAttributeValue->getProductAttributeValueId());
+            $productInventory = $this->productInventoryRepository->findByProductAttributeValueId($productAttributePrice->getProductAttributeValueId());
             $productAttribute = $this->productAttributeRepository->findById($productAttributeValue->getProductAttributeId());
             $measureUnit = $this->measureUnitRepository->findById($productAttributeValue->getMeasureUnitId());
 

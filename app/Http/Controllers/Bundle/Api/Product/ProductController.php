@@ -35,7 +35,6 @@ use App\Bundle\ProductBundle\Infrastructure\ProductInventoryRepository;
 use App\Bundle\ProductBundle\Infrastructure\ProductRepository;
 use App\Http\Controllers\Bundle\Api\Common\BaseController;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -48,14 +47,19 @@ class ProductController extends BaseController
     {
         $applicationService = new ProductPostApplicationService(
             new ProductRepository(),
-            new FeatureImagePathRepository(),
+            new ProductAttributeValueRepository(),
+            new ProductAttributePriceRepository(),
+            new ProductInventoryRepository()
         );
 
         $command = new ProductPostCommand(
             $request->name,
-            $request->code,
-            $request->description,
+            $request->name,
+            $request->name,
             $request->category_id,
+            $request->price,
+            $request->measure_unit_type,
+            !empty($request->notice_price_type) ? $request->notice_price_type : 'default',
         );
 
         $result = $applicationService->handle($command);

@@ -24,6 +24,7 @@ final class ProductAttributeValueRepository implements IProductAttributeValueRep
             'product_attribute_id' => $productAttributeValue->getProductAttributeId()->asString(),
             'value' => $productAttributeValue->getValue(),
             'code' => $productAttributeValue->getCode(),
+            'is_original' => $productAttributeValue->isOriginal(),
         ]);
         if (!$result) {
             return null;

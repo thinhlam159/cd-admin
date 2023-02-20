@@ -19,6 +19,7 @@ class CreateProductAttributeValuesTable extends Migration
             $table->string('product_attribute_id');
             $table->string('value');
             $table->string('code');
+            $table->tinyInteger('is_original')->default(false);
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
             $table->foreign('product_attribute_id')->references('id')->on('product_attributes')->onDelete('cascade');
             $table->timestamps();

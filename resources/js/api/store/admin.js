@@ -24,11 +24,7 @@ export const updateCustomerFormApi = async (customerId, data) => api.put(`${apiC
 
 // product manage
 export const getListProductFromApi = async (page, config) => api.get(`${apiConstants.ADMIN.LIST_PRODUCT}?page=${page}`, config)
-export const createProductFromApi = async (data) => await api.post(apiConstants.ADMIN.CREATE_PRODUCT, data, {
-    headers: {
-        "Content-Type": "multipart/form-data",
-    },
-})
+export const createProductFromApi = async (data) => await api.post(apiConstants.ADMIN.CREATE_PRODUCT, data)
 export const getProductDetailFromApi = async (productId) => api.get(`${apiConstants.ADMIN.PRODUCT_DETAIL}/${productId}`)
 export const updateProductAttributePriceFromApi = async (data) => api.put(apiConstants.ADMIN.UPDATE_PRODUCT_ATTRIBUTE_PRICE, data)
 
