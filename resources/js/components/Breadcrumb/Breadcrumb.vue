@@ -1,4 +1,7 @@
 <template>
+  <div class="mb-1">
+    <span class="text-gray-500 text-xl font-medium">{{ currentItem }}</span>
+  </div>
   <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
       <li class="breadcrumb-item" v-for="(item, index) in items" :key="index">
@@ -10,17 +13,15 @@
 </template>
 
 <script setup>
-const props = defineProps({
-  items: {
-    type: Array,
-    required: true
-  },
-  currentItem: {
-    type: String,
-    required: true
-  }
-})
+import {MODULE_STORE} from "@/const";
+import {computed, nextTick, reactive, ref} from "vue";
+import {useStore} from "vuex";
+
+const store = useStore()
 const emit = defineEmits(['changeRoute'])
+
+const items = computed(() => store.getters[`${MODULE_STORE.COMMON.NAME}/${MODULE_STORE.COMMON.GETTERS.GET_BREADCRUMB_ITEMS}`])
+const currentItem = computed(() => store.getters[`${MODULE_STORE.COMMON.NAME}/${MODULE_STORE.COMMON.GETTERS.GET_BREADCRUMB_CURRENT}`])
 const handleChangeRoute = (link) => {
   emit('changeRoute', link)
 }

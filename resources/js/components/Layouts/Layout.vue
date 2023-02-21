@@ -1,6 +1,6 @@
 <template>
   <div class="flex w-full min-h-screen">
-    <div class="w-[14%] bg-[rgba(0,0,0,.02)]">
+    <div class="w-[250px] bg-[#293846]">
       <SideBar />
     </div>
     <div class="w-[86%]">

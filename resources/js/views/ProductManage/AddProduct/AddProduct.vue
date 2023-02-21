@@ -1,13 +1,5 @@
 <template>
   <div class="w-full">
-    <div class="py-4 px-5 bg-white border-b border-[#e7eaec]">
-      <div>
-        <span class="text-gray-500 text-xl">Tạo Sản Phẩm</span>
-      </div>
-      <div class="mt-1">
-        <Breadcrumb :current-item="breadCrumbCurrent" :items="breadCrumbItems" />
-      </div>
-    </div>
     <div class="w-[650px] mt-5 ml-5 bg-white border-t-[2px] border-[#e7eaec]">
       <div class="py-4 px-3 border-b border-[#e7eaec] text-md text-gray-700">
         Tạo sản phẩm mới
@@ -81,13 +73,12 @@
 </template>
 
 <script setup>
-import {inject, reactive, ref} from "vue"
+import {inject, onMounted, reactive, ref} from "vue"
 import {useRouter} from "vue-router"
 import {useStore} from "vuex"
 import {MODULE_STORE, ROUTER_PATH} from "@/const"
 import {createProductFromApi, getListCategoryFromApi, getListMeasureUnitFromApi} from "@/api"
 import { useI18n } from "vue-i18n"
-import Breadcrumb from "@/components/Breadcrumb/Breadcrumb.vue";
 import * as Yup from "yup";
 
 const router = useRouter()
@@ -110,17 +101,6 @@ const noticePrices = ref([
   '224kg',
   '214kg',
   '190kg'
-])
-const breadCrumbCurrent = ref('Tạo sản phẩm')
-const breadCrumbItems = ref([
-  {
-    label: 'Trang chủ',
-    link: '/dashboard'
-  },
-  {
-    label: 'Sản phẩm',
-    link: '/product-manage'
-  }
 ])
 
 const schema = Yup.object().shape({
@@ -280,6 +260,17 @@ const validSelectNoticePrice = async () => {
     });
   }
 }
+store.state[MODULE_STORE.COMMON.NAME].breadcrumbCurrent = 'Tạo sản phẩm'
+store.state[MODULE_STORE.COMMON.NAME].breadcrumbItems = [
+  {
+    label: 'Trang chủ',
+    link: '/dashboard'
+  },
+  {
+    label: 'Sản phẩm',
+    link: '/product-manage'
+  }
+]
 
 getListCategory()
 getMeasureUnits()

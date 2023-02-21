@@ -1,42 +1,47 @@
 <template>
   <!--  <FormUserManage />-->
-  <div class="w-full h-full relative">
-    <div class="w-[650px] pt-14 h-full absolute left-20">
-      <div class="w-full py-6 py-auto text-xl">
+  <div class="w-full">
+    <div class="w-[650px] mt-5 ml-5 bg-white border-t-[2px] border-[#e7eaec]">
+      <div class="py-4 px-3 border-b border-[#e7eaec] text-md text-gray-700">
         <span class="text-gray-500">Thêm sản mã cho sản phẩm</span>
       </div>
-      <hr>
-
-      <div>
-        <div class="p-4 text-base text-gray-700">
+      <div class="px-4">
+        <div class="py-4 text-lg text-gray-700">
           <span>Tên sản phẩm: {{ product.name }}</span>
         </div>
+        <form @submit.prevent="handleSubmit(formData)">
+          <div class="py-1">
+            <label for="code" class="block py-2 font-bold text-lg">
+              <span>Mã loại sp</span>
+              <span class="text-xs text-gray-400 ml-1 font-extralight">(Tối thiểu 1 ký tự)</span>
+              <span v-if="errors.code" class="ml-1 text-red-500">*</span>
+            </label>
+            <input type="text" name="name" placeholder="Nhập mã loại sản phẩm" v-model="formData.code" @input="validInputCode(formData.code)"
+                   class="w-full h-10 px-3 text-base text-gray-700 placeholder-gray-400 border border-gray-400 focus:border-[#8ddd8d] outline-none"
+            >
+          </div>
+          <div class="py-1">
+            <label for="description" class="block py-2 font-bold text-lg">
+              <span>Số lượng sản phẩm</span>
+              <span class="text-xs text-gray-400 ml-1 font-extralight">(Tối thiểu 1 sản phẩm)</span>
+              <span v-if="errors.count" class="ml-1 text-red-500">*</span>
+            </label>
+            <input name="price" placeholder="Số lượng sản phẩm ban đầu" v-model="formData.count" @input="validInputCount(formData.count)"
+                   class="w-full h-10 px-3 text-base text-gray-700 placeholder-gray-400 border border-gray-400 focus:border-[#8ddd8d] outline-none"
+            />
+          </div>
+          <div class="flex justify-end mt-3 py-3 border-t border-[#e7eaec] items-center">
+            <input class="p-2 text-base font-bold text-white bg-[#1ab394] hover:bg-[#18a689] cursor-pointer rounded-md"
+                   type="submit" value="Tạo sản phẩm">
+          </div>
+        </form>
       </div>
-      <hr>
-      <form @submit.prevent="handleSubmit(formData)">
-        <div class="py-2">
-          <label for="code" class="block mb-1 font-bold text-sm">Mã loại sp</label>
-          <input type="text" name="name" placeholder="Nhập mã loại sản phẩm" v-model="formData.code"
-                 class="w-full h-10 px-3 text-base text-gray-700 placeholder-gray-400 border border-gray-400"
-          >
-        </div>
-        <div class="py-2">
-          <label for="description" class="block mb-1 font-bold text-sm">Số lượng sản phẩm</label>
-          <input name="price" placeholder="Số lượng sản phẩm ban đầu" v-model="formData.count"
-                 class="w-full h-10 px-3 text-base text-gray-700 placeholder-gray-400 border border-gray-400"
-          />
-        </div>
-        <div>
-          <input class="w-25 h-10 mt-5 px-3 text-base text-gray-700 placeholder-gray-400 bg-green-400 cursor-pointer"
-                 type="submit" value="Thêm mã sản phẩm">
-        </div>
-      </form>
     </div>
   </div>
 </template>
 
 <script setup>
-import {inject, ref} from "vue";
+import {inject, reactive, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {useStore} from "vuex";
 import {MODULE_STORE, ROUTER_PATH} from "@/const";
@@ -47,6 +52,8 @@ import {
   getProductDetailFromApi
 } from "@/api";
 import logoTimeSharing from "@/assets/images/default-thumbnail.jpg";
+import Breadcrumb from "@/components/Breadcrumb/Breadcrumb.vue";
+import * as Yup from "yup";
 
 const router = useRouter()
 const route = useRoute()
@@ -60,19 +67,25 @@ const product = ref({})
 const productId = ref(route.params.id)
 const measures = ref([])
 const productAttributes = ref([])
-const noticePrice = ref([
-  '298kg',
-  '273kg',
-  '248kg',
-  '224kg',
-  '214kg',
-])
+const errors = reactive({})
+
+const schema = Yup.object().shape({
+  code: Yup.string().required(),
+  count: Yup.number().required().min(1).typeError("Tối thiểu 1 sản phẩm"),
+})
+const codeSchema = Yup.object().shape({
+  code: Yup.string().required()
+})
+const countSchema = Yup.object().shape({
+  count: Yup.number().required().min(1).typeError("Tối thiểu 1 sản phẩm"),
+})
 
 const handleSubmit = async (data) => {
   try {
-    if (data.notice_price_type === 'Mặc định') {
-      data.notice_price_type = 'default'
-    }
+    await schema.validate(
+      { code: data.code, count: data.count },
+      { abortEarly: false }
+    )
     const bodyFormData = new FormData()
     bodyFormData.append('product_id', productId.value);
     bodyFormData.append('product_attribute_id', productAttributes.value[0].id);
@@ -85,9 +98,13 @@ const handleSubmit = async (data) => {
     const res = await createProductAttributeValueFromApi(bodyFormData)
     await router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.PRODUCT_MANAGE}`)
     toast.success('Thêm mã sản phẩm thành công', {duration: 3000});
-  } catch (errors) {
-    const error = errors.message;
-    toast.error(error);
+  } catch (validationErrors) {
+    if (validationErrors.hasOwnProperty('inner')) {
+      validationErrors.inner.forEach((error) => {
+        errors[error.path] = error.message;
+      });
+    }
+    toast.error(errors.message);
   } finally {
     store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
   }
@@ -121,6 +138,46 @@ const getMeasureUnits = async (page) => {
     const error = errors.message;
   }
 }
+
+const validInputCode = async (code) => {
+  try {
+    await codeSchema.validate(
+      { code: code },
+      { abortEarly: false }
+    )
+    delete errors['code'];
+  } catch (validationErrors) {
+    validationErrors.inner.forEach((error) => {
+      errors[error.path] = error.message;
+    });
+  }
+}
+
+const validInputCount = async (count) => {
+  try {
+    await countSchema.validate(
+      { count: count },
+      { abortEarly: false }
+    )
+    delete errors['count'];
+  } catch (validationErrors) {
+    validationErrors.inner.forEach((error) => {
+      errors[error.path] = error.message;
+    });
+  }
+}
+
+store.state[MODULE_STORE.COMMON.NAME].breadcrumbCurrent = 'Tạo mã sản phẩm'
+store.state[MODULE_STORE.COMMON.NAME].breadcrumbItems = [
+  {
+    label: 'Trang chủ',
+    link: '/dashboard'
+  },
+  {
+    label: 'Sản phẩm',
+    link: '/product-manage'
+  }
+]
 
 getProduct(productId.value)
 getProductAttributes('')

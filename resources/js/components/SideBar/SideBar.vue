@@ -1,19 +1,19 @@
 <template>
-  <div class="bg-[e5e7eb]">
-    <div class="flex justify-center items-center py-3">
-      <span class="font-bold text-2xl">{{ userName }}</span>
+  <div class="">
+    <div class="flex justify-center items-center h-[140px]">
+      <span class="font-bold text-2xl text-[#a7b1c2]">{{ userName }}</span>
     </div>
     <ul class="">
       <router-link
         v-for="(item, index) in list"
         :key="index"
-        class="flex items-center hover:bg-[#dbdbdb] py-2 rounded px-2"
+        class="py-4 px-2 flex items-center hover:text-white text-[#a7b1c2] hover:bg-[#293846] bg-[#2f4050] rounded"
         :to="item.link"
       >
-        <div class="mx-2 flex items-center">
-          <i class="" :class="item.icon"></i>
+        <div class="mx-2 flex items-center text-current">
+          <i class="font-medium text-current" :class="item.icon"></i>
         </div>
-        <span class="text-sm">{{ item.title }}</span>
+        <span class="text-sm font-medium text-current">{{ item.title }}</span>
       </router-link>
     </ul>
   </div>
@@ -110,6 +110,7 @@ export default {
 </script>
 <style scoped>
 .router-link-active {
-  background-color: #dbdbdb;
+  background-color: #293846;
+  color: white;
 }
 </style>

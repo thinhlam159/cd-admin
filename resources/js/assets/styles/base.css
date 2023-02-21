@@ -8,6 +8,7 @@
 }
 * {
   color: #333;
+  box-sizing: border-box;
 }
 .v-toast__text {
   color: #fff;
