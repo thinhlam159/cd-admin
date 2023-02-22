@@ -1,7 +1,12 @@
 <template>
   <div class="p-5">
     <div class="w-full h-8 flex justify-start">
-      <input type="text" @input="onInput" class="outline-none w-[150px] h-full border border-gray-200" placeholder="Tìm khách hàng">
+      <div class="mr-1 relative">
+        <input type="text" @input="onInput" class="outline-none min-w-[150px] h-full border border-gray-300 rounded-sm px-10" placeholder="Tìm khách hàng">
+        <div class="absolute top-[50%] left-2 -translate-y-1/2">
+          <SearchIcon />
+        </div>
+      </div>
       <div class="ml-2">
         <ButtonFilter @clickBtn="sortByTotalDebt" :text="sortTotalDebt"/>
       </div>
@@ -86,6 +91,7 @@ import {useStore} from "vuex";
 import {MODULE_STORE, PAGE_DEFAULT, ROUTER_PATH} from "@/const";
 import {exportOrderFromApi, getListDebtFromApi, getListOrderFromApi} from "@/api";
 import { convertDateByTimestamp } from "@/utils";
+import SearchIcon from "@/components/icons/SearchIcon.vue";
 
 export default {
   name: "ListOrder",
@@ -95,6 +101,7 @@ export default {
     }
   },
   components: {
+    SearchIcon,
     ButtonAddNew,
     ButtonFilter,
     ButtonDownloadCSV,
@@ -149,7 +156,6 @@ export default {
     }
 
     const exportOrder = async (id) => {
-      console.log(12313)
       const excelRes = await exportOrderFromApi({order_id: id})
       const url = URL.createObjectURL(new Blob([excelRes], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'

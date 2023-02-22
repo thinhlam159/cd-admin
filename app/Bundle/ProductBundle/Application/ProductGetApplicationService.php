@@ -120,6 +120,7 @@ class ProductGetApplicationService
                 $productAttributePrice->getNoticePriceType()->getValue(),
                 $productAttributePrice->getProductAttributePriceId()->asString(),
                 $productAttributePrice->getStandardPrice(),
+                $productAttributeValue->isOriginal()
             );
         }
 

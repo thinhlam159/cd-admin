@@ -3,14 +3,17 @@
     <div class="bg-white p-2 h-full">
       <div class="w-full h-8 flex justify-between">
         <div class="flex">
-          <div class="mr-1">
+          <div class="mr-1 relative">
             <input
               type="text"
-              class="outline-none border-gray-400 border min-w-[120px] h-full px-1"
+              class="outline-none border-gray-300 border min-w-[150px] h-full px-10 rounded-sm"
               @input="handleFilter"
               v-model="filterText"
               placeholder="Tìm theo tên"
             >
+            <div class="absolute top-[50%] left-2 -translate-y-1/2">
+              <SearchIcon />
+            </div>
           </div>
           <ButtonFilter @clickBtn="listByCategory('all')" text='Tất cả'/>
           <ButtonFilter @clickBtn="listByCategory('jumbo')" text='Jumbo'/>
@@ -60,8 +63,8 @@
               <td class="border text-center">{{ ++index }}</td>
               <td class="border text-center">{{ item.name }}</td>
               <td class="border text-center">{{ item.category_name }}</td>
-              <td class="border text-center"></td>
-              <td class="border text-center"></td>
+              <td class="border text-center">{{ `${item.name} x ${item.notice_price_type} x ${item.price.toLocaleString('it-IT', {style : 'currency', currency : 'VND'})}` }}</td>
+              <td class="border text-center">{{ `${item.standard_price.toLocaleString('it-IT', {style : 'currency', currency : 'VND'})}` }}</td>
               <td class="border text-center"></td>
               <td class="border text-center"></td>
               <td class="border text-center"></td>
@@ -84,10 +87,10 @@
                 {{ item.category_name }}
               </td>
               <td v-if="subIndex === 0" :rowspan="item.product_attribute_values.length" class="border text-center h-full m-0 py-1">
-                {{ `${item.name} ${subItem.code} x ${subItem.notice_price_type} x ${subItem.price}` }}
+                {{ `${item.name} ${subItem.code} x ${item.notice_price_type} x ${item.price.toLocaleString('it-IT', {style : 'currency', currency : 'VND'})}` }}
               </td>
               <td v-if="subIndex === 0" :rowspan="item.product_attribute_values.length" class="border text-center h-full m-0 py-1">
-                {{ `${subItem.standard_price.toLocaleString('it-IT', {style : 'currency', currency : 'VND'})}` }}
+                {{ `${item.standard_price.toLocaleString('it-IT', {style : 'currency', currency : 'VND'})}` }}
               </td>
               <td v-if="subIndex === 0" :rowspan="item.product_attribute_values.length" class="border text-center h-full m-0 py-1">
                 <div class="flex justify-center ">
@@ -133,25 +136,18 @@
 </template>
 
 <script setup>
-import Datepicker from "vue3-datepicker";
 import {ROUTER_PATH, MODULE_STORE, PAGE_DEFAULT} from "@/const";
 import ButtonAddNew from "@/components/Buttons/ButtonAddNew";
 import ButtonFilter from "@/components/Buttons/ButtonFilter";
-import ButtonDownloadCSV from "@/components/Buttons/ButtonDownloadCSV";
 import ButtonEdit from "@/components/Buttons/ButtonEdit";
-import {
-  getListProductFromApi,
-  getListUserManagerFromApi,
-  getListCategoryFromApi,
-  exportOrderFromApi
-} from "@/api";
-import {convertDateByTimestamp} from "@/utils";
+import {getListProductFromApi,} from "@/api";
 import {ref, computed, watch, inject} from "vue";
 import {useRouter, useRoute} from "vue-router";
 import {useStore} from "vuex";
 import Pagination from "@/components/Pagination";
 import {useI18n} from "vue-i18n";
 import QuotePriceModal from "@/views/ProductManage/ListProduct/QuotePriceModal.vue";
+import SearchIcon from "@/components/icons/SearchIcon.vue";
 
 const filterKey = ref({});
 const isShowSort = ref(false);
@@ -279,7 +275,6 @@ const listByCategory = async (category) => {
         price: attributeValue.price.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}),
         originPrice: attributeValue.price
       }
-
     })
     return {
       ...product,

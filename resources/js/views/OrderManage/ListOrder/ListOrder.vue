@@ -1,6 +1,12 @@
 <template>
   <div class="px-2 py-3 bg-white mt-10 mx-5 min-h-[600px]">
     <div class="w-full h-8 flex justify-between">
+      <div class="mr-1 relative">
+        <input type="text" @input="onInput" class="outline-none min-w-[150px] h-full border border-gray-300 rounded-sm px-10" placeholder="Tìm khách hàng">
+        <div class="absolute top-[50%] left-2 -translate-y-1/2">
+          <SearchIcon />
+        </div>
+      </div>
       <div class="ml-2">
         <ButtonAddNew @clickBtn="handleCreateOrder" :text="addNewOrder"/>
       </div>
@@ -80,6 +86,7 @@ import {useRoute, useRouter} from "vue-router";
 import {useStore} from "vuex";
 import {MODULE_STORE, PAGE_DEFAULT, ROUTER_PATH} from "@/const";
 import {exportOrderFromApi, getListOrderFromApi} from "@/api";
+import SearchIcon from "@/components/icons/SearchIcon.vue";
 
 const listOrder = ref([]);
 const route = useRoute();
@@ -127,7 +134,7 @@ const exportOrder = async (id) => {
   }))
   const link = document.createElement('a')
   link.href = url
-  link.setAttribute('download', 'fileName')
+  link.setAttribute('download', 'fileName.xlsx')
   document.body.appendChild(link)
   link.click()
   link.remove()

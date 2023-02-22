@@ -60,7 +60,6 @@ final class ProductAttributeValueRepository implements IProductAttributeValueRep
     public function findByProductId(ProductId $productId): array
     {
         $conditions = [
-            ['is_original', '=', false,],
             ['product_id', '=', $productId->asString(),],
         ];
         $entities = ModelProductAttributeValue::where($conditions)->get();
@@ -75,6 +74,7 @@ final class ProductAttributeValueRepository implements IProductAttributeValueRep
                 $entity['code'],
                 null,
                 null,
+                $entity['is_original'],
             );
 
             $productAttributeValues[] = $productAttributeValue;

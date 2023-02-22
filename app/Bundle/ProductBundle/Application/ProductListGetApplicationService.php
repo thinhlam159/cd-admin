@@ -130,7 +130,8 @@ class ProductListGetApplicationService
                     $productAttributePrice->getMonetaryUnitType()->getValue(),
                     $productAttributePrice->getNoticePriceType()->getValue(),
                     $productAttributePrice->getProductAttributePriceId(),
-                    $standardPrice
+                    $standardPrice,
+                    $productAttributeValue->isOriginal()
                 );
             }
 

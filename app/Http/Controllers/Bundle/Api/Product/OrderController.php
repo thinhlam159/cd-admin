@@ -576,6 +576,8 @@ class OrderController extends BaseController
                 5 => $orderProduct->productOrderCost,
             ];
         }
+        $orderInfoRows = count($result->orderProductExportResults);
+
         $footer = [
             [
                 0 => "Tổng cộng",
@@ -619,7 +621,7 @@ class OrderController extends BaseController
             ],
         ];
         $template = array_merge($template, $footer);
-        $orderExport = new OrderExport($template);
-        return Excel::download($orderExport, "dfsf.xlsx");
+        $orderExport = new OrderExport($template, $orderInfoRows);
+        return Excel::download($orderExport, "users.xlsx");
     }
 }

@@ -89,12 +89,12 @@ const handleSubmit = async (data) => {
     const bodyFormData = new FormData()
     bodyFormData.append('product_id', productId.value);
     bodyFormData.append('product_attribute_id', productAttributes.value[0].id);
-    bodyFormData.append('measure_unit_type', product.value.product_attribute_values[0].measure_unit);
+    bodyFormData.append('measure_unit_type', product.value.measure_unit_type);
     bodyFormData.append('value', data.code);
     bodyFormData.append('code', data.code);
-    bodyFormData.append('price', product.value.product_attribute_values[0].price);
+    bodyFormData.append('price', product.value.price);
     bodyFormData.append('count', data.count);
-    bodyFormData.append('notice_price_type', product.value.product_attribute_values[0].notice_price_type);
+    bodyFormData.append('notice_price_type', product.value.notice_price_type);
     const res = await createProductAttributeValueFromApi(bodyFormData)
     await router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.PRODUCT_MANAGE}`)
     toast.success('Thêm mã sản phẩm thành công', {duration: 3000});

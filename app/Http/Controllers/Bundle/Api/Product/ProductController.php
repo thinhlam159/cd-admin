@@ -97,6 +97,7 @@ class ProductController extends BaseController
         foreach ($productResults as $product) {
             $productAttributeValues = [];
             foreach ($product->productAttributeValueResults as $productAttributeValueResult) {
+                if ($productAttributeValueResult->isOriginal) continue;
                 $productAttributeValues[] = [
                     'product_attribute_value_id' => $productAttributeValueResult->productAttributeValueId,
                     'code' => $productAttributeValueResult->code,
@@ -109,6 +110,7 @@ class ProductController extends BaseController
                     'monetary_unit_name' => $productAttributeValueResult->monetaryUnit,
                     'product_attribute_price_id' => $productAttributeValueResult->productAttributePriceId,
                     'standard_price' => $productAttributeValueResult->standardPrice,
+                    'is_original' => $productAttributeValueResult->isOriginal,
                 ];
             }
             $data[] = [
@@ -118,7 +120,10 @@ class ProductController extends BaseController
                 'description' => $product->description,
                 'category_id' => $product->categoryId,
                 'category_name' => $product->categoryName,
-                'product_attribute_values' => $productAttributeValues
+                'price' => $product->productAttributeValueResults[0]->price,
+                'notice_price_type' => $product->productAttributeValueResults[0]->noticePriceType,
+                'standard_price' => $product->productAttributeValueResults[0]->standardPrice,
+                'product_attribute_values' => $productAttributeValues,
             ];
         }
         $response = [
@@ -153,6 +158,7 @@ class ProductController extends BaseController
         $product = $applicationService->handle($command);
         $productAttributeValues = [];
         foreach ($product->productAttributeValueResults as $productAttributeValueResult) {
+            if ($productAttributeValueResult->isOriginal) continue;
             $productAttributeValues[] = [
                 'product_attribute_value_id' => $productAttributeValueResult->productAttributeValueId,
                 'product_attribute_name' => $productAttributeValueResult->productAttributeName,
@@ -172,6 +178,10 @@ class ProductController extends BaseController
             'description' => $product->description,
             'category_id' => $product->categoryId,
             'category_name' => $product->categoryName,
+            'price' => $product->productAttributeValueResults[0]->price,
+            'notice_price_type' => $product->productAttributeValueResults[0]->noticePriceType,
+            'standard_price' => $product->productAttributeValueResults[0]->standardPrice,
+            'measure_unit_type' => $product->productAttributeValueResults[0]->measureUnit,
             'product_attribute_values' => $productAttributeValues
         ];
 
