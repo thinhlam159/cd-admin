@@ -6,7 +6,10 @@
     <div class="pl-5 pt-3 mt-3">
       <div class="w-[330px]">
         <div class="w-full">
-          <p class="text-gray-400 text-base">Khách hàng</p>
+          <p class="text-gray-400 text-base">
+            Khách hàng
+            <span v-if="customerError" class="ml-1 text-red-500 text-sm">(Chọn khách hàng)</span>
+          </p>
           <div class="flex items-end w-full">
             <SelectBoxWithSearch :options="customers" @option-selected="handleSelectCustomer"/>
 <!--            <span class="ml-5 text-sm">{{ selectedCustomer ? selectedCustomer.customer_name : ''}}</span>-->
@@ -22,8 +25,11 @@
       <p class="text-gray-400 text-base">Chọn sản phẩm</p>
       <AddOrderItemBlock @addProductItem="handleAddProductItem"/>
     </div>
-    <div class="px-5 pt-3 mt-3">
-      <p class="text-gray-400 text-base">Đơn hàng</p>
+    <div class="px-5 pt-3 mt-3 mb-10">
+      <p class="text-gray-400 text-base">
+        Đơn hàng
+        <span v-if="listOrderError" class="ml-1 text-red-500 text-sm">(Đơn hàng không hợp lệ)</span>
+      </p>
       <div class="border border-gray-300 rounded-sm w-full">
         <div class="flex text-md items-center bg-gray-100 border-b border-gray-300">
           <span class="border-r border-gray-300 text-center py-2 w-[10%]">STT</span>
@@ -78,7 +84,7 @@
 <script setup>
 import {useRouter} from "vue-router";
 import {useStore} from "vuex";
-import {ref, inject} from "vue";
+import {ref, inject, reactive} from "vue";
 import {
   createOrderFromApi,
   getListCategoryFromApi,
@@ -93,6 +99,7 @@ import MultiSelect from "@/components/MultiSelect/MultiSelect.vue";
 import AddOrderItemBlock from "@/views/OrderManage/CreateOrder/AddOrderItemBlock.vue";
 import ButtonRemove from "@/components/Buttons/ButtonRemove/ButtonRemove.vue";
 import Datepicker from 'vue3-datepicker'
+import * as Yup from "yup";
 
 const router = useRouter()
 const store = useStore()
@@ -104,14 +111,33 @@ const products = ref({})
 const productsByCategory = ref({})
 const productSelected = ref({})
 const productAttributeValuesByProduct = ref({})
-const listInputItem = ref(store.state[MODULE_STORE.ORDER.NAME].orderPostData)
 const selectedCustomer = ref(null)
-const customerMessageError = ref(null)
+const customerError = ref(false)
 const listOrderItem = ref([])
 const picked = ref(new Date())
+const errors = reactive({})
+const listOrderError = ref(false)
+
+const schema = Yup.object().shape({
+  weight: Yup.number().min(1).typeError("Tối thiểu 1 đơn vị"),
+})
+const customerSchema = Yup.object().shape({
+  customer: Yup.string().required(),
+})
+const orderItemsSchema = Yup.array().of(schema)
 
 const handleSubmit = async () => {
   try {
+    if (selectedCustomer.value === null) {
+      customerError.value = true
+      return
+    }
+    if (listOrderItem.value.length === 0) {
+      listOrderError.value = true
+      return
+    }
+    await customerSchema.validate({customer: selectedCustomer.value.customer_id})
+    await orderItemsSchema.validate(listOrderItem.value, { abortEarly: false })
     const orderPostData = listOrderItem.value.map(orderItem => {
       return {
         product_id: orderItem.productId,
@@ -136,9 +162,14 @@ const handleSubmit = async () => {
     const res = await createOrderFromApi(postData)
     await router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.ORDER_MANAGE}`)
     toast.success('Tạo đơn hàng thành công', {duration: 3500})
-  } catch (errors) {
-    const error = errors.message;
-    toast.error(error);
+  } catch (validationErrors) {
+    if (validationErrors.hasOwnProperty('inner')) {
+      validationErrors.inner.forEach((error) => {
+        errors[error.path] = error.message
+      })
+      listOrderError.value = true
+    }
+    toast.error(validationErrors.message);
   } finally {
     store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
   }
@@ -217,7 +248,7 @@ const handleOnChangeProductSelect = () => {
   productAttributeValuesByProduct.value = productSelected.value.product_attribute_values
 }
 const handleSelectCustomer = (selectedItem) => {
-  customerMessageError.value = false
+  customerError.value = false
   selectedCustomer.value = {...selectedItem}
 }
 const handleAddProductItem = (item) => {

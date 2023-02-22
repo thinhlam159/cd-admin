@@ -73,7 +73,7 @@
 </template>
 
 <script setup>
-import {inject, onMounted, reactive, ref} from "vue"
+import {inject, reactive, ref} from "vue"
 import {useRouter} from "vue-router"
 import {useStore} from "vuex"
 import {MODULE_STORE, ROUTER_PATH} from "@/const"
