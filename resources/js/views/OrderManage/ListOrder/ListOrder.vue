@@ -46,7 +46,7 @@
             <td class="border text-center">{{ ++index }}</td>
             <td class="border text-center">{{ item.user_name }}</td>
             <td class="border text-center">{{ item.customer_name }}</td>
-            <td class="border text-center">{{ item.updated_at }}</td>
+            <td class="border text-center">{{ moment(item.updated_at).format('L') }}</td>
             <td class="border text-center">{{ item.total_cost.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
             <td class="border text-center">
               <div class="flex justify-center ">
@@ -87,6 +87,7 @@ import {useStore} from "vuex";
 import {MODULE_STORE, PAGE_DEFAULT, ROUTER_PATH} from "@/const";
 import {exportOrderFromApi, getListOrderFromApi} from "@/api";
 import SearchIcon from "@/components/icons/SearchIcon.vue";
+import moment from "moment/moment";
 
 const listOrder = ref([]);
 const route = useRoute();

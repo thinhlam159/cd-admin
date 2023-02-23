@@ -12,11 +12,16 @@
           <span class="font-bold text-2xl">CD-admin</span>
         </div>
       </div>
-      <div class="flex items-center justify-end">
-        <div v-show="isShowHeader" class="w-full flex items-center">
+      <div class="flex items-center justify-end  text-base">
+        <div class="cursor-pointer text-gray-400 hover:bg-gray-300 p-1 rounded-md mr-4">
+          <i class="fa fa-envelope text-current"></i>
         </div>
-        <div class="cursor-pointer hover:bg-gray-300 p-1 rounded-md min-w-fit mr-4 text-lg" @click="handleLogout">
-          Đăng xuất
+        <div class="cursor-pointer text-gray-400 hover:bg-gray-300 p-1 rounded-md mr-4">
+          <i class="fa fa-bell text-current"></i>
+        </div>
+        <div class="cursor-pointer text-gray-400 hover:bg-gray-300 p-1 rounded-md mr-4 font-semibold" @click="handleLogout">
+          <i class="fa fa-sign-out text-current"></i>
+          <span class="ml-2"></span>Đăng xuất
         </div>
       </div>
     </div>
@@ -45,6 +50,7 @@ const handleLogout = async () => {
   try {
     await logout();
     removeToken(TYPE_USER.ADMIN);
+    window.localStorage.removeItem('user_name')
     window.location.reload();
   } catch (error) {
     console.log("error: ", error);

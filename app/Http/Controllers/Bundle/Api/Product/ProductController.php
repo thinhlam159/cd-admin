@@ -123,6 +123,8 @@ class ProductController extends BaseController
                 'price' => $product->productAttributeValueResults[0]->price,
                 'notice_price_type' => $product->productAttributeValueResults[0]->noticePriceType,
                 'standard_price' => $product->productAttributeValueResults[0]->standardPrice,
+                'original_product_attribute_value_id' => $product->productAttributeValueResults[0]->productAttributeValueId,
+                'original_product_attribute_price_id' => $product->productAttributeValueResults[0]->productAttributePriceId,
                 'product_attribute_values' => $productAttributeValues,
             ];
         }
@@ -182,6 +184,8 @@ class ProductController extends BaseController
             'notice_price_type' => $product->productAttributeValueResults[0]->noticePriceType,
             'standard_price' => $product->productAttributeValueResults[0]->standardPrice,
             'measure_unit_type' => $product->productAttributeValueResults[0]->measureUnit,
+            'original_product_attribute_value_id' => $product->productAttributeValueResults[0]->productAttributeValueId,
+            'original_product_attribute_price_id' => $product->productAttributeValueResults[0]->productAttributePriceId,
             'product_attribute_values' => $productAttributeValues
         ];
 

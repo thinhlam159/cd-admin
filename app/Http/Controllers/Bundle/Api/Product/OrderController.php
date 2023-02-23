@@ -565,12 +565,21 @@ class OrderController extends BaseController
                 5 => 'Thành tiền',
             ]
         ];
+        $measureUnitType = [
+            'kg' => 'kg',
+            'met' => 'mét',
+            'roll' => 'cuộn',
+            'unit' => 'đơn vị',
+            'tree' => 'cây',
+            'tube' => 'ống',
+        ];
         foreach ($result->orderProductExportResults as $key => $orderProduct) {
             $key ++;
+            $measure = $measureUnitType["$orderProduct->measureUnitType"];
             $template[] = [
                 0 => $key,
                 1 => "$orderProduct->productCode $orderProduct->productAttributeValueCode$orderProduct->attributeDisplayIndex",
-                2 => $orderProduct->measureUnitType,
+                2 => $measure,
                 3 => $orderProduct->weight,
                 4 => $orderProduct->productAttributePriceStandard,
                 5 => $orderProduct->productOrderCost,

@@ -1,20 +1,17 @@
 <template>
-  <div class="p-5">
-    <div class="p-5">
-      <h1 class="text-2xl text-gray-700">Công nợ khách hàng</h1>
-    </div>
+  <div class="p-5 mt-8 mx-5 bg-white">
     <div class="w-full px-3 h-auto">
       <div class="">
-        <span class="text-lg text-gray-400">Khách hàng: </span>
-        <span class="text-2xl">{{ customerCurrentDebt.customerName }}</span>
+        <span class="text-base text-gray-500">Tên: </span>
+        <span class="text-base italic">{{ customerCurrentDebt.customerName }}</span>
       </div>
       <div class="">
-        <span class="text-lg text-gray-400">Tổng công nợ: </span>
-        <span class="text-2xl">{{ customerCurrentDebt.totalDebt?.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</span>
+        <span class="text-base text-gray-500">Tổng công nợ: </span>
+        <span class="text-base">{{ customerCurrentDebt.totalDebt?.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</span>
       </div>
       <div class="">
-        <span class="text-lg text-gray-400">Nợ phải thu: </span>
-        <span class="text-2xl">{{ customerCurrentDebt.restDebt?.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</span>
+        <span class="text-base text-gray-500">Nợ phải thu: </span>
+        <span class="text-base">{{ customerCurrentDebt.restDebt?.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</span>
       </div>
     </div>
     <!-- *********** -->
@@ -63,11 +60,11 @@
         <tbody>
         <template v-for="(item, index) in listDebt">
           <tr>
-            <td class="border text-center">{{ ++index }}</td>
+            <td class="border text-center">{{ (pagination.current_page - 1) * pagination.per_page + (parseInt(index) + 1) }}</td>
             <td class="border text-center">{{ item.total_debt.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
             <td class="border text-center">{{ item.total_payment.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
             <td class="border text-center">{{ (item.total_debt - item.total_payment).toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
-            <td class="border text-center">{{ item.updated_date }}</td>
+            <td class="border text-center">{{ moment(item.updated_date).format('L') }}</td>
             <td class="border text-center">{{ item.number_of_money.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
             <td class="border text-center">
               <div class="flex w-full h-full items-center justify-center" v-show="!!item.payment_id">
@@ -115,7 +112,7 @@
       <Pagination
         v-if="pagination"
         :pageCurrent="pagination.current_page"
-        :totalPage="pagination.total"
+        :totalPage="pagination.total_page"
         @onBack="handleBackPage"
         @onNext="handleNextPage"
       />
@@ -129,14 +126,14 @@ import Pagination from "@/components/Pagination/Pagination.vue";
 import {computed, inject, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {useStore} from "vuex";
-import {MODULE_STORE, PAGE_DEFAULT, ROUTER_PATH} from "@/const";
+import {MODULE_STORE, PAGE_DEFAULT} from "@/const";
 import {
-  exportCustomerDebtHistoryFromApi, exportOrderFromApi,
+  exportCustomerDebtHistoryFromApi,
   getCustomerCurrentDebtFromApi,
   getListCustomerDebtFromApi
 } from "@/api";
-import { convertDateByTimestamp } from '@/utils'
 import ButtonEdit from "@/components/Buttons/ButtonEdit/ButtonEdit.vue";
+import moment from "moment/moment";
 
 const route = useRoute();
 const router = useRouter();
@@ -224,6 +221,18 @@ const exportCustomerDebt = async (customerId) => {
 
 getListCustomerDebt(customerId.value, pageCurrent.value);
 getCustomerCurrentDebt(customerId.value);
+
+store.state[MODULE_STORE.COMMON.NAME].breadcrumbCurrent = 'Công nợ khách'
+store.state[MODULE_STORE.COMMON.NAME].breadcrumbItems = [
+  {
+    label: 'Trang chủ',
+    link: '/dashboard'
+  },
+  {
+    label: 'Công nợ',
+    link: '/debt-manage'
+  },
+]
 
 </script>
 

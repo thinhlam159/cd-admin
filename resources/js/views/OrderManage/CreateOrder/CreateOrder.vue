@@ -17,7 +17,7 @@
         </div>
         <div class="w-full mt-3">
           <p class="text-gray-400 text-base">Ngày tạo đơn</p>
-          <Datepicker class="p-2 border border-gray-200 w-full h-[40px] text-base outline-none" v-model="picked" :style="styleDatePicker"/>
+          <Datepicker class="p-2 border border-gray-200 w-full h-[40px] text-base outline-none" v-model="picked" :style="styleDatePicker"  inputFormat="dd/MM/yyyy" :locale="vi" />
         </div>
       </div>
     </div>
@@ -100,6 +100,8 @@ import AddOrderItemBlock from "@/views/OrderManage/CreateOrder/AddOrderItemBlock
 import ButtonRemove from "@/components/Buttons/ButtonRemove/ButtonRemove.vue";
 import Datepicker from 'vue3-datepicker'
 import * as Yup from "yup";
+import moment from "moment/moment";
+import { vi } from 'date-fns/locale'
 
 const router = useRouter()
 const store = useStore()
@@ -126,6 +128,9 @@ const customerSchema = Yup.object().shape({
 })
 const orderItemsSchema = Yup.array().of(schema)
 
+console.log(moment())
+console.log(moment().format('LLLL'))
+console.log(moment.locale())
 const handleSubmit = async () => {
   try {
     if (selectedCustomer.value === null) {

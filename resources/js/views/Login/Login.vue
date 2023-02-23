@@ -72,6 +72,7 @@ export default {
                 setToken(access_token, expires_in, TYPE_USER.ADMIN);
                 store.state[MODULE_STORE.AUTH.NAME].isAuthenticated = true;
                 store.state[MODULE_STORE.AUTH.NAME].userName = user.name;
+                localStorage.setItem('user_name', user.name)
                 await router.push(ROUTER_PATH.ADMIN);
                 toast.success("Login successful!");
                 store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
