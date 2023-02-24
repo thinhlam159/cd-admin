@@ -1,5 +1,5 @@
 <template>
-  <div class="p-5">
+  <div class="p-5 mt-8 mx-5 bg-white">
     <div class="w-full h-8 flex justify-between">
       <div class="ml-2">
         <ButtonAddNew @clickBtn="goToAdd" :text="addNewImportGood"/>
@@ -12,7 +12,7 @@
         <thead>
         <tr class="">
           <th rowspan="2" class="border py-1 w-[2%]">
-            STT
+            #
           </th>
           <th rowspan="2" class="border py-1 w-[12%]">
             Nguời tạo
@@ -35,7 +35,7 @@
           <th class="border py-1">Nhập kho</th>
         </tr>
         </thead>
-        <tbody>
+        <tbody class="[&>*:nth-child(odd)]:bg-[#f9f9f9]">
         <template v-for="(item, index) in listImportGood">
           <tr v-if="item.import_good_products.length === 0">
             <td class="border text-center">{{ ++index }}</td>
@@ -56,7 +56,7 @@
           <tr v-else v-for="(subItem, subIndex) in item.importGoodProducts"
               :key="subItem.product_attribute_value_id">
             <td v-if="subIndex === 0" :rowspan="item.import_good_products.length" class="border text-center">
-              {{ ++index }}
+              {{ (pagination.current_page - 1) * pagination.per_page + (parseInt(index) + 1) }}
             </td>
             <td v-if="subIndex === 0" :rowspan="item.import_good_products.length" class="border text-center">
               {{ item.user_name }}
@@ -65,7 +65,7 @@
 <!--              {{ item.import_good_date }}-->
 <!--            </td>-->
             <td v-if="subIndex === 0" :rowspan="item.import_good_products.length" class="border text-center">
-              {{ item.data }}
+              {{ moment(item.date).format('L') }}
             </td>
             <td v-if="subIndex === 0" :rowspan="item.import_good_products.length" class="border text-center">
               {{ item.containerName }}
@@ -97,7 +97,7 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import Datepicker from "vue3-datepicker";
 import ButtonAddNew from "@/components/Buttons/ButtonAddNew/ButtonAddNew.vue";
 import ButtonFilter from "@/components/Buttons/ButtonFilter/ButtonFilter.vue";
@@ -110,106 +110,90 @@ import {useStore} from "vuex";
 import {MODULE_STORE, PAGE_DEFAULT, ROUTER_PATH} from "@/const";
 import { getListImportGoodFromApi } from "@/api";
 import {convertDateByTimestamp} from "@/utils";
+import moment from "moment/moment";
 
-export default {
-  name: "ListImportGood",
-
-  components: {
-    Datepicker,
-    ButtonAddNew,
-    ButtonFilter,
-    ButtonDownloadCSV,
-    ButtonEdit,
-    Pagination,
+const route = useRoute();
+const router = useRouter();
+const store = useStore();
+const pagination = ref();
+const addNewImportGood = "Tạo đơn nhập kho";
+const orderDetail = "Chi tiết";
+const listImportGood = ref([]);
+const listMeasureUnitType = ref([
+  {
+    name: 'kg',
+    type: 'kg'
   },
-  setup() {
-    const route = useRoute();
-    const router = useRouter();
-    const store = useStore();
-    const pagination = ref();
-    const addNewImportGood = "Tạo đơn nhập kho";
-    const orderDetail = "Chi tiết";
-    const listImportGood = ref([]);
-    const listMeasureUnitType = ref([
-      {
-        name: 'kg',
-        type: 'kg'
-      },
-      {
-        name: 'met',
-        type: 'met'
-      },
-      {
-        name: 'cuộn',
-        type: 'roll'
-      },
-    ])
+  {
+    name: 'met',
+    type: 'met'
+  },
+  {
+    name: 'cuộn',
+    type: 'roll'
+  },
+])
 
-    const pageCurrent = computed(() => {
-      if (!route.query.page) {
-        return PAGE_DEFAULT;
-      }
-      return Number(route.query.page);
-    });
+const pageCurrent = computed(() => {
+  if (!route.query.page) {
+    return PAGE_DEFAULT;
+  }
+  return Number(route.query.page);
+});
 
-    const handleCreateOrder = () => {
-      router.push(`${ROUTER_PATH.ORDER_MANAGE}/${ROUTER_PATH.ADD}`);
-    }
+const handleCreateOrder = () => {
+  router.push(`${ROUTER_PATH.ORDER_MANAGE}/${ROUTER_PATH.ADD}`);
+}
 
-    const goToAdd = () => {
-      router.push(`${ROUTER_PATH.IMPORT_GOOD_MANAGE}/${ROUTER_PATH.ADD}`);
-    }
+const goToAdd = () => {
+  router.push(`${ROUTER_PATH.IMPORT_GOOD_MANAGE}/${ROUTER_PATH.ADD}`);
+}
 
-    const goToDetail = (id) => {
-      router.push(`${ROUTER_PATH.IMPORT_GOOD_MANAGE}/${ROUTER_PATH.DETAIL}/${id}`);
-    }
+const goToDetail = (id) => {
+  router.push(`${ROUTER_PATH.IMPORT_GOOD_MANAGE}/${ROUTER_PATH.DETAIL}/${id}`);
+}
 
-    const getListImportGood = async (param) => {
-      try {
-        const res = await getListImportGoodFromApi(param)
-        listImportGood.value = res.data.map((item) => {
+const getListImportGood = async (param) => {
+  try {
+    const res = await getListImportGoodFromApi(param)
+    listImportGood.value = res.data.map((item) => {
+      return {
+        ...item,
+        date: item.import_good_date,
+        containerName: item.container_name ? item.container_name : '-',
+        importGoodProducts: item.import_good_products.map( product =>  {
           return {
-            ...item,
-            data: item.import_good_date,
-            containerName: item.container_name ? item.container_name : '-',
-            importGoodProducts: item.import_good_products.map( product =>  {
-              return {
-                ...product,
-                measureUnitType: listMeasureUnitType.value.find( type => type.type === product.measure_unit_type ).name
-              }
-            })
+            ...product,
+            measureUnitType: listMeasureUnitType.value.find( type => type.type === product.measure_unit_type ).name
           }
         })
-        pagination.value = res.pagination
-      } catch (error) {
-        store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
       }
-    }
-    const handleBackPage = (page) => {
-      getListImportGood({page})
-    }
-    const handleNextPage = (page) => {
-      getListImportGood({page})
-    }
-
-    getListImportGood({page: pageCurrent.value});
-
-    return {
-      pagination,
-      addNewImportGood,
-      orderDetail,
-      listImportGood,
-      handleCreateOrder,
-      goToDetail,
-      getListImportGood,
-      handleBackPage,
-      handleNextPage,
-      goToAdd
-    }
+    })
+    console.log(listImportGood.value)
+    pagination.value = res.pagination
+  } catch (error) {
+    store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
   }
 }
+const handleBackPage = (page) => {
+  getListImportGood({page})
+}
+const handleNextPage = (page) => {
+  getListImportGood({page})
+}
+
+getListImportGood({page: pageCurrent.value});
+
+store.state[MODULE_STORE.COMMON.NAME].breadcrumbCurrent = 'Nhập kho'
+store.state[MODULE_STORE.COMMON.NAME].breadcrumbItems = [
+  {
+    label: 'Trang chủ',
+    link: '/dashboard'
+  },
+]
+
 </script>
 
 <style scoped>
-/*tr:nth-child(even){background-color: #f2f2f2;}*/
+
 </style>

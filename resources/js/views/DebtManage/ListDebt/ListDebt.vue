@@ -43,7 +43,7 @@
           </th>
         </tr>
         </thead>
-        <tbody>
+        <tbody class="[&>*:nth-child(odd)]:bg-[#f9f9f9]">
         <template v-for="(item, index) in listDebt">
           <tr>
             <td class="border text-center">{{ (pagination.current_page - 1) * pagination.per_page + (parseInt(index) + 1) }}</td>
@@ -51,7 +51,7 @@
             <td class="border text-center">{{ item.total_debt.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
             <td class="border text-center">{{ item.total_payment.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
             <td class="border text-center">{{ (item.total_debt - item.total_payment).toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
-            <td class="border text-center">{{ item.updated_date }}</td>
+            <td class="border text-center">{{ moment(item.updated_date).format('L') }}</td>
             <td class="border text-center">
               <div class="flex justify-center">
                 <ButtonEdit @clickBtn="() => goToCustomerDebtList(item.customer_id)" :text="DebtDetail"/>
@@ -83,6 +83,7 @@ import {useStore} from "vuex";
 import {MODULE_STORE, PAGE_DEFAULT, ROUTER_PATH} from "@/const";
 import {getListDebtFromApi} from "@/api";
 import SearchIcon from "@/components/icons/SearchIcon.vue";
+import moment from "moment/moment";
 
 const listDebt = ref([]);
 const route = useRoute();

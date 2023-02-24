@@ -17,9 +17,9 @@ class CreateDebtHistoriesTable extends Migration
             $table->string('id')->primary();
             $table->string('customer_id');
             $table->string('user_id');
-            $table->integer('total_debt');
-            $table->integer('total_payment');
-            $table->integer('rest_debt');
+            $table->bigInteger('total_debt');
+            $table->bigInteger('total_payment');
+            $table->bigInteger('rest_debt');
             $table->tinyInteger('is_current');
             $table->integer('update_type');
             $table->string('order_id')->nullable();
@@ -28,7 +28,7 @@ class CreateDebtHistoriesTable extends Migration
             $table->string('other_debt_id')->nullable();
             $table->string('payment_id')->nullable();
             $table->date('updated_date');
-            $table->integer('number_of_money');
+            $table->bigInteger('number_of_money');
             $table->integer('monetary_unit_type');
             $table->string('comment')->nullable();
             $table->integer('version');

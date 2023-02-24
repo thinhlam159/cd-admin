@@ -1,17 +1,14 @@
 <template>
   <div class="p-5 mt-8 mx-5 bg-white">
-    <div class="w-full py-6 py-auto text-xl">
-      <span class="text-gray-500">Thêm sản phẩm</span>
-    </div>
-    <div class="mr-4 w-full mb-5">
+    <div class="mr-4 mb-5">
       <div class="flex items-end mb-2">
-        <label for="customer" class="block mb-1 font-bold text-sm">Khách hàng: </label>
-        <span v-show="!customerMessageError" class="text-lg text-gray-400 ml-1">{{
+        <label for="customer" class="text-base text-gray-500">Khách hàng: </label>
+        <span v-show="!customerMessageError" class="text-base font-bold ml-1">{{
             currentCustomer.customer_name
           }}</span>
       </div>
     </div>
-    <div class="w-1/2 p-5">
+    <div class="w-[600px]">
       <TabsWrapper>
         <TabItem title="Container">
           <ContainerOrderItem :customer-id="currentCustomer.customer_id" @customer-id-error="handleCustomerIdError"/>
@@ -29,35 +26,36 @@
 
 <script setup>
 import {useRoute} from "vue-router";
-import {ref} from "vue";
+import {reactive, ref} from "vue";
 import {getListCustomerFromApi} from "@/api";
-import InputItem from "@/views/OrderManage/CreateOrder/InputItem";
-import ButtonAddNew from "@/components/Buttons/ButtonAddNew";
 import TabsWrapper from "@/views/DebtManage/CreateDebt/TabsWrapper.vue";
 import TabItem from "@/views/DebtManage/CreateDebt/TabItem.vue";
 import ContainerOrderItem from "@/views/DebtManage/CreateDebt/ContainerOrderItem.vue";
 import VatItem from "@/views/DebtManage/CreateDebt/VatItem.vue";
-import MultiSelect from "@/components/MultiSelect/MultiSelect.vue";
 import {MODULE_STORE} from "@/const";
 import {useStore} from "vuex";
 
 const route = useRoute()
-const customers = ref([])
 const selectedCustomers = ref([])
-const currentCustomer = ref({})
+const currentCustomer = reactive({
+  customer_id: '',
+  customer_name: '',
+})
 const customerMessageError = ref(null)
 const store = useStore();
 
 const getListCustomer = async () => {
   const res = await getListCustomerFromApi();
-  customers.value = [
+  const customers = [
     ...res.data
   ]
-  currentCustomer.value = customers.value.find(e => {
+
+  const customer = customers.find(e => {
     return e.customer_id === route.params.id
   })
+  currentCustomer.customer_name = customer.customer_name
+  currentCustomer.customer_id = customer.customer_id
 }
-
 const handleCustomerIdError = (value) => {
   customerMessageError.value = value
 }

@@ -141,6 +141,13 @@ const exportOrder = async (id) => {
   link.remove()
 }
 
+const handleBackPage = (page) => {
+  getListOrder(page)
+}
+const handleNextPage = (page) => {
+  getListOrder(page)
+}
+
 store.state[MODULE_STORE.COMMON.NAME].breadcrumbCurrent = 'Đơn hàng'
 store.state[MODULE_STORE.COMMON.NAME].breadcrumbItems = [
   {

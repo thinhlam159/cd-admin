@@ -51,19 +51,7 @@ const handleUpdatePrice = async () => {
   }
 }
 
-const formatCurrency = (value) => {
-  const formatter = new Intl.NumberFormat("de-DE", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  });
-  return formatter.format(value);
-}
 
-const updateValue = (event) => {
-  const rawValue = event.target.value.replace(/[^\d]/g, "");
-  const value = parseInt(rawValue, 10) || 0;
-  price.value = formatCurrency(value);
-}
 
 </script>
 

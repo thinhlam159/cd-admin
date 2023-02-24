@@ -15,7 +15,7 @@ class CreateContainerOrdersTable extends Migration
     {
         Schema::create('container_orders', function (Blueprint $table) {
             $table->string('id')->primary();
-            $table->integer('cost');
+            $table->bigInteger('cost');
             $table->integer('monetary_unit_type');
             $table->string('comment')->nullable();
             $table->string('customer_id');

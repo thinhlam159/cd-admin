@@ -1,189 +1,140 @@
 <template>
-  <div class="w-full h-full relative">
-    <div class="w-full pt-14 h-full absolute px-10">
-      <div class="w-full py-6 py-auto text-xl">
-        <span class="text-gray-500">Thêm sản phẩm</span>
-        <hr>
+  <div class="p-5 mt-8 mx-5 bg-white">
+    <div class="mr-4 mb-5">
+      <div class="flex items-end mb-2">
+        <label for="customer" class="text-base text-gray-500">Khách hàng: </label>
+        <span v-show="!customerMessageError" class="text-base font-bold ml-1">{{
+            currentCustomer.customer_name
+          }}</span>
       </div>
-      <div class="mr-4 w-[14%] mb-5">
-        <div class="flex items-end mb-2">
-          <label for="customer" class="block mb-1 font-bold text-sm">Khách hàng: </label>
-          <span v-show="!customerMessageError" class="text-lg text-gray-400 ml-1">{{ currentCustomer.customer_name }}</span>
+    </div>
+    <div class="w-[600px] p-5 border-gray-400 border rounded-md">
+      <form
+        @submit.prevent="handleSubmit"
+      >
+        <CurrencyInput
+          name="price"
+          type="text"
+          v-model="price"
+          label="Số tiền thanh toán"
+          placeholder="nhập giá"
+          success-message="Nice to meet you!"
+          :options="{ currency: 'EUR', currencyDisplay: 'hidden' }"
+        />
+        <p v-if="!!priceMessageError" class="text-red-500">{{ priceMessageError }}</p>
+        <div class="mt-4">
+          <label for="" class="font-bold mb-1 text-lg text-gray-500">Ngày thanh toán</label>
+          <Datepicker class="p-2 border border-gray-200 mt-3" v-model="picked" :style="styleDatePicker" :locale="vi"
+                      inputFormat="dd/MM/yyyy"/>
         </div>
-        <div class="flex items-center">
-          <MultiSelect
-            only-select-one
-            key-id="id"
-            key-name="position_name"
-            id="hrPositionAnalysis"
-            :options="customers"
-            :value="selectedCustomers"
-            :placeholder="'Nhập tên'"
-            :hasSearch="true"
-            @change="handleSelectCustomer"
-          />
-          <div class="flex h-full items-center ml-2">
-            <p v-if="!!customerMessageError" class="text-red-500">{{ customerMessageError }}</p>
-          </div>
+        <div class="mt-4">
+          <label for="" class="font-bold mb-1 text-lg text-gray-500">Ghi chú</label>
+          <textarea class="w-full h-auto border border-gray-200 min-h-[80px] outline-none text-sm"
+                    v-model="comment"></textarea>
         </div>
-      </div>
-      <div class="w-1/2 h-full p-5">
-        <form
-          @submit.prevent="handleSubmit"
-        >
-          <CurrencyInput
-            name="price"
-            type="text"
-            v-model="price"
-            label="Giá thành container"
-            placeholder="nhập giá"
-            success-message="Nice to meet you!"
-            :options="{ currency: 'EUR', currencyDisplay: 'hidden' }"
-          />
-          <p v-if="!!priceMessageError" class="text-red-500">{{ priceMessageError }}</p>
-          <div>
-            <label for="" class="font-bold mb-3 text-lg text-gray-500">Ngày bán</label>
-            <Datepicker class="p-2 border border-gray-200 mt-3" v-model="picked" :style="styleDatePicker" />
-          </div>
-          <div>
-            <label for="" class="font-bold mb-3 text-lg text-gray-500">Ghi chú</label>
-            <textarea class="w-full h-auto border border-gray-200 min-h-[80px] outline-none text-sm" v-model="comment"></textarea>
-          </div>
-          <button class="submit-btn border border-gray-200 p-3 max-w-[80px]" type="submit">Submit</button>
-        </form>
-      </div>
+        <button class="submit-btn border border-gray-200 p-2 text-gray-400 mt-3 font-semibold hover:bg-[#d9d9d9] hover:text-white rounded-md bg-gray-100" type="submit">Submit</button>
+      </form>
     </div>
   </div>
 </template>
 
-<script>
+<script setup>
 import {useRoute, useRouter} from "vue-router";
-import {useStore} from "vuex";
-import {inject, ref} from "vue";
+import {inject, reactive, ref} from "vue";
 import {
   createPaymentFromApi,
   getListCustomerFromApi,
 } from "@/api";
 import {MODULE_STORE, ROUTER_PATH} from "@/const";
-import InputItem from "@/views/OrderManage/CreateOrder/InputItem";
-import ButtonAddNew from "@/components/Buttons/ButtonAddNew";
 import CurrencyInput from "@/views/DebtManage/CreateDebt/CurrencyInput.vue";
 import Datepicker from 'vue3-datepicker'
 import * as Yup from 'yup';
-import MultiSelect from "@/components/MultiSelect/MultiSelect.vue";
+import { styleDatePicker } from "@/const";
+import { vi } from "date-fns/locale"
+import {useStore} from "vuex";
 
-export default {
-  name: "CreateDebt",
-  components: {MultiSelect, CurrencyInput, InputItem, ButtonAddNew, Datepicker },
-  setup(emit) {
-    const router = useRouter()
-    const route = useRoute()
-    const customers = ref([])
-    const selectedCustomers = ref([])
-    const currentCustomer = ref({})
-    const customerMessageError = ref(null)
-    const priceMessageError = ref(null)
-    const price = ref(null)
-    const comment = ref('')
-    const picked = ref(new Date())
-    const toast = inject('$toast')
-    const styleDatePicker = ref({
-      "--vdp-bg-color": "#ffffff",
-      "--vdp-text-color": "#e21818",
-      "--vdp-box-shadow": "0 4px 10px 0 rgba(128, 144, 160, 0.1), 0 0 1px 0 rgba(128, 144, 160, 0.81)",
-      "--vdp-border-radius": "10px",
-      "--vdp-heading-size": "2.5em",
-      "--vdp-heading-weight": "bold",
-      "--vdp-heading-hover-color": "#eeeeee",
-      "--vdp-arrow-color": "currentColor",
-      "--vdp-elem-color": "currentColor",
-      "--vdp-disabled-color": "#d5d9e0",
-      "--vdp-hover-color": "#ffffff",
-      "--vdp-hover-bg-color": "#0baf74",
-      "--vdp-selected-color": "#ffffff",
-      "--vdp-selected-bg-color": "#0baf74",
-      "--vdp-current-date-outline-color": "#888888",
-      "--vdp-current-date-font-weight": "bold",
-      "--vdp-elem-font-size": "1em",
-      "--vdp-elem-border-radius": "3px",
-      "--vdp-divider-color": "#ffffff"
-    })
+const router = useRouter()
+const route = useRoute()
+const store = useStore();
+const customers = reactive([])
+const selectedCustomers = reactive([])
+const currentCustomer = reactive({
+  customer_id: '',
+  customer_name: '',
+})
+const customerMessageError = ref(null)
+const priceMessageError = ref(null)
+const price = ref(null)
+const comment = ref('')
+const picked = ref(new Date())
+const toast = inject('$toast')
 
-    const handleSubmit = async () => {
-      try {
-        await schema.validate({ price: price.value, customerId: currentCustomer.value.customer_id });
-        priceMessageError.value = ''
-        const year = picked.value.getFullYear()
-        const month = ('0' + (picked.value.getMonth() + 1)).slice(-2)
-        const day = ('0' + picked.value.getDate()).slice(-2)
-        const date = `${year}-${month}-${day}`
-        const postData = {
-          cost: price.value,
-          comment: comment.value,
-          date: date,
-          monetary_unit_type: 'vnd',
-          customer_id: currentCustomer.value.customer_id
-        }
-        const res = await createPaymentFromApi(postData)
-        toast.success("Tạo đơn container thành công!", {duration:3000})
-        router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.DEBT_MANAGE}`)
-      } catch (err) {
-        switch (err.path) {
-          case 'price':
-            priceMessageError.value = err.errors[0];
-            break
-          case 'customerId':
-            emit('customerIdError', err.errors[0])
-            break
-        }
-      }
+const handleSubmit = async () => {
+  try {
+    await schema.validate({ price: price.value, customerId: currentCustomer.customer_id });
+    priceMessageError.value = ''
+    const year = picked.value.getFullYear()
+    const month = ('0' + (picked.value.getMonth() + 1)).slice(-2)
+    const day = ('0' + picked.value.getDate()).slice(-2)
+    const date = `${year}-${month}-${day}`
+    const postData = {
+      cost: price.value,
+      comment: comment.value,
+      date: date,
+      monetary_unit_type: 'vnd',
+      customer_id: currentCustomer.customer_id
     }
-
-    const getListCustomer = async () => {
-      const res = await getListCustomerFromApi();
-      customers.value = [
-        ...res.data
-      ]
-      currentCustomer.value = customers.value.find(e => {
-        return e.customer_id === route.params.id
-      })
-    }
-
-    const handleCustomerIdError = (value) => {
-      customerMessageError.value = value
-    }
-
-    const handleSelectCustomer = (ids) => {
-      customerMessageError.value = false
-      currentCustomer.value = customers.value.find((e) => {
-        return e.customer_id === ids[0]
-      })
-      selectedCustomers.value = ids
-    }
-
-    const schema = Yup.object().shape({
-      price: Yup.number().min(1000).typeError("Tối thiểu 1000đ"),
-      customerId: Yup.string().required().typeError('Chọn khách hàng'),
-    });
-
-    getListCustomer()
-
-    return {
-      customers,
-      selectedCustomers,
-      currentCustomer,
-      customerMessageError,
-      priceMessageError,
-      price,
-      styleDatePicker,
-      picked,
-      comment,
-      handleSubmit,
-      handleCustomerIdError,
-      handleSelectCustomer
+    const res = await createPaymentFromApi(postData)
+    toast.success("Tạo đơn container thành công!", {duration:3000})
+    await router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.DEBT_MANAGE}`)
+  } catch (err) {
+    toast.error(err.message)
+    switch (err.path) {
+      case 'price':
+        priceMessageError.value = err.errors[0];
+        break
     }
   }
 }
+
+const getListCustomer = async () => {
+  const res = await getListCustomerFromApi();
+  const customers = [
+    ...res.data
+  ]
+
+  const customer = customers.find(e => {
+    return e.customer_id === route.params.id
+  })
+  currentCustomer.customer_name = customer.customer_name
+  currentCustomer.customer_id = customer.customer_id
+}
+
+const handleCustomerIdError = (value) => {
+  customerMessageError.value = value
+}
+
+const schema = Yup.object().shape({
+  price: Yup.number().min(1000).typeError("Tối thiểu 1000đ"),
+  customerId: Yup.string().required().typeError('Chọn khách hàng'),
+});
+
+getListCustomer()
+store.state[MODULE_STORE.COMMON.NAME].breadcrumbCurrent = 'Tạo thanh toán'
+store.state[MODULE_STORE.COMMON.NAME].breadcrumbItems = [
+  {
+    label: 'Trang chủ',
+    link: '/dashboard'
+  },
+  {
+    label: 'Công nợ',
+    link: '/debt-manage'
+  },
+  {
+    label: 'Công nợ khách',
+    link: `/list-customer-debt/${route.params.id}`
+  },
+]
 </script>
 
 <style scoped>
