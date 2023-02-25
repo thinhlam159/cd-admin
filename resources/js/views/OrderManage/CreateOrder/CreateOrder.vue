@@ -128,9 +128,6 @@ const customerSchema = Yup.object().shape({
 })
 const orderItemsSchema = Yup.array().of(schema)
 
-console.log(moment())
-console.log(moment().format('LLLL'))
-console.log(moment.locale())
 const handleSubmit = async () => {
   try {
     if (selectedCustomer.value === null) {

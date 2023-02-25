@@ -21,12 +21,7 @@ const importGood = {
     },
 
     [MODULE_STORE.IMPORT_GOOD.MUTATIONS.REMOVE_IMPORT_GOOD_DATA_ITEM](state, payload) {
-      if (state.importGoodPostData[payload.index] === payload.item) {
-        state.importGoodPostData.splice(payload.index, 1)
-      } else {
-        let found = state.importGoodPostData.indexOf(payload.item)
-        state.importGoodPostData.splice(found, 1)
-      }
+      state.importGoodPostData.splice(payload.index, 1)
 
       return state.importGoodPostData;
     },
@@ -43,7 +38,6 @@ const importGood = {
 
       return state.importGoodPostData;
     },
-
   },
 };
 

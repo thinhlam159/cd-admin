@@ -1,9 +1,9 @@
 <template>
-  <button class="decrement-button" @click="decrementValue">
+  <div class="decrement-button" @click="decrementValue">
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
       <path d="M19,13H5V11h14Z"/>
     </svg>
-  </button>
+  </div>
 </template>
 
 <script setup>

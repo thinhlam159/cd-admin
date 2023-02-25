@@ -1,58 +1,64 @@
 <template>
   <div class="p-5 mt-8 mx-5 bg-white">
-    <div class="w-full pt-14 h-full pl-10">
-      <div class="w-full py-6 py-auto text-xl">
-        <span class="text-gray-500">Thêm sản phẩm</span>
-        <hr>
+    <div class="">
+      <div class="text-xl">
+        <span class="text-gray-500">Nhập sản phẩm</span>
       </div>
-      <form @submit.prevent="handleSubmit(formData)">
-        <div class="mt-5 py-3 flex">
-          <div class="mr-4 w-[18%]">
-            <span>Danh mục</span>
+      <div class="mb-5">
+        <form @submit.prevent="handleSubmit()">
+          <div class="mt-5 flex bg-gray-100 border border-gray-300">
+            <div class="w-[25%] py-2 border-r border-gray-300 text-center">
+              <span>Danh mục</span>
+            </div>
+            <div class="w-[20%] py-2 border-r border-gray-300 text-center">
+              <span>Sản phẩm</span>
+            </div>
+            <div class="w-[20%] py-2 border-r border-gray-300 text-center">
+              <span>Mã sản phẩm</span>
+            </div>
+            <div class="w-[13%] py-2 border-r border-gray-300 text-center">
+              <span>Tên sản phẩm</span>
+            </div>
+            <div class="w-[15%] py-2 border-r border-gray-300 text-center">
+              <span>Số lượng</span>
+            </div>
+            <div class="w-[7%] py-2 border-gray-300 text-center">
+              <span>Xóa sp</span>
+            </div>
           </div>
-          <div class="mr-4 w-[18%]">
-            <span>Sản phẩm</span>
+          <div>
+            <import-good-item v-for="(item, index) in listImportGoodItem" :key="item.key"
+                              @handle-remove-input-item="handleRemoveInputItem(item, index)"
+                              @check-valid="handleCheckValid"
+                              :item="item"
+                              :index="index"
+                              :count="item.count"
+                              :categories="categories"
+                              :products="products"
+            />
           </div>
-          <div class="mr-4 w-[18%]">
-            <span>Mã sản phẩm</span>
+          <div class="ml-2 my-4">
+            <ButtonAddNew @clickBtn="handleAddToImportGood" :text="'Sản phẩm'"/>
           </div>
-          <div class="mr-4 w-[10%]">
-            <span>Tên sản phẩm</span>
+          <div class="flex mt-3">
+            <span class="text-base text-gray-500 font-semibold">Ngày nhập: </span>
+            <Datepicker class="border-b border-gray-200 outline-none ml-2 text-base" v-model="picked" :style="styleDatePicker" :locale="vi" inputFormat="dd-MM-yyyy"/>
           </div>
-          <div class="mr-4 w-[10%]">
-            <span>Số lượng</span>
+          <div class="flex mt-3">
+            <span class="text-base text-gray-500 font-semibold">Tên container: </span>
+            <input type="text" class="outline-none border-gray-300 border-b ml-3 min-w-[150px] ml-2 text-base" v-model="containerName" placeholder="Tên">
           </div>
-          <div class="mr-4 w-[10%]">
-            <span>Xóa sp</span>
+          <div class="text-base font-bold text-gray-500">
+            <input class="mt-5 p-2 border border-gray-500 cursor-pointer hover:bg-gray-500 hover:text-gray-50 rounded-md text-current bg-gray-100"
+                   type="submit"
+                   value="Tạo đơn nhập hàng"
+                   :class="!isAllValid ? 'hover:bg-red-500' : '' "
+                   :disabled="!isAllValid"
+            >
+            <span v-show="!isAllValid" class="text-red-500 text-sm ml-2">Danh sách nhập không hợp lệ!</span>
           </div>
-        </div>
-
-        <div v-if="renderComponent">
-          <import-good-item v-for="(item, index) in listImportGoodItem" :key="index"
-                      @handle-remove-input-item="handleRemoveInputItem({item, index})"
-                      @item-valid="checkItemValid(error)"
-                      :item="item"
-                      :index="index"
-                      :categories="categories"
-                      :dealers="dealers"
-                      :products="products"
-          />
-        </div>
-        <div class="ml-2 my-4">
-          <ButtonAddNew @clickBtn="handleAddToImportGood" :text="'Sản phẩm'"/>
-        </div>
-        <div class="flex mt-3 items-end">
-          <span>Ngày nhập: </span>
-          <Datepicker class="p-3 border border-gray-200 mt-3 outline-none" v-model="picked" :style="styleDatePicker" :locale="vi" inputFormat="dd-MM-yyyy"/>
-        </div>
-        <div class="flex mt-3 items-end">
-          <span>Tên container: </span>
-          <input type="text" class="outline-none border-gray-300 border ml-3 min-w-[150px] p-2" v-model="containerName">
-        </div>
-        <div>
-          <input class="w-25 h-10 mt-5 px-3 text-base text-gray-700 placeholder-gray-400 bg-green-400 cursor-pointer" type="submit" value="Tạo đơn nhập hàng">
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   </div>
 </template>
@@ -60,11 +66,10 @@
 <script setup>
 import {useRouter} from "vue-router";
 import {useStore} from "vuex";
-import {ref, nextTick, inject, onUnmounted} from "vue";
+import {ref, inject, reactive, onUnmounted} from "vue";
 import {
   createImportGoodFromApi,
   getListCategoryFromApi,
-  getListDealerFromApi,
   getListProductFromApi
 } from "@/api";
 import {MODULE_STORE, ROUTER_PATH} from "@/const";
@@ -73,27 +78,39 @@ import ImportGoodItem from "@/views/ImportGoodManage/CreateImportGood/ImportGood
 import Datepicker from 'vue3-datepicker'
 import {vi} from "date-fns/locale";
 import { styleDatePicker } from "@/const";
+import * as Yup from "yup";
 
 const router = useRouter()
 const store = useStore()
-const formData = ref({})
-const categories = ref({})
-const dealers = ref({})
-const products = ref({})
-const productsByCategory = ref({})
-const productSelected = ref({})
-const productAttributeValues = ref({})
-const productAttributeValuesByProduct = ref({})
-const listImportGoodItem = ref(store.state[MODULE_STORE.IMPORT_GOOD.NAME].importGoodPostData)
-const importGoodItemErrors = ref([])
+const categories = reactive([])
+const products = reactive([])
+const listImportGoodItem = reactive([])
+const importGoodItemErrors = reactive([])
 const containerName = ref('')
-const toast = inject("$toast");
+const toast = inject("$toast")
 const picked = ref(new Date())
+const isAllValid = ref(true)
+
+const schema = Yup.object().shape({
+  category_id: Yup.string().required(),
+  product_id: Yup.string().required(),
+  product_attribute_value_id: Yup.string().required(),
+  product_attribute_price_id: Yup.string().required(),
+  count: Yup.number().min(1).typeError("Tối thiểu 1 đơn vị").required(),
+  measure_unit_type: Yup.string().required(),
+})
+
+const listImportGoodSchema = Yup.object().shape({
+  listImportGoodItem: Yup.array().min(1, 'Tối thiểu 1 sản phẩm')
+})
+const importGoodPostDataSchema = Yup.array().of(schema)
 
 const handleSubmit = async () => {
   try {
     store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = true
     const orderPostData = [...store.state[MODULE_STORE.IMPORT_GOOD.NAME].importGoodPostData]
+    await importGoodPostDataSchema.validate(orderPostData, { abortEarly: false })
+    await listImportGoodSchema.validate({listImportGoodItem: orderPostData}, { abortEarly: false })
     const year = picked.value.getFullYear()
     const month = ('0' + (picked.value.getMonth() + 1)).slice(-2)
     const day = ('0' + picked.value.getDate()).slice(-2)
@@ -105,12 +122,17 @@ const handleSubmit = async () => {
     }
     const res = await createImportGoodFromApi(postData)
     toast.success("Tạo đơn nhập thành công!", {duration:3000})
-    store.commit(`${MODULE_STORE.IMPORT_GOOD.NAME}/${MODULE_STORE.IMPORT_GOOD.MUTATIONS.CLEAR_IMPORT_GOOD_DATA_ITEM}`, [])
     await router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.IMPORT_GOOD_MANAGE}`)
     store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false
-  } catch (errors) {
-    const error = errors.message;
-    toast.error(error)
+  } catch (validateErrors) {
+    const listValidateErrors = {};
+    if(validateErrors.hasOwnProperty('inner')) {
+      validateErrors.inner.forEach((errors) => {
+        listValidateErrors[errors.path] = errors.message
+      })
+      isAllValid.value = false
+    }
+    toast.error(validateErrors.message)
   } finally {
     store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false
   }
@@ -119,17 +141,9 @@ const handleSubmit = async () => {
 const getListCategory = async () => {
   try {
     const res = await getListCategoryFromApi()
-    categories.value = res.data.reduce( (option, data) => {
-      return [
-        ...option,
-        {
-          name: data.name,
-          id: data.category_id
-        }
-      ]
-    }, [])
-    formData.value.category = res.data[0].category_id
-    store.state[MODULE_STORE.IMPORT_GOOD.NAME].categories = res.data
+    res.data.forEach((category) => {
+      categories.push({...category, id: category.category_id})
+    })
   } catch (errors) {
     toast.error(errors.message)
   }
@@ -137,56 +151,49 @@ const getListCategory = async () => {
 
 const getListProduct = async () => {
   const res = await getListProductFromApi();
-  products.value = res.data
-  store.state[MODULE_STORE.IMPORT_GOOD.NAME].products = res.data
-}
-
-const getListDealer = async () => {
-  const res = await getListDealerFromApi();
-  dealers.value = {
-    ...res.data
-  }
-}
-
-const handleOnChangeCategorySelect = () => {
-  productsByCategory.value = products.value.filter((product) => {
-    return product.category_id === formData.value.category
+  res.data.forEach((product) => {
+    products.push(product)
   })
 }
-const handleOnChangeProductSelect = () => {
-  productSelected.value = products.value.filter((product) => {
-    return product.product_id === formData.value.product
-  })[0]
 
-  productAttributeValuesByProduct.value = productSelected.value.product_attribute_values
-}
 const handleAddToImportGood = () => {
   const payload = {
     category_id: '',
     product_id: '',
     product_attribute_value_id: '',
     product_attribute_price_id: '',
-    count: '',
+    count: 0,
     measure_unit_type: '',
-    checked: false
+    key: Math.floor(Math.random() * 10000)
   }
   store.commit(`${MODULE_STORE.IMPORT_GOOD.NAME}/${MODULE_STORE.IMPORT_GOOD.MUTATIONS.ADD_IMPORT_GOOD_DATA}`, payload)
-  listImportGoodItem.value = []
-  nextTick(() => {listImportGoodItem.value = store.state[MODULE_STORE.IMPORT_GOOD.NAME].importGoodPostData})
+  listImportGoodItem.push(payload)
 }
-const handleRemoveInputItem = (item) => {
-  store.commit(`${MODULE_STORE.IMPORT_GOOD.NAME}/${MODULE_STORE.IMPORT_GOOD.MUTATIONS.REMOVE_IMPORT_GOOD_DATA_ITEM}`, item)
-  listImportGoodItem.value = []
-  nextTick(() => {listImportGoodItem.value = store.state[MODULE_STORE.IMPORT_GOOD.NAME].importGoodPostData})
+const handleRemoveInputItem = (item, index) => {
+  if (listImportGoodItem[index] === item) {
+    listImportGoodItem.splice(index, 1)
+  } else {
+    const found = listImportGoodItem.indexOf(item)
+    listImportGoodItem.splice(found, 1)
+  }
+  store.commit(`${MODULE_STORE.IMPORT_GOOD.NAME}/${MODULE_STORE.IMPORT_GOOD.MUTATIONS.REMOVE_IMPORT_GOOD_DATA_ITEM}`, {item, index})
+}
+const handleCheckValid = () => {
+  const orderPostData = [...store.state[MODULE_STORE.IMPORT_GOOD.NAME].importGoodPostData]
+  let listValidateErrors = {};
+  importGoodPostDataSchema.validate(orderPostData, {abortEarly: false})
+    .catch((validateErrors) => {
+      isAllValid.value = false
+      if (validateErrors.hasOwnProperty('inner')) {
+        listValidateErrors = validateErrors.inner
+        validateErrors.inner.forEach((errors) => {
+          listValidateErrors[errors.path] = errors.message
+        })
+      }
+    })
+  isAllValid.value = !listValidateErrors.hasOwnProperty('inner') && listImportGoodItem.length > 0
 }
 
-// const checkItemValid = (error) => {
-//   if (error.isValid === true) {
-//     importGoodItemErrors.value[error.index] = error.isValid
-//   } else {
-//     importGoodItemErrors.value.splice(error.index, 1)
-//   }
-// }
 onUnmounted(() => {
   store.commit(`${MODULE_STORE.IMPORT_GOOD.NAME}/${MODULE_STORE.IMPORT_GOOD.MUTATIONS.CLEAR_IMPORT_GOOD_DATA_ITEM}`, [])
 })
@@ -204,7 +211,6 @@ store.state[MODULE_STORE.COMMON.NAME].breadcrumbItems = [
 ]
 
 getListCategory()
-getListDealer()
 getListProduct()
 </script>
 

@@ -1,9 +1,9 @@
 <template>
-  <button class="increment-button" @click="incrementValue">
+  <div class="increment-button" @click="incrementValue">
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
       <path d="M19,13H13v6h-2V13H5V11h6V5h2v6h6Z"/>
     </svg>
-  </button>
+  </div>
 </template>
 
 <script setup>

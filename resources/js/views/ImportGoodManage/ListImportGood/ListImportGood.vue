@@ -98,10 +98,7 @@
 </template>
 
 <script setup>
-import Datepicker from "vue3-datepicker";
 import ButtonAddNew from "@/components/Buttons/ButtonAddNew/ButtonAddNew.vue";
-import ButtonFilter from "@/components/Buttons/ButtonFilter/ButtonFilter.vue";
-import ButtonDownloadCSV from "@/components/Buttons/ButtonDownloadCSV/ButtonDownloadCSV.vue";
 import ButtonEdit from "@/components/Buttons/ButtonEdit/ButtonEdit.vue";
 import Pagination from "@/components/Pagination/Pagination.vue";
 import {computed, ref} from "vue";
@@ -109,30 +106,17 @@ import {useRoute, useRouter} from "vue-router";
 import {useStore} from "vuex";
 import {MODULE_STORE, PAGE_DEFAULT, ROUTER_PATH} from "@/const";
 import { getListImportGoodFromApi } from "@/api";
-import {convertDateByTimestamp} from "@/utils";
 import moment from "moment/moment";
+import {useI18n} from "vue-i18n";
 
 const route = useRoute();
 const router = useRouter();
 const store = useStore();
+const {t} = useI18n()
 const pagination = ref();
 const addNewImportGood = "Tạo đơn nhập kho";
 const orderDetail = "Chi tiết";
 const listImportGood = ref([]);
-const listMeasureUnitType = ref([
-  {
-    name: 'kg',
-    type: 'kg'
-  },
-  {
-    name: 'met',
-    type: 'met'
-  },
-  {
-    name: 'cuộn',
-    type: 'roll'
-  },
-])
 
 const pageCurrent = computed(() => {
   if (!route.query.page) {
@@ -164,12 +148,11 @@ const getListImportGood = async (param) => {
         importGoodProducts: item.import_good_products.map( product =>  {
           return {
             ...product,
-            measureUnitType: listMeasureUnitType.value.find( type => type.type === product.measure_unit_type ).name
+            measureUnitType: t(`measure_unit_type.${product.measure_unit_type}`)
           }
         })
       }
     })
-    console.log(listImportGood.value)
     pagination.value = res.pagination
   } catch (error) {
     store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
