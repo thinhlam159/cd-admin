@@ -34,7 +34,7 @@ class CustomerManagementController extends BaseController
             $request->customer_name,
             $request->email,
             Hash::make($request->password),
-            (int)$request->phone,
+            $request->phone,
             $request->status
         );
 
@@ -55,7 +55,10 @@ class CustomerManagementController extends BaseController
         $applicationService = new CustomerListGetApplicationService(
             $customerRepository,
         );
-        $command = new CustomerListGetCommand();
+
+        $command = new CustomerListGetCommand(
+            !empty($request->keyword) ? $request->keyword : null
+        );
         $result = $applicationService->handle($command);
         $customerManageResults = $result->customerResults;
         $paginationResult = $result->paginationResult;
@@ -121,7 +124,7 @@ class CustomerManagementController extends BaseController
             $request->id,
             $request->customer_name,
             $request->email,
-            (int)$request->phone,
+            $request->phone,
             $request->status
         );
 

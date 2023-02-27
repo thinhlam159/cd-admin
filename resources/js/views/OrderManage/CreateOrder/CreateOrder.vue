@@ -92,15 +92,11 @@ import {
   getListProductFromApi
 } from "@/api";
 import {MODULE_STORE, ROUTER_PATH, styleDatePicker} from "@/const";
-import InputItem from "@/views/OrderManage/CreateOrder/InputItem";
-import ButtonAddNew from "@/components/Buttons/ButtonAddNew";
 import SelectBoxWithSearch from "@/components/MultiSelect/SelectBoxWithSearch.vue";
-import MultiSelect from "@/components/MultiSelect/MultiSelect.vue";
 import AddOrderItemBlock from "@/views/OrderManage/CreateOrder/AddOrderItemBlock.vue";
 import ButtonRemove from "@/components/Buttons/ButtonRemove/ButtonRemove.vue";
 import Datepicker from 'vue3-datepicker'
 import * as Yup from "yup";
-import moment from "moment/moment";
 import { vi } from 'date-fns/locale'
 
 const router = useRouter()

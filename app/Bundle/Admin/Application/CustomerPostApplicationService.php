@@ -43,10 +43,10 @@ class CustomerPostApplicationService
 
     public function handle(CustomerPostCommand $command): CustomerPostResult
     {
-        $existingEmail = $this->customerRepository->checkExistingEmail($command->email);
-        if ($existingEmail) {
-            throw new InvalidArgumentException('Existing Email!');
-        }
+//        $existingEmail = $this->customerRepository->checkExistingEmail($command->email);
+//        if ($existingEmail) {
+//            throw new InvalidArgumentException('Existing Email!');
+//        }
         $customerId = CustomerId::newId();
         $customer = new Customer(
             $customerId,

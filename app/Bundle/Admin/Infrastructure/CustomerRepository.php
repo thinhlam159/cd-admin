@@ -7,6 +7,7 @@ use App\Bundle\Admin\Domain\Model\CustomerId;
 use App\Bundle\Admin\Domain\Model\ICustomerRepository;
 use App\Bundle\Common\Constants\PaginationConst;
 use App\Bundle\Common\Domain\Model\Pagination;
+use App\Bundle\ProductBundle\Domain\Model\CustomerCriteria;
 use App\Models\Customer as ModelCustomer;
 use Exception;
 use InvalidArgumentException;
@@ -34,9 +35,14 @@ class CustomerRepository implements ICustomerRepository
     /**
      * @inheritDoc
      */
-    public function findAll(): array
+    public function findAll(CustomerCriteria $criteria): array
     {
-        $entities = ModelCustomer::paginate(PaginationConst::PAGINATE_ROW);
+        $keyword = $criteria->getKeyword();
+        $conditions = [];
+        if ($criteria->getKeyword()) {
+            $conditions[] = ['name', 'like', "%$keyword%"];
+        }
+        $entities = ModelCustomer::where($conditions)->paginate(PaginationConst::PAGINATE_ROW);
 
         /** @var \App\Bundle\Admin\Domain\Model\User[] $result */
         $customers = [];

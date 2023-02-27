@@ -5,9 +5,15 @@ namespace App\Bundle\Admin\Application;
 class CustomerListGetCommand
 {
     /**
-     * @noparam
+     * @var string|null
      */
-    public function __construct()
+    public ?string $keyword;
+
+    /**
+     * @param string|null $keyword
+     */
+    public function __construct(?string $keyword)
     {
+        $this->keyword = $keyword;
     }
 }

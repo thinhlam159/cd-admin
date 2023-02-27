@@ -19,9 +19,9 @@ final class CustomerGetResult
     public string $customerName;
 
     /**
-     * @var int
+     * @var string
      */
-    public int $phone;
+    public string $phone;
 
     /**
      * @var bool
@@ -32,14 +32,14 @@ final class CustomerGetResult
      * @param string $customerId customerId
      * @param string $customerName customerName
      * @param string $email email
-     * @param int $phone phone
+     * @param string $phone phone
      * @param bool $isActive isActive
      */
     public function __construct(
         string $customerId,
         string $customerName,
         string $email,
-        int $phone,
+        string $phone,
         bool $isActive
     )
     {

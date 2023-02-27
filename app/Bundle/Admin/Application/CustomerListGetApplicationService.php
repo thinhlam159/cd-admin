@@ -4,6 +4,7 @@ namespace App\Bundle\Admin\Application;
 
 use App\Bundle\Admin\Domain\Model\ICustomerRepository;
 use App\Bundle\Common\Application\PaginationResult;
+use App\Bundle\ProductBundle\Domain\Model\CustomerCriteria;
 
 class CustomerListGetApplicationService
 {
@@ -20,7 +21,11 @@ class CustomerListGetApplicationService
      */
     public function handle(CustomerListGetCommand $command): CustomerListGetResult
     {
-        [$customers, $pagination] = $this->customerRepository->findAll();
+        $criteria = new CustomerCriteria(
+            null,
+            $command->keyword
+        );
+        [$customers, $pagination] = $this->customerRepository->findAll($criteria);
         $customerResults = [];
         foreach ($customers as $customer) {
             $customerResults[] = new CustomerResult(

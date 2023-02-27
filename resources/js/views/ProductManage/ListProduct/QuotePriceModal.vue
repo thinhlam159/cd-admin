@@ -17,7 +17,7 @@
 </template>
 
 <script setup>
-import {computed, inject, ref} from "vue";
+import {inject, ref} from "vue";
 import {updateProductAttributePriceFromApi} from "@/api";
 
 const props = defineProps({
@@ -29,7 +29,6 @@ const formatter = new Intl.NumberFormat("de-DE", {
   minimumFractionDigits: 0,
   maximumFractionDigits: 0,
 });
-// const newPrice = ref(0)
 const price = ref(formatter.format(props.data.price))
 const handleUpdatePrice = async () => {
   try {

@@ -7,21 +7,24 @@ final class Customer
     private CustomerId $customerId;
     private string $customerName;
     private string $email;
-    private ?string $password = null;
-    private ?int $phone = null;
-    private ?bool $isActive = false;
+    private ?string $password;
+    private ?string $phone;
+    private ?bool $isActive;
 
     /**
      * @param \App\Bundle\Admin\Domain\Model\CustomerId $customerId customerId
      * @param string $customerName
      * @param string $email
+     * @param string|null $password
+     * @param string|null $phone
+     * @param bool $isActive
      */
     public function __construct(
         CustomerId $customerId,
         string $customerName,
         string $email,
         ?string $password = null,
-        ?int $phone = null,
+        ?string $phone = null,
         ?bool $isActive = false
     )
     {
@@ -74,17 +77,17 @@ final class Customer
     }
 
     /**
-     * @return int|null
+     * @return string|null
      */
-    public function getPhone(): ?int
+    public function getPhone(): ?string
     {
         return $this->phone;
     }
 
     /**
-     * @param int|null $phone
+     * @param string|null $phone
      */
-    public function setPhone(?int $phone): void
+    public function setPhone(?string $phone): void
     {
         $this->phone = $phone;
     }
