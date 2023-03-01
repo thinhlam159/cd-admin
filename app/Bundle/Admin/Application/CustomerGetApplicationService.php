@@ -39,6 +39,7 @@ final class CustomerGetApplicationService
             $customer->getCustomerId()->__toString(),
             $customer->getCustomerName(),
             $customer->getEmail(),
+            $customer->getAddress(),
             $customer->getPhone(),
             $customer->getIsActive(),
         );

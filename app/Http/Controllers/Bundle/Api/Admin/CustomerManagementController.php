@@ -34,6 +34,7 @@ class CustomerManagementController extends BaseController
             $request->customer_name,
             $request->email,
             Hash::make($request->password),
+            $request->address,
             $request->phone,
             $request->status
         );
@@ -68,6 +69,7 @@ class CustomerManagementController extends BaseController
                 'customer_id' => $customer->customerId,
                 'customer_name' => $customer->customerName,
                 'customer_email' => $customer->email,
+                'address' => $customer->address,
                 'phone' => $customer->phone,
                 'status' => $customer->isActive,
             ];
@@ -101,6 +103,7 @@ class CustomerManagementController extends BaseController
             'customer_id' => $customer->customerId,
             'email' => $customer->email,
             'customer_name' => $customer->customerName,
+            'address' => $customer->address,
             'phone' => $customer->phone,
             'status' => $customer->isActive,
         ];
@@ -124,6 +127,7 @@ class CustomerManagementController extends BaseController
             $request->id,
             $request->customer_name,
             $request->email,
+            $request->address,
             $request->phone,
             $request->status
         );

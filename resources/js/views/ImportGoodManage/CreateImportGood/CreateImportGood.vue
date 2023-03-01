@@ -23,7 +23,7 @@
               <span>Số lượng</span>
             </div>
             <div class="w-[7%] py-2 border-gray-300 text-center">
-              <span>Xóa sp</span>
+              <span>Xóa</span>
             </div>
           </div>
           <div>

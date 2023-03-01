@@ -21,6 +21,7 @@ class CustomerRepository implements ICustomerRepository
             'email' => $customer->getEmail(),
             'name' => $customer->getCustomerName(),
             'password' => $customer->getPassword(),
+            'address' => $customer->getAddress(),
             'phone' => $customer->getPhone(),
             'is_active' => $customer->getIsActive(),
         ]);
@@ -53,6 +54,7 @@ class CustomerRepository implements ICustomerRepository
                 $entity->email
             );
             $customer->setPhone($entity->phone);
+            $customer->setAddress($entity->address);
             $customer->setIsActive($entity->is_active);
 
             $customers[] = $customer;
@@ -83,6 +85,7 @@ class CustomerRepository implements ICustomerRepository
             $entity->email,
         );
         $customer->setPhone($entity->phone);
+        $customer->setAddress($entity->address);
         $customer->setIsActive($entity->is_active);
 
         return $customer;
@@ -98,6 +101,7 @@ class CustomerRepository implements ICustomerRepository
         $data = [
             'name' => $customer->getCustomerName(),
             'phone' => $customer->getPhone(),
+            'address' => $customer->getAddress(),
             'is_active' => $customer->getIsActive(),
         ];
 
@@ -158,6 +162,7 @@ class CustomerRepository implements ICustomerRepository
                 $entity->email
             );
             $customer->setPhone($entity->phone);
+            $customer->setAddress($entity->phone);
             $customer->setIsActive($entity->is_active);
 
             $customers[] = $customer;

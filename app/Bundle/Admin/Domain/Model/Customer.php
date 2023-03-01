@@ -4,11 +4,39 @@ namespace App\Bundle\Admin\Domain\Model;
 
 final class Customer
 {
+    /**
+     * @var CustomerId
+     */
     private CustomerId $customerId;
+
+    /**
+     * @var string
+     */
     private string $customerName;
+
+    /**
+     * @var string
+     */
     private string $email;
+
+    /**
+     * @var string|null
+     */
     private ?string $password;
+
+    /**
+     * @var string|null
+     */
     private ?string $phone;
+
+    /**
+     * @var string|null
+     */
+    private ?string $address;
+
+    /**
+     * @var bool|null
+     */
     private ?bool $isActive;
 
     /**
@@ -16,6 +44,7 @@ final class Customer
      * @param string $customerName
      * @param string $email
      * @param string|null $password
+     * @param string|null $address
      * @param string|null $phone
      * @param bool $isActive
      */
@@ -24,6 +53,7 @@ final class Customer
         string $customerName,
         string $email,
         ?string $password = null,
+        ?string $address = null,
         ?string $phone = null,
         ?bool $isActive = false
     )
@@ -32,6 +62,7 @@ final class Customer
         $this->customerName = $customerName;
         $this->email = $email;
         $this->password = $password;
+        $this->address = $address;
         $this->phone = $phone;
         $this->isActive = $isActive;
     }
@@ -74,6 +105,22 @@ final class Customer
     public function getPassword(): ?string
     {
         return $this->password;
+    }
+
+    /**
+     * @param string|null $address
+     */
+    public function setAddress(?string $address): void
+    {
+        $this->address = $address;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getAddress(): ?string
+    {
+        return $this->address;
     }
 
     /**

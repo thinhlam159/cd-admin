@@ -6,7 +6,7 @@
         Thêm khách hàng
       </div>
       <form @submit.prevent="handleSubmit()">
-        <div class="py-1">
+        <div class="py-1 mx-3">
           <label for="name" class="block py-2 font-bold text-lg">
             <span>Tên khách hàng</span>
             <span v-if="errors.name" class="ml-1 text-red-500">*</span>
@@ -16,7 +16,18 @@
                  :class="!!errors['name'] ? 'border-red-500 border' : ''"
           >
         </div>
-        <div class="py-1">
+        <div class="py-1 mx-3">
+          <label for="address" class="block py-2 font-bold text-lg">
+            <span>Địa chỉ</span>
+            <span class="text-xs text-gray-400 ml-1 font-extralight"></span>
+            <span v-if="errors.address" class="ml-1 text-red-500">*</span>
+          </label>
+          <input type="text" name="address" placeholder="Nhập địa chỉ" v-model="formData.address"
+                 class="w-full h-10 px-3 text-base text-gray-700 placeholder-gray-400 border border-gray-400 focus:border-[#8ddd8d] outline-none"
+                 :class="!!errors['address'] ? 'border-red-500 border' : ''"
+          >
+        </div>
+        <div class="py-1 mx-3">
           <label for="phone" class="block py-2 font-bold text-lg">
             <span>Số điện thoại</span>
             <span class="text-xs text-gray-400 ml-1 font-extralight"></span>
@@ -27,7 +38,7 @@
                  :class="!!errors['phone'] ? 'border-red-500 border' : ''"
           >
         </div>
-        <div class="flex justify-end border-t border-[#e7eaec]">
+        <div class="flex justify-end border-t border-[#e7eaec] mt-4 p-2">
           <input class="mt-3 p-2 text-base font-bold text-white bg-[#1ab394] hover:bg-[#18a689] cursor-pointer rounded-md"
                  type="submit" value="Cập nhật">
         </div>
@@ -53,6 +64,7 @@ const formData = reactive({
   name: '',
   email: 'thinhlv@gmail.com',
   password: '123456',
+  address: '',
   phone: '',
   status: true
 })
@@ -62,7 +74,7 @@ const nameSchema = Yup.object().shape({
   name: Yup.string().required().min(3, 'Tối thiểu 3 ký tự')
 })
 const phoneSchema = Yup.object().shape({
-  phone: Yup.string().required().min(10, 'Tối thiểu 10 số')
+  phone: Yup.string().min(10, 'Tối thiểu 10 số')
 })
 
 const getCustomerDetail = async (customerId) => {
@@ -81,11 +93,12 @@ const getCustomerDetail = async (customerId) => {
 const handleSubmit = async () => {
   try {
     await nameSchema.validate({name: formData.name}, { abortEarly: false })
-    await phoneSchema.validate({phone: formData.phone}, { abortEarly: false })
+    // await phoneSchema.validate({phone: formData.phone}, { abortEarly: false })
     const res = await updateCustomerFormApi(customerId.value, {
       customer_name: formData.name,
       email: formData.email,
       password: formData.password,
+      address: formData.address,
       phone: formData.phone,
       status: formData.status,
     })

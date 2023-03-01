@@ -19,9 +19,14 @@ final class CustomerGetResult
     public string $customerName;
 
     /**
-     * @var string
+     * @var string|null
      */
-    public string $phone;
+    public ?string $address;
+
+    /**
+     * @var string|null
+     */
+    public ?string $phone;
 
     /**
      * @var bool
@@ -30,22 +35,18 @@ final class CustomerGetResult
 
     /**
      * @param string $customerId customerId
-     * @param string $customerName customerName
      * @param string $email email
-     * @param string $phone phone
+     * @param string $customerName customerName
+     * @param string|null $address address
+     * @param string|null $phone phone
      * @param bool $isActive isActive
      */
-    public function __construct(
-        string $customerId,
-        string $customerName,
-        string $email,
-        string $phone,
-        bool $isActive
-    )
+    public function __construct(string $customerId, string $email, string $customerName, ?string $address, ?string $phone, bool $isActive)
     {
         $this->customerId = $customerId;
-        $this->customerName = $customerName;
         $this->email = $email;
+        $this->customerName = $customerName;
+        $this->address = $address;
         $this->phone = $phone;
         $this->isActive = $isActive;
     }

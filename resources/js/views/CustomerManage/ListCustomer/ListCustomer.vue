@@ -10,12 +10,6 @@
       <ButtonAddNew @clickBtn="handleAddUserManage" :text="addNewCustomer" />
     </div>
 
-<!--    &lt;!&ndash; *********** &ndash;&gt;-->
-<!--    <div class="flex h-8 justify-between mt-1">-->
-<!--      <ButtonFilter @clickBtn="handleClickSortFn" />-->
-<!--      <ButtonDownloadCSV />-->
-<!--    </div>-->
-
     <!-- *********** -->
     <div class="mt-4">
       <table class="w-full">
@@ -30,6 +24,9 @@
 <!--            <th class="border py-1 w-[20%]">-->
 <!--              Email-->
 <!--            </th>-->
+            <th class="border py-1 w-[15%]">
+              Địa chỉ
+            </th>
             <th class="border py-1 w-[10%]">
               Số điên thoại
             </th>
@@ -45,6 +42,7 @@
         <tr v-for="(item, index) in listCustomer" :key="index">
           <td class="border text-center">{{ ++index }}</td>
           <td class="border text-center">{{ item.customer_name }}</td>
+          <td class="border text-center">{{ item.address }}</td>
           <td class="border text-center">{{ item.phone }}</td>
           <td class="border text-center">{{ item.status ? 'Hoạt động' : '-' }}</td>
           <td class="border text-center">

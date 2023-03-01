@@ -1,5 +1,5 @@
 <template>
-  <div class="p-5">
+  <div class="p-5 mt-8 mx-5 bg-white">
     <div class="w-full h-8 flex justify-end">
       <ButtonAddNew @clickBtn="goToAddCategory" :text="addNewUser" />
     </div>
@@ -120,6 +120,14 @@ const goToAddCategory = () => {
 }
 
 getListCategory(pageCurrent.value);
+
+store.state[MODULE_STORE.COMMON.NAME].breadcrumbCurrent = 'Danh mục'
+store.state[MODULE_STORE.COMMON.NAME].breadcrumbItems = [
+  {
+    label: 'Trang chủ',
+    link: '/dashboard'
+  },
+]
 </script>
 
 <style scoped></style>

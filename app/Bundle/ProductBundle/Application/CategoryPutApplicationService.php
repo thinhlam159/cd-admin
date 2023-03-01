@@ -37,7 +37,7 @@ class CategoryPutApplicationService
             $categoryId,
             $command->name,
             $command->slug,
-            new CategoryId($command->name)
+            !empty($command->parentId) ? new CategoryId($command->parentId) : $categoryId
         );
 
         DB::beginTransaction();

@@ -22,6 +22,11 @@ class CustomerPostCommand
     /**
      * @var string|null
      */
+    public ?string $address;
+
+    /**
+     * @var string|null
+     */
     public ?string $phone;
 
     /**
@@ -33,6 +38,7 @@ class CustomerPostCommand
      * @param string $customerName
      * @param string $email
      * @param string|null $password
+     * @param string|null $address
      * @param string|null $phone
      * @param bool $status
      */
@@ -40,6 +46,7 @@ class CustomerPostCommand
         string $customerName,
         string $email,
         ?string $password,
+        ?string $address,
         ?string $phone,
         bool $status
     )
@@ -47,6 +54,7 @@ class CustomerPostCommand
         $this->customerName = $customerName;
         $this->email = $email;
         $this->password = $password;
+        $this->address = $address;
         $this->phone = $phone;
         $this->status = $status;
     }

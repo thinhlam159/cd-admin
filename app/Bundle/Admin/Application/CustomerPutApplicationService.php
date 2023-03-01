@@ -52,6 +52,7 @@ final class CustomerPutApplicationService
             $command->email,
         );
         $customer->setPhone($command->phone);
+        $customer->setAddress($command->address);
         $customer->setIsActive($command->isActive);
 
         DB::beginTransaction();

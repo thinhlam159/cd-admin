@@ -5,7 +5,6 @@ namespace App\Bundle\Admin\Application;
 use App\Bundle\Admin\Domain\Model\Customer;
 use App\Bundle\Admin\Domain\Model\CustomerId;
 use App\Bundle\Admin\Domain\Model\ICustomerRepository;
-use App\Bundle\Common\Domain\Model\InvalidArgumentException;
 use App\Bundle\Common\Domain\Model\TransactionException;
 use App\Bundle\ProductBundle\Domain\Model\DebtHistory;
 use App\Bundle\ProductBundle\Domain\Model\DebtHistoryId;
@@ -55,6 +54,7 @@ class CustomerPostApplicationService
         );
         $customer->setPassword($command->password);
         $customer->setPhone($command->phone);
+        $customer->setAddress($command->address);
         $customer->setIsActive(true);
 
         $debtHistory = new DebtHistory(
