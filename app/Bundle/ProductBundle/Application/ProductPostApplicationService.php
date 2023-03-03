@@ -92,7 +92,7 @@ class ProductPostApplicationService
             '',
             '',
             null,
-            null,
+            MeasureUnitType::fromValue($command->measureUnitType),
             true
         );
 

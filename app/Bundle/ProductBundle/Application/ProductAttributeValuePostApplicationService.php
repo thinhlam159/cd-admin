@@ -71,8 +71,7 @@ class ProductAttributeValuePostApplicationService
 
         $existingCode = $this->productAttributeValueRepository->checkExistingCode($productId, $command->code);
         if ($existingCode) {
-//            throw new InvalidArgumentException(MessageConst::EXISTING_PRODUCT_CODE['message']);
-            throw new TransactionException(MessageConst::EXISTING_PRODUCT_CODE['message']);
+            throw new InvalidArgumentException(MessageConst::EXISTING_PRODUCT_CODE['message']);
         }
 
         $productAttributeValue = new ProductAttributeValue(
@@ -82,7 +81,8 @@ class ProductAttributeValuePostApplicationService
             $command->value,
             $command->code,
             null,
-            null
+            MeasureUnitType::fromValue($command->measureUnitType),
+            false
         );
 
         $productInventory = new ProductInventory(

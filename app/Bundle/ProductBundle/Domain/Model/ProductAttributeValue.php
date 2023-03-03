@@ -34,9 +34,9 @@ final class ProductAttributeValue
     private ?string $productAttributeName;
 
     /**
-     * @var string|null
+     * @var MeasureUnitType
      */
-    private ?string $measureUnitName;
+    private MeasureUnitType $measureUnitType;
 
     /**
      * @var bool
@@ -50,10 +50,10 @@ final class ProductAttributeValue
      * @param string $value
      * @param string $code
      * @param string|null $productAttributeName
-     * @param string|null $measureUnitName
+     * @param MeasureUnitType $measureUnitType
      * @param bool $isOriginal
      */
-    public function __construct(ProductAttributeValueId $productAttributeValueId, ProductId $productId, ProductAttributeId $productAttributeId, string $value, string $code, ?string $productAttributeName, ?string $measureUnitName, bool $isOriginal = false)
+    public function __construct(ProductAttributeValueId $productAttributeValueId, ProductId $productId, ProductAttributeId $productAttributeId, string $value, string $code, ?string $productAttributeName, MeasureUnitType $measureUnitType, bool $isOriginal)
     {
         $this->productAttributeValueId = $productAttributeValueId;
         $this->productId = $productId;
@@ -61,7 +61,7 @@ final class ProductAttributeValue
         $this->value = $value;
         $this->code = $code;
         $this->productAttributeName = $productAttributeName;
-        $this->measureUnitName = $measureUnitName;
+        $this->measureUnitType = $measureUnitType;
         $this->isOriginal = $isOriginal;
     }
 
@@ -114,11 +114,11 @@ final class ProductAttributeValue
     }
 
     /**
-     * @return string|null
+     * @return MeasureUnitType
      */
-    public function getMeasureUnitName(): ?string
+    public function getMeasureUnitType(): MeasureUnitType
     {
-        return $this->measureUnitName;
+        return $this->measureUnitType;
     }
 
     /**

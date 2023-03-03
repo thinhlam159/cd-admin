@@ -11,6 +11,7 @@ use App\Bundle\ProductBundle\Domain\Model\ImportGood;
 use App\Bundle\ProductBundle\Domain\Model\ImportGoodId;
 use App\Bundle\ProductBundle\Domain\Model\ImportGoodProduct;
 use App\Bundle\ProductBundle\Domain\Model\ImportGoodProductId;
+use App\Bundle\ProductBundle\Domain\Model\IProductAttributeValueRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductInventoryRepository;
 use App\Bundle\ProductBundle\Domain\Model\MeasureUnitType;
 use App\Bundle\ProductBundle\Domain\Model\MonetaryUnitType;
@@ -37,16 +38,24 @@ class ImportGoodPostApplicationService
     private IProductInventoryRepository $productInventoryRepository;
 
     /**
+     * @var IProductAttributeValueRepository
+     */
+    private IProductAttributeValueRepository $productAttributeValueRepository;
+
+    /**
      * @param IImportGoodRepository $importGoodRepository
      * @param IProductInventoryRepository $productInventoryRepository
+     * @param IProductAttributeValueRepository $productAttributeValueRepository
      */
     public function __construct(
         IImportGoodRepository $importGoodRepository,
-        IProductInventoryRepository $productInventoryRepository
+        IProductInventoryRepository $productInventoryRepository,
+        IProductAttributeValueRepository $productAttributeValueRepository
     )
     {
         $this->importGoodRepository = $importGoodRepository;
         $this->productInventoryRepository = $productInventoryRepository;
+        $this->productAttributeValueRepository = $productAttributeValueRepository;
     }
 
     /**
@@ -71,6 +80,8 @@ class ImportGoodPostApplicationService
         $newProductInventories = [];
         foreach ($command->importGoodProductCommands as $importGoodProductCommand) {
             $importGoodProductId = ImportGoodProductId::newId();
+            $productAttributeValueId = new ProductAttributeValueId($importGoodProductCommand->productAttributeValueId);
+            $productAttributeValue = $this->productAttributeValueRepository->findById($productAttributeValueId);
             $importGoodProducts[] = new ImportGoodProduct(
                 $importGoodProductId,
                 $importGoodId,
@@ -79,16 +90,15 @@ class ImportGoodPostApplicationService
                 $importGoodProductCommand->price,
                 MonetaryUnitType::fromValue($importGoodProductCommand->monetaryUnitType),
                 $importGoodProductCommand->count,
-                MeasureUnitType::fromValue($importGoodProductCommand->measureUnitType)
+                $productAttributeValue->getMeasureUnitType(),
             );
-            $productAttributeValueId = new ProductAttributeValueId($importGoodProductCommand->productAttributeValueId);
             $currentProductInventory = $this->productInventoryRepository->findByProductAttributeValueId($productAttributeValueId);
             $newCount = $currentProductInventory->getCount() + $importGoodProductCommand->count;
             $newProductInventories[] = new ProductInventoryImportGood(
                 ProductInventoryId::newId(),
                 new ProductAttributeValueId($importGoodProductCommand->productAttributeValueId),
                 $newCount,
-                MeasureUnitType::fromValue($importGoodProductCommand->measureUnitType),
+                $productAttributeValue->getMeasureUnitType(),
                 ProductInventoryUpdateType::fromType(ProductInventoryUpdateType::IMPORT_GOOD),
                 $importGoodProductId,
                 $importGoodProductCommand->count,

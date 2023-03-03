@@ -74,7 +74,7 @@ class ProductAttributeValueListGetApplicationService
                 $productAttribute->getName(),
                 $productAttributeValue->getValue(),
                 $productAttributeValue->getCode(),
-                $inventory->getMeasureUnitType()->getValue(),
+                $productAttributeValue->getMeasureUnitType()->getValue(),
                 $inventory->getCount(),
                 $price->getPrice(),
                 $price->getMonetaryUnitType()->getValue(),

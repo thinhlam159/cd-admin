@@ -352,6 +352,7 @@ class ProductController extends BaseController
 
         $data = [];
         foreach ($result->productAttributeValueResults as $productAttributeValueResult) {
+            if ($productAttributeValueResult->isOriginal) continue;
             $data[] = [
                 'id' => $productAttributeValueResult->productAttributeValueId,
                 'product_id' => $productAttributeValueResult->productId,

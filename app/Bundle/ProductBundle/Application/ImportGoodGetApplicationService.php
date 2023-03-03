@@ -97,7 +97,7 @@ class ImportGoodGetApplicationService
                     $importGoodProduct->getPrice(),
                     $importGoodProduct->getMonetaryUnitType()->getValue(),
                     $importGoodProduct->getCount(),
-                    $importGoodProduct->getMeasureUnitType()->getValue(),
+                    $productAttributeValue->getMeasureUnitType()->getValue(),
                 );
             }
         return new ImportGoodGetResult(

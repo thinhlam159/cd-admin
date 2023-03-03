@@ -287,7 +287,8 @@ class OrderController extends BaseController
     {
         $applicationService = new ImportGoodPostApplicationService(
             new ImportGoodRepository(),
-            new ProductInventoryRepository()
+            new ProductInventoryRepository(),
+            new ProductAttributeValueRepository()
         );
 
         $importGoodProducts = $request->import_good_products;
@@ -448,7 +449,8 @@ class OrderController extends BaseController
     {
         $applicationService = new RestoreImportGoodPutApplicationService(
             new ImportGoodRepository(),
-            new ProductInventoryRepository()
+            new ProductInventoryRepository(),
+            new ProductAttributeValueRepository()
         );
 
         $command = new RestoreImportGoodPutCommand($request->id);

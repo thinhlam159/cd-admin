@@ -3,6 +3,7 @@ namespace App\Bundle\ProductBundle\Infrastructure;
 
 use App\Bundle\ProductBundle\Domain\Model\IProductAttributeValueRepository;
 use App\Bundle\ProductBundle\Domain\Model\MeasureUnitId;
+use App\Bundle\ProductBundle\Domain\Model\MeasureUnitType;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributeId;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributePriceId;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValue;
@@ -24,6 +25,7 @@ final class ProductAttributeValueRepository implements IProductAttributeValueRep
             'product_attribute_id' => $productAttributeValue->getProductAttributeId()->asString(),
             'value' => $productAttributeValue->getValue(),
             'code' => $productAttributeValue->getCode(),
+            'measure_unit_type' => $productAttributeValue->getMeasureUnitType()->getType(),
             'is_original' => $productAttributeValue->isOriginal(),
         ]);
         if (!$result) {
@@ -50,7 +52,8 @@ final class ProductAttributeValueRepository implements IProductAttributeValueRep
             $entity['value'],
             $entity['code'],
             null,
-            null,
+            MeasureUnitType::fromType($entity['measure_unit_type']),
+            $entity['is_original'],
         );
     }
 
@@ -73,7 +76,7 @@ final class ProductAttributeValueRepository implements IProductAttributeValueRep
                 $entity['value'],
                 $entity['code'],
                 null,
-                null,
+                MeasureUnitType::fromType($entity['measure_unit_type']),
                 $entity['is_original'],
             );
 
@@ -118,7 +121,6 @@ final class ProductAttributeValueRepository implements IProductAttributeValueRep
         $productAttributeValues = [];
         foreach ($entities as $entity) {
             $productAttributePrices = $entity->productAttributePrices();
-
             $productAttributePriceId = $productAttributePrices->where('is_current', '=', 1)->first()->id;
             $productAttributeValues[] = new ProductAttributeValue(
                 new ProductAttributeValueId($entity['id']),
@@ -127,7 +129,8 @@ final class ProductAttributeValueRepository implements IProductAttributeValueRep
                 $entity['value'],
                 $entity['code'],
                 null,
-                null
+                MeasureUnitType::fromType($entity['measure_unit_type']),
+                $entity['is_original'],
             );
         }
 

@@ -12,6 +12,7 @@ use App\Bundle\ProductBundle\Domain\Model\ImportGood;
 use App\Bundle\ProductBundle\Domain\Model\ImportGoodId;
 use App\Bundle\ProductBundle\Domain\Model\ImportGoodProduct;
 use App\Bundle\ProductBundle\Domain\Model\ImportGoodProductId;
+use App\Bundle\ProductBundle\Domain\Model\IProductAttributeValueRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductInventoryRepository;
 use App\Bundle\ProductBundle\Domain\Model\MeasureUnitType;
 use App\Bundle\ProductBundle\Domain\Model\MonetaryUnitType;
@@ -38,16 +39,24 @@ class RestoreImportGoodPutApplicationService
     private IProductInventoryRepository $productInventoryRepository;
 
     /**
+     * @var IProductAttributeValueRepository
+     */
+    private IProductAttributeValueRepository $productAttributeValueRepository;
+
+    /**
      * @param IImportGoodRepository $importGoodRepository
      * @param IProductInventoryRepository $productInventoryRepository
+     * @param IProductAttributeValueRepository $productAttributeValueRepository
      */
     public function __construct(
         IImportGoodRepository $importGoodRepository,
-        IProductInventoryRepository $productInventoryRepository
+        IProductInventoryRepository $productInventoryRepository,
+        IProductAttributeValueRepository $productAttributeValueRepository
     )
     {
         $this->importGoodRepository = $importGoodRepository;
         $this->productInventoryRepository = $productInventoryRepository;
+        $this->productAttributeValueRepository = $productAttributeValueRepository;
     }
 
     /**
@@ -71,13 +80,14 @@ class RestoreImportGoodPutApplicationService
         $newProductInventories = [];
         foreach ($restoreImportGoodProducts as $restoreImportGoodProduct) {
             $productAttributeValueId = new ProductAttributeValueId($restoreImportGoodProduct->getProductAttributeValueId());
+            $productAttributeValue = $this->productAttributeValueRepository->findById($productAttributeValueId);
             $currentProductInventory = $this->productInventoryRepository->findByProductAttributeValueId($productAttributeValueId);
             $newCount = $currentProductInventory->getCount() - $restoreImportGoodProduct->getCount();
             $newProductInventories[] = new ProductInventoryImportGood(
                 ProductInventoryId::newId(),
                 $productAttributeValueId,
                 $newCount,
-                MeasureUnitType::fromValue($restoreImportGoodProduct->getMeasureUnitType()->getValue()),
+                $productAttributeValue->getMeasureUnitType(),
                 ProductInventoryUpdateType::fromType(ProductInventoryUpdateType::RESTORE_IMPORT_GOOD),
                 $restoreImportGoodProduct->getImportGoodProductId(),
                 $restoreImportGoodProduct->getCount(),

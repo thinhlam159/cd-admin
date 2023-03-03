@@ -94,7 +94,7 @@ class OrderExportPostApplicationService
                 $orderProduct->getProductAttributeValueId()->asString(),
                 $orderProduct->getProductAttributePriceId()->asString(),
                 $orderProduct->getCount(),
-                $orderProduct->getMeasureUnitType()->getValue(),
+                $productAttributeValue->getMeasureUnitType()->getValue(),
                 $orderProduct->getWeight(),
                 $orderProduct->getAttributeDisplayIndex(),
                 $orderProduct->getOrderProductCost(),

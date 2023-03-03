@@ -124,7 +124,7 @@ class ProductListGetApplicationService
                     $productAttribute->getName(),
                     $productAttributeValue->getValue(),
                     $productAttributeValue->getCode(),
-                    $productInventory->getMeasureUnitType()->getValue(),
+                    $productAttributeValue->getMeasureUnitType()->getValue(),
                     $productInventory->getCount(),
                     $productAttributePrice->getPrice(),
                     $productAttributePrice->getMonetaryUnitType()->getValue(),

@@ -114,7 +114,7 @@ class ImportGoodListGetApplicationService
                     $importGoodProduct->getPrice(),
                     $importGoodProduct->getMonetaryUnitType()->getValue(),
                     $importGoodProduct->getCount(),
-                    $importGoodProduct->getMeasureUnitType()->getValue(),
+                    $productAttributeValue->getMeasureUnitType()->getValue(),
                 );
             }
             $importGoodResults[] = new ImportGoodResult(
