@@ -57,7 +57,7 @@
           </th>
         </tr>
         </thead>
-        <tbody>
+        <tbody class="[&>*:nth-child(odd)]:bg-[#f9f9f9]">
         <template v-for="(item, index) in listDebt">
           <tr>
             <td class="border text-center">{{ (pagination.current_page - 1) * pagination.per_page + (parseInt(index) + 1) }}</td>
@@ -109,13 +109,13 @@
           <ButtonEdit @clickBtn="exportCustomerDebt(customerId)" :text="exportExcel"/>
         </div>
       </div>
-      <Pagination
-        v-if="pagination"
-        :pageCurrent="pagination.current_page"
-        :totalPage="pagination.total_page"
-        @onBack="handleBackPage"
-        @onNext="handleNextPage"
-      />
+<!--      <Pagination-->
+<!--        v-if="pagination"-->
+<!--        :pageCurrent="pagination.current_page"-->
+<!--        :totalPage="pagination.total_page"-->
+<!--        @onBack="handleBackPage"-->
+<!--        @onNext="handleNextPage"-->
+<!--      />-->
     </div>
   </div>
 </template>
@@ -155,9 +155,9 @@ const pageCurrent = computed(() => {
   return Number(route.query.page);
 });
 
-const getListCustomerDebt = async (customerId, page) => {
+const getListCustomerDebt = async (page) => {
   try {
-    const res = await getListCustomerDebtFromApi(customerId,{page})
+    const res = await getListCustomerDebtFromApi(customerId.value,{page})
     pagination.value = res.pagination
     listDebt.value = {
       ...res.data
@@ -200,10 +200,10 @@ const goToCreatePayment = () => {
 }
 
 const handleBackPage = (page) => {
-  getListCustomerDebt({page})
+  getListCustomerDebt(page)
 }
 const handleNextPage = (page) => {
-  getListCustomerDebt({page})
+  getListCustomerDebt(page)
 }
 
 const exportCustomerDebt = async (customerId) => {
@@ -213,13 +213,13 @@ const exportCustomerDebt = async (customerId) => {
   }))
   const link = document.createElement('a')
   link.href = url
-  link.setAttribute('download', 'fileName')
+  link.setAttribute('download', `${customerCurrentDebt.value.customerName}-${moment().format('DDMM')}`)
   document.body.appendChild(link)
   link.click()
   link.remove()
 }
 
-getListCustomerDebt(customerId.value, pageCurrent.value);
+getListCustomerDebt(pageCurrent.value);
 getCustomerCurrentDebt(customerId.value);
 
 store.state[MODULE_STORE.COMMON.NAME].breadcrumbCurrent = 'Công nợ khách'

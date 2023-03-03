@@ -22,4 +22,9 @@ final class MessageConst
         'title' => 'existing_email',
         'message' => 'Existing email!',
     ];
+
+    public const EXISTING_PRODUCT_CODE = [
+        'title' => 'existing_product_code',
+        'message' => 'Mã sản phẩm đã tồn tại!',
+    ];
 }

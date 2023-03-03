@@ -2,6 +2,7 @@
 
 namespace App\Bundle\ProductBundle\Application;
 
+use App\Bundle\Common\Constants\MessageConst;
 use App\Bundle\Common\Domain\Model\InvalidArgumentException;
 use App\Bundle\Common\Domain\Model\TransactionException;
 use App\Bundle\ProductBundle\Domain\Model\IProductAttributePriceRepository;
@@ -67,6 +68,12 @@ class ProductAttributeValuePostApplicationService
         $productAttributeValueId = ProductAttributeValueId::newId();
         $productId = new ProductId($command->productId);
         $productAttributeId = new ProductAttributeId($command->productAttributeId);
+
+        $existingCode = $this->productAttributeValueRepository->checkExistingCode($productId, $command->code);
+        if ($existingCode) {
+//            throw new InvalidArgumentException(MessageConst::EXISTING_PRODUCT_CODE['message']);
+            throw new TransactionException(MessageConst::EXISTING_PRODUCT_CODE['message']);
+        }
 
         $productAttributeValue = new ProductAttributeValue(
             $productAttributeValueId,

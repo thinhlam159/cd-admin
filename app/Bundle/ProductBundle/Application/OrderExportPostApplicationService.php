@@ -3,6 +3,7 @@
 namespace App\Bundle\ProductBundle\Application;
 
 use App\Bundle\Admin\Domain\Model\ICustomerRepository;
+use App\Bundle\Common\Constants\DateTimeConst;
 use App\Bundle\Common\Constants\MessageConst;
 use App\Bundle\Common\Domain\Model\InvalidArgumentException;
 use App\Bundle\Common\Domain\Model\TransactionException;
@@ -105,6 +106,10 @@ class OrderExportPostApplicationService
                 $productAttributePrice->getStandardPrice()
             );
         }
+        $orderDay = $order->getOrderDate()->getValue()->format(DateTimeConst::FORMAT_DAY);
+        $orderMon = $order->getOrderDate()->getValue()->format(DateTimeConst::FORMAT_MON);
+        $orderYear = $order->getOrderDate()->getValue()->format(DateTimeConst::FORMAT_Y);
+        $orderDate = "Ngày $orderDay tháng $orderMon năm $orderYear";
 
         return new OrderExportPostResult(
             $order->getOrderId()->asString(),
@@ -115,7 +120,10 @@ class OrderExportPostApplicationService
             $orderProductExportResults,
             $order->getUpdatedAt()->asString(),
             $order->getCreatedAt()->asString(),
+            $orderDate,
             $customer->getCustomerName(),
+            $customer->getPhone(),
+            $customer->getAddress(),
             $totalCost
         );
     }

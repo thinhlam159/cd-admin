@@ -10,7 +10,7 @@
             Ngày tạo đơn:
           </span>
         <div class="inline ml-2">
-          <span>{{ moment(importGoodDetail.import_good_date).format('L')}}</span>
+          <span>{{ moment(importGoodDetail.import_good_date).format('DD-MM-yyyy')}}</span>
         </div>
       </div>
     </div>
@@ -26,7 +26,7 @@
         <div class="inline-block w-[10%]"><span>{{ ++index }}</span></div>
         <div class="inline-block w-[35%]"><span>{{ item.product_name + ' ' + item.product_attribute_value_code }}</span>
         </div>
-        <div class="inline-block w-[25%]"><span>{{ item.measure_unit_type }}</span></div>
+        <div class="inline-block w-[25%]"><span>{{ t(`measure_unit_type.${item.measure_unit_type}`) }}</span></div>
         <div class="inline-block w-[30%]"><span>{{ item.count }}</span></div>
       </div>
     </div>
@@ -44,13 +44,14 @@ import { useRoute,useRouter } from 'vue-router'
 import {MODULE_STORE, ROUTER_PATH} from "@/const";
 import {getImportGoodDetailFromApi, restoreImportGoodFromApi} from "@/api";
 import {useStore} from "vuex";
-import Datepicker from "vue3-datepicker";
 import ButtonAddNew from "@/components/Buttons/ButtonAddNew";
 import moment from "moment/moment";
+import {useI18n} from "vue-i18n";
 
 const route = useRoute()
 const router = useRouter()
 const store = useStore()
+const {t} = useI18n()
 const importGoodId = ref(route.params.id)
 const importGoodDetail = ref({})
 const importGoodProduct = ref([])
@@ -92,7 +93,7 @@ store.state[MODULE_STORE.COMMON.NAME].breadcrumbItems = [
   },
   {
     label: 'Nhập kho',
-    link: '/dashboard'
+    link: '/import-good-manage'
   },
 ]
 </script>

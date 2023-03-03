@@ -42,16 +42,18 @@
             <td class="border text-center">{{ item.user_name }}</td>
             <td class="border text-center">{{ item.date }}</td>
             <td class="border text-center">{{ item.containerName }}</td>
+            <td class="border text-center"></td>
+            <td class="border text-center"></td>
             <td class="border text-center">
               <div class="flex justify-center ">
-                <ButtonEdit @clickBtn="() => goToDetail(item.order_id)" :text="orderDetail"/>
+                <ButtonEdit @clickBtn="() => goToDetail(item.import_good_id)" text="Cập nhật"/>
               </div>
             </td>
-            <td class="border text-center">
-              <div class="flex justify-center ">
-                <ButtonEdit @clickBtn="() => exportOrder(item.order_id)" :text="exportExcel"/>
-              </div>
-            </td>
+<!--            <td class="border text-center">-->
+<!--              <div class="flex justify-center ">-->
+<!--                <ButtonEdit @clickBtn="() => exportOrder(item.order_id)" :text="exportExcel"/>-->
+<!--              </div>-->
+<!--            </td>-->
           </tr>
           <tr v-else v-for="(subItem, subIndex) in item.importGoodProducts"
               :key="subItem.product_attribute_value_id">
@@ -65,7 +67,7 @@
 <!--              {{ item.import_good_date }}-->
 <!--            </td>-->
             <td v-if="subIndex === 0" :rowspan="item.import_good_products.length" class="border text-center">
-              {{ moment(item.date).format('L') }}
+              {{ moment(item.date).format('DD-MM-yyyy') }}
             </td>
             <td v-if="subIndex === 0" :rowspan="item.import_good_products.length" class="border text-center">
               {{ item.containerName }}

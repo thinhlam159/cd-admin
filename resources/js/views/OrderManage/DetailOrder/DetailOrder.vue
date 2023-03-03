@@ -37,7 +37,7 @@
 <script setup>
 import {inject, ref} from "vue";
 import { useRoute,useRouter } from 'vue-router'
-import {MODULE_STORE, ROUTER_PATH} from "@/const";
+import {MODULE_STORE} from "@/const";
 import {getOrderDetailFromApi} from "@/api";
 import {useStore} from "vuex";
 import moment from "moment/moment";

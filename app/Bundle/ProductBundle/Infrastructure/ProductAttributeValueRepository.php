@@ -133,4 +133,21 @@ final class ProductAttributeValueRepository implements IProductAttributeValueRep
 
         return $productAttributeValues;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function checkExistingCode(ProductId $productId, string $code): bool
+    {
+        $entity = ModelProductAttributeValue::where([
+            ['product_id', '=', $productId->asString()],
+            ['code', '=', $code]
+        ])->first();
+
+        if (!$entity) {
+            return false;
+        }
+
+        return true;
+    }
 }

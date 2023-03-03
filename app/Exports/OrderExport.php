@@ -196,8 +196,8 @@ class OrderExport implements FromArray, WithStyles, ShouldAutoSize, WithEvents, 
     public function columnFormats(): array
     {
         return [
-            'E' => '#,##0"₫"',
-            'F' => '#,##0"₫"',
+            'E' => '#,##0',
+            'F' => '#,##0',
         ];
     }
 }

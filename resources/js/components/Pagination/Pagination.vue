@@ -37,7 +37,6 @@ export default {
       }
     };
     const handleNext = () => {
-      console.log(props.totalPage)
       if (props.pageCurrent < props.totalPage) {
         context.emit("onNext", props.pageCurrent + 1);
       }

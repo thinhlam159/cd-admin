@@ -74,7 +74,7 @@ store.state[MODULE_STORE.COMMON.NAME].breadcrumbItems = [
   },
   {
     label: 'Công nợ khách',
-    link: `/list-customer-debt/${route.params.id}`
+    link: `/debt-manage/list-customer-debt/${route.params.id}`
   },
 ]
 </script>

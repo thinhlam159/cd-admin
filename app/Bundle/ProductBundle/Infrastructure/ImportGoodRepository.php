@@ -130,7 +130,7 @@ class ImportGoodRepository implements IImportGoodRepository
      */
     public function findAll(ImportGoodCriteria $importGoodCriteria): array
     {
-        $entities = ModelImportGood::where('is_restore')->paginate(PaginationConst::PAGINATE_ROW);
+        $entities = ModelImportGood::where('is_restore')->orderBy('import_good_date', 'DESC')->paginate(PaginationConst::PAGINATE_ROW);
 
         $importGoods = [];
         foreach ($entities as $entity) {

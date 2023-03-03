@@ -47,7 +47,22 @@ class OrderExportPostResult
     /**
      * @var string
      */
+    public string $orderDate;
+
+    /**
+     * @var string
+     */
     public string $customerName;
+
+    /**
+     * @var string|null
+     */
+    public ?string $customerPhone;
+
+    /**
+     * @var string|null
+     */
+    public ?string $customerAddress;
 
     /**
      * @var int
@@ -63,10 +78,13 @@ class OrderExportPostResult
      * @param OrderProductExportResult[] $orderProductExportResults
      * @param string $updateAt
      * @param string $createdAt
+     * @param string $orderDate
      * @param string $customerName
+     * @param string|null $customerPhone
+     * @param string|null $customerAddress
      * @param int $totalCost
      */
-    public function __construct(string $orderId, string $customerId, string $userId, string $deliveryStatus, string $paymentStatus, array $orderProductExportResults,string $updateAt, string $createdAt, string $customerName, int $totalCost)
+    public function __construct(string $orderId, string $customerId, string $userId, string $deliveryStatus, string $paymentStatus, array $orderProductExportResults, string $updateAt, string $createdAt, string $orderDate, string $customerName, ?string $customerPhone, ?string $customerAddress, int $totalCost)
     {
         $this->orderId = $orderId;
         $this->customerId = $customerId;
@@ -76,7 +94,10 @@ class OrderExportPostResult
         $this->orderProductExportResults = $orderProductExportResults;
         $this->updateAt = $updateAt;
         $this->createdAt = $createdAt;
+        $this->orderDate = $orderDate;
         $this->customerName = $customerName;
+        $this->customerPhone = $customerPhone;
+        $this->customerAddress = $customerAddress;
         $this->totalCost = $totalCost;
     }
 }

@@ -77,7 +77,17 @@ final class OrderRepository implements IOrderRepository
      */
     public function findAll(OrderCriteria $criteria): array
     {
-        $entities = ModelOrder::paginate(PaginationConst::PAGINATE_ROW);
+        $customerConditions = [];
+        if (!is_null($criteria->getKeyword())) {
+            $keyword = $criteria->getKeyword();
+            $customerConditions[] = ['name', 'like', "%$keyword%"];
+        }
+
+        $entities = ModelOrder::whereHas('customer', function ($q) use($customerConditions) {
+            $q->where($customerConditions);
+        })
+            ->orderBy('order_date', 'DESC')
+            ->paginate(PaginationConst::PAGINATE_ROW);
         $orders = [];
         foreach ($entities as $entity) {
             $order = new Order(

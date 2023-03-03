@@ -2,7 +2,7 @@
   <div class="px-2 py-3 bg-white mt-10 mx-5 min-h-[600px]">
     <div class="w-full h-8 flex justify-between">
       <div class="mr-1 relative">
-        <input type="text" @input="onInput" class="outline-none min-w-[150px] h-full border border-gray-300 rounded-sm px-10" placeholder="Tìm khách hàng">
+        <input type="text" v-model="keyword" @input="onInput" class="outline-none min-w-[150px] h-full border border-gray-300 rounded-sm px-10" placeholder="Tìm khách hàng">
         <div class="absolute top-[50%] left-2 -translate-y-1/2">
           <SearchIcon />
         </div>
@@ -100,6 +100,7 @@ const listOrder = reactive([]);
 const addNewOrder = "Tạo đơn";
 const orderDetail = "Chi tiết";
 const exportExcel = "Xuất excel";
+const keyword = ref(null);
 
 const pageCurrent = computed(() => {
   if (!route.query.page) {
@@ -114,7 +115,7 @@ const handleCreateOrder = () => {
 
 const getListOrder = async (page) => {
   try {
-    const res = await getListOrderFromApi(page)
+    const res = await getListOrderFromApi(page, {params: {keyword: keyword.value}})
     pagination.value = res.pagination
     listOrder.length = 0
     res.data.forEach((item) => {
@@ -152,6 +153,11 @@ const handleBackPage = (page) => {
 }
 const handleNextPage = (page) => {
   getListOrder(page)
+}
+
+const onInput = (e) => {
+  keyword.value = e.target.value
+  getListOrder(pageCurrent.value)
 }
 
 store.state[MODULE_STORE.COMMON.NAME].breadcrumbCurrent = 'Đơn hàng'

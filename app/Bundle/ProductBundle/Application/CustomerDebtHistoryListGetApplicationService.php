@@ -61,7 +61,7 @@ class CustomerDebtHistoryListGetApplicationService
             $customerId,
             $command->keyword,
         );
-        [$debtHistories, $pagination] = $this->debtHistoryRepository->findAllHistoryByCustomerId($criteria);
+        $debtHistories = $this->debtHistoryRepository->findAllHistoryByCustomerId3($customerId);
         $debtResults = [];
         $totalDebt = 0;
         $totalPayment = 0;
@@ -94,9 +94,12 @@ class CustomerDebtHistoryListGetApplicationService
         }
 
         $paginationResult = new PaginationResult(
-            $pagination->getTotalPages(),
-            $pagination->getPerPage(),
-            $pagination->getCurrentPage(),
+//            $pagination->getTotalPages(),
+//            $pagination->getPerPage(),
+//            $pagination->getCurrentPage(),
+            1,
+            1,
+            1
         );
 
         return new CustomerDebtHistoryListGetResult($debtResults, $paginationResult);

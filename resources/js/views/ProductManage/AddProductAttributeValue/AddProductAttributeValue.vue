@@ -104,6 +104,7 @@ const handleSubmit = async (data) => {
         errors[error.path] = error.message;
       });
     }
+    console.log(errors[0])
     toast.error(errors.message);
   } finally {
     store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;

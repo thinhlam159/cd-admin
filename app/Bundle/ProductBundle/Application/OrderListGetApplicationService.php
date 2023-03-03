@@ -78,7 +78,7 @@ class OrderListGetApplicationService
      */
     public function handle(OrderListGetCommand $command): OrderListGetResult
     {
-        $orderCriteria = new OrderCriteria();
+        $orderCriteria = new OrderCriteria($command->keyword);
         [$orders, $pagination] = $this->orderRepository->findAll($orderCriteria);
 
         $orderResults = [];

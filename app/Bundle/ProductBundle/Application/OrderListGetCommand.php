@@ -5,10 +5,15 @@ namespace App\Bundle\ProductBundle\Application;
 final class OrderListGetCommand
 {
     /**
-     * @noparam
+     * @var string|null
      */
-    public function __construct()
-    {
+    public ?string $keyword;
 
+    /**
+     * @param string|null $keyword
+     */
+    public function __construct(?string $keyword)
+    {
+        $this->keyword = $keyword;
     }
 }

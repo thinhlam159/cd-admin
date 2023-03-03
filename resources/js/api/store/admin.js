@@ -48,7 +48,7 @@ export const createProductAttributeValueFromApi = async (data) => await api.post
 })
 
 //order
-export const getListOrderFromApi = async (page) => api.get(`${apiConstants.ADMIN.LIST_ORDER}?page=${page}`)
+export const getListOrderFromApi = async (page, config) => api.get(`${apiConstants.ADMIN.LIST_ORDER}?page=${page}`, config)
 export const createOrderFromApi = async (data) => await api.post(apiConstants.ADMIN.CREATE_ORDER, data)
 export const getOrderDetailFromApi = async (id) => await api.get(`${apiConstants.ADMIN.DETAIL_ORDER}/${id}`)
 

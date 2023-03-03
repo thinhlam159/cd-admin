@@ -100,7 +100,9 @@ class OrderController extends BaseController
             new ProductRepository(),
         );
 
-        $command = new OrderListGetCommand();
+        $command = new OrderListGetCommand(
+            !empty($request->keyword) ? $request->keyword : null
+        );
         $result = $applicationService->handle($command);
         $orderResults = $result->orderResults;
         $paginationResult = $result->paginationResult;
@@ -171,38 +173,39 @@ class OrderController extends BaseController
         );
         $result = $applicationService->handle($command);
 
-            $orderProducts = [];
-            foreach ($result->orderProductResults as $orderProductResult) {
-                $orderProducts[] = [
-                    'order_product_id' => $orderProductResult->orderProductId,
-                    'order_id' => $orderProductResult->orderId,
-                    'product_id' => $orderProductResult->productId,
-                    'product_attribute_value_id' => $orderProductResult->productAttributeValueId,
-                    'product_attribute_price_id' => $orderProductResult->productAttributePriceId,
-                    'measure_unit_type' => $orderProductResult->measureUnitType,
-                    'weight' => $orderProductResult->weight,
-                    'attribute_display_index' => $orderProductResult->attributeDisplayIndex,
-                    'notice_price_type' => $orderProductResult->noticePriceType,
-                    'price' => $orderProductResult->price,
-                    'cost' => $orderProductResult->cost,
-                    'count' => $orderProductResult->count,
-                    'product_attribute_value_code' => $orderProductResult->productAttributeValueCode,
-                    'product_name' => $orderProductResult->productName,
-                    'product_code' => $orderProductResult->productCode,
-                ];
-            }
-            $data = [
-                'order_id' => $result->orderId,
-                'customer_id' => $result->customerId,
-                'customer_name' => $result->customerName,
-                'user_id' => $result->userId,
-                'user_name' => $result->userName,
-                'delivery_status' => $result->deliveryStatus,
-                'payment_status' => $result->paymentStatus,
-                'update_at' => $result->updatedAt,
-                'order_products' => $orderProducts,
-                'total_cost' => $result->totalCost,
+        $orderProducts = [];
+        foreach ($result->orderProductResults as $orderProductResult) {
+            $measure = $orderProductResult->measureUnitType !== 'roll' ? $orderProductResult->measureUnitType : 'kg';
+            $orderProducts[] = [
+                'order_product_id' => $orderProductResult->orderProductId,
+                'order_id' => $orderProductResult->orderId,
+                'product_id' => $orderProductResult->productId,
+                'product_attribute_value_id' => $orderProductResult->productAttributeValueId,
+                'product_attribute_price_id' => $orderProductResult->productAttributePriceId,
+                'measure_unit_type' => $measure,
+                'weight' => $orderProductResult->weight,
+                'attribute_display_index' => $orderProductResult->attributeDisplayIndex,
+                'notice_price_type' => $orderProductResult->noticePriceType,
+                'price' => $orderProductResult->price,
+                'cost' => $orderProductResult->cost,
+                'count' => $orderProductResult->count,
+                'product_attribute_value_code' => $orderProductResult->productAttributeValueCode,
+                'product_name' => $orderProductResult->productName,
+                'product_code' => $orderProductResult->productCode,
             ];
+        }
+        $data = [
+            'order_id' => $result->orderId,
+            'customer_id' => $result->customerId,
+            'customer_name' => $result->customerName,
+            'user_id' => $result->userId,
+            'user_name' => $result->userName,
+            'delivery_status' => $result->deliveryStatus,
+            'payment_status' => $result->paymentStatus,
+            'update_at' => $result->updatedAt,
+            'order_products' => $orderProducts,
+            'total_cost' => $result->totalCost,
+        ];
 
         return response()->json(['data' => $data], 200);
     }
@@ -474,6 +477,8 @@ class OrderController extends BaseController
 
         $result = $applicationService->handle($command);
         $customerName = "Tên khách hàng: $result->customerName";
+        $customerPhone = !is_null($result->customerPhone) ? $result->customerPhone : '';
+        $customerAddress = !is_null($result->customerAddress) ? $result->customerAddress : '';
 
         $template = [
             [
@@ -546,10 +551,10 @@ class OrderController extends BaseController
                 2 => null,
                 3 => null,
                 4 => null,
-                5 => "Điện thoại:",
+                5 => "Điện thoại: $customerPhone",
             ],
             [
-                0 => "Địa chỉ:",
+                0 => "Địa chỉ: $customerAddress",
                 1 => null,
                 2 => null,
                 3 => null,
@@ -568,14 +573,14 @@ class OrderController extends BaseController
         $measureUnitType = [
             'kg' => 'kg',
             'met' => 'mét',
-            'roll' => 'cuộn',
+            'roll' => 'kg',
             'unit' => 'đơn vị',
             'tree' => 'cây',
             'tube' => 'ống',
         ];
         foreach ($result->orderProductExportResults as $key => $orderProduct) {
             $key ++;
-            $measure = $measureUnitType["$orderProduct->measureUnitType"];
+            $measure = $measureUnitType[$orderProduct->measureUnitType];
             $template[] = [
                 0 => $key,
                 1 => "$orderProduct->productCode $orderProduct->productAttributeValueCode$orderProduct->attributeDisplayIndex",
@@ -617,7 +622,7 @@ class OrderController extends BaseController
                 1 => null,
                 2 => null,
                 3 => null,
-                4 => "Ngày tháng năm 2022",
+                4 => $result->orderDate,
                 5 => null
             ],
             [

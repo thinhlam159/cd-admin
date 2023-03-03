@@ -149,7 +149,7 @@ class DebtHistoryRepository implements IDebtHistoryRepository
     {
         $entities = ModelDebtHistory::where([
             ['customer_id', '=', $criteria->getCustomerId()->asString(),]
-        ])->paginate(PaginationConst::PAGINATE_ROW);
+        ])->orderBy('updated_date', 'DESC')->paginate(PaginationConst::PAGINATE_ROW);
 
         $debts = [];
         foreach ($entities as $entity) {
@@ -271,7 +271,42 @@ class DebtHistoryRepository implements IDebtHistoryRepository
     {
         $entities = ModelDebtHistory::where([
             ['customer_id', '=', $criteria->getCustomerId()->asString(),]
-        ])->paginate(PaginationConst::PAGINATE_ROW);
+        ])->get();
+
+        $debts = [];
+        foreach ($entities as $entity) {
+            $debts[] = new DebtHistory(
+                new DebtHistoryId($entity->id),
+                new CustomerId($entity->customer_id),
+                new UserId($entity->user_id),
+                $entity->total_debt,
+                $entity->total_payment,
+                $entity->rest_debt,
+                $entity->is_current,
+                DebtHistoryUpdateType::fromType($entity->update_type),
+                !is_null($entity->order_id) ? new OrderId($entity->order_id) : null,
+                !is_null($entity->container_order_id) ? new ContainerOrderId($entity->container_order_id) : null,
+                !is_null($entity->vat_id) ? new VatId($entity->vat_id) : null,
+                !is_null($entity->payment_id) ? new PaymentId($entity->payment_id) : null,
+                !is_null($entity->other_debt_id) ? new OtherDebtId($entity->other_debt_id) : null,
+                $entity->number_of_money,
+                SettingDate::fromYmdHis($entity->updated_date),
+                MonetaryUnitType::fromType($entity->monetary_unit_type),
+                $entity->comment,
+                $entity->version
+            );
+        }
+
+        return $debts;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function findAllHistoryByCustomerId3(CustomerId $customerId): array{
+        $entities = ModelDebtHistory::where([
+            ['customer_id', '=', $customerId->asString(),]
+        ])->get();
 
         $debts = [];
         foreach ($entities as $entity) {

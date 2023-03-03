@@ -34,4 +34,11 @@ interface IProductAttributeValueRepository
      * @return ProductAttributeValue[]
      */
     public function findAll(ProductAttributeValueCriteria $productAttributeValueCriteria): array;
+
+    /**
+     * @param ProductId $productId
+     * @param string $code
+     * @return bool
+     */
+    public function checkExistingCode(ProductId $productId, string $code): bool;
 }
