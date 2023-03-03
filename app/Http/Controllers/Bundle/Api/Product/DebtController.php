@@ -22,9 +22,11 @@ use App\Bundle\ProductBundle\Infrastructure\ContainerOrderRepository;
 use App\Bundle\ProductBundle\Infrastructure\DebtHistoryRepository;
 use App\Bundle\ProductBundle\Infrastructure\PaymentRepository;
 use App\Bundle\ProductBundle\Infrastructure\VatRepository;
+use App\Exports\DebtCustomerExport;
 use App\Http\Controllers\Bundle\Api\Common\BaseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 
 class DebtController extends BaseController
 {
@@ -253,25 +255,35 @@ class DebtController extends BaseController
         );
 
         $command = new DebtsCustomerExcelExportPostCommand(
-            $request->customer_id,
+            $request->id,
             !empty($request->startDate) ? $request->startDate : null,
             !empty($request->endDate) ? $request->endDate : null
         );
 
         $result = $application->handle($command);
-        $customerName = "Tên khách hàng: $result->customerName";
+        $name = $result->customerExcelExportResult->customerName;
+        $totalDebt = $result->customerExcelExportResult->totalDebt;
+        $totalPayment = $result->customerExcelExportResult->totalPayment;
+        $restDebt = $result->customerExcelExportResult->restDebt;
+        $customerName = "Tên khách hàng: $name";
+        $taxNumber = '';
+        $countDebtResults = count($result->debtResults);
 
         $template = [
             [
-                0 => "CÔNG TY TNHH SẢN XUẤT VÀ XUẤT NHẬP KHẨU HƯNG THỊNH - NH",
+                0 => "CÔNG TY TNHH SẢN XUẤT VÀ THƯƠNG MẠI NAM HƯƠNG",
                 1 => null,
                 2 => null,
                 3 => null,
                 4 => null,
                 5 => null,
+                6 => null,
+                7 => null,
+                8 => null,
+                9 => null,
             ],
             [
-                0 => "CHUYÊN SẢN XUẤT CÁC LOẠI BĂNG DÍNH",
+                0 => "MST: ",
                 1 => null,
                 2 => null,
                 3 => null,
@@ -287,39 +299,7 @@ class DebtController extends BaseController
                 5 => null,
             ],
             [
-                0 => "ĐT: 0988.397.883 - 0987.594.704",
-                1 => null,
-                2 => null,
-                3 => null,
-                4 => null,
-                5 => null,
-            ],
-            [
-                0 => "STK: 100000958649 - Ngân hàng Viettinbank, CN Đông Hà Nội - Người thụ hưởng: Thạch Thị Thùy Hương",
-                1 => null,
-                2 => null,
-                3 => null,
-                4 => null,
-                5 => null,
-            ],
-            [
-                0 => null,
-                1 => null,
-                2 => null,
-                3 => null,
-                4 => null,
-                5 => null,
-            ],
-            [
-                0 => null,
-                1 => null,
-                2 => null,
-                3 => null,
-                4 => null,
-                5 => null,
-            ],
-            [
-                0 => "HÓA ĐƠN BÁN HÀNG",
+                0 => "BẢNG THEO DÕI CÔNG NỢ",
                 1 => null,
                 2 => null,
                 3 => null,
@@ -332,10 +312,10 @@ class DebtController extends BaseController
                 2 => null,
                 3 => null,
                 4 => null,
-                5 => "Điện thoại:",
+                5 => null,
             ],
             [
-                0 => "Địa chỉ:",
+                0 => null,
                 1 => null,
                 2 => null,
                 3 => null,
@@ -344,66 +324,69 @@ class DebtController extends BaseController
             ],
             [
                 0 => "STT",
-                1 => "Tên sản phẩm",
-                2 => 'ĐVT',
-                3 => 'Số lượng',
-                4 => 'Đơn giá',
-                5 => 'Thành tiền',
+                1 => "Ngày tháng",
+                2 => 'Tổng công nợ',
+                3 => 'Tổng thanh toán',
+                4 => 'Nợ phải thu',
+                5 => 'Thanh toán',
+                6 => 'Đơn lẻ',
+                7 => 'container',
+                8 => 'VAT',
+                9 => 'Ghi chú',
             ]
         ];
         foreach ($result->debtResults as $key => $debtResult) {
             $key ++;
+            $rest = $debtResult->totalDebt - $debtResult->totalPayment;
             $template[] = [
                 0 => $key,
-                1 => "$debtResult->productCode $orderProduct->productAttributeValueCode$orderProduct->attributeDisplayIndex",
-                2 => $debtResult->measureUnitType,
-                3 => $debtResult->weight,
-                4 => $debtResult->productAttributePriceStandard,
-                5 => $debtResult->productOrderCost,
+                1 => $debtResult->updatedDate,
+                2 => $debtResult->totalDebt,
+                3 => $debtResult->totalPayment,
+                4 => $rest,
+                5 => !is_null($debtResult->paymentId) ? $debtResult->numberOfMoney : null,
+                6 => !is_null($debtResult->orderId) ? $debtResult->numberOfMoney : null,
+                7 => !is_null($debtResult->containerOrderId) ? $debtResult->numberOfMoney : null,
+                8 => !is_null($debtResult->vatId) ? $debtResult->numberOfMoney : null,
+                9 => $debtResult->comment,
             ];
         }
         $footer = [
             [
-                0 => "Tổng cộng",
-                1 => null,
-                2 => null,
-                3 => null,
-                4 => null,
-                5 => $result->totalCost
-            ],
-            [
-                0 => "Số tiền bằng chữ",
-                1 => null,
-                2 => null,
-                3 => null,
-                4 => null,
-                5 => null
-            ],
-            [
                 0 => null,
                 1 => null,
                 2 => null,
                 3 => null,
                 4 => null,
-                5 => null
+                5 => null,
             ],
             [
-                0 => null,
+                0 => "TỔNG CÔNG NỢ",
                 1 => null,
                 2 => null,
                 3 => null,
-                4 => "Ngày tháng năm 2022",
-                5 => null
+                4 => $totalDebt,
+                5 => null,
             ],
             [
-                0 => null,
-                1 => 'Người mua hàng',
+                0 => "ĐÃ TRẢ",
+                1 => null,
                 2 => null,
                 3 => null,
-                4 => 'Người bán hàng',
-                5 => null
+                4 => $totalPayment,
+                5 => null,
+            ],
+            [
+                0 => "CÒN LẠI",
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => $restDebt,
+                5 => null,
             ],
         ];
         $template = array_merge($template, $footer);
+        $orderExport = new DebtCustomerExport($template, $countDebtResults);
+        return Excel::download($orderExport, "users.xlsx");
     }
 }

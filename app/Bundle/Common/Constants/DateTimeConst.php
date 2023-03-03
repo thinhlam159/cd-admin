@@ -11,4 +11,5 @@ final class DateTimeConst
     public const FORMAT_YM = 'Y-m';
     public const FORMAT_DAY = 'D';
     public const FORMAT_Ymd = 'Ymd';
+    public const FORMAT_DMY = 'd-m-Y';
 }

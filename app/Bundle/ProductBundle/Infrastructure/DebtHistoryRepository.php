@@ -290,7 +290,7 @@ class DebtHistoryRepository implements IDebtHistoryRepository
                 !is_null($entity->payment_id) ? new PaymentId($entity->payment_id) : null,
                 !is_null($entity->other_debt_id) ? new OtherDebtId($entity->other_debt_id) : null,
                 $entity->number_of_money,
-                SettingDate::fromTimeStamps($entity->update_date),
+                SettingDate::fromYmdHis($entity->updated_date),
                 MonetaryUnitType::fromType($entity->monetary_unit_type),
                 $entity->comment,
                 $entity->version

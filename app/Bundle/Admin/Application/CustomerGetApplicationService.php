@@ -3,8 +3,6 @@ namespace App\Bundle\Admin\Application;
 
 use App\Bundle\Admin\Domain\Model\CustomerId;
 use App\Bundle\Admin\Domain\Model\ICustomerRepository;
-use App\Bundle\Admin\Domain\Model\IUserRepository;
-use App\Bundle\Admin\Domain\Model\UserId;
 use App\Bundle\Common\Domain\Model\RecordNotFoundException;
 use App\Bundle\Common\Constants\MessageConst;
 
@@ -37,8 +35,8 @@ final class CustomerGetApplicationService
 
         return new CustomerGetResult(
             $customer->getCustomerId()->__toString(),
-            $customer->getCustomerName(),
             $customer->getEmail(),
+            $customer->getCustomerName(),
             $customer->getAddress(),
             $customer->getPhone(),
             $customer->getIsActive(),

@@ -18,25 +18,28 @@
         <thead>
         <tr class="">
           <th class="border py-1 w-[2%]">
-            STT
+            #
           </th>
-          <th class="border py-1 w-[12%]">
+          <th class="border py-1 w-[10%]">
             Nguời tạo đơn
           </th>
-          <th class="border py-1 w-[12%]">
+          <th class="border py-1 w-[10%]">
             Khách hàng
           </th>
-          <th class="border py-1 w-[9%]">
+          <th class="border py-1 w-[8%]">
             Ngày tạo đơn
           </th>
           <th class="border py-1 w-[20%]">
             Tổng giá
           </th>
-          <th class="border py-1 w-[20%]">
+          <th class="border py-1 w-[15%]">
             Chi Tiết
           </th>
-          <th class="border py-1 w-[20%]">
+          <th class="border py-1 w-[15%]">
             Xuất excel
+          </th>
+          <th class="border py-1 w-[20%]">
+            id
           </th>
         </tr>
         </thead>
@@ -46,7 +49,7 @@
             <td class="border text-center">{{ ++index }}</td>
             <td class="border text-center">{{ item.user_name }}</td>
             <td class="border text-center">{{ item.customer_name }}</td>
-            <td class="border text-center">{{ moment(item.updated_at).format('L') }}</td>
+            <td class="border text-center">{{ moment(item.updated_at).format('DD-MM-YYYY') }}</td>
             <td class="border text-center">{{ item.total_cost.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
             <td class="border text-center">
               <div class="flex justify-center ">
@@ -58,6 +61,7 @@
                 <ButtonEdit @clickBtn="() => exportOrder(item.order_id)" :text="exportExcel"/>
               </div>
             </td>
+            <td class="border text-center">{{ item.order_id }}</td>
           </tr>
         </template>
         </tbody>
@@ -77,23 +81,22 @@
 <script setup>
 import Datepicker from "vue3-datepicker";
 import ButtonAddNew from "@/components/Buttons/ButtonAddNew/ButtonAddNew.vue";
-import ButtonFilter from "@/components/Buttons/ButtonFilter/ButtonFilter.vue";
-import ButtonDownloadCSV from "@/components/Buttons/ButtonDownloadCSV/ButtonDownloadCSV.vue";
 import ButtonEdit from "@/components/Buttons/ButtonEdit/ButtonEdit.vue";
 import Pagination from "@/components/Pagination/Pagination.vue";
-import {computed, ref} from "vue";
+import {computed, reactive, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {useStore} from "vuex";
 import {MODULE_STORE, PAGE_DEFAULT, ROUTER_PATH} from "@/const";
 import {exportOrderFromApi, getListOrderFromApi} from "@/api";
 import SearchIcon from "@/components/icons/SearchIcon.vue";
 import moment from "moment/moment";
+import _ from 'lodash';
 
-const listOrder = ref([]);
 const route = useRoute();
 const router = useRouter();
 const store = useStore();
 const pagination = ref(null);
+const listOrder = reactive([]);
 const addNewOrder = "Tạo đơn";
 const orderDetail = "Chi tiết";
 const exportExcel = "Xuất excel";
@@ -113,12 +116,13 @@ const getListOrder = async (page) => {
   try {
     const res = await getListOrderFromApi(page)
     pagination.value = res.pagination
-    listOrder.value = {
-      ...res.data
-    }
+    listOrder.length = 0
+    res.data.forEach((item) => {
+      listOrder.push(item)
+    })
   } catch (errors) {
     const error = errors.message
-    // toast.error(error);
+    toast.error(error);
   } finally {
     store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false
   }
@@ -129,13 +133,15 @@ const goToDetail = (id) => {
 }
 
 const exportOrder = async (id) => {
+  const order = _.find(listOrder, (e) => e.order_id === id)
+  const fileName = `${order.customer_name}-${moment(order.updated_at).format('DDMM')}-${_.takeRight(order.order_id, 8).join('')}.xlsx`
   const excelRes = await exportOrderFromApi({order_id: id})
   const url = URL.createObjectURL(new Blob([excelRes], {
     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
   }))
   const link = document.createElement('a')
   link.href = url
-  link.setAttribute('download', 'fileName.xlsx')
+  link.setAttribute('download', fileName)
   document.body.appendChild(link)
   link.click()
   link.remove()

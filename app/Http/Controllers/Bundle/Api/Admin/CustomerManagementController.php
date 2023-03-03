@@ -125,8 +125,8 @@ class CustomerManagementController extends BaseController
 
         $command = new CustomerPutCommand(
             $request->id,
-            $request->customer_name,
             $request->email,
+            $request->customer_name,
             $request->address,
             $request->phone,
             $request->status

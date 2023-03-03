@@ -16,14 +16,16 @@
 import {MODULE_STORE} from "@/const";
 import {computed, nextTick, reactive, ref} from "vue";
 import {useStore} from "vuex";
+import {useRouter} from "vue-router";
 
 const store = useStore()
+const router = useRouter()
 const emit = defineEmits(['changeRoute'])
 
 const items = computed(() => store.getters[`${MODULE_STORE.COMMON.NAME}/${MODULE_STORE.COMMON.GETTERS.GET_BREADCRUMB_ITEMS}`])
 const currentItem = computed(() => store.getters[`${MODULE_STORE.COMMON.NAME}/${MODULE_STORE.COMMON.GETTERS.GET_BREADCRUMB_CURRENT}`])
 const handleChangeRoute = (link) => {
-  emit('changeRoute', link)
+  router.push('/admin' + link)
 }
 </script>
 

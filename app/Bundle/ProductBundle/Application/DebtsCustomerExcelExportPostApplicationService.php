@@ -6,9 +6,11 @@ use App\Bundle\Admin\Domain\Model\CustomerId;
 use App\Bundle\Admin\Domain\Model\ICustomerRepository;
 use App\Bundle\Admin\Domain\Model\IUserRepository;
 use App\Bundle\Admin\Domain\Model\UserId;
+use App\Bundle\Common\Constants\DateTimeConst;
 use App\Bundle\Common\Constants\MessageConst;
 use App\Bundle\Common\Domain\Model\InvalidArgumentException;
 use App\Bundle\Common\Domain\Model\TransactionException;
+use App\Bundle\ProductBundle\Domain\Model\DebtHistoryUpdateType;
 use App\Bundle\ProductBundle\Domain\Model\DebtsCustomerExcelCriteria;
 use App\Bundle\ProductBundle\Domain\Model\IDebtHistoryRepository;
 use App\Bundle\ProductBundle\Domain\Model\SettingDate;
@@ -66,9 +68,24 @@ class DebtsCustomerExcelExportPostApplicationService
         );
         $debtHistories = $this->debtHistoryRepository->findAllHistoryByCustomerId2($criteria);
         $debtResults = [];
+        $totalDebt = 0;
+        $totalPayment = 0;
+        $restDebt = 0;
         foreach ($debtHistories as $debt) {
             $customer = $this->customerRepository->findById($debt->getCustomerId());
             $user = $this->userRepository->findById(new UserId($debt->getUserId()->asString()));
+            if ($debt->getDebtHistoryUpdateType()->getType() === DebtHistoryUpdateType::PAYMENT && !is_null($debt->getPaymentId())) {
+                $totalPayment += $debt->getNumberOfMoney();
+                $restDebt -= $debt->getNumberOfMoney();
+            }
+            if ($debt->getDebtHistoryUpdateType()->getType() !== DebtHistoryUpdateType::PAYMENT
+                && $debt->getDebtHistoryUpdateType()->getType() !== DebtHistoryUpdateType::INIT
+                && is_null($debt->getPaymentId())
+            ) {
+                $totalDebt += $debt->getNumberOfMoney();
+                $restDebt += $debt->getNumberOfMoney();
+            }
+
             $debtResults[] = new DebtResult(
                 $debt->getDebtHistoryId()->asString(),
                 $customer->getCustomerId()->asString(),
@@ -85,13 +102,19 @@ class DebtsCustomerExcelExportPostApplicationService
                 !is_null($debt->getPaymentId()) ? $debt->getPaymentId()->asString() : null,
                 !is_null($debt->getOtherDebtId()) ? $debt->getOtherDebtId()->asString() : null,
                 $debt->getNumberOfMoney(),
-                $debt->getUpdateDate()->asTimeStamps(),
+                $debt->getUpdateDate()->getValue()->format(DateTimeConst::FORMAT_DMY),
                 $debt->getMonetaryUnitType()->getValue(),
                 $debt->getComment(),
                 $debt->getVersion()
             );
         }
+        $customerDebtResult = new DebtCustomerExcelExportResult(
+            $customer->getCustomerName(),
+            $totalDebt,
+            $totalPayment,
+            $restDebt
+        );
 
-        return new DebtsCustomerExcelOrderExportPostResult($debtResults);
+        return new DebtsCustomerExcelOrderExportPostResult($customerDebtResult, $debtResults);
     }
 }

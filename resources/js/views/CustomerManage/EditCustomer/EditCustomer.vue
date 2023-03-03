@@ -84,6 +84,7 @@ const getCustomerDetail = async (customerId) => {
     const data = res.data
     formData.name = data.customer_name
     formData.phone = data.phone
+    formData.address = data.address
   } catch (errors) {
     toast.error(errors.message);
   } finally {

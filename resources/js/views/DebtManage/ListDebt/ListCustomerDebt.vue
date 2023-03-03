@@ -64,7 +64,7 @@
             <td class="border text-center">{{ item.total_debt.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
             <td class="border text-center">{{ item.total_payment.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
             <td class="border text-center">{{ (item.total_debt - item.total_payment).toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
-            <td class="border text-center">{{ moment(item.updated_date).format('L') }}</td>
+            <td class="border text-center">{{ moment(item.updated_date).format('DD-MM-YYYY') }}</td>
             <td class="border text-center">{{ item.number_of_money.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
             <td class="border text-center">
               <div class="flex w-full h-full items-center justify-center" v-show="!!item.payment_id">
@@ -207,7 +207,7 @@ const handleNextPage = (page) => {
 }
 
 const exportCustomerDebt = async (customerId) => {
-  const excelRes = await exportCustomerDebtHistoryFromApi({customer_id: customerId})
+  const excelRes = await exportCustomerDebtHistoryFromApi(customerId)
   const url = URL.createObjectURL(new Blob([excelRes], {
     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
   }))

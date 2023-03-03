@@ -4,7 +4,7 @@
       <div class="flex items-end mb-2">
         <label for="customer" class="text-base text-gray-500">Khách hàng: </label>
         <span v-show="!customerMessageError" class="text-base font-bold ml-1">{{
-            currentCustomer.customer_name
+            currentCustomer?.customer_name
           }}</span>
       </div>
     </div>
@@ -27,7 +27,7 @@
 <script setup>
 import {useRoute} from "vue-router";
 import {reactive, ref} from "vue";
-import {getListCustomerFromApi} from "@/api";
+import {getCustomerDetailFromApi} from "@/api";
 import TabsWrapper from "@/views/DebtManage/CreateDebt/TabsWrapper.vue";
 import TabItem from "@/views/DebtManage/CreateDebt/TabItem.vue";
 import ContainerOrderItem from "@/views/DebtManage/CreateDebt/ContainerOrderItem.vue";
@@ -44,31 +44,24 @@ const currentCustomer = reactive({
 const customerMessageError = ref(null)
 const store = useStore();
 
-const getListCustomer = async () => {
-  const res = await getListCustomerFromApi();
-  const customers = [
-    ...res.data
-  ]
-
-  const customer = customers.find(e => {
-    return e.customer_id === route.params.id
-  })
-  currentCustomer.customer_name = customer.customer_name
-  currentCustomer.customer_id = customer.customer_id
+const getCustomerDetail = async (customerId) => {
+  try {
+    store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = true;
+    const res = await getCustomerDetailFromApi(customerId);
+    const data = res.data
+    currentCustomer.customer_name = data.customer_name
+    currentCustomer.customer_id = data.customer_id
+  } catch (errors) {
+    toast.error(errors.message);
+  } finally {
+    store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
+  }
 }
 const handleCustomerIdError = (value) => {
   customerMessageError.value = value
 }
 
-const handleSelectCustomer = (ids) => {
-  customerMessageError.value = false
-  currentCustomer.value = customers.value.find((e) => {
-    return e.customer_id === ids[0]
-  })
-  selectedCustomers.value = ids
-}
-
-getListCustomer()
+getCustomerDetail(route.params.id)
 store.state[MODULE_STORE.COMMON.NAME].breadcrumbCurrent = 'Thêm công nợ'
 store.state[MODULE_STORE.COMMON.NAME].breadcrumbItems = [
   {

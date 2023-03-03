@@ -71,7 +71,7 @@ export const getListDealerFromApi = async (page) => api.get(`${apiConstants.ADMI
 export const getListDebtFromApi = async (params) => api.get(`${apiConstants.ADMIN.LIST_DEBT}`, {params})
 export const getListCustomerDebtFromApi = async (id, params) => api.get(`${apiConstants.ADMIN.LIST_CUSTOMER_DEBT}/${id}`, {params})
 export const getCustomerCurrentDebtFromApi = async (id) => api.get(`${apiConstants.ADMIN.CUSTOMER_CURRENT_DEBT}/${id}`)
-export const exportCustomerDebtHistoryFromApi = async (data) => api.get(`${apiConstants.ADMIN.CUSTOMER_CURRENT_DEBT}/${id}`)
+export const exportCustomerDebtHistoryFromApi = async (id) => await api.post(`${apiConstants.ADMIN.EXPORT_CUSTOMER_DEBT}/${id}`,{}, {responseType: 'blob'})
 
 //statistical
 export const getRevenuesFromApi = async (params) => api.get(apiConstants.ADMIN.STATISTICAL_REVENUES, {params})

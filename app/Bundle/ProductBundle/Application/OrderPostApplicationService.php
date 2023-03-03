@@ -183,7 +183,7 @@ class OrderPostApplicationService
             new ProductBundleUserId($userId->asString()),
             !is_null($currentDebt) ? $currentDebt->getTotalDebt() + $totalOrderCost : $totalOrderCost,
             !is_null($currentDebt) ? $currentDebt->getTotalPayment() : 0,
-            !is_null($currentDebt) ? $currentDebt->getRestDebt() : $totalOrderCost,
+            !is_null($currentDebt) ? $currentDebt->getRestDebt() + $totalOrderCost : $totalOrderCost,
             true,
             DebtHistoryUpdateType::fromType(DebtHistoryUpdateType::CONTAINER_ORDER),
             $orderId,
