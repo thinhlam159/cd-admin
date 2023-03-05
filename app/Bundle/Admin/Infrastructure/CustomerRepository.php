@@ -170,4 +170,35 @@ class CustomerRepository implements ICustomerRepository
 
         return $customers;
     }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function findAllNotPaginate(CustomerCriteria $criteria): array
+    {
+        $keyword = $criteria->getKeyword();
+        $conditions = [['is_active', '=', true]];
+        if ($criteria->getKeyword()) {
+            $conditions[] = ['name', 'like', "%$keyword%"];
+        }
+        $entities = ModelCustomer::where($conditions)->get();
+
+        /** @var \App\Bundle\Admin\Domain\Model\User[] $result */
+        $customers = [];
+        foreach ($entities as $entity) {
+            $customer = new Customer(
+                new CustomerId($entity->id),
+                $entity->name,
+                $entity->email
+            );
+            $customer->setPhone($entity->phone);
+            $customer->setAddress($entity->address);
+            $customer->setIsActive($entity->is_active);
+
+            $customers[] = $customer;
+        }
+
+        return $customers;
+    }
 }

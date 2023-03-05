@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Bundle\Api\Admin;
 
+use App\Bundle\Admin\Application\CustomerAllListGetApplicationService;
+use App\Bundle\Admin\Application\CustomerAllListGetCommand;
 use App\Bundle\Admin\Application\CustomerDeleteApplicationService;
 use App\Bundle\Admin\Application\CustomerDeleteCommand;
 use App\Bundle\Admin\Application\CustomerGetApplicationService;
@@ -84,6 +86,33 @@ class CustomerManagementController extends BaseController
         ];
 
         return response()->json($response, 200);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getCustomerAll(Request $request) {
+        $customerRepository = new CustomerRepository();
+        $applicationService = new CustomerAllListGetApplicationService(
+            $customerRepository,
+        );
+
+        $command = new CustomerAllListGetCommand(
+            !empty($request->keyword) ? $request->keyword : null
+        );
+        $result = $applicationService->handle($command);
+        $customerManageResults = $result->customerResults;
+
+        $data = [];
+        foreach ($customerManageResults as $customer) {
+            $data[] = [
+                'customer_id' => $customer->customerId,
+                'customer_name' => $customer->customerName,
+            ];
+        }
+
+        return response()->json(['data' => $data,], 200);
     }
 
     /**

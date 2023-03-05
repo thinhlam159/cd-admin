@@ -583,9 +583,13 @@ class OrderController extends BaseController
         foreach ($result->orderProductExportResults as $key => $orderProduct) {
             $key ++;
             $measure = $measureUnitType[$orderProduct->measureUnitType];
+            $productCode = $orderProduct->productCode;
+            if ($orderProduct->measureUnitType === 'roll') {
+                $productCode = "$orderProduct->productCode $orderProduct->productAttributeValueCode$orderProduct->attributeDisplayIndex";
+            }
             $template[] = [
                 0 => $key,
-                1 => "$orderProduct->productCode $orderProduct->productAttributeValueCode$orderProduct->attributeDisplayIndex",
+                1 => $productCode,
                 2 => $measure,
                 3 => $orderProduct->weight,
                 4 => $orderProduct->productAttributePriceStandard,

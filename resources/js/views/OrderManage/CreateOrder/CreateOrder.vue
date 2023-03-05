@@ -43,16 +43,24 @@
         <div class="text-md min-h-[300px]">
           <form @submit.prevent="handleSubmit()">
             <div class="border-b border-gray-300">
-              <div v-for="(orderItem, index) in listOrderItem" :key="index" class="flex items-center">
+              <div v-for="(orderItem, index) in listOrderItem" :key="orderItem.key" class="flex items-center">
                 <div class="border-r border-gray-300 text-center py-2 w-[10%]">{{ index + 1 }}</div>
-                <div class="border-r border-gray-300 text-center py-2 w-[25%]">{{
+                <div v-if="orderItem.measureUnitName === 'roll'" class="border-r border-gray-300 text-center py-2 w-[25%]">{{
                     `${orderItem.productCode} ${orderItem.code} x ${orderItem.noticePriceType} x ${orderItem.price.toLocaleString('it-IT', {
                       style: 'currency',
                       currency: 'VND'
                     })}`
                   }}
                 </div>
-                <div class="border-r border-gray-300 text-center py-2 w-[10%]">{{ orderItem.code + orderItem.order }}</div>
+                <div v-else class="border-r border-gray-300 text-center py-2 w-[25%]">{{
+                    `${orderItem.productCode} x ${orderItem.price.toLocaleString('it-IT', {
+                      style: 'currency',
+                      currency: 'VND'
+                    })}`
+                  }}
+                </div>
+                <div v-if="orderItem.measureUnitName === 'roll'" class="border-r border-gray-300 text-center py-2 w-[10%]">{{ orderItem.code + orderItem.order }}</div>
+                <div v-else class="border-r border-gray-300 text-center py-2 w-[10%]">{{ orderItem.code}}</div>
                 <div class="border-r border-gray-300 text-center py-2 w-[10%]">
                   {{ orderItem.standardPrice.toLocaleString('it-IT', {style: 'currency', currency: 'VND'}) }}</div>
                 <div class="border-r border-gray-300 text-center py-2 w-[10%]">
@@ -87,7 +95,7 @@ import {useStore} from "vuex";
 import {ref, inject, reactive} from "vue";
 import {
   createOrderFromApi,
-  getListCategoryFromApi,
+  getListCategoryFromApi, getListCustomerAllFromApi,
   getListCustomerFromApi,
   getListProductFromApi
 } from "@/api";
@@ -111,7 +119,7 @@ const productSelected = ref({})
 const productAttributeValuesByProduct = ref({})
 const selectedCustomer = ref(null)
 const customerError = ref(false)
-const listOrderItem = ref([])
+const listOrderItem = reactive([])
 const picked = ref(new Date())
 const errors = reactive({})
 const listOrderError = ref(false)
@@ -130,13 +138,13 @@ const handleSubmit = async () => {
       customerError.value = true
       return
     }
-    if (listOrderItem.value.length === 0) {
+    if (listOrderItem.length === 0) {
       listOrderError.value = true
       return
     }
     await customerSchema.validate({customer: selectedCustomer.value.customer_id})
-    await orderItemsSchema.validate(listOrderItem.value, { abortEarly: false })
-    const orderPostData = listOrderItem.value.map(orderItem => {
+    await orderItemsSchema.validate(listOrderItem, { abortEarly: false })
+    const orderPostData = listOrderItem.map(orderItem => {
       return {
         product_id: orderItem.productId,
         product_attribute_value_id: orderItem.productAttributeValueId,
@@ -222,7 +230,7 @@ const getListProduct = async () => {
   }
 }
 const getListCustomer = async () => {
-  const res = await getListCustomerFromApi();
+  const res = await getListCustomerAllFromApi();
   customers.value = [
     ...res.data.map(item => {
       return {
@@ -232,6 +240,7 @@ const getListCustomer = async () => {
     })
   ]
   store.state[MODULE_STORE.ORDER.NAME].customers = res.data
+  console.log(res)
 }
 const handleOnChangeCategorySelect = () => {
   productsByCategory.value = products.value.filter((product) => {
@@ -253,16 +262,17 @@ const handleAddProductItem = (item) => {
   const listProductAttributeValue = [...store.state[MODULE_STORE.ORDER.NAME].productAttributeValues]
   const itemOrder = listProductAttributeValue.find(i => i.productAttributeValueId === item.id)
   for(let i = 0; i < item.amount; i++) {
-    const lastItemOfSameAttributeValue = listOrderItem.value.slice().reverse().find(i => i.productAttributeValueId === item.id)
+    const lastItemOfSameAttributeValue = listOrderItem.slice().reverse().find(i => i.productAttributeValueId === item.id)
     const order = lastItemOfSameAttributeValue ? lastItemOfSameAttributeValue.order + 1 : 1
-    listOrderItem.value.push({
+    listOrderItem.push({
       ...itemOrder,
       weight: 0,
       cost: 0,
-      order: order
+      order: order,
+      key: makeItemKey(8)
     })
   }
-  listOrderItem.value.sort((a, b) => {
+  listOrderItem.sort((a, b) => {
     if (a.productAttributeValueId === b.productAttributeValueId) {
       return a.order - b.order;
     }
@@ -270,7 +280,35 @@ const handleAddProductItem = (item) => {
   })
 }
 const handleRemoveOrderItem = (index) => {
-  listOrderItem.value.splice(index, 1)
+  const removeItem = listOrderItem[index]
+  listOrderItem.splice(index, 1)
+  let order = 0
+  const newListOrderItem = listOrderItem.map((item) => {
+    if(item.productAttributeValueId !== removeItem.productAttributeValueId) return item
+    return {
+      ...item,
+      order: ++order
+    }
+  })
+  listOrderItem.length = 0
+  newListOrderItem.forEach(item => listOrderItem.push(item))
+  listOrderItem.sort((a, b) => {
+    if (a.productAttributeValueId === b.productAttributeValueId) {
+      return a.order - b.order;
+    }
+    return a.productAttributeValueId.localeCompare(b.productAttributeValueId);
+  })
+}
+const makeItemKey = (length) => {
+  let result = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const charactersLength = characters.length;
+  let counter = 0;
+  while (counter < length) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    counter += 1;
+  }
+  return result;
 }
 
 store.state[MODULE_STORE.COMMON.NAME].breadcrumbCurrent = 'Tạo đơn'

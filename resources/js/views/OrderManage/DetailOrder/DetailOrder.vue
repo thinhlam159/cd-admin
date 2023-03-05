@@ -21,7 +21,10 @@
         <div class="[&>div:nth-child(odd)]:bg-gray-50 border">
           <div v-for="(item, index) in orderProductResponse" class="w-full py-2 flex border-b border-gray-50">
             <div class="inline-block w-[4%]"><span>{{ ++index }}</span></div>
-            <div class="inline-block w-[22%]"><span>{{ item.product_name + ' ' + item.product_attribute_value_code + item.attribute_display_index }}</span></div>
+            <div class="inline-block w-[22%]">
+              <span v-if="item.notice_price_type !== 'default'">{{ item.product_name + ' ' + item.product_attribute_value_code + item.attribute_display_index }}</span>
+              <span v-else>{{ item.product_name }}</span>
+            </div>
             <div class="inline-block w-[8%]"><span>{{ t(`measure_unit_type.${item.measure_unit_type}`) }}</span></div>
             <div class="inline-block w-[20%]"><span>{{ item.weight }}</span></div>
             <div class="inline-block w-[20%]"><span>{{ item.price.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</span></div>

@@ -14,16 +14,18 @@
         </div>
         <input class="px-10 outline-none text-lg w-full" v-model="searchTerm" placeholder="Tìm..." @focus="showDropdown = true"/>
       </div>
-      <ul class="w-full">
-        <li v-for="option in filteredOptions"
-            :key="option.id"
-            :value="option.id"
-            @click="handleOptionsSelected(option)"
-            class="list-none w-full p-2 text-lg hover:bg-[#d9d9d9]"
-        >
-          {{ option.text }}
-        </li>
-      </ul>
+      <div class="max-h-[300px] overflow-y-scroll overscroll-y-auto">
+        <ul class="w-full">
+          <li v-for="option in filteredOptions"
+              :key="option.id"
+              :value="option.id"
+              @click="handleOptionsSelected(option)"
+              class="list-none w-full p-2 text-lg hover:bg-[#d9d9d9]"
+          >
+            {{ option.text }}
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 </template>

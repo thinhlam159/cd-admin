@@ -12,6 +12,7 @@ export default {
     CREATE_USER: '/admin/create-user',
 
     LIST_CUSTOMER: 'admin/list-customer',
+    LIST_CUSTOMER_ALL: 'admin/list-customer-all',
     CREATE_CUSTOMER: 'admin/create-customer',
     CUSTOMER_DETAIL: 'admin/customer-detail',
     UPDATE_CUSTOMER: 'admin/update-customer',

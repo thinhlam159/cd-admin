@@ -41,4 +41,10 @@ interface ICustomerRepository
      * @return \App\Bundle\Admin\Domain\Model\Customer[]
      */
     public function findAllByKeyword(string $keyword): array;
+
+    /**
+     * @param CustomerCriteria $criteria
+     * @return \App\Bundle\Admin\Domain\Model\Customer[]
+     */
+    public function findAllNotPaginate(CustomerCriteria $criteria): array;
 }
