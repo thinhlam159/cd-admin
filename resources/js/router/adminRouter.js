@@ -34,7 +34,7 @@ import Dashboard from "@/views/Dashboard";
 import Overview from "@/views/Dashboard/Overview/Overview.vue";
 import AddCategory from "@/views/CategoryManage/AddCategory/AddCategory.vue";
 import EditCategory from "@/views/CategoryManage/EditCategory/EditCategory.vue";
-
+import EditProductPrice from "@/views/ProductManage/EditProduct/EditProductPrice.vue";
 export default [
   // ROUTER_ADMIN
   {
@@ -126,6 +126,10 @@ export default [
           {
             path: ROUTER_PATH.ADD_PRODUCT_ATTRIBUTE_VALUE_ID,
             component: AddProductAttributeValue,
+          },
+          {
+            path: ROUTER_PATH.PRICE_MANAGE,
+            component: EditProductPrice,
           },
         ],
       },

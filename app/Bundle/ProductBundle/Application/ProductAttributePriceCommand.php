@@ -25,16 +25,23 @@ class ProductAttributePriceCommand
     public string $noticePriceType;
 
     /**
+     * @var string
+     */
+    public string $productId;
+
+    /**
      * @param string $productAttributePriceId
      * @param string $productAttributeValueId
      * @param int $price
      * @param string $noticePriceType
+     * @param string $productId
      */
-    public function __construct(string $productAttributePriceId, string $productAttributeValueId, int $price, string $noticePriceType)
+    public function __construct(string $productAttributePriceId, string $productAttributeValueId, int $price, string $noticePriceType, string $productId)
     {
         $this->productAttributePriceId = $productAttributePriceId;
         $this->productAttributeValueId = $productAttributeValueId;
         $this->price = $price;
         $this->noticePriceType = $noticePriceType;
+        $this->productId = $productId;
     }
 }

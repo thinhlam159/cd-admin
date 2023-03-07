@@ -23,6 +23,8 @@ use App\Bundle\ProductBundle\Application\ProductListGetApplicationService;
 use App\Bundle\ProductBundle\Application\ProductListGetCommand;
 use App\Bundle\ProductBundle\Application\ProductPostApplicationService;
 use App\Bundle\ProductBundle\Application\ProductPostCommand;
+use App\Bundle\ProductBundle\Application\ProductPriceAllListGetApplicationService;
+use App\Bundle\ProductBundle\Application\ProductPriceAllListGetCommand;
 use App\Bundle\ProductBundle\Application\ProductPutApplicationService;
 use App\Bundle\ProductBundle\Application\ProductPutCommand;
 use App\Bundle\ProductBundle\Infrastructure\CategoryRepository;
@@ -380,7 +382,8 @@ class ProductController extends BaseController
     {
         $applicationService = new ProductAttributePriceListPutApplicationService(
             new ProductAttributeValueRepository(),
-            new ProductAttributePriceRepository()
+            new ProductAttributePriceRepository(),
+            new ProductRepository()
         );
         $productAttributeValuePriceCommands = [];
         $productAttributeValuePrices = !empty($request->product_attribute_value_price) ? $request->product_attribute_value_price : [];
@@ -390,6 +393,7 @@ class ProductController extends BaseController
                 $productAttributeValuePrice['product_attribute_value_id'],
                 $productAttributeValuePrice['price'],
                 $productAttributeValuePrice['notice_price_type'],
+                $productAttributeValuePrice['product_id'],
             );
         }
         $command = new ProductAttributePriceListPutCommand(
@@ -422,6 +426,38 @@ class ProductController extends BaseController
                 'notice_price_type' => $productAttributePriceResult->noticePriceType,
                 'standard_price' => $productAttributePriceResult->standardPrice,
                 'is_current' => $productAttributePriceResult->isCurrent,
+            ];
+        }
+
+        return response()->json(['data' => $data], 200);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws InvalidArgumentException
+     * @throws \App\Bundle\Common\Domain\Model\TransactionException
+     */
+    public function getProductAttributePrices2(Request $request) {
+        $applicationService = new ProductPriceAllListGetApplicationService(
+            new ProductAttributePriceRepository(),
+            new ProductAttributeValueRepository(),
+            new ProductRepository()
+        );
+        $command = new ProductPriceAllListGetCommand();
+        $result = $applicationService->handle($command);
+        $data = [];
+        foreach ($result->productPriceResults as $productPriceResult) {
+            $data[] = [
+                'product_id' => $productPriceResult->productId,
+                'product_name' => $productPriceResult->name,
+                'product_code' => $productPriceResult->code,
+                'product_attribute_price_id' => $productPriceResult->productAttributePriceId,
+                'product_attribute_value_id' => $productPriceResult->productAttributeValueId,
+                'price' => $productPriceResult->price,
+                'monetary_unit' => $productPriceResult->monetaryUnitType,
+                'notice_price_type' => $productPriceResult->noticePriceType,
+                'is_current' => $productPriceResult->isCurrent,
             ];
         }
 

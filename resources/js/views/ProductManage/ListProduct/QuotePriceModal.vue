@@ -39,6 +39,7 @@ const handleUpdatePrice = async () => {
           product_attribute_value_id: props.data.productAttributeValueId,
           price: parseInt(price.value.replace(/[^\d]/g, ""), 10),
           notice_price_type: props.data.noticePriceType,
+          product_id: props.data.productId,
         },
       ]
     })
@@ -49,7 +50,9 @@ const handleUpdatePrice = async () => {
     toast.error(errors.message)
   }
 }
+const updateValue = (e) => {
 
+}
 
 
 </script>

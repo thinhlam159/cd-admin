@@ -39,6 +39,7 @@
         "vue-template-compiler": "^2.7.10",
         "vue-toast-notification": "^3.0.4",
         "vue3-datepicker": "^0.3.4",
+        "vuedraggable": "^2.24.3",
         "vuex": "^4.0.2",
         "yup": "^0.32.11"
     }

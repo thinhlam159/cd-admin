@@ -55,6 +55,7 @@ export const getOrderDetailFromApi = async (id) => await api.get(`${apiConstants
 
 // product attribute price
 export const getListProductAttributePriceFromApi = async () => api.get(`${apiConstants.ADMIN.LIST_PRODUCT_ATTRIBUTE_PRICES}`)
+export const getListProductPriceFromApi = async () => api.get(`${apiConstants.ADMIN.LIST_PRODUCT_PRICE}`)
 
 export const exportOrderFromApi = async (data) => await api.post(apiConstants.ADMIN.EXPORT_ORDER, data,{responseType: 'blob'})
 

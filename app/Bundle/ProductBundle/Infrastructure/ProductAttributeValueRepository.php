@@ -153,4 +153,31 @@ final class ProductAttributeValueRepository implements IProductAttributeValueRep
 
         return true;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function findAllOriginal(): array
+    {
+        $entities = ModelProductAttributeValue::where('is_original', '=', true)->get();
+        if ($entities->isEmpty()) {
+            return [];
+        }
+
+        $productAttributeValues = [];
+        foreach ($entities as $entity) {
+            $productAttributeValues[] = new ProductAttributeValue(
+                new ProductAttributeValueId($entity['id']),
+                new ProductId($entity['product_id']),
+                new ProductAttributeId($entity['product_attribute_id']),
+                $entity['value'],
+                $entity['code'],
+                null,
+                MeasureUnitType::fromType($entity['measure_unit_type']),
+                $entity['is_original'],
+            );
+        }
+
+        return $productAttributeValues;
+    }
 }

@@ -41,4 +41,10 @@ interface IProductAttributeValueRepository
      * @return bool
      */
     public function checkExistingCode(ProductId $productId, string $code): bool;
+
+    /**
+     * @noparam
+     * @return ProductAttributeValue[]
+     */
+    public function findAllOriginal(): array;
 }

@@ -95,7 +95,7 @@
               <td v-if="subIndex === 0" :rowspan="item.product_attribute_values.length" class="border text-center h-full m-0 py-1">
                 <div class="flex justify-center ">
                   <ButtonEdit
-                    @clickBtn="() => openQuoteModal(item.original_product_attribute_price_id, item.name, subItem.code, item.notice_price_type, item.price, item.original_product_attribute_value_id)"
+                    @clickBtn="() => openQuoteModal(item.original_product_attribute_price_id, item.name, subItem.code, item.notice_price_type, item.price, item.original_product_attribute_value_id, item.product_id)"
                     text=' '
                   />
                 </div>
@@ -286,14 +286,15 @@ const listByCategory = async (category) => {
   };
 }
 
-const openQuoteModal = (id, name, code, noticePriceType, price, productAttributeValueId) => {
+const openQuoteModal = (id, name, code, noticePriceType, price, productAttributeValueId, productId) => {
   quotePriceData.value = {
     id: id,
     name: name,
     code: code,
     noticePriceType: noticePriceType,
     price: price,
-    productAttributeValueId: productAttributeValueId
+    productAttributeValueId: productAttributeValueId,
+    productId: productId
   }
   showModal.value = true
 }

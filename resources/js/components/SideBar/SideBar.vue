@@ -59,24 +59,30 @@ const list = ref([
   },
   {
     id: 5,
+    title: 'Báo giá',
+    link: `${ROUTER_PATH.ADMIN}/${ROUTER_PATH.PRODUCT_MANAGE}/${ROUTER_PATH.PRICE_MANAGE}`,
+    icon: "fa fa-lg fa-pencil-square-o",
+  },
+  {
+    id: 6,
     title: 'Quản lý sản phẩm',
     link: `${ROUTER_PATH.ADMIN}/${ROUTER_PATH.PRODUCT_MANAGE}`,
     icon: "fa fa-lg fa-product-hunt",
   },
   {
-    id: 6,
+    id: 7,
     title: 'Khách hàng',
     link: `${ROUTER_PATH.ADMIN}/${ROUTER_PATH.CUSTOMER_MANAGE}`,
     icon: "fa fa-lg fa-users",
   },
   {
-    id: 7,
+    id: 8,
     title: 'Danh mục sản phẩm',
     link: `${ROUTER_PATH.ADMIN}/${ROUTER_PATH.CATEGORY_MANAGE}`,
     icon: "fa fa-lg fa-tasks",
   },
   {
-    id: 8,
+    id: 9,
     title: 'Quản lý người dùng',
     link: `${ROUTER_PATH.ADMIN}/${ROUTER_PATH.USER_MANAGER}`,
     icon: "fa fa-lg fa-user",
