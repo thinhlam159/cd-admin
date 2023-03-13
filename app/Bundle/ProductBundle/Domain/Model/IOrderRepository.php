@@ -1,6 +1,7 @@
 <?php
 namespace App\Bundle\ProductBundle\Domain\Model;
 
+use App\Bundle\Admin\Domain\Model\CustomerId;
 use App\Bundle\Common\Domain\Model\Pagination;
 
 interface IOrderRepository
@@ -39,7 +40,7 @@ interface IOrderRepository
      * @param Order $order
      * @return bool
      */
-    public function updateDeliveryStatus(Order $order): bool;
+    public function updateCancelStatus(Order $order): bool;
 
     /**
      * @param StatisticalProductSaleCriteria $criteria
@@ -52,4 +53,10 @@ interface IOrderRepository
      * @return int
      */
     public function countCustomerOrders(StatisticalCountCustomerOrderCriteria $criteria): int;
+
+    /**
+     * @param CustomerId $customerId
+     * @return array{Order[], Pagination}
+     */
+    public function findAllByCustomer(CustomerId $customerId): array;
 }

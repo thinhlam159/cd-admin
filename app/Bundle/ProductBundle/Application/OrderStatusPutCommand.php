@@ -2,7 +2,7 @@
 
 namespace App\Bundle\ProductBundle\Application;
 
-final class OrderCancelPostCommand
+class OrderStatusPutCommand
 {
     /**
      * @var string

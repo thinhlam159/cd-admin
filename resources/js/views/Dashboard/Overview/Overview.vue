@@ -38,6 +38,7 @@ import Datepicker from 'vue3-datepicker'
 import PeriodRevenue from "@/views/Dashboard/Overview/PeriodRevenue.vue";
 import StatisticalJumbo from "@/views/Dashboard/Overview/StatisticalJumbo.vue";
 import CustomerOrderAmount from "@/views/Dashboard/Overview/CustomerOrderAmount.vue";
+import { styleDatePicker } from "@/const";
 
 const toast = inject('$toast');
 const store = useStore();
@@ -50,27 +51,6 @@ const chartOptions = ref({
 })
 const picked = ref(new Date())
 const totalDebtByDay = ref(0)
-const styleDatePicker = ref({
-  "--vdp-bg-color": "#ffffff",
-  "--vdp-text-color": "#e21818",
-  "--vdp-box-shadow": "0 4px 10px 0 rgba(128, 144, 160, 0.1), 0 0 1px 0 rgba(128, 144, 160, 0.81)",
-  "--vdp-border-radius": "10px",
-  "--vdp-heading-size": "2.5em",
-  "--vdp-heading-weight": "bold",
-  "--vdp-heading-hover-color": "#eeeeee",
-  "--vdp-arrow-color": "currentColor",
-  "--vdp-elem-color": "currentColor",
-  "--vdp-disabled-color": "#d5d9e0",
-  "--vdp-hover-color": "#ffffff",
-  "--vdp-hover-bg-color": "#0baf74",
-  "--vdp-selected-color": "#ffffff",
-  "--vdp-selected-bg-color": "#0baf74",
-  "--vdp-current-date-outline-color": "#888888",
-  "--vdp-current-date-font-weight": "bold",
-  "--vdp-elem-font-size": "1em",
-  "--vdp-elem-border-radius": "3px",
-  "--vdp-divider-color": "#ffffff"
-})
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
@@ -95,6 +75,8 @@ const getRevenueByDay = async () => {
 watch(picked, getRevenueByDay)
 
 getRevenueByDay()
+store.state[MODULE_STORE.COMMON.NAME].breadcrumbCurrent = 'Trang chủ'
+store.state[MODULE_STORE.COMMON.NAME].breadcrumbItems = []
 </script>
 
 <style scoped>

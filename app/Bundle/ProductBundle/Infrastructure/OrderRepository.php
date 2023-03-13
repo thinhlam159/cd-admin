@@ -14,6 +14,7 @@ use App\Bundle\ProductBundle\Domain\Model\OrderId;
 use App\Bundle\ProductBundle\Domain\Model\OrderPaymentStatus;
 use App\Bundle\ProductBundle\Domain\Model\OrderProduct;
 use App\Bundle\ProductBundle\Domain\Model\OrderProductId;
+use App\Bundle\ProductBundle\Domain\Model\OrderStatus;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributePriceId;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValueId;
 use App\Bundle\ProductBundle\Domain\Model\ProductId;
@@ -37,6 +38,7 @@ final class OrderRepository implements IOrderRepository
             'user_id' => $order->getUserId()->asString(),
             'delivery_status' => $order->getOrderDeliveryStatus()->getStatus(),
             'payment_status' => $order->getOrderPaymentStatus()->getStatus(),
+            'order_status' => $order->getOrderStatus()->getStatus(),
             'order_date' => $order->getOrderDate(),
     	]);
         if (!$result) {
@@ -96,6 +98,7 @@ final class OrderRepository implements IOrderRepository
                 new UserId($entity->user_id),
                 OrderDeliveryStatus::fromStatus($entity->delivery_status),
                 OrderPaymentStatus::fromStatus($entity->payment_status),
+                OrderStatus::fromStatus($entity->order_status),
                 SettingDate::fromYmdHis($entity->order_date)
             );
             $order->setUpdatedAt(SettingDate::fromYmdHis($entity->updated_at));
@@ -154,6 +157,7 @@ final class OrderRepository implements IOrderRepository
             new UserId($entity->user_id),
             OrderDeliveryStatus::fromStatus($entity->delivery_status),
             OrderPaymentStatus::fromStatus($entity->payment_status),
+            OrderStatus::fromStatus($entity->order_status),
             SettingDate::fromYmdHis($entity->order_date)
         );
         $order->setUpdatedAt(SettingDate::fromYmdHis($entity->updated_at));
@@ -165,12 +169,11 @@ final class OrderRepository implements IOrderRepository
     /**
      * @inheritDoc
      */
-    public function updateDeliveryStatus(Order $order): bool
+    public function updateCancelStatus(Order $order): bool
     {
         $entity = ModelOrder::find($order->getOrderId()->asString());
         $result = $entity::update([
-            'delivery_status' => $order->getOrderDeliveryStatus()->getValue(),
-            'payment_status' => $order->getOrderPaymentStatus()->getValue(),
+            'cancel_status' => $order->getOrderStatus()->getValue(),
         ]);
         if (!$result) {
             return false;
@@ -207,6 +210,7 @@ final class OrderRepository implements IOrderRepository
                 new UserId($entity->user_id),
                 OrderDeliveryStatus::fromStatus($entity->delivery_status),
                 OrderPaymentStatus::fromStatus($entity->payment_status),
+                OrderStatus::fromStatus($entity->order_status),
                 SettingDate::fromYmdHis($entity->order_date)
             );
             $order->setOrderDate(SettingDate::fromYmdHis($entity->order_date));
@@ -230,5 +234,43 @@ final class OrderRepository implements IOrderRepository
         }
 
         return ModelOrder::where($conditions)->count();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function findAllByCustomer(CustomerId $customerId): array
+    {
+        $customerConditions = [];
+        $customerConditions[] = ['id', '=', $customerId->asString()];
+
+        $entities = ModelOrder::whereHas('customer', function ($q) use($customerConditions) {
+            $q->where($customerConditions);
+        })
+            ->orderBy('order_date', 'DESC')
+            ->paginate(PaginationConst::PAGINATE_ROW);
+        $orders = [];
+        foreach ($entities as $entity) {
+            $order = new Order(
+                new OrderId($entity->id),
+                new CustomerId($entity->customer_id),
+                new UserId($entity->user_id),
+                OrderDeliveryStatus::fromStatus($entity->delivery_status),
+                OrderPaymentStatus::fromStatus($entity->payment_status),
+                OrderStatus::fromStatus($entity->order_status),
+                SettingDate::fromYmdHis($entity->order_date)
+            );
+            $order->setUpdatedAt(SettingDate::fromYmdHis($entity->updated_at));
+            $order->setOrderDate(SettingDate::fromYmdHis($entity->order_date));
+
+            $orders[] = $order;
+        }
+        $pagination = new Pagination(
+            $entities->lastPage(),
+            $entities->perPage(),
+            $entities->currentPage()
+        );
+
+        return [$orders, $pagination];
     }
 }

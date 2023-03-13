@@ -33,6 +33,11 @@ final class Order
     private OrderPaymentStatus $orderPaymentStatus;
 
     /**
+     * @var OrderStatus
+     */
+    private OrderStatus $orderStatus;
+
+    /**
      * @var SettingDate|null
      */
     private ?SettingDate $updatedAt;
@@ -53,6 +58,7 @@ final class Order
      * @param \App\Bundle\Admin\Domain\Model\UserId $userId
      * @param OrderDeliveryStatus $orderDeliveryStatus
      * @param OrderPaymentStatus $orderPaymentStatus
+     * @param OrderStatus $orderStatus
      * @param SettingDate $orderDate
      */
     public function __construct(
@@ -61,6 +67,7 @@ final class Order
         UserId $userId,
         OrderDeliveryStatus $orderDeliveryStatus,
         OrderPaymentStatus $orderPaymentStatus,
+        OrderStatus $orderStatus,
         SettingDate $orderDate
     )
     {
@@ -69,6 +76,7 @@ final class Order
         $this->userId = $userId;
         $this->orderDeliveryStatus = $orderDeliveryStatus;
         $this->orderPaymentStatus = $orderPaymentStatus;
+        $this->orderStatus = $orderStatus;
         $this->orderDate = $orderDate;
     }
 
@@ -86,6 +94,14 @@ final class Order
     public function getCustomerId(): CustomerId
     {
         return $this->customerId;
+    }
+
+    /**
+     * @param UserId $userId
+     */
+    public function setUserId(UserId $userId): void
+    {
+        $this->userId = $userId;
     }
 
     /**
@@ -110,6 +126,14 @@ final class Order
     public function getOrderPaymentStatus(): OrderPaymentStatus
     {
         return $this->orderPaymentStatus;
+    }
+
+    /**
+     * @return OrderStatus
+     */
+    public function getOrderStatus(): OrderStatus
+    {
+        return $this->orderStatus;
     }
 
     /**
@@ -197,9 +221,25 @@ final class Order
         }
     }
 
+    /**
+     * @return void
+     * @throws \App\Bundle\Common\Domain\Model\InvalidArgumentException
+     */
     public function updateCancelStatus(): void
     {
         $this->orderDeliveryStatus = OrderDeliveryStatus::fromStatus(OrderDeliveryStatus::RETURNED_GOODS);
         $this->orderPaymentStatus = OrderPaymentStatus::fromStatus(OrderPaymentStatus::CANCEL);
+        $this->orderStatus = OrderStatus::fromStatus(OrderStatus::CANCEL);
+    }
+
+    /**
+     * @return void
+     * @throws \App\Bundle\Common\Domain\Model\InvalidArgumentException
+     */
+    public function updateResolvedStatus(): void
+    {
+        $this->orderDeliveryStatus = OrderDeliveryStatus::fromStatus(OrderDeliveryStatus::RETURNED_GOODS);
+        $this->orderPaymentStatus = OrderPaymentStatus::fromStatus(OrderPaymentStatus::CANCEL);
+        $this->orderStatus = OrderStatus::fromStatus(OrderStatus::RESOLVED);
     }
 }

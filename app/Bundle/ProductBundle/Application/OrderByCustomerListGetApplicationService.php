@@ -2,18 +2,17 @@
 
 namespace App\Bundle\ProductBundle\Application;
 
+use App\Bundle\Admin\Domain\Model\CustomerId;
 use App\Bundle\Admin\Domain\Model\ICustomerRepository;
-use App\Bundle\Admin\Domain\Model\IUserRepository;
 use App\Bundle\Common\Application\PaginationResult;
+use App\Bundle\Common\Constants\MessageConst;
 use App\Bundle\Common\Domain\Model\InvalidArgumentException;
-use App\Bundle\Common\Domain\Model\TransactionException;
 use App\Bundle\ProductBundle\Domain\Model\IOrderRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductAttributePriceRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductAttributeValueRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductRepository;
-use App\Bundle\ProductBundle\Domain\Model\OrderCriteria;
 
-class OrderListGetApplicationService
+class OrderByCustomerListGetApplicationService
 {
     /**
      * @var IOrderRepository
@@ -24,11 +23,6 @@ class OrderListGetApplicationService
      * @var ICustomerRepository
      */
     private ICustomerRepository $customerRepository;
-
-    /**
-     * @var IUserRepository
-     */
-    private IUserRepository $userRepository;
 
     /**
      * @var IProductAttributeValueRepository
@@ -48,7 +42,6 @@ class OrderListGetApplicationService
     /**
      * @param IOrderRepository $orderRepository
      * @param ICustomerRepository $customerRepository
-     * @param IUserRepository $userRepository
      * @param IProductAttributeValueRepository $productAttributeValueRepository
      * @param IProductAttributePriceRepository $productAttributePriceRepository
      * @param IProductRepository $productRepository
@@ -56,7 +49,6 @@ class OrderListGetApplicationService
     public function __construct(
         IOrderRepository $orderRepository,
         ICustomerRepository $customerRepository,
-        IUserRepository $userRepository,
         IProductAttributeValueRepository $productAttributeValueRepository,
         IProductAttributePriceRepository $productAttributePriceRepository,
         IProductRepository $productRepository
@@ -64,66 +56,46 @@ class OrderListGetApplicationService
     {
         $this->orderRepository = $orderRepository;
         $this->customerRepository = $customerRepository;
-        $this->userRepository = $userRepository;
         $this->productAttributeValueRepository = $productAttributeValueRepository;
         $this->productAttributePriceRepository = $productAttributePriceRepository;
         $this->productRepository = $productRepository;
     }
 
     /**
-     * @param OrderListGetCommand $command
+     * @param OrderByCustomerListGetCommand $command
      * @return OrderListGetResult
      * @throws InvalidArgumentException
-     * @throws TransactionException
      */
-    public function handle(OrderListGetCommand $command): OrderListGetResult
+    public function handle(OrderByCustomerListGetCommand $command): OrderListGetResult
     {
-        $orderCriteria = new OrderCriteria($command->keyword);
-        [$orders, $pagination] = $this->orderRepository->findAll($orderCriteria);
+        $customerId = new CustomerId($command->customerId);
+        $customer = $this->customerRepository->findById($customerId);
+        if(!$customer) {
+            throw new InvalidArgumentException(MessageConst::NO_RECORD['message']);
+        }
+        [$orders, $pagination] = $this->orderRepository->findAllByCustomer($customerId);
 
         $orderResults = [];
         foreach ($orders as $order) {
             $orderProducts = $this->orderRepository->findOrderProductsByOrderId($order->getOrderId());
             $customer = $this->customerRepository->findById($order->getCustomerId());
-            $user = $this->userRepository->findById($order->getUserId());
-            $orderProductResults = [];
             $totalCost = 0;
             foreach ($orderProducts as $orderProduct) {
-                $productAttributePrice = $this->productAttributePriceRepository->findById($orderProduct->getProductAttributePriceId());
-                $productAttributeValue = $this->productAttributeValueRepository->findById($orderProduct->getProductAttributeValueId());
-                $product = $this->productRepository->findById($orderProduct->getProductId());
                 $totalCost += $orderProduct->getOrderProductCost();
-                $orderProductResults[] = new OrderProductResult(
-                    $orderProduct->getOrderProductId()->asString(),
-                    $orderProduct->getOrderId()->asString(),
-                    $orderProduct->getProductId()->asString(),
-                    $orderProduct->getProductAttributeValueId()->asString(),
-                    $orderProduct->getProductAttributePriceId()->asString(),
-                    $orderProduct->getCount(),
-                    $productAttributeValue->getMeasureUnitType()->getValue(),
-                    $orderProduct->getWeight(),
-                    $orderProduct->getAttributeDisplayIndex(),
-                    $productAttributePrice->getNoticePriceType()->getValue(),
-                    $productAttributePrice->getPrice(),
-                    $orderProduct->getOrderProductCost(),
-                    $productAttributeValue->getCode(),
-                    $product->getName(),
-                    $product->getCode()
-                );
             }
             $orderResults[] = new OrderResult(
                 $order->getOrderId()->asString(),
                 $order->getCustomerId()->asString(),
                 $customer->getCustomerName(),
-                $order->getUserId()->asString(),
-                $user->getUserName(),
+                '',
+                '',
                 $order->getOrderDeliveryStatus()->getValue(),
                 $order->getOrderPaymentStatus()->getValue(),
-                $orderProductResults,
+                [],
                 $order->getUpdatedAt()->asString(),
                 $order->getOrderDate()->asString(),
                 $totalCost,
-                $order->getOrderStatus()->getStatus()
+                $order->getOrderStatus()
             );
         }
         $paginationResult = new PaginationResult(

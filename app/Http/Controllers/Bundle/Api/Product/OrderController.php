@@ -14,6 +14,8 @@ use App\Bundle\ProductBundle\Application\ImportGoodListGetCommand;
 use App\Bundle\ProductBundle\Application\ImportGoodPostApplicationService;
 use App\Bundle\ProductBundle\Application\ImportGoodPostCommand;
 use App\Bundle\ProductBundle\Application\ImportGoodProductCommand;
+use App\Bundle\ProductBundle\Application\OrderByCustomerListGetApplicationService;
+use App\Bundle\ProductBundle\Application\OrderByCustomerListGetCommand;
 use App\Bundle\ProductBundle\Application\OrderCancelPostApplicationService;
 use App\Bundle\ProductBundle\Application\OrderCancelPostCommand;
 use App\Bundle\ProductBundle\Application\OrderExportPostApplicationService;
@@ -25,6 +27,8 @@ use App\Bundle\ProductBundle\Application\OrderListGetCommand;
 use App\Bundle\ProductBundle\Application\OrderPostApplicationService;
 use App\Bundle\ProductBundle\Application\OrderPostCommand;
 use App\Bundle\ProductBundle\Application\OrderProductCommand;
+use App\Bundle\ProductBundle\Application\OrderStatusPutApplicationService;
+use App\Bundle\ProductBundle\Application\OrderStatusPutCommand;
 use App\Bundle\ProductBundle\Application\RestoreImportGoodPutApplicationService;
 use App\Bundle\ProductBundle\Application\RestoreImportGoodPutCommand;
 use App\Bundle\ProductBundle\Infrastructure\DebtHistoryRepository;
@@ -87,6 +91,29 @@ class OrderController extends BaseController
     }
 
     /**
+     * @param Request $request request
+     */
+    public function updateResolvedOrderStatus(Request $request)
+    {
+        $applicationService = new OrderStatusPutApplicationService(
+            new OrderRepository(),
+            new DebtHistoryRepository()
+        );
+
+        $command = new OrderStatusPutCommand(
+            $request->order_id,
+            Auth::id(),
+        );
+
+        $result = $applicationService->handle($command);
+        $data = [
+            'id' => $result->orderId,
+        ];
+
+        return response()->json(['data' => $data], 200);
+    }
+
+    /**
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -101,7 +128,8 @@ class OrderController extends BaseController
         );
 
         $command = new OrderListGetCommand(
-            !empty($request->keyword) ? $request->keyword : null
+            !empty($request->keyword) ? $request->keyword : null,
+            !empty($request->customer_id) ? $request->customer_id : null,
         );
         $result = $applicationService->handle($command);
         $orderResults = $result->orderResults;
@@ -139,6 +167,53 @@ class OrderController extends BaseController
                 'user_name' => $orderResult->userName,
                 'order_products' => $orderProducts,
                 'total_cost' => $orderResult->totalCost
+            ];
+        }
+        $response = [
+            'data' => $data,
+            'pagination' => [
+                'total' => $paginationResult->totalPage,
+                'per_page' => $paginationResult->perPage,
+                'current_page' => $paginationResult->currentPage,
+            ],
+        ];
+
+        return response()->json($response, 200);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getOrdersByCustomer(Request $request) {
+        $applicationService = new OrderByCustomerListGetApplicationService(
+            new OrderRepository(),
+            new CustomerRepository(),
+            new ProductAttributeValueRepository(),
+            new ProductAttributePriceRepository(),
+            new ProductRepository(),
+        );
+
+        $command = new OrderByCustomerListGetCommand(
+            !empty($request->keyword) ? $request->keyword : null,
+            !empty($request->customer_id) ? $request->customer_id : null,
+        );
+        $result = $applicationService->handle($command);
+        $orderResults = $result->orderResults;
+        $paginationResult = $result->paginationResult;
+        $data = [];
+        foreach ($orderResults as $orderResult) {
+            $data[] = [
+                'order_id' => $orderResult->orderId,
+                'customer_id' => $orderResult->customerId,
+                'user_id' => $orderResult->userId,
+                'delivery_status' => $orderResult->deliveryStatus,
+                'payment_status' => $orderResult->paymentStatus,
+                'updated_at' => $orderResult->updatedAt,
+                'customer_name' => $orderResult->customerName,
+                'user_name' => $orderResult->userName,
+                'total_cost' => $orderResult->totalCost,
+                'order_status' => $orderResult->orderStatus,
             ];
         }
         $response = [
@@ -264,10 +339,12 @@ class OrderController extends BaseController
     public function cancelOrder(Request $request) {
         $applicationService = new OrderCancelPostApplicationService(
             new OrderRepository(),
+            new ProductInventoryRepository()
         );
 
         $command = new OrderCancelPostCommand(
             $request->order_id,
+            Auth::id()
         );
         $result = $applicationService->handle($command);
 

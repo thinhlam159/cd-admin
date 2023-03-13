@@ -2,7 +2,7 @@
 
 namespace App\Bundle\ProductBundle\Application;
 
-final class OrderListGetCommand
+final class OrderByCustomerListGetCommand
 {
     /**
      * @var string|null

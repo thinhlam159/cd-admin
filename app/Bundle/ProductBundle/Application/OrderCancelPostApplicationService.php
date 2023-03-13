@@ -2,12 +2,17 @@
 
 namespace App\Bundle\ProductBundle\Application;
 
+use App\Bundle\Admin\Domain\Model\UserId;
 use App\Bundle\Common\Constants\MessageConst;
 use App\Bundle\Common\Domain\Model\InvalidArgumentException;
 use App\Bundle\Common\Domain\Model\TransactionException;
 use App\Bundle\ProductBundle\Domain\Model\IOrderRepository;
-use App\Bundle\ProductBundle\Domain\Model\OrderDeliveryStatus;
+use App\Bundle\ProductBundle\Domain\Model\IProductInventoryRepository;
 use App\Bundle\ProductBundle\Domain\Model\OrderId;
+use App\Bundle\ProductBundle\Domain\Model\OrderStatus;
+use App\Bundle\ProductBundle\Domain\Model\ProductInventoryId;
+use App\Bundle\ProductBundle\Domain\Model\ProductInventoryOrder;
+use App\Bundle\ProductBundle\Domain\Model\ProductInventoryUpdateType;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -19,12 +24,23 @@ class OrderCancelPostApplicationService
      */
     private IOrderRepository $orderRepository;
 
+
+    /**
+     * @var IProductInventoryRepository
+     */
+    private IProductInventoryRepository $productInventoryRepository;
+
     /**
      * @param IOrderRepository $orderRepository
+     * @param IProductInventoryRepository $productInventoryRepository
      */
-    public function __construct(IOrderRepository $orderRepository)
+    public function __construct(
+        IOrderRepository $orderRepository,
+        IProductInventoryRepository $productInventoryRepository
+    )
     {
         $this->orderRepository = $orderRepository;
+        $this->productInventoryRepository = $productInventoryRepository;
     }
 
     /**
@@ -40,20 +56,50 @@ class OrderCancelPostApplicationService
         if (!$order) {
             throw new InvalidArgumentException(MessageConst::NOT_FOUND['message']);
         }
-        $order->updateCancelStatus(OrderDeliveryStatus::fromValue($command->deliveryStatus));
+        if ($order->getOrderStatus()->getStatus() !== OrderStatus::IN_PROGRESS) {
+            throw new InvalidArgumentException(MessageConst::INVALID_ORDER_STATUS['message']);
+        }
+        $userId = new UserId($command->userId);
+        $order->setUserId($userId);
+        $order->updateCancelStatus();
+
+        $orderProducts = $this->orderRepository->findOrderProductsByOrderId($orderId);
+        $saveNewProductInventories = [];
+        $currentProductInventories= [];
+        foreach ($orderProducts as $orderProduct) {
+            $productAttributeValueId = $orderProduct->getProductAttributeValueId();
+            $currentProductInventory = $this->productInventoryRepository->findByProductAttributeValueId($productAttributeValueId);
+            $newCount = $currentProductInventory->getCount() + $orderProduct->getCount();
+            $saveNewProductInventories[] = new ProductInventoryOrder(
+                ProductInventoryId::newId(),
+                $productAttributeValueId,
+                $newCount,
+                $currentProductInventory->getMeasureUnitType(),
+                ProductInventoryUpdateType::fromType(ProductInventoryUpdateType::ORDER),
+                $orderProduct->getOrderProductId(),
+                $orderProduct->getCount(),
+                true,
+            );
+            $currentProductInventories[] = $currentProductInventory;
+        }
 
         DB::beginTransaction();
         try {
-            $result = $this->orderRepository->updateDeliveryStatus($order);
+            $result = $this->orderRepository->updateCancelStatus($order);
             if (!$result) {
-                throw new InvalidArgumentException('update delivery status failed!');
+                throw new InvalidArgumentException('Cập nhật trạng thái không thành công!');
+            }
+            $createInventoryProductResult = $this->productInventoryRepository->createMultiProductInventoryByOrder($saveNewProductInventories);
+            $updateCurrentInventoryResult = $this->productInventoryRepository->updateProductInventories($currentProductInventories);
+            if (!$createInventoryProductResult || !$updateCurrentInventoryResult) {
+                throw new InvalidArgumentException('Cập nhật lưu kho thất bại!');
             }
 
             DB::commit();
         } catch (Exception $e) {
             DB::rollBack();
             Log::error($e);
-            throw new TransactionException('Add product fail!');
+            throw new TransactionException($e->getMessage());
         }
 
         return new OrderCancelPostResult($orderId->__toString());

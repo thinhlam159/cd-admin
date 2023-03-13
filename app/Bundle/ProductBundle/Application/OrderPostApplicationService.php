@@ -7,6 +7,7 @@ use App\Bundle\Admin\Domain\Model\ICustomerRepository;
 use App\Bundle\Admin\Domain\Model\IUserRepository;
 use App\Bundle\Admin\Domain\Model\UserId;
 use App\Bundle\ProductBundle\Domain\Model\NoticePriceType;
+use App\Bundle\ProductBundle\Domain\Model\OrderStatus;
 use App\Bundle\ProductBundle\Domain\Model\SettingDate;
 use App\Bundle\ProductBundle\Domain\Model\UserId as ProductBundleUserId;
 use App\Bundle\Common\Domain\Model\InvalidArgumentException;
@@ -119,6 +120,7 @@ class OrderPostApplicationService
             $userId,
             OrderDeliveryStatus::fromStatus(OrderDeliveryStatus::IN_PROGRESS),
             OrderPaymentStatus::fromStatus(OrderPaymentStatus::PLANNING),
+            OrderStatus::fromStatus(OrderStatus::IN_PROGRESS),
             SettingDate::fromYmdHis($command->date)
         );
 
@@ -175,28 +177,28 @@ class OrderPostApplicationService
             $currentProductInventories[] = $currentProductInventory;
         }
 
-        $currentDebt = $this->debtHistoryRepository->findCurrentDebtByCustomerId($customerId);
-        $debtHistoryId = DebtHistoryId::newId();
-        $newDebtHistory = new DebtHistory(
-            $debtHistoryId,
-            $customerId,
-            new ProductBundleUserId($userId->asString()),
-            !is_null($currentDebt) ? $currentDebt->getTotalDebt() + $totalOrderCost : $totalOrderCost,
-            !is_null($currentDebt) ? $currentDebt->getTotalPayment() : 0,
-            !is_null($currentDebt) ? $currentDebt->getRestDebt() + $totalOrderCost : $totalOrderCost,
-            true,
-            DebtHistoryUpdateType::fromType(DebtHistoryUpdateType::CONTAINER_ORDER),
-            $orderId,
-            null,
-            null,
-            null,
-            null,
-            $totalOrderCost,
-            SettingDate::fromYmdHis($command->date),
-            MonetaryUnitType::fromType(MonetaryUnitType::VND),
-            null,
-            !is_null($currentDebt) ? $currentDebt->getVersion() + 1 : 1
-        );
+//        $currentDebt = $this->debtHistoryRepository->findCurrentDebtByCustomerId($customerId);
+//        $debtHistoryId = DebtHistoryId::newId();
+//        $newDebtHistory = new DebtHistory(
+//            $debtHistoryId,
+//            $customerId,
+//            new ProductBundleUserId($userId->asString()),
+//            !is_null($currentDebt) ? $currentDebt->getTotalDebt() + $totalOrderCost : $totalOrderCost,
+//            !is_null($currentDebt) ? $currentDebt->getTotalPayment() : 0,
+//            !is_null($currentDebt) ? $currentDebt->getRestDebt() + $totalOrderCost : $totalOrderCost,
+//            true,
+//            DebtHistoryUpdateType::fromType(DebtHistoryUpdateType::ORDER),
+//            $orderId,
+//            null,
+//            null,
+//            null,
+//            null,
+//            $totalOrderCost,
+//            SettingDate::fromYmdHis($command->date),
+//            MonetaryUnitType::fromType(MonetaryUnitType::VND),
+//            null,
+//            !is_null($currentDebt) ? $currentDebt->getVersion() + 1 : 1
+//        );
 
         DB::beginTransaction();
         try {
@@ -216,10 +218,10 @@ class OrderPostApplicationService
             if (!$createInventoryProductResult) {
                 throw new InvalidArgumentException('customer not exist!');
             }
-            if ($currentDebt) {
-                $this->debtHistoryRepository->updateCurrentDebtHistory($currentDebt->getDebtHistoryId());
-            }
-            $this->debtHistoryRepository->create($newDebtHistory);
+//            if ($currentDebt) {
+//                $this->debtHistoryRepository->updateCurrentDebtHistory($currentDebt->getDebtHistoryId());
+//            }
+//            $this->debtHistoryRepository->create($newDebtHistory);
 
             DB::commit();
         } catch (Exception $e) {
