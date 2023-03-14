@@ -51,7 +51,10 @@ export const createProductAttributeValueFromApi = async (data) => await api.post
 //order
 export const getListOrderFromApi = async (page, config) => api.get(`${apiConstants.ADMIN.LIST_ORDER}?page=${page}`, config)
 export const createOrderFromApi = async (data) => await api.post(apiConstants.ADMIN.CREATE_ORDER, data)
+export const updateResolvedOrderFromApi = async (data) => await api.put(apiConstants.ADMIN.UPDATE_RESOLVED_ORDER, data)
+export const cancelOrderFromApi = async (id) => await api.delete(`${apiConstants.ADMIN.CANCEL_ORDER}/${id}`)
 export const getOrderDetailFromApi = async (id) => await api.get(`${apiConstants.ADMIN.DETAIL_ORDER}/${id}`)
+export const getListCustomerOrderFromApi = async (params) => await api.get(apiConstants.ADMIN.LIST_CUSTOMER_ORDER, {params})
 
 // product attribute price
 export const getListProductAttributePriceFromApi = async () => api.get(`${apiConstants.ADMIN.LIST_PRODUCT_ATTRIBUTE_PRICES}`)
@@ -74,6 +77,9 @@ export const getListDebtFromApi = async (params) => api.get(`${apiConstants.ADMI
 export const getListCustomerDebtFromApi = async (id, params) => api.get(`${apiConstants.ADMIN.LIST_CUSTOMER_DEBT}/${id}`, {params})
 export const getCustomerCurrentDebtFromApi = async (id) => api.get(`${apiConstants.ADMIN.CUSTOMER_CURRENT_DEBT}/${id}`)
 export const exportCustomerDebtHistoryFromApi = async (id) => await api.post(`${apiConstants.ADMIN.EXPORT_CUSTOMER_DEBT}/${id}`,{}, {responseType: 'blob'})
+export const getListCustomerPaymentFromApi = async (params) => api.get(apiConstants.ADMIN.LIST_CUSTOMER_PAYMENT, {params})
+export const cancelPaymentFromApi = async (data) => await api.put(`${apiConstants.ADMIN.CANCEL_PAYMENT}`, data)
+export const updateResolvedPaymentFromApi = async (data) => await api.put(`${apiConstants.ADMIN.UPDATE_RESOLVED_PAYMENT}`, data)
 
 //statistical
 export const getRevenuesFromApi = async (params) => api.get(apiConstants.ADMIN.STATISTICAL_REVENUES, {params})

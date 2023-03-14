@@ -20,7 +20,7 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class PaymentPostApplicationService
+class PaymentResolvedPutApplicationService
 {
     /**
      * @var IPaymentRepository
@@ -46,30 +46,49 @@ class PaymentPostApplicationService
     }
 
     /**
-     * @param PaymentPostCommand $command
-     * @return PaymentPostResult
+     * @param PaymentResolvedPutCommand $command
+     * @return PaymentResolvedPutResult
      * @throws InvalidArgumentException
      * @throws TransactionException
      */
-    public function handle(PaymentPostCommand $command): PaymentPostResult
+    public function handle(PaymentResolvedPutCommand $command): PaymentResolvedPutResult
     {
-        $paymentId = PaymentId::newId();
-        $customerId = new CustomerId($command->customerId);
-        $userId = new UserId($command->userId);
-        $payment = new Payment(
-            $paymentId,
-            $command->cost,
-            MonetaryUnitType::fromValue($command->monetaryUnitType),
-            $command->comment,
+        $paymentId = new PaymentId($command->paymentId);
+        $payment = $this->paymentRepository->findById($paymentId);
+        $customerId = $payment->getCustomerId();
+        $userId = $payment->getUserId();
+        $payment->updateResolvedStatus();
+        $currentDebt = $this->debtHistoryRepository->findCurrentDebtByCustomerId($payment->getCustomerId());
+
+        $debtHistoryId = DebtHistoryId::newId();
+        $newDebtHistory = new DebtHistory(
+            $debtHistoryId,
             $customerId,
             $userId,
-            SettingDate::fromYmdHis($command->date),
-            PaymentStatus::fromStatus(PaymentStatus::IN_PROGRESS)
+            !is_null($currentDebt) ? $currentDebt->getTotalDebt() : 0,
+            !is_null($currentDebt) ? $currentDebt->getTotalPayment() + $payment->getCost() : $payment->getCost(),
+            !is_null($currentDebt) ? $currentDebt->getRestDebt() - $payment->getCost() : 0,
+            true,
+            DebtHistoryUpdateType::fromType(DebtHistoryUpdateType::PAYMENT),
+            null,
+            null,
+            null,
+            $paymentId,
+            null,
+            $payment->getCost(),
+            $payment->getDate(),
+            $payment->getMonetaryUnitType(),
+            $payment->getComment(),
+            !is_null($currentDebt) ? $currentDebt->getVersion() + 1 : 1
         );
 
         DB::beginTransaction();
         try {
-            $paymentId = $this->paymentRepository->create($payment);
+            $updateResult = $this->paymentRepository->updateResolvedStatus($payment);
+            if ($currentDebt) {
+                $this->debtHistoryRepository->updateCurrentDebtHistory($currentDebt->getDebtHistoryId());
+            }
+            $this->debtHistoryRepository->create($newDebtHistory);
             DB::commit();
         } catch (Exception $e) {
             DB::rollBack();
@@ -77,6 +96,6 @@ class PaymentPostApplicationService
             throw new TransactionException($e->getMessage());
         }
 
-        return new PaymentPostResult($paymentId->__toString());
+        return new PaymentResolvedPutResult($paymentId->__toString());
     }
 }

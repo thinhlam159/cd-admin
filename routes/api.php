@@ -76,10 +76,11 @@ Route::group([
     Route::get('/order/list-order', [OrderController::class, 'getOrders'])->middleware('auth:api');
     Route::get('/order/list-customer-order', [OrderController::class, 'getOrdersByCustomer'])->middleware('auth:api');
     Route::post('/order/create-order', [OrderController::class, 'createOrder'])->middleware('auth:api');
+    Route::put('/order/update-resolved-order', [OrderController::class, 'updateResolvedOrderStatus'])->middleware('auth:api');
     Route::get('/order/detail-order/{id}', [OrderController::class, 'getOrder'])->middleware('auth:api');
     Route::put('/order/payment-status', [OrderController::class, 'updatePaymentStatus'])->middleware('auth:api');
     Route::put('/order/delivery-status', [OrderController::class, 'updateDeliveryStatus'])->middleware('auth:api');
-    Route::put('/order/cancel-order', [OrderController::class, 'cancelOrder'])->middleware('auth:api');
+    Route::delete('/order/cancel-order/{id}', [OrderController::class, 'cancelOrder'])->middleware('auth:api');
 
     Route::post('/import-good/import-good', [OrderController::class, 'createImportGood'])->middleware('auth:api');
     Route::delete('/import-good/restore-import-good/{id}', [OrderController::class, 'restoreImportGood'])->middleware('auth:api');
@@ -91,6 +92,9 @@ Route::group([
     Route::get('/dealer/dealers', [DealerController::class, 'getDealers'])->middleware('auth:api');
 
     Route::post('/debt/create-payment', [DebtController::class, 'createPayment'])->middleware('auth:api');
+    Route::get('/debt/list-customer-payment', [DebtController::class, 'getCustomerPayments'])->middleware('auth:api');
+    Route::put('/debt/update-resolved-payment', [DebtController::class, 'updateResolvedPayment'])->middleware('auth:api');
+    Route::put('/debt/cancel-payment', [DebtController::class, 'cancelPayment'])->middleware('auth:api');
     Route::get('/debt/list-debt', [DebtController::class, 'getDebts'])->middleware('auth:api');
     Route::get('/debt/list-customer-debt/{id}', [DebtController::class, 'getCustomerDebtDetail'])->middleware('auth:api');
     Route::get('/debt/customer-current-debt/{id}', [DebtController::class, 'getCustomerCurrentDebtDetail'])->middleware('auth:api');
@@ -98,7 +102,6 @@ Route::group([
 
     Route::post('/debt/create-container-order', [DebtController::class, 'createContainerOrderDebt'])->middleware('auth:api');
     Route::post('/debt/create-vat-debt', [DebtController::class, 'createVatDebt'])->middleware('auth:api');
-    Route::post('/debt/create-payment', [DebtController::class, 'createPayment'])->middleware('auth:api');
 
     Route::get('/statistical/revenues', [StatisticalController::class, 'getRevenues'])->middleware('auth:api');
     Route::get('/statistical/period-revenues', [StatisticalController::class, 'getPeriodRevenues'])->middleware('auth:api');

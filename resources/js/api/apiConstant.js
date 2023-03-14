@@ -38,7 +38,10 @@ export default {
 
     LIST_ORDER: 'admin/order/list-order',
     CREATE_ORDER: 'admin/order/create-order',
+    UPDATE_RESOLVED_ORDER: 'admin/order/update-resolved-order',
+    CANCEL_ORDER: 'admin/order/cancel-order',
     DETAIL_ORDER: 'admin/order/detail-order',
+    LIST_CUSTOMER_ORDER: "admin/order/list-customer-order",
 
     LIST_IMPORT_GOOD: 'admin/import-good/import-goods',
     CREATE_IMPORT_GOOD: 'admin/import-good/import-good',
@@ -54,6 +57,9 @@ export default {
     CREATE_VAT_DEBT: 'admin/debt/create-vat-debt',
     CREATE_PAYMENT: 'admin/debt/create-payment',
     EXPORT_CUSTOMER_DEBT: 'admin/debt/export-customer-debt',
+    LIST_CUSTOMER_PAYMENT: 'admin/debt/list-customer-payment',
+    CANCEL_PAYMENT: 'admin/debt/cancel-payment',
+    UPDATE_RESOLVED_PAYMENT: 'admin/debt/update-resolved-payment',
 
     STATISTICAL_REVENUES: 'admin/statistical/revenues',
     STATISTICAL_PERIOD_REVENUES: 'admin/statistical/period-revenues',

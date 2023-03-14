@@ -166,7 +166,8 @@ class OrderController extends BaseController
                 'customer_name' => $orderResult->customerName,
                 'user_name' => $orderResult->userName,
                 'order_products' => $orderProducts,
-                'total_cost' => $orderResult->totalCost
+                'total_cost' => $orderResult->totalCost,
+                'order_status' => $orderResult->orderStatus
             ];
         }
         $response = [
@@ -210,6 +211,7 @@ class OrderController extends BaseController
                 'delivery_status' => $orderResult->deliveryStatus,
                 'payment_status' => $orderResult->paymentStatus,
                 'updated_at' => $orderResult->updatedAt,
+                'order_date' => $orderResult->orderDate,
                 'customer_name' => $orderResult->customerName,
                 'user_name' => $orderResult->userName,
                 'total_cost' => $orderResult->totalCost,
@@ -343,7 +345,7 @@ class OrderController extends BaseController
         );
 
         $command = new OrderCancelPostCommand(
-            $request->order_id,
+            $request->id,
             Auth::id()
         );
         $result = $applicationService->handle($command);

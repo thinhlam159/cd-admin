@@ -29,17 +29,23 @@
           <th class="border py-1 w-[8%]">
             Ngày tạo đơn
           </th>
-          <th class="border py-1 w-[20%]">
+          <th class="border py-1 w-[14%]">
             Tổng giá
           </th>
-          <th class="border py-1 w-[15%]">
+          <th class="border py-1 w-[10%]">
+            Trạng thái
+          </th>
+          <th class="border py-1 w-[10%]">
             Chi Tiết
           </th>
-          <th class="border py-1 w-[15%]">
+          <th class="border py-1 w-[10%]">
             Xuất excel
           </th>
           <th class="border py-1 w-[20%]">
             id
+          </th>
+          <th class="border py-1 w-[6%]">
+            Xóa
           </th>
         </tr>
         </thead>
@@ -52,6 +58,10 @@
             <td class="border text-center">{{ moment(item.updated_at).format('DD-MM-YYYY') }}</td>
             <td class="border text-center">{{ item.total_cost.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
             <td class="border text-center">
+              <span v-if="item.order_status === 2">Hoàn thành</span>
+              <button v-if="item.order_status === 1" class="p-2 bg-red-500 text-white rounded-full cursor-pointer" @click="changeOrderStatus(item.order_id)"><span>Chưa hoàn thành</span></button>
+            </td>
+            <td class="border text-center">
               <div class="flex justify-center ">
                 <ButtonEdit @clickBtn="() => goToDetail(item.order_id)" :text="orderDetail"/>
               </div>
@@ -62,6 +72,10 @@
               </div>
             </td>
             <td class="border text-center">{{ item.order_id }}</td>
+            <td class="border text-center">
+              <span v-if="item.order_status === 2"></span>
+              <button v-if="item.order_status === 1" class="p-2 bg-red-500 rounded-md cursor-pointer" @click="handleCancelOrder(item.order_id)"><span>Xóa</span></button>
+            </td>
           </tr>
         </template>
         </tbody>
@@ -79,7 +93,6 @@
 </template>
 
 <script setup>
-import Datepicker from "vue3-datepicker";
 import ButtonAddNew from "@/components/Buttons/ButtonAddNew/ButtonAddNew.vue";
 import ButtonEdit from "@/components/Buttons/ButtonEdit/ButtonEdit.vue";
 import Pagination from "@/components/Pagination/Pagination.vue";
@@ -87,7 +100,7 @@ import {computed, reactive, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {useStore} from "vuex";
 import {MODULE_STORE, PAGE_DEFAULT, ROUTER_PATH} from "@/const";
-import {exportOrderFromApi, getListOrderFromApi} from "@/api";
+import {cancelOrderFromApi, exportOrderFromApi, getListOrderFromApi, updateResolvedOrderFromApi} from "@/api";
 import SearchIcon from "@/components/icons/SearchIcon.vue";
 import moment from "moment/moment";
 import _ from 'lodash';
@@ -147,17 +160,37 @@ const exportOrder = async (id) => {
   link.click()
   link.remove()
 }
-
 const handleBackPage = (page) => {
   getListOrder(page)
 }
 const handleNextPage = (page) => {
   getListOrder(page)
 }
-
 const onInput = (e) => {
   keyword.value = e.target.value
   getListOrder(pageCurrent.value)
+}
+const changeOrderStatus = async (orderId) => {
+  try {
+    const res = await updateResolvedOrderFromApi({order_id: orderId})
+    await getListOrder(pageCurrent.value)
+  } catch (errors) {
+    const error = errors.message
+    toast.error(error);
+  } finally {
+    store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false
+  }
+}
+const handleCancelOrder = async (orderId) => {
+  try {
+    const res = await cancelOrderFromApi(orderId)
+    await getListOrder(pageCurrent.value)
+  } catch (errors) {
+    const error = errors.message
+    toast.error(error);
+  } finally {
+    store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false
+  }
 }
 
 store.state[MODULE_STORE.COMMON.NAME].breadcrumbCurrent = 'Đơn hàng'

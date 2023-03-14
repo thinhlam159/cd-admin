@@ -88,6 +88,7 @@ final class OrderRepository implements IOrderRepository
         $entities = ModelOrder::whereHas('customer', function ($q) use($customerConditions) {
             $q->where($customerConditions);
         })
+            ->where([['order_status', '!=', 3]])
             ->orderBy('order_date', 'DESC')
             ->paginate(PaginationConst::PAGINATE_ROW);
         $orders = [];
@@ -172,9 +173,26 @@ final class OrderRepository implements IOrderRepository
     public function updateCancelStatus(Order $order): bool
     {
         $entity = ModelOrder::find($order->getOrderId()->asString());
-        $result = $entity::update([
-            'cancel_status' => $order->getOrderStatus()->getValue(),
+        $result = $entity->update([
+            'order_status' => $order->getOrderStatus()->getStatus(),
         ]);
+        if (!$result) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function updateOrderStatus(Order $order): bool
+    {
+        $entity = ModelOrder::find($order->getOrderId()->asString());
+        $result = $entity->update([
+            'order_status' => $order->getOrderStatus()->getStatus(),
+        ]);
+
         if (!$result) {
             return false;
         }
@@ -247,6 +265,7 @@ final class OrderRepository implements IOrderRepository
         $entities = ModelOrder::whereHas('customer', function ($q) use($customerConditions) {
             $q->where($customerConditions);
         })
+            ->where([['order_status', '!=', 3]])
             ->orderBy('order_date', 'DESC')
             ->paginate(PaginationConst::PAGINATE_ROW);
         $orders = [];

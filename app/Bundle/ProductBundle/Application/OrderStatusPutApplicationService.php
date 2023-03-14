@@ -96,14 +96,11 @@ class OrderStatusPutApplicationService
 
         DB::beginTransaction();
         try {
-            $orderId = $this->orderRepository->create($order);
-            if (!$orderId) {
+            $updateResult = $this->orderRepository->updateOrderStatus($order);
+            if (!$updateResult) {
                 throw new InvalidArgumentException('customer not exist!');
             }
-            $result = $this->orderRepository->createOrderProducts($orderProducts);
-            if (!$result) {
-                throw new InvalidArgumentException('customer not exist!');
-            }
+
             if ($currentDebt) {
                 $this->debtHistoryRepository->updateCurrentDebtHistory($currentDebt->getDebtHistoryId());
             }

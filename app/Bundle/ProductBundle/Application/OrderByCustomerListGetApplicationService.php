@@ -95,7 +95,7 @@ class OrderByCustomerListGetApplicationService
                 $order->getUpdatedAt()->asString(),
                 $order->getOrderDate()->asString(),
                 $totalCost,
-                $order->getOrderStatus()
+                $order->getOrderStatus()->getStatus()
             );
         }
         $paginationResult = new PaginationResult(

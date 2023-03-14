@@ -14,8 +14,14 @@ use App\Bundle\ProductBundle\Application\DebtListGetApplicationService;
 use App\Bundle\ProductBundle\Application\DebtListGetCommand;
 use App\Bundle\ProductBundle\Application\DebtsCustomerExcelExportPostApplicationService;
 use App\Bundle\ProductBundle\Application\DebtsCustomerExcelExportPostCommand;
+use App\Bundle\ProductBundle\Application\PaymentCancelPutApplicationService;
+use App\Bundle\ProductBundle\Application\PaymentCancelPutCommand;
+use App\Bundle\ProductBundle\Application\PaymentCustomerListGetApplicationService;
+use App\Bundle\ProductBundle\Application\PaymentCustomerListGetCommand;
 use App\Bundle\ProductBundle\Application\PaymentPostApplicationService;
 use App\Bundle\ProductBundle\Application\PaymentPostCommand;
+use App\Bundle\ProductBundle\Application\PaymentResolvedPutApplicationService;
+use App\Bundle\ProductBundle\Application\PaymentResolvedPutCommand;
 use App\Bundle\ProductBundle\Application\VatPostApplicationService;
 use App\Bundle\ProductBundle\Application\VatPostCommand;
 use App\Bundle\ProductBundle\Infrastructure\ContainerOrderRepository;
@@ -47,6 +53,89 @@ class DebtController extends BaseController
             $request->customer_id,
             Auth::id(),
             $request->date,
+        );
+
+        $result = $applicationService->handle($command);
+        $data = [
+            'id' => $result->paymentId,
+        ];
+
+        return response()->json(['data' => $data], 200);
+    }
+
+    /**
+     * @param Request $request request
+     */
+    public function getCustomerPayments(Request $request)
+    {
+        $applicationService = new PaymentCustomerListGetApplicationService(
+            new PaymentRepository(),
+        );
+
+        $command = new PaymentCustomerListGetCommand(
+            $request->customer_id
+        );
+        $result = $applicationService->handle($command);
+        $paginationResult = $result->pagination;
+        $paymentResults = $result->paymentResults;
+        $data = [];
+        foreach ($paymentResults as $paymentResult) {
+            $data[] = [
+                'payment_id' => $paymentResult->paymentId,
+                'cost' => $paymentResult->cost,
+                'monetary_unit_type' => $paymentResult->monetaryUnitType,
+                'comment' => $paymentResult->comment,
+                'customer_id' => $paymentResult->customerId,
+                'user_id' => $paymentResult->userId,
+                'date' => $paymentResult->date,
+                'payment_status' => $paymentResult->paymentStatus,
+            ];
+        }
+
+        $response = [
+            'data' => $data,
+            'pagination' => [
+                'total_page' => $paginationResult->totalPage,
+                'per_page' => $paginationResult->perPage,
+                'current_page' => $paginationResult->currentPage,
+            ],
+        ];
+
+        return response()->json($response, 200);
+    }
+
+    /**
+     * @param Request $request request
+     */
+    public function updateResolvedPayment(Request $request)
+    {
+        $applicationService = new PaymentResolvedPutApplicationService(
+            new PaymentRepository(),
+            new DebtHistoryRepository()
+        );
+
+        $command = new PaymentResolvedPutCommand(
+            $request->payment_id,
+        );
+
+        $result = $applicationService->handle($command);
+        $data = [
+            'id' => $result->paymentId,
+        ];
+
+        return response()->json(['data' => $data], 200);
+    }
+
+    /**
+     * @param Request $request request
+     */
+    public function cancelPayment(Request $request)
+    {
+        $applicationService = new PaymentCancelPutApplicationService(
+            new PaymentRepository()
+        );
+        $command = new PaymentCancelPutCommand(
+            $request->payment_id,
         );
 
         $result = $applicationService->handle($command);

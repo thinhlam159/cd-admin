@@ -86,7 +86,7 @@ const handleSubmit = async () => {
     }
     const res = await createPaymentFromApi(postData)
     toast.success("Tạo đơn container thành công!", {duration:3000})
-    await router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.DEBT_MANAGE}`)
+    await router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.DEBT_MANAGE}/${ROUTER_PATH.LIST_CUSTOMER_DEBT}/${route.params.id}`)
   } catch (err) {
     toast.error(err.message)
     switch (err.path) {

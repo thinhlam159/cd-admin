@@ -42,6 +42,11 @@ final class Payment
     private SettingDate $date;
 
     /**
+     * @var PaymentStatus
+     */
+    private PaymentStatus $paymentStatus;
+
+    /**
      * @param PaymentId $paymentId
      * @param int $cost
      * @param MonetaryUnitType $monetaryUnitType
@@ -49,8 +54,9 @@ final class Payment
      * @param CustomerId $customerId
      * @param UserId $userId
      * @param SettingDate $date
+     * @param PaymentStatus $paymentStatus
      */
-    public function __construct(PaymentId $paymentId, int $cost, MonetaryUnitType $monetaryUnitType, ?string $comment, CustomerId $customerId, UserId $userId, SettingDate $date)
+    public function __construct(PaymentId $paymentId, int $cost, MonetaryUnitType $monetaryUnitType, ?string $comment, CustomerId $customerId, UserId $userId, SettingDate $date, PaymentStatus $paymentStatus)
     {
         $this->paymentId = $paymentId;
         $this->cost = $cost;
@@ -59,6 +65,7 @@ final class Payment
         $this->customerId = $customerId;
         $this->userId = $userId;
         $this->date = $date;
+        $this->paymentStatus = $paymentStatus;
     }
 
     /**
@@ -115,5 +122,32 @@ final class Payment
     public function getDate(): SettingDate
     {
         return $this->date;
+    }
+
+    /**
+     * @return PaymentStatus
+     */
+    public function getPaymentStatus(): PaymentStatus
+    {
+        return $this->paymentStatus;
+    }
+
+
+    /**
+     * @return void
+     * @throws \App\Bundle\Common\Domain\Model\InvalidArgumentException
+     */
+    public function updateResolvedStatus(): void
+    {
+        $this->paymentStatus = PaymentStatus::fromStatus(PaymentStatus::RESOLVED);
+    }
+
+    /**
+     * @return void
+     * @throws \App\Bundle\Common\Domain\Model\InvalidArgumentException
+     */
+    public function updateCancelStatus(): void
+    {
+        $this->paymentStatus = PaymentStatus::fromStatus(PaymentStatus::CANCEL);
     }
 }

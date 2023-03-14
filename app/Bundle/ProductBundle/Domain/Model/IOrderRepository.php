@@ -43,6 +43,12 @@ interface IOrderRepository
     public function updateCancelStatus(Order $order): bool;
 
     /**
+     * @param Order $order
+     * @return bool
+     */
+    public function updateOrderStatus(Order $order): bool;
+
+    /**
      * @param StatisticalProductSaleCriteria $criteria
      * @return Order[]
      */

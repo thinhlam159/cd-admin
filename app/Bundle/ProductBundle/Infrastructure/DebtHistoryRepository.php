@@ -306,7 +306,7 @@ class DebtHistoryRepository implements IDebtHistoryRepository
     public function findAllHistoryByCustomerId3(CustomerId $customerId): array{
         $entities = ModelDebtHistory::where([
             ['customer_id', '=', $customerId->asString(),]
-        ])->orderBy('updated_date', 'DESC')->get();
+        ])->orderBy('created_at', 'ASC')->get();
 
         $debts = [];
         foreach ($entities as $entity) {

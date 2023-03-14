@@ -65,22 +65,28 @@ class OrderCancelPostApplicationService
 
         $orderProducts = $this->orderRepository->findOrderProductsByOrderId($orderId);
         $saveNewProductInventories = [];
-        $currentProductInventories= [];
+        $currentProductInventories = [];
+        $countProductItem = [];
         foreach ($orderProducts as $orderProduct) {
             $productAttributeValueId = $orderProduct->getProductAttributeValueId();
             $currentProductInventory = $this->productInventoryRepository->findByProductAttributeValueId($productAttributeValueId);
-            $newCount = $currentProductInventory->getCount() + $orderProduct->getCount();
-            $saveNewProductInventories[] = new ProductInventoryOrder(
+            if (array_key_exists("$productAttributeValueId", $countProductItem)) {
+                $countProductItem["$productAttributeValueId"] += $orderProduct->getCount();
+            } else {
+                $countProductItem["$productAttributeValueId"] = $orderProduct->getCount();
+            }
+            $newCount = $currentProductInventory->getCount() + $countProductItem["$productAttributeValueId"];
+            $saveNewProductInventories["$productAttributeValueId"] = new ProductInventoryOrder(
                 ProductInventoryId::newId(),
                 $productAttributeValueId,
                 $newCount,
                 $currentProductInventory->getMeasureUnitType(),
-                ProductInventoryUpdateType::fromType(ProductInventoryUpdateType::ORDER),
+                ProductInventoryUpdateType::fromType(ProductInventoryUpdateType::RESTORE_ORDER),
                 $orderProduct->getOrderProductId(),
-                $orderProduct->getCount(),
+                $countProductItem["$productAttributeValueId"],
                 true,
             );
-            $currentProductInventories[] = $currentProductInventory;
+            $currentProductInventories["$productAttributeValueId"] = $currentProductInventory;
         }
 
         DB::beginTransaction();
