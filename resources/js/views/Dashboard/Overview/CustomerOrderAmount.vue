@@ -2,26 +2,29 @@
   <div class="p-2 bg-gray-50">
     <div>
       <p class="text-xl">4. Số lượng đơn hàng của khách khoảng thời gian</p>
-      <div class="flex mt-1 justify-start items-end">
+      <div class="flex mt-1 justify-start items-center text-base">
         <span>Từ ngày: </span>
         <Datepicker
-          class="px-2 py-1 border border-gray-200 ml-1"
+          class="px-2 py-1 outline-none ml-1 bg-gray-50 text-base"
           v-model="pickedFrom"
           :upper-limit="pickedTo"
           :style="styleDatePicker"
-          lang="vi"
-          format="dd-MM-YYYY"
         />
       </div>
-      <div class="flex mt-1 justify-start items-end">
+      <div class="flex mt-1 justify-start items-center text-base">
         <span>Đến ngày: </span>
         <Datepicker
-          class="px-2 py-1 border border-gray-200 ml-1"
+          class="px-2 py-1 outline-none ml-1 bg-gray-50 text-base"
           v-model="pickedTo"
           :lower-limit="pickedFrom"
           :style="styleDatePicker"
-          lang="vi"
-          format="dd-MM-YYYY"
+        />
+      </div>
+      <div class="mt-5">
+        <DP
+          locale="vi"
+          v-model.range="range"
+          @dayclick="onDateSelected"
         />
       </div>
       <div class="py-2 text-md">
@@ -62,6 +65,8 @@ import {useStore} from "vuex";
 import Datepicker from 'vue3-datepicker'
 import { Bar } from 'vue-chartjs'
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
+import { DatePicker as DP } from 'v-calendar';
+import { styleDatePicker } from '@/const'
 
 const toast = inject('$toast');
 const store = useStore();
@@ -71,34 +76,20 @@ const pickedTo = ref(new Date())
 const isLoaded = ref(false)
 const chartData = ref({
   labels: [],
-  datasets: [ { data: [] } ]
+  datasets: [ {
+    labels: 'Số lượng đơn',
+    data: []
+  } ]
 })
 const chartOptions = ref({
   responsive: true
 })
 const totalOrder = ref(0)
 const tableData = ref([])
-const styleDatePicker = ref({
-  "--vdp-bg-color": "#ffffff",
-  "--vdp-text-color": "#e21818",
-  "--vdp-box-shadow": "0 4px 10px 0 rgba(128, 144, 160, 0.1), 0 0 1px 0 rgba(128, 144, 160, 0.81)",
-  "--vdp-border-radius": "10px",
-  "--vdp-heading-size": "2.5em",
-  "--vdp-heading-weight": "bold",
-  "--vdp-heading-hover-color": "#eeeeee",
-  "--vdp-arrow-color": "currentColor",
-  "--vdp-elem-color": "currentColor",
-  "--vdp-disabled-color": "#d5d9e0",
-  "--vdp-hover-color": "#ffffff",
-  "--vdp-hover-bg-color": "#0baf74",
-  "--vdp-selected-color": "#ffffff",
-  "--vdp-selected-bg-color": "#0baf74",
-  "--vdp-current-date-outline-color": "#888888",
-  "--vdp-current-date-font-weight": "bold",
-  "--vdp-elem-font-size": "1em",
-  "--vdp-elem-border-radius": "3px",
-  "--vdp-divider-color": "#ffffff"
-})
+const range = ref({
+  start: pickedFrom,
+  end: pickedTo,
+});
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
@@ -106,6 +97,7 @@ const getCountCustomerOrders = async (customerId) => {
   try {
     store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = true
     isLoaded.value = false
+    totalOrder.value = 0
     chartData.value.datasets[0].data = []
     chartData.value.labels = []
     const year = pickedFrom.value.getFullYear()
@@ -139,8 +131,20 @@ const getCountCustomerOrders = async (customerId) => {
     store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false
   }
 }
-watch(pickedFrom, getCountCustomerOrders)
-watch(pickedTo, getCountCustomerOrders)
+const onDateSelected = () => {
+  const startDate = range.value.start;
+  const endDate = range.value.end;
+  pickedFrom.value = new Date(startDate)
+  pickedTo.value = new Date(endDate)
+}
+watch(pickedFrom, () => {
+  range.value = {
+    start: pickedFrom.value,
+    end: pickedTo.value
+  }
+  getCountCustomerOrders()
+})
+
 watch(keyword, getCountCustomerOrders)
 
 getCountCustomerOrders()

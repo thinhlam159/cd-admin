@@ -2,6 +2,7 @@
 
 namespace App\Bundle\ProductBundle\Application;
 
+use App\Bundle\Common\Domain\Model\CarbonSettingDate;
 use App\Bundle\ProductBundle\Domain\Model\IDebtHistoryRepository;
 use App\Bundle\ProductBundle\Domain\Model\SettingDate;
 use App\Bundle\ProductBundle\Domain\Model\StatisticalDebtCriteria;
@@ -29,8 +30,8 @@ class StatisticalPeriodRevenueGetApplicationService
     {
         $criteria = new StatisticalDebtCriteria(
             null,
-            !is_null($command->startDate) ? SettingDate::fromYmdHis($command->startDate) : null,
-            !is_null($command->endDate) ? SettingDate::fromYmdHis($command->endDate) : null,
+            !is_null($command->startDate) ? CarbonSettingDate::fromYmdHis($command->startDate) : null,
+            !is_null($command->endDate) ? CarbonSettingDate::fromYmdHis($command->endDate) : null,
         );
         $debts = $this->debtHistoryRepository->findAllByPeriodRevenue($criteria);
 

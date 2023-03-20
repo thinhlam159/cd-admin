@@ -2,20 +2,18 @@
 
 namespace App\Bundle\ProductBundle\Application;
 
-use App\Bundle\Common\Application\PaginationResult;
-
 final class StatisticalDebtListGetResult
 {
     /**
-     * @var DebtResult[]
+     * @var StatisticalRevenuesDayResult[]
      */
-    public array $debtResults;
+    public array $revenuesDayResults;
 
     /**
-     * @param DebtResult[] $debtResults
+     * @param StatisticalRevenuesDayResult[] $revenuesDayResults
      */
-    public function __construct(array $debtResults)
+    public function __construct(array $revenuesDayResults)
     {
-        $this->debtResults = $debtResults;
+        $this->revenuesDayResults = $revenuesDayResults;
     }
 }

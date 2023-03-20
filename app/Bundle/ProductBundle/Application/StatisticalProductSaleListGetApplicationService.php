@@ -128,6 +128,7 @@ class StatisticalProductSaleListGetApplicationService
                 '',
                 $order->getOrderDate()->asString(),
                 0,
+                1
             );
         }
         $statisticalProductSaleResults = [];

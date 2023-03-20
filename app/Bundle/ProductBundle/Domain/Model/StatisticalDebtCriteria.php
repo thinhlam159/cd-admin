@@ -2,31 +2,31 @@
 
 namespace App\Bundle\ProductBundle\Domain\Model;
 
-use App\Bundle\Admin\Domain\Model\CustomerId;
+use App\Bundle\Common\Domain\Model\CarbonSettingDate;
 
 final class StatisticalDebtCriteria
 {
     /**
-     * @var SettingDate|null
+     * @var CarbonSettingDate|null
      */
-    private ?SettingDate $date;
+    private ?CarbonSettingDate $date;
 
     /**
-     * @var SettingDate|null
+     * @var CarbonSettingDate|null
      */
-    private ?SettingDate $startDate;
+    private ?CarbonSettingDate $startDate;
 
     /**
-     * @var SettingDate|null
+     * @var CarbonSettingDate|null
      */
-    private ?SettingDate $endDate;
+    private ?CarbonSettingDate $endDate;
 
     /**
-     * @param SettingDate|null $date
-     * @param SettingDate|null $startDate
-     * @param SettingDate|null $endDate
+     * @param CarbonSettingDate|null $date
+     * @param CarbonSettingDate|null $startDate
+     * @param CarbonSettingDate|null $endDate
      */
-    public function __construct(?SettingDate $date, ?SettingDate $startDate, ?SettingDate $endDate)
+    public function __construct(?CarbonSettingDate $date, ?CarbonSettingDate $startDate = null, ?CarbonSettingDate $endDate = null)
     {
         $this->date = $date;
         $this->startDate = $startDate;
@@ -34,25 +34,25 @@ final class StatisticalDebtCriteria
     }
 
     /**
-     * @return SettingDate|null
+     * @return CarbonSettingDate|null
      */
-    public function getDate(): ?SettingDate
+    public function getDate(): ?CarbonSettingDate
     {
         return $this->date;
     }
 
     /**
-     * @return SettingDate|null
+     * @return CarbonSettingDate|null
      */
-    public function getStartDate(): ?SettingDate
+    public function getStartDate(): ?CarbonSettingDate
     {
         return $this->startDate;
     }
 
     /**
-     * @return SettingDate|null
+     * @return CarbonSettingDate|null
      */
-    public function getEndDate(): ?SettingDate
+    public function getEndDate(): ?CarbonSettingDate
     {
         return $this->endDate;
     }

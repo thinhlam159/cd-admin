@@ -2,11 +2,10 @@
 
 namespace App\Bundle\ProductBundle\Application;
 
-use App\Bundle\Common\Domain\Model\InvalidArgumentException;
-use App\Bundle\Common\Domain\Model\TransactionException;
+use App\Bundle\Common\Domain\Model\CarbonSettingDate;
 use App\Bundle\ProductBundle\Domain\Model\IDebtHistoryRepository;
-use App\Bundle\ProductBundle\Domain\Model\SettingDate;
 use App\Bundle\ProductBundle\Domain\Model\StatisticalDebtCriteria;
+use Carbon\Carbon;
 
 class StatisticalDebtListGetApplicationService
 {
@@ -26,43 +25,27 @@ class StatisticalDebtListGetApplicationService
     /**
      * @param StatisticalDebtListGetCommand $command
      * @return StatisticalDebtListGetResult
-     * @throws InvalidArgumentException
-     * @throws TransactionException
      */
     public function handle(StatisticalDebtListGetCommand $command): StatisticalDebtListGetResult
     {
-        $criteria = new StatisticalDebtCriteria(
-            !is_null($command->date) ? SettingDate::fromYmdHis($command->date) : null,
-            !is_null($command->startDate) ? SettingDate::fromYmdHis($command->startDate) : null,
-            !is_null($command->endDate) ? SettingDate::fromYmdHis($command->endDate) : null,
-        );
-        $debts = $this->debtHistoryRepository->findAllByStatistical($criteria);
-
-        $debtResults = [];
-        foreach ($debts as $debt) {
-            $debtResults[] = new DebtResult(
-                $debt->getDebtHistoryId()->asString(),
-                '',
-                '',
-                '',
-                '',
-                $debt->getTotalDebt(),
-                $debt->getTotalPayment(),
-                $debt->isCurrent(),
-                $debt->getDebtHistoryUpdateType()->getValue(),
-                !is_null($debt->getOrderId()) ? $debt->getOrderId()->asString() : null,
-                !is_null($debt->getContainerOrderId()) ? $debt->getContainerOrderId()->asString() : null,
-                !is_null($debt->getVatId()) ? $debt->getVatId()->asString() : null,
-                !is_null($debt->getPaymentId()) ? $debt->getPaymentId()->asString() : null,
-                !is_null($debt->getOtherDebtId()) ? $debt->getOtherDebtId()->asString() : null,
-                $debt->getNumberOfMoney(),
-                $debt->getUpdateDate()->asTimeStamps(),
-                $debt->getMonetaryUnitType()->getValue(),
-                $debt->getComment(),
-                $debt->getVersion()
+        $targetDate = CarbonSettingDate::fromYmdHis($command->date);
+        $revenuesDay = [];
+        for ($i = 0; $i < 7; $i++) {
+            $date = $targetDate->getSubDay($i);
+            $criteria = new StatisticalDebtCriteria(
+                $date
+            );
+            $debts = $this->debtHistoryRepository->findAllByStatistical($criteria);
+            $total = 0;
+            foreach ($debts as $debt) {
+                $total += $debt->getNumberOfMoney();
+            }
+            $revenuesDay[] = new StatisticalRevenuesDayResult(
+                $date->asString(),
+                $total
             );
         }
 
-        return new StatisticalDebtListGetResult($debtResults);
+        return new StatisticalDebtListGetResult($revenuesDay);
     }
 }

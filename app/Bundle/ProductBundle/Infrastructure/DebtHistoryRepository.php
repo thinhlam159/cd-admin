@@ -345,12 +345,6 @@ class DebtHistoryRepository implements IDebtHistoryRepository
         if (!is_null($criteria->getDate())) {
             $conditions[] = ['updated_date', '=', $criteria->getDate()->asString()];
         }
-        if (!is_null($criteria->getStartDate())) {
-            $conditions[] = ['updated_date', '>=', $criteria->getDate()->asString()];
-        }
-        if (!is_null($criteria->getEndDate())) {
-            $conditions[] = ['updated_date', '<=', $criteria->getDate()->asString()];
-        }
 
         $entities = ModelDebtHistory::where($conditions)->get();
 

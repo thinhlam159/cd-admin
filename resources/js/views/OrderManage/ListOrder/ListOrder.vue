@@ -54,7 +54,11 @@
           <tr>
             <td class="border text-center">{{ ++index }}</td>
             <td class="border text-center">{{ item.user_name }}</td>
-            <td class="border text-center">{{ item.customer_name }}</td>
+            <td class="border text-center">
+              <span class="text-[#337ab7] cursor-pointer break-all" @click="goToCustomerDebt(item.customer_id)">
+                {{ item.customer_name }}
+              </span>
+            </td>
             <td class="border text-center">{{ moment(item.updated_at).format('DD-MM-YYYY') }}</td>
             <td class="border text-center">{{ item.total_cost.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
             <td class="border text-center">
@@ -191,6 +195,9 @@ const handleCancelOrder = async (orderId) => {
   } finally {
     store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false
   }
+}
+const goToCustomerDebt = (customerId) => {
+  router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.DEBT_MANAGE}/${ROUTER_PATH.LIST_CUSTOMER_DEBT}/${customerId}`)
 }
 
 store.state[MODULE_STORE.COMMON.NAME].breadcrumbCurrent = 'Đơn hàng'
