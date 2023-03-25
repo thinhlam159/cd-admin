@@ -8,7 +8,6 @@
         ref="inputRef"
         :placeholder="placeholder"
         :value="value"
-        @input="updatePrice"
       />
       <div class="absolute top-[30%] right-3 ml-2">
         <span>VND</span>
