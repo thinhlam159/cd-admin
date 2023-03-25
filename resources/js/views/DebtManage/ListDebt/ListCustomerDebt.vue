@@ -4,7 +4,7 @@
       <div class="w-full px-3 h-auto">
         <div class="">
           <span class="text-base text-gray-500">Tên: </span>
-          <span class="text-base italic">{{ customerCurrentDebt.customerName }}</span>
+          <span class="text-lg font-semibold">{{ customerCurrentDebt.customerName }}</span>
         </div>
         <div class="">
           <span class="text-base text-gray-500">Tổng công nợ: </span>
@@ -24,34 +24,16 @@
               STT
             </th>
             <th class="border py-1 w-[9%]">
-              Tổng công nợ
-            </th>
-            <th class="border py-1 w-[9%]">
-              Tổng thanh toán
+              Ngày phát sinh
             </th>
             <th class="border py-1 w-[9%]">
               Nợ phải thu
             </th>
             <th class="border py-1 w-[9%]">
-              Ngày tạo
-            </th>
-            <th class="border py-1 w-[9%]">
-              Thay đổi
-            </th>
-            <th class="border py-1 w-[6%]">
               Thanh toán
             </th>
-            <th class="border py-1 w-[9%]">
-              Đơn lẻ
-            </th>
             <th class="border py-1 w-[6%]">
-              Container
-            </th>
-            <th class="border py-1 w-[4%]">
-              Vat
-            </th>
-            <th class="border py-1 w-[5%]">
-              Khác
+              Phải thu tăng
             </th>
             <th class="border py-1 w-[20%]">
               Ghi Chú
@@ -61,37 +43,11 @@
           <tbody class="[&>*:nth-child(odd)]:bg-[#f9f9f9]">
           <template v-for="(item, index) in listDebt">
             <tr>
-              <td class="border text-center">{{ (pagination.current_page - 1) * pagination.per_page + (parseInt(index) + 1) }}</td>
-              <td class="border text-center">{{ item.total_debt.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
-              <td class="border text-center">{{ item.total_payment.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
-              <td class="border text-center">{{ (item.total_debt - item.total_payment).toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
+              <td class="border text-center">{{ parseInt(index) + 1 }}</td>
               <td class="border text-center">{{ moment(item.updated_date).format('DD-MM-YYYY') }}</td>
-              <td class="border text-center">{{ item.number_of_money.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
-              <td class="border text-center">
-                <div class="flex w-full h-full items-center justify-center" v-show="!!item.payment_id">
-                  <div class="w-[5px] h-[5px] border border-[#000] rounded-full"></div>
-                </div>
-              </td>
-              <td class="border text-center">
-                <div class="flex w-full h-full items-center justify-center" v-show="!!item.order_id">
-                  <div class="w-[5px] h-[5px] border border-[#000] rounded-full"></div>
-                </div>
-              </td>
-              <td class="border text-center">
-                <div class="flex w-full h-full items-center justify-center" v-show="!!item.container_order_id">
-                  <div class="w-[5px] h-[5px] border border-[#000] rounded-full"></div>
-                </div>
-              </td>
-              <td class="border text-center">
-                <div class="flex w-full h-full items-center justify-center" v-show="!!item.vat_id">
-                  <div class="w-[5px] h-[5px] border border-[#000] rounded-full"></div>
-                </div>
-              </td>
-              <td class="border text-center">
-                <div class="flex w-full h-full items-center justify-center" v-show="!!item.other_debt_id">
-                  <div class="w-[5px] h-[5px] border border-[#000] rounded-full"></div>
-                </div>
-              </td>
+              <td class="border text-center">{{ item.restDebt }}</td>
+              <td class="border text-center">{{ item.payment }}</td>
+              <td class="border text-center">{{ item.incrementDebt }}</td>
               <td class="border text-center">{{ item.comment }}</td>
             </tr>
           </template>
@@ -110,13 +66,6 @@
             <ButtonEdit @clickBtn="exportCustomerDebt(customerId)" :text="exportExcel"/>
           </div>
         </div>
-        <!--      <Pagination-->
-        <!--        v-if="pagination"-->
-        <!--        :pageCurrent="pagination.current_page"-->
-        <!--        :totalPage="pagination.total_page"-->
-        <!--        @onBack="handleBackPage"-->
-        <!--        @onNext="handleNextPage"-->
-        <!--      />-->
       </div>
     </div>
     <div>
@@ -181,9 +130,15 @@ const pageCurrent = computed(() => {
 const getListCustomerDebt = async (page) => {
   try {
     const res = await getListCustomerDebtFromApi(customerId.value,{page})
-    pagination.value = res.pagination
     listDebt.value = {
-      ...res.data
+      ...res.data.map(item => {
+        return {
+          ...item,
+          restDebt: formatNumber((item.total_debt - item.total_payment).toString()),
+          payment: item.is_payment ? formatNumber(item.number_of_money.toString()) : '-',
+          incrementDebt: item.is_payment ? '-' : formatNumber(item.number_of_money.toString()),
+        }
+      }),
     }
   } catch (errors) {
     const error = errors.message
@@ -222,13 +177,6 @@ const goToCreatePayment = () => {
   router.push({name: `CreatePayment`, params: {id: customerId.value}})
 }
 
-const handleBackPage = (page) => {
-  getListCustomerDebt(page)
-}
-const handleNextPage = (page) => {
-  getListCustomerDebt(page)
-}
-
 const exportCustomerDebt = async (customerId) => {
   const excelRes = await exportCustomerDebtHistoryFromApi(customerId)
   const url = URL.createObjectURL(new Blob([excelRes], {
@@ -240,6 +188,10 @@ const exportCustomerDebt = async (customerId) => {
   document.body.appendChild(link)
   link.click()
   link.remove()
+}
+
+const formatNumber = (n) => {
+  return n.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 }
 
 getListCustomerDebt(pageCurrent.value);

@@ -71,4 +71,16 @@ interface IDebtHistoryRepository
      * @return DebtHistory[]
      */
     public function findAllByPeriodRevenue(StatisticalDebtCriteria $criteria): array;
+
+    /**
+     * @param PaymentId $paymentId
+     * @return DebtHistory|null
+     */
+    public function findByPaymentId(PaymentId $paymentId): ?DebtHistory;
+
+    /**
+     * @param DebtHistoryId $debtHistoryId
+     * @return bool
+     */
+    public function deleteById(DebtHistoryId $debtHistoryId): bool;
 }

@@ -104,7 +104,7 @@ class DebtsCustomerExcelExportPostApplicationService
                 $debt->getNumberOfMoney(),
                 $debt->getUpdateDate()->getValue()->format(DateTimeConst::FORMAT_DMY),
                 $debt->getMonetaryUnitType()->getValue(),
-                $debt->getComment(),
+                $debt->getDebtHistoryUpdateType()->getComment(),
                 $debt->getVersion()
             );
         }

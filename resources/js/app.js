@@ -11,8 +11,11 @@ import "./assets/styles/font-awesome-4.5.0-master/css/font-awesome.css"
 import * as VeeValidate from "vee-validate";
 import { plugin, defaultConfig } from "@formkit/vue";
 import 'vue-toast-notification/dist/theme-sugar.css';
+import { createVfm } from 'vue-final-modal'
+import 'vue-final-modal/style.css'
 
 const app = createApp(App);
+const vfm = createVfm()
 
 app.use(router);
 app.use(store);
@@ -28,6 +31,7 @@ app.use(VueToast, {
   position: "top-right",
   duration: 3000
 });
+app.use(vfm)
 
 app.mount("#app");
 

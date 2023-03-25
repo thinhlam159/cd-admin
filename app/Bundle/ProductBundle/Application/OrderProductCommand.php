@@ -45,6 +45,11 @@ class OrderProductCommand
     public string $noticePriceType;
 
     /**
+     * @var int
+     */
+    public int $actualSellingPrice;
+
+    /**
      * @param string $productId
      * @param string $productAttributeValueId
      * @param int $attributeDisplayIndex
@@ -53,8 +58,9 @@ class OrderProductCommand
      * @param string $measureUnitType
      * @param int $weight
      * @param string $noticePriceType
+     * @param int $actualSellingPrice
      */
-    public function __construct(string $productId, string $productAttributeValueId, int $attributeDisplayIndex, ?string $productAttributePriceId, int $count, string $measureUnitType, int $weight, string $noticePriceType)
+    public function __construct(string $productId, string $productAttributeValueId, int $attributeDisplayIndex, ?string $productAttributePriceId, int $count, string $measureUnitType, int $weight, string $noticePriceType, int $actualSellingPrice)
     {
         $this->productId = $productId;
         $this->productAttributeValueId = $productAttributeValueId;
@@ -64,5 +70,6 @@ class OrderProductCommand
         $this->measureUnitType = $measureUnitType;
         $this->weight = $weight;
         $this->noticePriceType = $noticePriceType;
+        $this->actualSellingPrice = $actualSellingPrice;
     }
 }

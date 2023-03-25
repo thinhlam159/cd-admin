@@ -132,7 +132,8 @@ class DebtController extends BaseController
     public function cancelPayment(Request $request)
     {
         $applicationService = new PaymentCancelPutApplicationService(
-            new PaymentRepository()
+            new PaymentRepository(),
+            new DebtHistoryRepository()
         );
         $command = new PaymentCancelPutCommand(
             $request->payment_id,
@@ -266,7 +267,7 @@ class DebtController extends BaseController
         $result = $applicationService->handle($command);
         $data = [];
         foreach ($result->debtResults as $debtResult) {
-            $data[] = [
+            $debt = [
                 'debt_history_id' => $debtResult->debtHistoryId,
                 'customer_id' => $debtResult->customerId,
                 'customer_name' => $debtResult->customerName,
@@ -285,16 +286,16 @@ class DebtController extends BaseController
                 'number_of_money' => $debtResult->numberOfMoney,
                 'comment' => $debtResult->comment,
             ];
+            if (!is_null($debtResult->paymentId)) {
+                $debt['is_payment'] = true;
+            } else {
+                $debt['is_payment'] = false;
+            }
+            $data[] = $debt;
         }
 
-        $paginationResult = $result->paginationResult;
         $response = [
             'data' => $data,
-            'pagination' => [
-                'total_page' => $paginationResult->totalPage,
-                'per_page' => $paginationResult->perPage,
-                'current_page' => $paginationResult->currentPage,
-            ],
         ];
 
         return response()->json($response, 200);
@@ -414,14 +415,10 @@ class DebtController extends BaseController
             [
                 0 => "STT",
                 1 => "Ngày tháng",
-                2 => 'Tổng công nợ',
-                3 => 'Tổng thanh toán',
-                4 => 'Nợ phải thu',
-                5 => 'Thanh toán',
-                6 => 'Đơn lẻ',
-                7 => 'container',
-                8 => 'VAT',
-                9 => 'Ghi chú',
+                2 => 'Nợ phải thu',
+                3 => 'Thanh toán',
+                4 => 'Phải thu tăng',
+                5 => 'Ghi chú',
             ]
         ];
         foreach ($result->debtResults as $key => $debtResult) {
@@ -430,14 +427,10 @@ class DebtController extends BaseController
             $template[] = [
                 0 => $key,
                 1 => $debtResult->updatedDate,
-                2 => $debtResult->totalDebt,
-                3 => $debtResult->totalPayment,
-                4 => $rest,
-                5 => !is_null($debtResult->paymentId) ? $debtResult->numberOfMoney : null,
-                6 => !is_null($debtResult->orderId) ? $debtResult->numberOfMoney : null,
-                7 => !is_null($debtResult->containerOrderId) ? $debtResult->numberOfMoney : null,
-                8 => !is_null($debtResult->vatId) ? $debtResult->numberOfMoney : null,
-                9 => $debtResult->comment,
+                2 => $rest,
+                3 => !is_null($debtResult->paymentId) ? $debtResult->numberOfMoney : '-',
+                4 => is_null($debtResult->paymentId) ? $debtResult->numberOfMoney : '-',
+                5 => $debtResult->comment,
             ];
         }
         $footer = [

@@ -72,9 +72,9 @@ class OrderController extends BaseController
                 $orderProduct['measure_unit_type'],
                 (int)$orderProduct['weight'],
                 $orderProduct['notice_price_type'],
+                $orderProduct['actual_selling_price'],
             );
         }
-
         $command = new OrderPostCommand(
             $request->customer_id,
             Auth::id(),

@@ -33,9 +33,6 @@
             Tổng giá
           </th>
           <th class="border py-1 w-[10%]">
-            Trạng thái
-          </th>
-          <th class="border py-1 w-[10%]">
             Chi Tiết
           </th>
           <th class="border py-1 w-[10%]">
@@ -62,10 +59,6 @@
             <td class="border text-center">{{ moment(item.updated_at).format('DD-MM-YYYY') }}</td>
             <td class="border text-center">{{ item.total_cost.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
             <td class="border text-center">
-              <span v-if="item.order_status === 2">Hoàn thành</span>
-              <button v-if="item.order_status === 1" class="p-2 bg-red-500 text-white rounded-full cursor-pointer" @click="changeOrderStatus(item.order_id)"><span>Chưa hoàn thành</span></button>
-            </td>
-            <td class="border text-center">
               <div class="flex justify-center ">
                 <ButtonEdit @clickBtn="() => goToDetail(item.order_id)" :text="orderDetail"/>
               </div>
@@ -77,8 +70,7 @@
             </td>
             <td class="border text-center">{{ item.order_id }}</td>
             <td class="border text-center">
-              <span v-if="item.order_status === 2"></span>
-              <button v-if="item.order_status === 1" class="p-2 bg-red-500 rounded-md cursor-pointer" @click="handleCancelOrder(item.order_id)"><span>Xóa</span></button>
+              <button class="p-2 bg-red-500 rounded-md cursor-pointer" @click="handleCancelOrder(item.order_id)"><span>Xóa</span></button>
             </td>
           </tr>
         </template>
@@ -93,6 +85,15 @@
       @onBack="handleBackPage"
       @onNext="handleNextPage"
     />
+    <ModalConfirm
+      v-model="show"
+      :modal-id="modalId"
+      title="Xóa đơn!"
+      @confirm="() => confirmCancel(modalId)"
+      button-value="Xóa"
+    >
+      <p>Bạn muốn xóa đơn hàng</p>
+    </ModalConfirm>
   </div>
 </template>
 
@@ -100,7 +101,7 @@
 import ButtonAddNew from "@/components/Buttons/ButtonAddNew/ButtonAddNew.vue";
 import ButtonEdit from "@/components/Buttons/ButtonEdit/ButtonEdit.vue";
 import Pagination from "@/components/Pagination/Pagination.vue";
-import {computed, reactive, ref} from "vue";
+import {computed, inject, reactive, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {useStore} from "vuex";
 import {MODULE_STORE, PAGE_DEFAULT, ROUTER_PATH} from "@/const";
@@ -108,16 +109,20 @@ import {cancelOrderFromApi, exportOrderFromApi, getListOrderFromApi, updateResol
 import SearchIcon from "@/components/icons/SearchIcon.vue";
 import moment from "moment/moment";
 import _ from 'lodash';
+import ModalConfirm from "@/components/Modal/Modal/ModalConfirm.vue";
 
 const route = useRoute();
 const router = useRouter();
 const store = useStore();
+const toast = inject('$toast')
 const pagination = ref(null);
 const listOrder = reactive([]);
 const addNewOrder = "Tạo đơn";
 const orderDetail = "Chi tiết";
 const exportExcel = "Xuất excel";
 const keyword = ref(null);
+const modalId = ref(null)
+const show = ref(false)
 
 const pageCurrent = computed(() => {
   if (!route.query.page) {
@@ -174,21 +179,15 @@ const onInput = (e) => {
   keyword.value = e.target.value
   getListOrder(pageCurrent.value)
 }
-const changeOrderStatus = async (orderId) => {
-  try {
-    const res = await updateResolvedOrderFromApi({order_id: orderId})
-    await getListOrder(pageCurrent.value)
-  } catch (errors) {
-    const error = errors.message
-    toast.error(error);
-  } finally {
-    store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false
-  }
+const handleCancelOrder = (orderId) => {
+  show.value = true
+  modalId.value = orderId
 }
-const handleCancelOrder = async (orderId) => {
+const confirmCancel = async (orderId) => {
   try {
     const res = await cancelOrderFromApi(orderId)
     await getListOrder(pageCurrent.value)
+    show.value = false
   } catch (errors) {
     const error = errors.message
     toast.error(error);

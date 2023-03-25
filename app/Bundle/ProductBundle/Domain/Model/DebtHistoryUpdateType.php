@@ -33,6 +33,16 @@ final class DebtHistoryUpdateType
         self::OTHER_DEBT => 'other_debt',
         self::INIT => 'init',
     ];
+    /** @var array<int,string> */
+    private const COMMENT_VALUES = [
+        self::ORDER => 'Đơn lẻ',
+        self::CONTAINER_ORDER => 'Container',
+        self::VAT => 'VAT',
+        self::PAYMENT => 'Thanh toán',
+        self::OTHER_DEBT => 'Khác',
+        self::INIT => 'Khởi tạo',
+    ];
+
     private int $type;
 
     /**
@@ -94,5 +104,13 @@ final class DebtHistoryUpdateType
     public function getValue(): string
     {
         return self::VALUES[$this->type];
+    }
+
+    /**
+     * @return string
+     */
+    public function getComment(): string
+    {
+        return self::COMMENT_VALUES[$this->type];
     }
 }

@@ -56,7 +56,7 @@ class OrderCancelPostApplicationService
         if (!$order) {
             throw new InvalidArgumentException(MessageConst::NOT_FOUND['message']);
         }
-        if ($order->getOrderStatus()->getStatus() !== OrderStatus::IN_PROGRESS) {
+        if ($order->getOrderStatus()->getStatus() !== OrderStatus::RESOLVED) {
             throw new InvalidArgumentException(MessageConst::INVALID_ORDER_STATUS['message']);
         }
         $userId = new UserId($command->userId);

@@ -63,7 +63,7 @@ class DebtCustomerExport implements FromArray, WithStyles, ShouldAutoSize, WithE
         $lastRow = $this->countDebtResults + 8;
         $sheet->getStyle(4)->getAlignment()->setHorizontal('center');
         $sheet->getStyle(7)->getAlignment()->setHorizontal('center');
-        $sheet->getStyle("A$lastRow:J$lastRow")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('59a57f');
+        $sheet->getStyle("A$lastRow:F$lastRow")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('59a57f');
 
         for ($i = 1; $i <= $lastRow; $i++) {
             $sheet->getRowDimension($i)->setRowHeight(18);
@@ -97,7 +97,7 @@ class DebtCustomerExport implements FromArray, WithStyles, ShouldAutoSize, WithE
             ],
 
             // Styling a specific cell by coordinate.
-            "A7:J$restDebtRow" => [
+            "A7:F$restDebtRow" => [
                 'borders' => [
                     'allBorders' => [
                         'borderStyle' => Border::BORDER_THIN,
@@ -170,10 +170,6 @@ class DebtCustomerExport implements FromArray, WithStyles, ShouldAutoSize, WithE
             'D' => 15,
             'E' => 15,
             'F' => 15,
-            'G' => 15,
-            'H' => 15,
-            'I' => 15,
-            'J' => 15,
         ];
     }
 
@@ -183,10 +179,6 @@ class DebtCustomerExport implements FromArray, WithStyles, ShouldAutoSize, WithE
             'C' => '#,##0',
             'D' => '#,##0',
             'E' => '#,##0',
-            'F' => '#,##0',
-            'G' => '#,##0',
-            'H' => '#,##0',
-            'I' => '#,##0',
         ];
     }
 }

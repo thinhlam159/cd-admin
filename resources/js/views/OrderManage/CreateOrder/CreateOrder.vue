@@ -32,16 +32,16 @@
       </p>
       <div class="border border-gray-300 rounded-sm w-full">
         <div class="flex text-md items-center bg-gray-100 border-b border-gray-300">
-          <span class="border-r border-gray-300 text-center py-2 w-[10%]">STT</span>
+          <span class="border-r border-gray-300 text-center py-2 w-[10%]">#</span>
           <span class="border-r border-gray-300 text-center py-2 w-[25%]">Mã</span>
           <span class="border-r border-gray-300 text-center py-2 w-[10%]">Tên</span>
-          <span class="border-r border-gray-300 text-center py-2 w-[10%]">Đơn giá</span>
+          <span class="border-r border-gray-300 text-center py-2 w-[15%]">Đơn giá</span>
           <span class="border-r border-gray-300 text-center py-2 w-[10%]">Số lượng</span>
-          <span class="border-r border-gray-300 text-center py-2 w-[25%]">Thành tiền</span>
+          <span class="border-r border-gray-300 text-center py-2 w-[20%]">Thành tiền</span>
           <span class="border-r border-gray-300 text-center py-2 w-[10%]">Xóa</span>
         </div>
         <div class="text-md min-h-[300px]">
-          <form @submit.prevent="handleSubmit()">
+          <form @submit.prevent="handleSubmit">
             <div class="border-b border-gray-300">
               <div v-for="(orderItem, index) in listOrderItem" :key="orderItem.key" class="flex items-center">
                 <div class="border-r border-gray-300 text-center py-2 w-[10%]">{{ index + 1 }}</div>
@@ -59,15 +59,30 @@
                     })}`
                   }}
                 </div>
-                <div v-if="orderItem.measureUnitName === 'roll'" class="border-r border-gray-300 text-center py-2 w-[10%]">{{ orderItem.code + orderItem.order }}</div>
-                <div v-else class="border-r border-gray-300 text-center py-2 w-[10%]">{{ orderItem.code}}</div>
                 <div class="border-r border-gray-300 text-center py-2 w-[10%]">
-                  {{ orderItem.standardPrice.toLocaleString('it-IT', {style: 'currency', currency: 'VND'}) }}</div>
+                  <span v-if="orderItem.measureUnitName === 'roll'">{{ orderItem.code + orderItem.order }}</span>
+                  <span v-else>{{ orderItem.code}}</span>
+                </div>
+                <div class="border-r border-gray-300 text-center py-2 w-[15%]">
+                  <div class="flex">
+                    <CurrencyInput
+                      name="price"
+                      type="text"
+                      v-model="orderItem.price"
+                      :value="orderItem.price"
+                      placeholder="nhập giá"
+                      :options="{ currency: 'VND', currencyDisplay: 'hidden' }"
+                    />
+                    <div class="text-center">
+                      <span>đ</span>
+                    </div>
+                  </div>
+                </div>
                 <div class="border-r border-gray-300 text-center py-2 w-[10%]">
                   <input type="number" class="outline-none border-b border-gray-400 w-1/2 text-center" min="0"
                          v-model="orderItem.weight">
                 </div>
-                <div class="border-r border-gray-300 text-center py-2 w-[25%]">{{
+                <div class="border-r border-gray-300 text-center py-2 w-[20%]">{{
                     (orderItem.standardPrice * orderItem.weight).toLocaleString('it-IT', {
                       style: 'currency',
                       currency: 'VND'
@@ -86,6 +101,7 @@
         </div>
       </div>
     </div>
+    <ModalsContainer />
   </div>
 </template>
 
@@ -96,7 +112,6 @@ import {ref, inject, reactive} from "vue";
 import {
   createOrderFromApi,
   getListCategoryFromApi, getListCustomerAllFromApi,
-  getListCustomerFromApi,
   getListProductFromApi
 } from "@/api";
 import {MODULE_STORE, ROUTER_PATH, styleDatePicker} from "@/const";
@@ -106,6 +121,23 @@ import ButtonRemove from "@/components/Buttons/ButtonRemove/ButtonRemove.vue";
 import Datepicker from 'vue3-datepicker'
 import * as Yup from "yup";
 import { vi } from 'date-fns/locale'
+import CurrencyInput from "@/components/CurrencyInput";
+import ModalConfirm from "@/components/Modal/Modal/ModalConfirm.vue";
+import { ModalsContainer, useModal } from 'vue-final-modal'
+
+const { open, close } = useModal({
+  component: ModalConfirm,
+  attrs: {
+    title: 'Đơn hàng',
+    onConfirm() {
+      close()
+      creatOrder()
+    },
+  },
+  slots: {
+    default: '<p>Bạn muốn tạo đơn hàng?</p>',
+  },
+})
 
 const router = useRouter()
 const store = useStore()
@@ -132,18 +164,8 @@ const customerSchema = Yup.object().shape({
 })
 const orderItemsSchema = Yup.array().of(schema)
 
-const handleSubmit = async () => {
+const creatOrder = async () => {
   try {
-    if (selectedCustomer.value === null) {
-      customerError.value = true
-      return
-    }
-    if (listOrderItem.length === 0) {
-      listOrderError.value = true
-      return
-    }
-    await customerSchema.validate({customer: selectedCustomer.value.customer_id})
-    await orderItemsSchema.validate(listOrderItem, { abortEarly: false })
     const orderPostData = listOrderItem.map(orderItem => {
       return {
         product_id: orderItem.productId,
@@ -154,6 +176,7 @@ const handleSubmit = async () => {
         measure_unit_type: orderItem.measureUnitName,
         weight: orderItem.weight,
         notice_price_type: orderItem.noticePriceType,
+        actual_selling_price: orderItem.price
       }
     })
     const year = picked.value.getFullYear()
@@ -179,6 +202,19 @@ const handleSubmit = async () => {
   } finally {
     store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
   }
+}
+const handleSubmit = async () => {
+  if (selectedCustomer.value === null) {
+    customerError.value = true
+    return
+  }
+  if (listOrderItem.length === 0) {
+    listOrderError.value = true
+    return
+  }
+  await customerSchema.validate({customer: selectedCustomer.value.customer_id})
+  await orderItemsSchema.validate(listOrderItem, {abortEarly: false})
+  await open()
 }
 
 const getListCategory = async () => {

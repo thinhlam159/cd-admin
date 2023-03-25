@@ -11,6 +11,7 @@
         placeholder="nhập giá"
         success-message="Nice to meet you!"
         :options="{ currency: 'VND', currencyDisplay: 'hidden' }"
+        @update-price="price=$event"
       />
       <p v-if="!!priceMessageError" class="text-red-500">{{ priceMessageError }}</p>
       <div>
@@ -24,6 +25,15 @@
 
       <button class="submit-btn border border-gray-200 p-3 max-w-[80px]" type="submit">Submit</button>
     </form>
+    <ModalConfirm
+      v-model="show"
+      :modal-id="modalId"
+      title="Xóa đơn!"
+      @confirm="() => createContainerOrder"
+      button-value="Xóa"
+    >
+      <p>Bạn muốn xóa đơn hàng</p>
+    </ModalConfirm>
   </div>
 </template>
 
@@ -37,12 +47,16 @@ import {ROUTER_PATH} from "@/const";
 import { useRouter } from 'vue-router';
 import {vi} from "date-fns/locale";
 import { styleDatePicker } from "@/const";
+import ModalConfirm from "@/components/Modal/Modal/ModalConfirm.vue";
 
 const price = ref('')
 const comment = ref('')
 const priceMessageError = ref(null)
 const picked = ref(new Date())
 const router = useRouter()
+const modalId = ref(null)
+const show = ref(false)
+const toast = inject('$toast')
 
 const schema = Yup.object().shape({
   price: Yup.number().min(1000).typeError("Tối thiểu 1000đ"),
@@ -57,11 +71,25 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['customerIdError'])
-const toast = inject('$toast')
 
-async function handleSubmit() {
+const handleSubmit = async () => {
   try {
-    await schema.validate({ price: price.value, customerId: props.customerId });
+    schema.validate({price: price.value, customerId: props.customerId});
+    show.value = true
+  } catch (err) {
+    switch (err.path) {
+      case 'price':
+        priceMessageError.value = err.errors[0];
+        break
+      case 'customerId':
+        emit('customerIdError', err.errors[0])
+        break
+    }
+  }
+}
+
+const createContainerOrder = async () => {
+  try {
     priceMessageError.value = ''
     const year = picked.value.getFullYear()
     const month = ('0' + (picked.value.getMonth() + 1)).slice(-2)
@@ -75,8 +103,9 @@ async function handleSubmit() {
       customer_id: props.customerId
     }
     const res = await createContainerOrderFromApi(postData)
+    show.value = false
     toast.success("Tạo đơn container thành công!", {duration:3000})
-    await router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.DEBT_MANAGE}`)
+    await router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.DEBT_MANAGE}/${ROUTER_PATH.LIST_CUSTOMER_DEBT}/${props.customerId}`)
   } catch (err) {
     switch (err.path) {
       case 'price':

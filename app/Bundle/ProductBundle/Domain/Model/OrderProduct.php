@@ -55,6 +55,11 @@ final class OrderProduct
     private int $orderProductCost;
 
     /**
+     * @var int
+     */
+    private int $actualSellingPrice;
+
+    /**
      * @param OrderProductId $orderProductId
      * @param OrderId $orderId
      * @param ProductId $productId
@@ -65,6 +70,7 @@ final class OrderProduct
      * @param int $attributeDisplayIndex
      * @param int $weight
      * @param int $orderProductCost
+     * @param int $actualSellingPrice
      */
     public function __construct(
         OrderProductId $orderProductId,
@@ -76,7 +82,8 @@ final class OrderProduct
         MeasureUnitType $measureUnitType,
         int $attributeDisplayIndex,
         int $weight,
-        int $orderProductCost
+        int $orderProductCost,
+        int $actualSellingPrice
     )
     {
         $this->orderProductId = $orderProductId;
@@ -89,6 +96,7 @@ final class OrderProduct
         $this->attributeDisplayIndex = $attributeDisplayIndex;
         $this->weight = $weight;
         $this->orderProductCost = $orderProductCost;
+        $this->actualSellingPrice = $actualSellingPrice;
     }
 
     /**
@@ -169,5 +177,13 @@ final class OrderProduct
     public function getOrderProductCost(): int
     {
         return $this->orderProductCost;
+    }
+
+    /**
+     * @return int
+     */
+    public function getActualSellingPrice(): int
+    {
+        return $this->actualSellingPrice;
     }
 }

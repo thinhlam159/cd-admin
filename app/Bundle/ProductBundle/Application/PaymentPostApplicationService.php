@@ -16,6 +16,7 @@ use App\Bundle\ProductBundle\Domain\Model\PaymentId;
 use App\Bundle\ProductBundle\Domain\Model\PaymentStatus;
 use App\Bundle\ProductBundle\Domain\Model\SettingDate;
 use App\Bundle\ProductBundle\Domain\Model\UserId;
+use App\Bundle\ProductBundle\Domain\Model\UserId as ProductBundleUserId;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -64,12 +65,39 @@ class PaymentPostApplicationService
             $customerId,
             $userId,
             SettingDate::fromYmdHis($command->date),
-            PaymentStatus::fromStatus(PaymentStatus::IN_PROGRESS)
+            PaymentStatus::fromStatus(PaymentStatus::RESOLVED)
+        );
+        $currentDebt = $this->debtHistoryRepository->findCurrentDebtByCustomerId($customerId);
+        $debtHistoryId = DebtHistoryId::newId();
+        $totalOrderCost = $payment->getCost();
+        $newDebtHistory = new DebtHistory(
+            $debtHistoryId,
+            $customerId,
+            new ProductBundleUserId($userId->asString()),
+            $currentDebt->getTotalDebt(),
+            !is_null($currentDebt) ? $currentDebt->getTotalPayment() + $totalOrderCost : $totalOrderCost,
+            !is_null($currentDebt) ? $currentDebt->getRestDebt() - $totalOrderCost : - $totalOrderCost,
+            true,
+            DebtHistoryUpdateType::fromType(DebtHistoryUpdateType:: PAYMENT),
+            null,
+            null,
+            null,
+            $payment->getPaymentId(),
+            null,
+            $totalOrderCost,
+            SettingDate::fromYmdHis($command->date),
+            MonetaryUnitType::fromType(MonetaryUnitType::VND),
+            null,
+            !is_null($currentDebt) ? $currentDebt->getVersion() + 1 : 1
         );
 
         DB::beginTransaction();
         try {
             $paymentId = $this->paymentRepository->create($payment);
+            if ($currentDebt) {
+                $this->debtHistoryRepository->updateCurrentDebtHistory($currentDebt->getDebtHistoryId());
+            }
+            $this->debtHistoryRepository->create($newDebtHistory);
             DB::commit();
         } catch (Exception $e) {
             DB::rollBack();

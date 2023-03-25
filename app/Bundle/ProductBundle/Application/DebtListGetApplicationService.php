@@ -8,8 +8,7 @@ use App\Bundle\Admin\Domain\Model\IUserRepository;
 use App\Bundle\Admin\Domain\Model\UserId;
 use App\Bundle\Common\Application\PaginationResult;
 use App\Bundle\Common\Domain\Model\InvalidArgumentException;
-use App\Bundle\Common\Domain\Model\TransactionException;
-use App\Bundle\ProductBundle\Domain\Model\DebtHistoryCriteria;
+use App\Bundle\ProductBundle\Domain\Model\CustomerCriteria;
 use App\Bundle\ProductBundle\Domain\Model\IDebtHistoryRepository;
 
 class DebtListGetApplicationService
@@ -49,20 +48,17 @@ class DebtListGetApplicationService
      * @param DebtListGetCommand $command
      * @return DebtListGetResult
      * @throws InvalidArgumentException
-     * @throws TransactionException
      */
     public function handle(DebtListGetCommand $command): DebtListGetResult
     {
-        $criteria = new DebtHistoryCriteria(
-            !is_null($command->customerId) ? new CustomerId($command->customerId) : null,
-            $command->keyword,
-            $command->order,
-            $command->sort,
+        $criteria = new CustomerCriteria(
+            !empty($command->customerId) ? new CustomerId($command->customerId) : null,
+            $command->keyword
         );
-        [$debts, $pagination] = $this->debtHistoryRepository->findAllCurrentByCustomer($criteria);
+        [$customers, $pagination] = $this->customerRepository->findAll($criteria);
         $debtResults = [];
-        foreach ($debts as $debt) {
-            $customer = $this->customerRepository->findById($debt->getCustomerId());
+        foreach ($customers as $customer) {
+            $debt = $this->debtHistoryRepository->findCurrentDebtByCustomerId($customer->getCustomerId());
             $user = $this->userRepository->findById(new UserId($debt->getUserId()->asString()));
             $debtResults[] = new DebtResult(
                 $debt->getDebtHistoryId()->asString(),

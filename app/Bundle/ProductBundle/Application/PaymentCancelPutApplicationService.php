@@ -4,6 +4,7 @@ namespace App\Bundle\ProductBundle\Application;
 
 use App\Bundle\Common\Domain\Model\InvalidArgumentException;
 use App\Bundle\Common\Domain\Model\TransactionException;
+use App\Bundle\ProductBundle\Domain\Model\IDebtHistoryRepository;
 use App\Bundle\ProductBundle\Domain\Model\IPaymentRepository;
 use App\Bundle\ProductBundle\Domain\Model\PaymentId;
 use Exception;
@@ -18,11 +19,21 @@ class PaymentCancelPutApplicationService
     private IPaymentRepository $paymentRepository;
 
     /**
-     * @param IPaymentRepository $paymentRepository
+     * @var IDebtHistoryRepository
      */
-    public function __construct(IPaymentRepository $paymentRepository)
+    private IDebtHistoryRepository $debtHistoryRepository;
+
+    /**
+     * @param IPaymentRepository $paymentRepository
+     * @param IDebtHistoryRepository $debtHistoryRepository
+     */
+    public function __construct(
+        IPaymentRepository $paymentRepository,
+        IDebtHistoryRepository $debtHistoryRepository
+    )
     {
         $this->paymentRepository = $paymentRepository;
+        $this->debtHistoryRepository = $debtHistoryRepository;
     }
 
     /**
@@ -37,9 +48,12 @@ class PaymentCancelPutApplicationService
         $payment = $this->paymentRepository->findById($paymentId);
         $payment->updateCancelStatus();
 
+        $debt = $this->debtHistoryRepository->findByPaymentId($paymentId);
+
         DB::beginTransaction();
         try {
             $updateResult = $this->paymentRepository->updateCancelStatus($payment);
+            $result = $this->debtHistoryRepository->deleteById($debt->getDebtHistoryId());
             DB::commit();
         } catch (Exception $e) {
             DB::rollBack();

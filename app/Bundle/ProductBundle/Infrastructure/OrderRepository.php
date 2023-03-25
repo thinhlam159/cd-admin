@@ -64,6 +64,7 @@ final class OrderRepository implements IOrderRepository
                 'weight' => $orderProduct->getWeight(),
                 'count' => $orderProduct->getCount(),
                 'cost' => $orderProduct->getOrderProductCost(),
+                'actual_selling_price' => $orderProduct->getActualSellingPrice(),
                 'measure_unit_type' => $orderProduct->getMeasureUnitType()->getType(),
             ]);
             if (!$result) {
@@ -135,7 +136,8 @@ final class OrderRepository implements IOrderRepository
                 MeasureUnitType::fromType($orderProductEntity->measure_unit_type),
                 $orderProductEntity->attribute_display_index,
                 $orderProductEntity->weight,
-                $orderProductEntity->cost
+                $orderProductEntity->cost,
+                $orderProductEntity->actual_selling_price
             );
         }
 

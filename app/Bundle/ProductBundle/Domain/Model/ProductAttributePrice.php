@@ -106,8 +106,20 @@ final class ProductAttributePrice
         return $this->isCurrent;
     }
 
+    /**
+     * @return int
+     */
     public function getStandardPrice() : int
     {
         return $this->price / $this->noticePriceType->getAmountValue();
+    }
+
+    /**
+     * @param int $actualSellingPrice
+     * @return int
+     */
+    public function calculateSellingPrice(int $actualSellingPrice) : int
+    {
+        return $actualSellingPrice / $this->noticePriceType->getAmountValue();
     }
 }

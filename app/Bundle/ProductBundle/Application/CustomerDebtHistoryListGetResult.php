@@ -2,8 +2,6 @@
 
 namespace App\Bundle\ProductBundle\Application;
 
-use App\Bundle\Common\Application\PaginationResult;
-
 final class CustomerDebtHistoryListGetResult
 {
     /**
@@ -12,17 +10,10 @@ final class CustomerDebtHistoryListGetResult
     public array $debtResults;
 
     /**
-     * @var PaginationResult
-     */
-    public PaginationResult $paginationResult;
-
-    /**
      * @param DebtResult[] $debtResults
-     * @param PaginationResult $paginationResult
      */
-    public function __construct(array $debtResults, PaginationResult $paginationResult)
+    public function __construct(array $debtResults)
     {
         $this->debtResults = $debtResults;
-        $this->paginationResult = $paginationResult;
     }
 }

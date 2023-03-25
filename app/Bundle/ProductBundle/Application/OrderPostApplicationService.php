@@ -120,17 +120,19 @@ class OrderPostApplicationService
             $userId,
             OrderDeliveryStatus::fromStatus(OrderDeliveryStatus::IN_PROGRESS),
             OrderPaymentStatus::fromStatus(OrderPaymentStatus::PLANNING),
-            OrderStatus::fromStatus(OrderStatus::IN_PROGRESS),
+            OrderStatus::fromStatus(OrderStatus::RESOLVED),
             SettingDate::fromYmdHis($command->date)
         );
 
         $orderProducts = [];
         $newProductInventories = [];
         $totalOrderCost = 0;
+        $costs = [];
         foreach ($command->orderProductCommands as $orderProductCommand) {
             $productAttributeValueId = $orderProductCommand->productAttributeValueId;
             $productAttributePrice = $this->productAttributePriceRepository->findByProductAttributeValueId(new ProductAttributeValueId($productAttributeValueId));
-            $orderProductCost = $productAttributePrice->getStandardPrice() * $orderProductCommand->weight;
+            $orderProductCost = $productAttributePrice->calculateSellingPrice($orderProductCommand->actualSellingPrice) * $orderProductCommand->weight;
+            $costs[] = $orderProductCost;
             $totalOrderCost += $orderProductCost;
             $orderProduct = OrderProductId::newId();
             $amount = $orderProductCommand->count;
@@ -147,7 +149,8 @@ class OrderPostApplicationService
                 MeasureUnitType::fromValue($orderProductCommand->measureUnitType),
                 $orderProductCommand->attributeDisplayIndex,
                 $orderProductCommand->weight,
-                $orderProductCost
+                $orderProductCost,
+                $orderProductCommand->actualSellingPrice
             );
 
             $newProductInventories[$productAttributeValueId]['count'] =
@@ -177,28 +180,28 @@ class OrderPostApplicationService
             $currentProductInventories[] = $currentProductInventory;
         }
 
-//        $currentDebt = $this->debtHistoryRepository->findCurrentDebtByCustomerId($customerId);
-//        $debtHistoryId = DebtHistoryId::newId();
-//        $newDebtHistory = new DebtHistory(
-//            $debtHistoryId,
-//            $customerId,
-//            new ProductBundleUserId($userId->asString()),
-//            !is_null($currentDebt) ? $currentDebt->getTotalDebt() + $totalOrderCost : $totalOrderCost,
-//            !is_null($currentDebt) ? $currentDebt->getTotalPayment() : 0,
-//            !is_null($currentDebt) ? $currentDebt->getRestDebt() + $totalOrderCost : $totalOrderCost,
-//            true,
-//            DebtHistoryUpdateType::fromType(DebtHistoryUpdateType::ORDER),
-//            $orderId,
-//            null,
-//            null,
-//            null,
-//            null,
-//            $totalOrderCost,
-//            SettingDate::fromYmdHis($command->date),
-//            MonetaryUnitType::fromType(MonetaryUnitType::VND),
-//            null,
-//            !is_null($currentDebt) ? $currentDebt->getVersion() + 1 : 1
-//        );
+        $currentDebt = $this->debtHistoryRepository->findCurrentDebtByCustomerId($customerId);
+        $debtHistoryId = DebtHistoryId::newId();
+        $newDebtHistory = new DebtHistory(
+            $debtHistoryId,
+            $customerId,
+            new ProductBundleUserId($userId->asString()),
+            !is_null($currentDebt) ? $currentDebt->getTotalDebt() + $totalOrderCost : $totalOrderCost,
+            !is_null($currentDebt) ? $currentDebt->getTotalPayment() : 0,
+            !is_null($currentDebt) ? $currentDebt->getRestDebt() + $totalOrderCost : $totalOrderCost,
+            true,
+            DebtHistoryUpdateType::fromType(DebtHistoryUpdateType::ORDER),
+            $orderId,
+            null,
+            null,
+            null,
+            null,
+            $totalOrderCost,
+            SettingDate::fromYmdHis($command->date),
+            MonetaryUnitType::fromType(MonetaryUnitType::VND),
+            null,
+            !is_null($currentDebt) ? $currentDebt->getVersion() + 1 : 1
+        );
 
         DB::beginTransaction();
         try {
@@ -218,10 +221,10 @@ class OrderPostApplicationService
             if (!$createInventoryProductResult) {
                 throw new InvalidArgumentException('customer not exist!');
             }
-//            if ($currentDebt) {
-//                $this->debtHistoryRepository->updateCurrentDebtHistory($currentDebt->getDebtHistoryId());
-//            }
-//            $this->debtHistoryRepository->create($newDebtHistory);
+            if ($currentDebt) {
+                $this->debtHistoryRepository->updateCurrentDebtHistory($currentDebt->getDebtHistoryId());
+            }
+            $this->debtHistoryRepository->create($newDebtHistory);
 
             DB::commit();
         } catch (Exception $e) {

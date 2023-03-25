@@ -18,9 +18,6 @@
         <th class="border py-1 w-[26%]">
           Ghi chú
         </th>
-        <th class="border py-1 w-[20%]">
-          Trạng thái
-        </th>
         <th class="border py-1 w-[10%]">
 
         </th>
@@ -35,14 +32,7 @@
           <td class="border text-center">{{ item.comment }}</td>
           <td class="border text-center">
             <div class="flex justify-center">
-              <span v-if="item.order_status === 2">Hoàn thành</span>
-              <ButtonEdit v-if="item.order_status === 1" @clickBtn="() => handleUpdateResolvedOrder(item.order_id)" text="Chưa hoàn thành"/>
-            </div>
-          </td>
-          <td class="border text-center">
-            <div class="flex justify-center">
-              <span v-if="item.order_status === 2"></span>
-              <ButtonRemove v-if="item.order_status === 1" @clickBtn="() => handleCancelOrder(item.order_id)" text="Xóa"/>
+              <ButtonRemove @clickBtn="() => handleCancelOrder(item.order_id)" text="Xóa"/>
             </div>
           </td>
         </tr>
@@ -116,20 +106,6 @@ const handleNextPage = (page) => {
 const handleCancelOrder = async (id) => {
   try {
     const res = await cancelOrderFromApi(id)
-    listOrder.length = 0
-    await getListCustomerOrder(pageCurrent.value)
-  } catch (errors) {
-    const error = errors.message
-    toast.error(error);
-  } finally {
-    store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false
-  }
-}
-const handleUpdateResolvedOrder = async (id) => {
-  try {
-    const res = await updateResolvedOrderFromApi({order_id: id})
-    emit('updateListDebt')
-    emit('updateCustomerDebt')
     listOrder.length = 0
     await getListCustomerOrder(pageCurrent.value)
   } catch (errors) {

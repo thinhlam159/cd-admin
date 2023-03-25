@@ -62,28 +62,35 @@ class DebtHistoryRepository implements IDebtHistoryRepository
     public function findCurrentDebtByCustomerId(CustomerId $customerId): ?DebtHistory
     {
         $entity = ModelDebtHistory::where([
-            ['is_current', '=', true],
             ['customer_id', '=', $customerId->asString()],
         ])->first();
 
         if (!$entity) {
             return null;
         }
+        $totalDebt = ModelDebtHistory::where([
+            ['customer_id', '=', $customerId->asString()],
+            ['update_type', '!=', DebtHistoryUpdateType::fromType(DebtHistoryUpdateType::PAYMENT)]
+        ])->sum('number_of_money');
+        $totalPayment = ModelDebtHistory::where([
+            ['customer_id', '=', $customerId->asString()],
+            ['update_type', '=', DebtHistoryUpdateType::fromType(DebtHistoryUpdateType::PAYMENT)]
+        ])->sum('number_of_money');
 
         return new DebtHistory(
             new DebtHistoryId($entity->id),
             new CustomerId($entity->customer_id),
             new UserId($entity->user_id),
-            $entity->total_debt,
-            $entity->total_payment,
-            $entity->rest_debt,
+            (int)$totalDebt,
+            (int)$totalPayment,
+            (int)$totalDebt - (int)$totalPayment,
             $entity->is_current,
             DebtHistoryUpdateType::fromType($entity->update_type),
-            !is_null($entity->order_id) ? new OrderId($entity->order_id) : null,
-            !is_null($entity->container_order_id) ? new ContainerOrderId($entity->container_order_id) : null,
-            !is_null($entity->vat_id) ? new VatId($entity->vat_id) : null,
-            !is_null($entity->payment_id) ? new PaymentId($entity->payment_id) : null,
-            !is_null($entity->other_debt_id) ? new OtherDebtId($entity->other_debt_id) : null,
+            null,
+            null,
+            null,
+            null,
+            null,
             $entity->number_of_money,
             SettingDate::fromYmdHis($entity->updated_date),
             MonetaryUnitType::fromType($entity->monetary_unit_type),
@@ -416,5 +423,48 @@ class DebtHistoryRepository implements IDebtHistoryRepository
         }
 
         return $debts;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function findByPaymentId(PaymentId $paymentId): ?DebtHistory
+    {
+        $entity = ModelDebtHistory::where([['payment_id', '=', $paymentId->asString()]])->first();
+        if (!$entity) {
+            return null;
+        }
+
+        return new DebtHistory(
+            new DebtHistoryId($entity->id),
+            new CustomerId($entity->customer_id),
+            new UserId($entity->user_id),
+            $entity->total_debt,
+            $entity->total_payment,
+            $entity->rest_debt,
+            $entity->is_current,
+            DebtHistoryUpdateType::fromType($entity->update_type),
+            null,
+            null,
+            null,
+            new PaymentId($entity->payment_id),
+            null,
+            $entity->number_of_money,
+            SettingDate::fromYmdHis($entity->updated_date),
+            MonetaryUnitType::fromType($entity->monetary_unit_type),
+            $entity->comment,
+            $entity->version
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function deleteById(DebtHistoryId $debtHistoryId): bool
+    {
+        $result = ModelDebtHistory::find($debtHistoryId->asString())->delete();
+        if (!$result) return false;
+
+        return true;
     }
 }

@@ -10,6 +10,7 @@ use App\Bundle\Common\Application\PaginationResult;
 use App\Bundle\Common\Constants\MessageConst;
 use App\Bundle\Common\Domain\Model\InvalidArgumentException;
 use App\Bundle\ProductBundle\Domain\Model\CustomerDebtHistoryCriteria;
+use App\Bundle\ProductBundle\Domain\Model\DebtHistoryUpdateType;
 use App\Bundle\ProductBundle\Domain\Model\IDebtHistoryRepository;
 
 class CustomerDebtHistoryListGetApplicationService
@@ -57,10 +58,6 @@ class CustomerDebtHistoryListGetApplicationService
         if (!$customer) {
             throw new InvalidArgumentException(MessageConst::NO_RECORD['message']);
         }
-        $criteria = new CustomerDebtHistoryCriteria(
-            $customerId,
-            $command->keyword,
-        );
         $debtHistories = $this->debtHistoryRepository->findAllHistoryByCustomerId3($customerId);
         $debtResults = [];
         $totalDebt = 0;
@@ -86,22 +83,13 @@ class CustomerDebtHistoryListGetApplicationService
                 $debt->getNumberOfMoney(),
                 $debt->getUpdateDate()->asString(),
                 $debt->getMonetaryUnitType()->getValue(),
-                $debt->getComment(),
+                $debt->getDebtHistoryUpdateType()->getComment(),
                 $debt->getVersion()
             );
             $totalDebt = $debt->calculateTotalDebt($totalDebt);
             $totalPayment = $debt->calculateTotalPayment($totalPayment);
         }
 
-        $paginationResult = new PaginationResult(
-//            $pagination->getTotalPages(),
-//            $pagination->getPerPage(),
-//            $pagination->getCurrentPage(),
-            1,
-            1,
-            1
-        );
-
-        return new CustomerDebtHistoryListGetResult($debtResults, $paginationResult);
+        return new CustomerDebtHistoryListGetResult($debtResults);
     }
 }
