@@ -79,6 +79,12 @@ interface IDebtHistoryRepository
     public function findByPaymentId(PaymentId $paymentId): ?DebtHistory;
 
     /**
+     * @param OrderId $orderId
+     * @return DebtHistory|null
+     */
+    public function findByOrderId(OrderId $orderId): ?DebtHistory;
+
+    /**
      * @param DebtHistoryId $debtHistoryId
      * @return bool
      */

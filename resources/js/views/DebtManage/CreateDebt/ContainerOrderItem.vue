@@ -27,11 +27,11 @@
     <ModalConfirm
       v-model="show"
       :modal-id="modalId"
-      title="Xóa đơn!"
-      @confirm="() => createContainerOrder"
-      button-value="Xóa"
+      title="Công nợ!"
+      @confirm="() => createContainerOrder()"
+      button-value="Tạo"
     >
-      <p>Bạn muốn xóa đơn hàng</p>
+      <p>Tạo container công nợ ?</p>
     </ModalConfirm>
   </div>
 </template>
@@ -73,7 +73,7 @@ const emit = defineEmits(['customerIdError'])
 
 const handleSubmit = async () => {
   try {
-    schema.validate({price: price.value, customerId: props.customerId});
+    await schema.validate({price: price.value, customerId: props.customerId});
     show.value = true
   } catch (err) {
     switch (err.path) {

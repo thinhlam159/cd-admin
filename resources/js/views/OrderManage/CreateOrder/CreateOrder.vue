@@ -101,7 +101,15 @@
         </div>
       </div>
     </div>
-    <ModalsContainer />
+    <ModalConfirm
+      v-model="show"
+      :modal-id="modalId"
+      title="Công nợ!"
+      @confirm="() => createOrder()"
+      button-value="Tạo"
+    >
+      <p>Tạo container công nợ ?</p>
+    </ModalConfirm>
   </div>
 </template>
 
@@ -123,21 +131,6 @@ import * as Yup from "yup";
 import { vi } from 'date-fns/locale'
 import CurrencyInput from "@/components/CurrencyInput";
 import ModalConfirm from "@/components/Modal/Modal/ModalConfirm.vue";
-import { ModalsContainer, useModal } from 'vue-final-modal'
-
-const { open, close } = useModal({
-  component: ModalConfirm,
-  attrs: {
-    title: 'Đơn hàng',
-    onConfirm() {
-      close()
-      creatOrder()
-    },
-  },
-  slots: {
-    default: '<p>Bạn muốn tạo đơn hàng?</p>',
-  },
-})
 
 const router = useRouter()
 const store = useStore()
@@ -155,6 +148,8 @@ const listOrderItem = reactive([])
 const picked = ref(new Date())
 const errors = reactive({})
 const listOrderError = ref(false)
+const modalId = ref(null)
+const show = ref(false)
 
 const schema = Yup.object().shape({
   weight: Yup.number().min(1).typeError("Tối thiểu 1 đơn vị"),
@@ -164,7 +159,7 @@ const customerSchema = Yup.object().shape({
 })
 const orderItemsSchema = Yup.array().of(schema)
 
-const creatOrder = async () => {
+const createOrder = async () => {
   try {
     const orderPostData = listOrderItem.map(orderItem => {
       return {
@@ -214,7 +209,7 @@ const handleSubmit = async () => {
   }
   await customerSchema.validate({customer: selectedCustomer.value.customer_id})
   await orderItemsSchema.validate(listOrderItem, {abortEarly: false})
-  await open()
+  show.value = true
 }
 
 const getListCategory = async () => {

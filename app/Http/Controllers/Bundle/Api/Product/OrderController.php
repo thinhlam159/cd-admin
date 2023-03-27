@@ -341,7 +341,8 @@ class OrderController extends BaseController
     public function cancelOrder(Request $request) {
         $applicationService = new OrderCancelPostApplicationService(
             new OrderRepository(),
-            new ProductInventoryRepository()
+            new ProductInventoryRepository(),
+            new DebtHistoryRepository(),
         );
 
         $command = new OrderCancelPostCommand(

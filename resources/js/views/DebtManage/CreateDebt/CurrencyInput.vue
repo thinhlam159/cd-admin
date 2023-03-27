@@ -7,7 +7,6 @@
         class="border border-gray-200 px-[60px] w-full p-2 text-sm text-end outline-none"
         ref="inputRef"
         :placeholder="placeholder"
-        v-model="value"
       />
       <div class="absolute top-[30%] right-3 ml-2">
         <span>VND</span>
@@ -18,7 +17,6 @@
 
 <script setup>
 import {useCurrencyInput} from "vue-currency-input";
-import {emit} from "../../../../../public/js/app";
 
 const props = defineProps({
   type: {

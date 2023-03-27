@@ -6,6 +6,7 @@ use App\Bundle\Admin\Domain\Model\UserId;
 use App\Bundle\Common\Constants\MessageConst;
 use App\Bundle\Common\Domain\Model\InvalidArgumentException;
 use App\Bundle\Common\Domain\Model\TransactionException;
+use App\Bundle\ProductBundle\Domain\Model\IDebtHistoryRepository;
 use App\Bundle\ProductBundle\Domain\Model\IOrderRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductInventoryRepository;
 use App\Bundle\ProductBundle\Domain\Model\OrderId;
@@ -31,16 +32,24 @@ class OrderCancelPostApplicationService
     private IProductInventoryRepository $productInventoryRepository;
 
     /**
+     * @var IDebtHistoryRepository
+     */
+    private IDebtHistoryRepository $debtHistoryRepository;
+
+    /**
      * @param IOrderRepository $orderRepository
      * @param IProductInventoryRepository $productInventoryRepository
+     * @param IDebtHistoryRepository $debtHistoryRepository
      */
     public function __construct(
         IOrderRepository $orderRepository,
-        IProductInventoryRepository $productInventoryRepository
+        IProductInventoryRepository $productInventoryRepository,
+        IDebtHistoryRepository $debtHistoryRepository
     )
     {
         $this->orderRepository = $orderRepository;
         $this->productInventoryRepository = $productInventoryRepository;
+        $this->debtHistoryRepository = $debtHistoryRepository;
     }
 
     /**
@@ -88,6 +97,7 @@ class OrderCancelPostApplicationService
             );
             $currentProductInventories["$productAttributeValueId"] = $currentProductInventory;
         }
+        $debt = $this->debtHistoryRepository->findByOrderId($orderId);
 
         DB::beginTransaction();
         try {
@@ -100,6 +110,7 @@ class OrderCancelPostApplicationService
             if (!$createInventoryProductResult || !$updateCurrentInventoryResult) {
                 throw new InvalidArgumentException('Cập nhật lưu kho thất bại!');
             }
+            $this->debtHistoryRepository->deleteById($debt->getDebtHistoryId());
 
             DB::commit();
         } catch (Exception $e) {

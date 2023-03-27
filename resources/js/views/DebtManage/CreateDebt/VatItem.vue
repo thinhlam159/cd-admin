@@ -24,6 +24,15 @@
 
       <button class="submit-btn border border-gray-200 p-3 max-w-[80px]" type="submit">Submit</button>
     </form>
+    <ModalConfirm
+      v-model="show"
+      :modal-id="modalId"
+      title="Công nợ!"
+      @confirm="() => createVatDebt()"
+      button-value="Tạo"
+    >
+      <p>Tạo VAT ?</p>
+    </ModalConfirm>
   </div>
 </template>
 
@@ -37,12 +46,15 @@ import {ROUTER_PATH} from "@/const";
 import { useRouter } from 'vue-router';
 import {vi} from "date-fns/locale";
 import { styleDatePicker } from "@/const";
+import ModalConfirm from "@/components/Modal/Modal/ModalConfirm.vue";
 
 const price = ref('')
 const comment = ref('')
 const priceMessageError = ref(null)
 const picked = ref(new Date())
 const router = useRouter()
+const modalId = ref(null)
+const show = ref(false)
 
 const schema = Yup.object().shape({
   price: Yup.number().min(1000).typeError("Tối thiểu 1000đ"),
@@ -62,6 +74,21 @@ const toast = inject('$toast')
 async function handleSubmit() {
   try {
     await schema.validate({ price: price.value, customerId: props.customerId });
+    show.value = true
+  } catch (err) {
+    switch (err.path) {
+      case 'price':
+        priceMessageError.value = err.errors[0];
+        break
+      case 'customerId':
+        emit('customerIdError', err.errors[0])
+        break
+    }
+  }
+}
+
+const createVatDebt = async () => {
+  try {
     priceMessageError.value = ''
     const year = picked.value.getFullYear()
     const month = ('0' + (picked.value.getMonth() + 1)).slice(-2)
@@ -75,8 +102,8 @@ async function handleSubmit() {
       customer_id: props.customerId
     }
     const res = await createVatFromApi(postData)
-    toast.success("Tạo công nợ VAT thành công!", {duration:3000})
-    await router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.DEBT_MANAGE}`)
+    toast.success("Tạo công nợ VAT thành công!", {duration: 3000})
+    await router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.DEBT_MANAGE}/${ROUTER_PATH.LIST_CUSTOMER_DEBT}/${props.customerId}`)
   } catch (err) {
     switch (err.path) {
       case 'price':

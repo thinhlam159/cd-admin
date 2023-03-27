@@ -16,9 +16,6 @@
         <TabItem title="Vat" :customer-id="currentCustomer.customer_id" @customer-id-error="handleCustomerIdError">
           <VatItem :customer-id="currentCustomer.customer_id" @customer-id-error="handleCustomerIdError"/>
         </TabItem>
-        <TabItem title="Khác">Content from Tab 3 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Voluptates,
-          ipsa.
-        </TabItem>
       </TabsWrapper>
     </div>
   </div>

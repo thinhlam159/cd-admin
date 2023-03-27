@@ -460,6 +460,38 @@ class DebtHistoryRepository implements IDebtHistoryRepository
     /**
      * @inheritDoc
      */
+    public function findByOrderId(OrderId $orderId): ?DebtHistory
+    {
+        $entity = ModelDebtHistory::where([['order_id', '=', $orderId->asString()]])->first();
+        if (!$entity) {
+            return null;
+        }
+
+        return new DebtHistory(
+            new DebtHistoryId($entity->id),
+            new CustomerId($entity->customer_id),
+            new UserId($entity->user_id),
+            $entity->total_debt,
+            $entity->total_payment,
+            $entity->rest_debt,
+            $entity->is_current,
+            DebtHistoryUpdateType::fromType($entity->update_type),
+            new OrderId($entity->order_id),
+            null,
+            null,
+            null,
+            null,
+            $entity->number_of_money,
+            SettingDate::fromYmdHis($entity->updated_date),
+            MonetaryUnitType::fromType($entity->monetary_unit_type),
+            $entity->comment,
+            $entity->version
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function deleteById(DebtHistoryId $debtHistoryId): bool
     {
         $result = ModelDebtHistory::find($debtHistoryId->asString())->delete();
