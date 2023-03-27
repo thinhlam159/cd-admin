@@ -7,7 +7,7 @@
         class="border border-gray-200 px-[60px] w-full p-2 text-sm text-end outline-none"
         ref="inputRef"
         :placeholder="placeholder"
-        :value="value"
+        v-model="value"
       />
       <div class="absolute top-[30%] right-3 ml-2">
         <span>VND</span>
@@ -48,10 +48,6 @@ const props = defineProps({
   options: Object,
 });
 const { inputRef } = useCurrencyInput(props.options)
-const updatePrice = (e) => {
-  const value = e.target.value
-  emit('updatePrice', value)
-}
 
 </script>
 

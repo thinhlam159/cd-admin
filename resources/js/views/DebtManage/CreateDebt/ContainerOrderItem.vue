@@ -11,7 +11,6 @@
         placeholder="nhập giá"
         success-message="Nice to meet you!"
         :options="{ currency: 'VND', currencyDisplay: 'hidden' }"
-        @update-price="price=$event"
       />
       <p v-if="!!priceMessageError" class="text-red-500">{{ priceMessageError }}</p>
       <div>

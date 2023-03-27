@@ -4,7 +4,7 @@
     class="border-b border-gray-100 text-center outline-none"
     ref="inputRef"
     :placeholder="placeholder"
-    :value="value"
+    v-model="value"
   />
 </template>
 
