@@ -9,6 +9,7 @@
           v-model="pickedFrom"
           :upper-limit="pickedTo"
           :style="styleDatePicker"
+          inputFormat="dd-MM-yyyy"
         />
       </div>
       <div class="flex mt-1 justify-start items-center text-base">
@@ -18,6 +19,7 @@
           v-model="pickedTo"
           :lower-limit="pickedFrom"
           :style="styleDatePicker"
+          inputFormat="dd-MM-yyyy"
         />
       </div>
       <div class="mt-5">
@@ -41,10 +43,11 @@ import Datepicker from 'vue3-datepicker'
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
 import { styleDatePicker } from '@/const'
 import { DatePicker as DP } from 'v-calendar';
+import moment from "moment";
 
 const toast = inject('$toast');
 const store = useStore();
-const pickedFrom = ref(new Date())
+const pickedFrom = ref(new Date(moment().startOf('month').format('YYYY-MM-DD')))
 const pickedTo = ref(new Date())
 const isLoaded = ref(false)
 const totalRoll = ref(0)

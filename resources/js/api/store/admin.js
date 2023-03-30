@@ -73,6 +73,7 @@ export const createPaymentFromApi = async (data) => api.post(`${apiConstants.ADM
 // dealer
 export const getListDealerFromApi = async (page) => api.get(`${apiConstants.ADMIN.LIST_DEALER}?page=${page}`)
 
+// debt
 export const getListDebtFromApi = async (params) => api.get(`${apiConstants.ADMIN.LIST_DEBT}`, {params})
 export const getListCustomerDebtFromApi = async (id, params) => api.get(`${apiConstants.ADMIN.LIST_CUSTOMER_DEBT}/${id}`, {params})
 export const getCustomerCurrentDebtFromApi = async (id) => api.get(`${apiConstants.ADMIN.CUSTOMER_CURRENT_DEBT}/${id}`)
@@ -80,6 +81,10 @@ export const exportCustomerDebtHistoryFromApi = async (id) => await api.post(`${
 export const getListCustomerPaymentFromApi = async (params) => api.get(apiConstants.ADMIN.LIST_CUSTOMER_PAYMENT, {params})
 export const cancelPaymentFromApi = async (data) => await api.put(`${apiConstants.ADMIN.CANCEL_PAYMENT}`, data)
 export const updateResolvedPaymentFromApi = async (data) => await api.put(`${apiConstants.ADMIN.UPDATE_RESOLVED_PAYMENT}`, data)
+export const getListCustomerContainerOrderFromApi = async (params) => await api.get(apiConstants.ADMIN.LIST_CUSTOMER_CONTAINER_ORDER, {params})
+export const getListCustomerVatFromApi = async (params) => await api.get(apiConstants.ADMIN.LIST_CUSTOMER_VAT, {params})
+export const cancelContainerOrderFromApi = async (data) => await api.put(`${apiConstants.ADMIN.CANCEL_CONTAINER_ORDER}`, data)
+export const cancelVatFromApi = async (data) => await api.put(`${apiConstants.ADMIN.CANCEL_VAT}`, data)
 
 //statistical
 export const getRevenuesFromApi = async (params) => api.get(apiConstants.ADMIN.STATISTICAL_REVENUES, {params})

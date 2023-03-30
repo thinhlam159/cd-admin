@@ -60,6 +60,10 @@ export default {
     LIST_CUSTOMER_PAYMENT: 'admin/debt/list-customer-payment',
     CANCEL_PAYMENT: 'admin/debt/cancel-payment',
     UPDATE_RESOLVED_PAYMENT: 'admin/debt/update-resolved-payment',
+    LIST_CUSTOMER_CONTAINER_ORDER: "admin/debt/list-customer-container-order",
+    LIST_CUSTOMER_VAT: "admin/debt/list-customer-vat",
+    CANCEL_CONTAINER_ORDER: 'admin/debt/cancel-container-order',
+    CANCEL_VAT: 'admin/debt/cancel-vat',
 
     STATISTICAL_REVENUES: 'admin/statistical/revenues',
     STATISTICAL_PERIOD_REVENUES: 'admin/statistical/period-revenues',

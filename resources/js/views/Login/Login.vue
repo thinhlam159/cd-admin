@@ -63,7 +63,7 @@ const handleLogin = async (event) => {
     store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
   } catch (errors) {
     const error = errors.message || errors.error || this.$t("common.has_error");
-    toast.error(error);
+    toast.error('Tài khoàn hoặc mật khẩu không chính xác!');
     store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
   }
 }

@@ -102,6 +102,10 @@ Route::group([
 
     Route::post('/debt/create-container-order', [DebtController::class, 'createContainerOrderDebt'])->middleware('auth:api');
     Route::post('/debt/create-vat-debt', [DebtController::class, 'createVatDebt'])->middleware('auth:api');
+    Route::put('/debt/cancel-container-order', [DebtController::class, 'cancelContainerOrder'])->middleware('auth:api');
+    Route::put('/debt/cancel-vat', [DebtController::class, 'cancelVat'])->middleware('auth:api');
+    Route::get('/debt/list-customer-container-order', [DebtController::class, 'getCustomerContainerOrders'])->middleware('auth:api');
+    Route::get('/debt/list-customer-vat', [DebtController::class, 'getCustomerVats'])->middleware('auth:api');
 
     Route::get('/statistical/revenues', [StatisticalController::class, 'getRevenues'])->middleware('auth:api');
     Route::get('/statistical/period-revenues', [StatisticalController::class, 'getPeriodRevenues'])->middleware('auth:api');

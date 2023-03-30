@@ -4,6 +4,10 @@ namespace App\Http\Controllers\Bundle\Api\Product;
 
 use App\Bundle\Admin\Infrastructure\CustomerRepository;
 use App\Bundle\Admin\Infrastructure\UserRepository;
+use App\Bundle\ProductBundle\Application\ContainerOrderCancelPutApplicationService;
+use App\Bundle\ProductBundle\Application\ContainerOrderCancelPutCommand;
+use App\Bundle\ProductBundle\Application\ContainerOrderCustomerListGetApplicationService;
+use App\Bundle\ProductBundle\Application\ContainerOrderCustomerListGetCommand;
 use App\Bundle\ProductBundle\Application\ContainerOrderPostApplicationService;
 use App\Bundle\ProductBundle\Application\ContainerOrderPostCommand;
 use App\Bundle\ProductBundle\Application\CustomerCurrentDebtGetApplicationService;
@@ -22,8 +26,13 @@ use App\Bundle\ProductBundle\Application\PaymentPostApplicationService;
 use App\Bundle\ProductBundle\Application\PaymentPostCommand;
 use App\Bundle\ProductBundle\Application\PaymentResolvedPutApplicationService;
 use App\Bundle\ProductBundle\Application\PaymentResolvedPutCommand;
+use App\Bundle\ProductBundle\Application\VatCancelPutApplicationService;
+use App\Bundle\ProductBundle\Application\VatCancelPutCommand;
+use App\Bundle\ProductBundle\Application\VatCustomerListGetApplicationService;
+use App\Bundle\ProductBundle\Application\VatCustomerListGetCommand;
 use App\Bundle\ProductBundle\Application\VatPostApplicationService;
 use App\Bundle\ProductBundle\Application\VatPostCommand;
+use App\Bundle\ProductBundle\Domain\Model\IContainerOrderRepository;
 use App\Bundle\ProductBundle\Infrastructure\ContainerOrderRepository;
 use App\Bundle\ProductBundle\Infrastructure\DebtHistoryRepository;
 use App\Bundle\ProductBundle\Infrastructure\PaymentRepository;
@@ -177,6 +186,70 @@ class DebtController extends BaseController
     /**
      * @param Request $request request
      */
+    public function getCustomerContainerOrders(Request $request)
+    {
+        $applicationService = new ContainerOrderCustomerListGetApplicationService(
+            new ContainerOrderRepository(),
+        );
+
+        $command = new ContainerOrderCustomerListGetCommand(
+            $request->customer_id
+        );
+
+        $result = $applicationService->handle($command);
+        $paginationResult = $result->pagination;
+        $containerOrderResults = $result->containerOrderResults;
+        $data = [];
+        foreach ($containerOrderResults as $containerOrderResult) {
+            $data[] = [
+                'container_order_id' => $containerOrderResult->containerOrderId,
+                'cost' => $containerOrderResult->cost,
+                'monetary_unit_type' => $containerOrderResult->monetaryUnitType,
+                'comment' => $containerOrderResult->comment,
+                'customer_id' => $containerOrderResult->customerId,
+                'user_id' => $containerOrderResult->userId,
+                'date' => $containerOrderResult->date,
+                'payment_status' => $containerOrderResult->paymentStatus,
+            ];
+        }
+
+        $response = [
+            'data' => $data,
+            'pagination' => [
+                'total_page' => $paginationResult->totalPage,
+                'per_page' => $paginationResult->perPage,
+                'current_page' => $paginationResult->currentPage,
+            ],
+        ];
+
+        return response()->json($response, 200);
+    }
+
+    /**
+     * @param Request $request request
+     */
+    public function cancelContainerOrder(Request $request)
+    {
+        $applicationService = new ContainerOrderCancelPutApplicationService(
+            new ContainerOrderRepository(),
+            new DebtHistoryRepository()
+        );
+
+        $command = new ContainerOrderCancelPutCommand(
+            $request->container_order_id,
+        );
+
+        $result = $applicationService->handle($command);
+        $data = [
+            'id' => $result->containerOrderId,
+        ];
+
+        return response()->json(['data' => $data], 200);
+    }
+
+    /**
+     * @param Request $request request
+     */
     public function createVatDebt(Request $request)
     {
         $applicationService = new VatPostApplicationService(
@@ -191,6 +264,68 @@ class DebtController extends BaseController
             $request->customer_id,
             Auth::id(),
             $request->date,
+        );
+
+        $result = $applicationService->handle($command);
+        $data = [
+            'id' => $result->vatId,
+        ];
+
+        return response()->json(['data' => $data], 200);
+    }
+
+    /**
+     * @param Request $request request
+     */
+    public function getCustomerVats(Request $request)
+    {
+        $applicationService = new VatCustomerListGetApplicationService(
+            new VatRepository(),
+        );
+
+        $command = new VatCustomerListGetCommand(
+            $request->customer_id
+        );
+        $result = $applicationService->handle($command);
+        $paginationResult = $result->pagination;
+        $vatResults = $result->vatResults;
+        $data = [];
+        foreach ($vatResults as $vatResult) {
+            $data[] = [
+                'vat_id' => $vatResult->vatId,
+                'cost' => $vatResult->cost,
+                'monetary_unit_type' => $vatResult->monetaryUnitType,
+                'comment' => $vatResult->comment,
+                'customer_id' => $vatResult->customerId,
+                'user_id' => $vatResult->userId,
+                'date' => $vatResult->date,
+                'payment_status' => $vatResult->paymentStatus,
+            ];
+        }
+
+        $response = [
+            'data' => $data,
+            'pagination' => [
+                'total_page' => $paginationResult->totalPage,
+                'per_page' => $paginationResult->perPage,
+                'current_page' => $paginationResult->currentPage,
+            ],
+        ];
+
+        return response()->json($response, 200);
+    }
+
+    /**
+     * @param Request $request request
+     */
+    public function cancelVat(Request $request)
+    {
+        $applicationService = new VatCancelPutApplicationService(
+            new VatRepository(),
+            new DebtHistoryRepository()
+        );
+        $command = new VatCancelPutCommand(
+            $request->vat_id,
         );
 
         $result = $applicationService->handle($command);

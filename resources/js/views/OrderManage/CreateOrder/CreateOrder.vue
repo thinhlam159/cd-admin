@@ -104,11 +104,11 @@
     <ModalConfirm
       v-model="show"
       :modal-id="modalId"
-      title="Công nợ!"
+      title="Tạo mới đơn!"
       @confirm="() => createOrder()"
       button-value="Tạo"
     >
-      <p>Tạo container công nợ ?</p>
+      <p>Tạo đơn hàng ?</p>
     </ModalConfirm>
   </div>
 </template>

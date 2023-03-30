@@ -3,7 +3,7 @@
     <div class="py-3 text-lg px-5 border-[#e7eaec] border-b-[2px]">
       <p class="text-gray-500 font-semibold">Cập nhật báo giá</p>
     </div>
-    <div class="px-10 py-3">
+    <div class="flex flex-wrap px-10 py-3">
       <div class="flex justify-start border border-gray-200 rounded-md p-5 w-max bg-gray-50">
         <div class="w-[250px] bg-white">
           <input type="text" class="w-full px-2 py-3 border border-gray-200 outline-none" @input="handleFilter" placeholder="Lọc theo tên">
@@ -43,23 +43,30 @@
           </div>
         </div>
       </div>
+      <div class="flex justify-between w-[650px] border border-gray-200 rounded-md p-5 bg-gray-50 ml-5">
+        <div class="w-full border border-gray-200 min-h-[342px] bg-white p-8">
+          <div class="mb-3">
+            <p class="text-lg font-semibold text-gray-500">Báo giá Nam Hương ngày {{ dateNow }}:</p>
+          </div>
+          <ul class="w-full text-base">
+            <li v-for="(item, index) in listNoticePrice" :key="index"><span>{{ item }}</span></li>
+          </ul>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
 import {inject, reactive, ref} from "vue";
-import { useRoute,useRouter } from 'vue-router'
-import {MODULE_STORE, ROUTER_PATH} from "@/const";
-import {
-  getCustomerDetailFromApi,
-  getListProductPriceFromApi,
-  updateCustomerFormApi, updateProductAttributePriceFromApi
-} from "@/api";
+import {useRoute, useRouter} from 'vue-router'
+import {MODULE_STORE} from "@/const";
+import {getListProductPriceFromApi, updateProductAttributePriceFromApi} from "@/api";
 import {useStore} from "vuex";
 import {useCurrencyInput} from "vue-currency-input";
 import _ from "lodash"
 import CurrencyInput from "@/views/ProductManage/EditProduct/CurrencyInput.vue";
+import moment from "moment/moment";
 
 const route = useRoute()
 const router = useRouter()
@@ -70,6 +77,8 @@ const noticePriceItems = reactive([])
 const filterItems = reactive([])
 const noticePriceUpdateItems = reactive([])
 const { inputRef } = useCurrencyInput({currency: 'VND', currencyDisplay: 'hidden'})
+const listNoticePrice = reactive([])
+const dateNow = moment().format('DD/MM/yyyy')
 
 const getListProductPrice = async () => {
   try {
@@ -85,6 +94,8 @@ const getListProductPrice = async () => {
         productCode: productPrice.product_code,
         productAttributePriceId: productPrice.product_attribute_price_id,
       })
+      const price = formatNumber(productPrice.price.toString())
+      listNoticePrice.push(`${productPrice.product_name} x ${productPrice.notice_price_type} x ${price}đ`)
     })
     noticePriceItems.forEach((item) => {
       filterItems.push(item)

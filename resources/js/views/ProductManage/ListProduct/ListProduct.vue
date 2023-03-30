@@ -1,6 +1,6 @@
 <template>
-  <div class="px-5 mt-10 h-[600px]">
-    <div class="bg-white p-2 h-full">
+  <div class="px-5 mt-10 min-h-[600px]">
+    <div class="bg-white p-2 h-auto mb-20">
       <div class="w-full h-8 flex justify-between">
         <div class="flex">
           <div class="mr-1 relative">
@@ -57,7 +57,7 @@
               <th class="border py-1">Tồn kho</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody class="[&>tr:nth-child(odd)]:bg-[#f9f9f9]">
           <template v-for="(item, index) in listProduct">
             <tr v-if="item.product_attribute_values.length === 0">
               <td class="border text-center">{{ ++index }}</td>
@@ -118,13 +118,13 @@
         </table>
       </div>
 
-      <Pagination
-        v-if="pagination"
-        :pageCurrent="pagination.current_page"
-        :totalPage="pagination.total"
-        @onBack="handleBackPage"
-        @onNext="handleNextPage"
-      />
+<!--      <Pagination-->
+<!--        v-if="pagination"-->
+<!--        :pageCurrent="pagination.current_page"-->
+<!--        :totalPage="pagination.total"-->
+<!--        @onBack="handleBackPage"-->
+<!--        @onNext="handleNextPage"-->
+<!--      />-->
     </div>
   </div>
     <QuotePriceModal
@@ -141,7 +141,7 @@ import ButtonAddNew from "@/components/Buttons/ButtonAddNew";
 import ButtonFilter from "@/components/Buttons/ButtonFilter";
 import ButtonEdit from "@/components/Buttons/ButtonEdit";
 import {getListProductFromApi,} from "@/api";
-import {ref, computed, watch, inject} from "vue";
+import {ref, computed, inject} from "vue";
 import {useRouter, useRoute} from "vue-router";
 import {useStore} from "vuex";
 import Pagination from "@/components/Pagination";
@@ -182,6 +182,7 @@ const goToAddProductAttributeValue = (id) => {
 };
 const getListProduct = async (page, categoryIds = []) => {
   try {
+    page = null
     store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = true
     const response = await getListProductFromApi(page, categoryIds)
     pagination.value = response.pagination
@@ -215,12 +216,12 @@ const getListProduct = async (page, categoryIds = []) => {
 //     getListUserManager(page);
 //   }
 // });
-const handleBackPage = (page) => {
-  router.push(`${ROUTER_PATH.USER_MANAGER}?page=${page}`);
-}
-const handleNextPage = (page) => {
-  router.push(`${ROUTER_PATH.USER_MANAGER}?page=${page}`);
-}
+// const handleBackPage = (page) => {
+//   router.push(`${ROUTER_PATH.USER_MANAGER}?page=${page}`);
+// }
+// const handleNextPage = (page) => {
+//   router.push(`${ROUTER_PATH.USER_MANAGER}?page=${page}`);
+// }
 const handleFilter = async () => {
   const res = await getListProductFromApi(pageCurrent.value, {params: {keyword: filterText.value}})
   const productResult = res.data.map((product) => {

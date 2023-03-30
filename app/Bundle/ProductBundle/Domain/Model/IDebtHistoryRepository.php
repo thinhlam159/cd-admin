@@ -84,6 +84,19 @@ interface IDebtHistoryRepository
      */
     public function findByOrderId(OrderId $orderId): ?DebtHistory;
 
+
+    /**
+     * @param ContainerOrderId $containerOrderId
+     * @return DebtHistory|null
+     */
+    public function findByContainerOrderId(ContainerOrderId $containerOrderId): ?DebtHistory;
+
+    /**
+     * @param VatId $vatId
+     * @return DebtHistory|null
+     */
+    public function findByVatId(VatId $vatId): ?DebtHistory;
+
     /**
      * @param DebtHistoryId $debtHistoryId
      * @return bool

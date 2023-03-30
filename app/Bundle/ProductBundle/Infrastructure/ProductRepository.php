@@ -48,7 +48,7 @@ class ProductRepository implements IProductRepository
             $conditions[] = ['name', 'like', "%$keyword%"];
         }
         if (empty($productAttributeValueIds)) {
-            $entities = ModelProduct::where($conditions)->paginate(PaginationConst::PAGINATE_ROW);
+            $entities = ModelProduct::where($conditions)->paginate(100);
         } else {
             $entities = ModelProduct::whereIn('category_id', $productAttributeValueIds)->where($conditions)->paginate(PaginationConst::PAGINATE_ROW);
         }

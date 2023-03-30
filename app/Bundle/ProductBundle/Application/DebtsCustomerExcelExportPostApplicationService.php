@@ -70,21 +70,9 @@ class DebtsCustomerExcelExportPostApplicationService
         $debtResults = [];
         $totalDebt = 0;
         $totalPayment = 0;
-        $restDebt = 0;
         foreach ($debtHistories as $debt) {
             $customer = $this->customerRepository->findById($debt->getCustomerId());
             $user = $this->userRepository->findById(new UserId($debt->getUserId()->asString()));
-            if ($debt->getDebtHistoryUpdateType()->getType() === DebtHistoryUpdateType::PAYMENT && !is_null($debt->getPaymentId())) {
-                $totalPayment += $debt->getNumberOfMoney();
-                $restDebt -= $debt->getNumberOfMoney();
-            }
-            if ($debt->getDebtHistoryUpdateType()->getType() !== DebtHistoryUpdateType::PAYMENT
-                && $debt->getDebtHistoryUpdateType()->getType() !== DebtHistoryUpdateType::INIT
-                && is_null($debt->getPaymentId())
-            ) {
-                $totalDebt += $debt->getNumberOfMoney();
-                $restDebt += $debt->getNumberOfMoney();
-            }
 
             $debtResults[] = new DebtResult(
                 $debt->getDebtHistoryId()->asString(),
@@ -92,8 +80,8 @@ class DebtsCustomerExcelExportPostApplicationService
                 $customer->getCustomerName(),
                 $user->getUserId()->asString(),
                 $user->getUserName(),
-                $debt->getTotalDebt(),
-                $debt->getTotalPayment(),
+                $debt->calculateTotalDebt($totalDebt),
+                $debt->calculateTotalPayment($totalPayment),
                 $debt->isCurrent(),
                 $debt->getDebtHistoryUpdateType()->getValue(),
                 !is_null($debt->getOrderId()) ? $debt->getOrderId()->asString() : null,
@@ -107,12 +95,14 @@ class DebtsCustomerExcelExportPostApplicationService
                 $debt->getDebtHistoryUpdateType()->getComment(),
                 $debt->getVersion()
             );
+            $totalDebt = $debt->calculateTotalDebt($totalDebt);
+            $totalPayment = $debt->calculateTotalPayment($totalPayment);
         }
         $customerDebtResult = new DebtCustomerExcelExportResult(
             $customer->getCustomerName(),
             $totalDebt,
             $totalPayment,
-            $restDebt
+            $totalDebt - $totalPayment
         );
 
         return new DebtsCustomerExcelOrderExportPostResult($customerDebtResult, $debtResults);

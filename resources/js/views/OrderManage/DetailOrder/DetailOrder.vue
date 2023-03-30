@@ -6,7 +6,7 @@
       </div>
       <div class="w-full py-1 text-sm flex justify-between">
         <span class="text-gray-900 font-semibold text-base">Tên khách hàng: {{ orderResponse.customer_name }}</span>
-        <span class="font-semibold text-base">Ngày tạo đơn: {{ moment(orderResponse.update_at).format('L') }}</span>
+        <span class="font-semibold text-base">Ngày tạo đơn: {{ moment(orderResponse.update_at).format('DD/MM/yyyy') }}</span>
       </div>
       <hr>
       <div class="w-full py-4 text-sm text-center">

@@ -11,7 +11,7 @@
         <div class="mt-1 flex justify-start items-center h-[56px]">
           <p class="text-base">Chọn ngày: </p>
           <Datepicker class="px-2 py-1 bg-gray-50 outline-none ml-1 text-base" v-model="picked"
-                      :style="styleDatePicker"/>
+                      :style="styleDatePicker" inputFormat="dd-MM-yyyy"/>
         </div>
         <DP v-model="picked" locale="vi"/>
       </div>

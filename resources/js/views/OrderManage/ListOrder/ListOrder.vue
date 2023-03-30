@@ -27,7 +27,7 @@
             Khách hàng
           </th>
           <th class="border py-1 w-[8%]">
-            Ngày tạo đơn
+            Ngày mua
           </th>
           <th class="border py-1 w-[14%]">
             Tổng giá
@@ -46,7 +46,7 @@
           </th>
         </tr>
         </thead>
-        <tbody class="[&>*:nth-child(odd)]:bg-[#f9f9f9]">
+        <tbody class="[&>tr:nth-child(odd)]:bg-[#f9f9f9]">
         <template v-for="(item, index) in listOrder">
           <tr>
             <td class="border text-center">{{ ++index }}</td>

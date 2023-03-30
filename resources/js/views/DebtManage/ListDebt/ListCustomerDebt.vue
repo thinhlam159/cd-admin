@@ -81,10 +81,14 @@
           </div>
         </div>
         <div class="w-1/2">
-          <div class="w-full border border-gray-200"></div>
+          <div class="w-[90%] p-5 border border-gray-200">
+            <ListCustomerContainerOrder :customer-id="customerId" />
+          </div>
         </div>
         <div class="w-1/2">
-          <div class="w-full border border-gray-200"></div>
+          <div class="w-[90%] p-5 border border-gray-200">
+            <ListCustomerVAT :customer-id="customerId" />
+          </div>
         </div>
       </div>
     </div>
@@ -106,6 +110,8 @@ import ButtonEdit from "@/components/Buttons/ButtonEdit/ButtonEdit.vue";
 import moment from "moment/moment";
 import ListCustomerPayment from "@/views/DebtManage/ListDebt/ListCustomerPayment.vue";
 import ListCustomerOrder from "@/views/DebtManage/ListDebt/ListCustomerOrder.vue";
+import ListCustomerContainerOrder from "@/views/DebtManage/ListDebt/ListCustomerContainerOrder.vue";
+import ListCustomerVAT from "@/views/DebtManage/ListDebt/ListCustomerVAT.vue";
 
 const route = useRoute();
 const router = useRouter();

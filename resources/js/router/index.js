@@ -23,13 +23,13 @@ router.beforeEach((to, from, next) => {
     }
     const { middleware } = to.meta;
     const context = { to, from, next };
-    // const publicPages = ['/admin/login', '/register'];
-    // const authRequired = !publicPages.includes(to.path);
-    // const loggedIn = localStorage.getItem('ủe');
+    const publicPages = ['/admin/login', '/register'];
+    const authRequired = !publicPages.includes(to.path);
+    const loggedIn = localStorage.getItem('user_name');
 
-    // if (authRequired && !loggedIn) {
-    //     return next('/admin/login');
-    // }
+    if (authRequired && !loggedIn) {
+        return next('/admin/login');
+    }
 
     return middleware[0]({
         ...context,

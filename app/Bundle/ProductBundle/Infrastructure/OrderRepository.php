@@ -91,6 +91,7 @@ final class OrderRepository implements IOrderRepository
         })
             ->where([['order_status', '!=', 3]])
             ->orderBy('order_date', 'DESC')
+            ->orderBy('created_at', 'DESC')
             ->paginate(PaginationConst::PAGINATE_ROW);
         $orders = [];
         foreach ($entities as $entity) {
@@ -211,6 +212,7 @@ final class OrderRepository implements IOrderRepository
 //        if (!is_null($criteria->getCategoryId())) {
 //            $conditions[] = ['category_id', '=', $criteria->getCategoryId()];
 //        }
+        $conditions[] = ['order_status', '!=', OrderStatus::CANCEL];
         if (!is_null($criteria->getProductAttributeValueId())) {
             $conditions[] = ['product_attribute_value_id', '=', $criteria->getProductAttributeValueId()];
         }
@@ -248,6 +250,7 @@ final class OrderRepository implements IOrderRepository
     {
         $conditions = [];
         $conditions[] = ['customer_id', '=', $criteria->getCustomerId()->asString()];
+        $conditions[] = ['order_status', '!=', OrderStatus::CANCEL];
         if (!is_null($criteria->getStartDate())) {
             $conditions[] = ['order_date', '>=', $criteria->getStartDate()->asString()];
             $conditions[] = ['order_date', '<=', $criteria->getEndDate()->asString()];

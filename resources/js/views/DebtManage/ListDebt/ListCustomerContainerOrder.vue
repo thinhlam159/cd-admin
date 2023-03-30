@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="mb-3">
-      <span class="text-base font-semibold text-gray-500">Lịch sử thanh toán</span>
+      <span class="text-base font-semibold text-gray-500">Container</span>
     </div>
     <table>
       <thead>
@@ -18,11 +18,13 @@
         <th class="border py-1 w-[26%]">
           Ghi chú
         </th>
-        <th class="border py-1 w-[10%]"></th>
+        <th class="border py-1 w-[10%]">
+
+        </th>
       </tr>
       </thead>
       <tbody>
-      <template v-for="(item, index) in listPayment" :key="index">
+      <template v-for="(item, index) in listCustomerOrder" :key="index">
         <tr>
           <td class="border text-center">{{ (pagination.current_page - 1) * pagination.per_page + (parseInt(index) + 1) }}</td>
           <td class="border text-center">{{ item.cost.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</td>
@@ -30,7 +32,7 @@
           <td class="border text-center">{{ item.comment }}</td>
           <td class="border text-center">
             <div class="flex justify-center">
-              <ButtonRemove @clickBtn="() => handleCancelPayment(item.payment_id)" text="Xóa"/>
+              <ButtonRemove @clickBtn="() => handleCancelOrder(item.container_order_id)" text="Xóa"/>
             </div>
           </td>
         </tr>
@@ -47,11 +49,11 @@
     <ModalConfirm
       v-model="show"
       :modal-id="modalId"
-      title="Xóa thanh toán!"
+      title="Xóa đơn!"
       @confirm="() => confirmCancel(modalId)"
       button-value="Xóa"
     >
-      <p>Bạn muốn xóa thanh toán</p>
+      <p>Bạn muốn xóa đơn hàng</p>
     </ModalConfirm>
   </div>
 </template>
@@ -63,13 +65,11 @@ import {MODULE_STORE, PAGE_DEFAULT} from "@/const"
 import {useRoute, useRouter} from "vue-router"
 import {useStore} from "vuex"
 import {
-  cancelOrderFromApi,
-  cancelPaymentFromApi,
-  getListCustomerPaymentFromApi,
-  updateResolvedPaymentFromApi
+  cancelContainerOrderFromApi,
+  cancelOrderFromApi, getListCustomerContainerOrderFromApi,
+  getListCustomerOrderFromApi,
 } from "@/api"
 import moment from "moment/moment";
-import ButtonEdit from "@/components/Buttons/ButtonEdit/ButtonEdit.vue";
 import ButtonRemove from "@/components/Buttons/ButtonRemove/ButtonRemove.vue";
 import ModalConfirm from "@/components/Modal/Modal/ModalConfirm.vue";
 
@@ -86,19 +86,19 @@ const pageCurrent = computed(() => {
   }
   return Number(route.query.page)
 });
-const listPayment = reactive([])
+const listCustomerOrder = reactive([])
 const props = defineProps({
   customerId : String,
 })
 const emit = defineEmits(['updateListDebt', 'updateCustomerDebt'])
 
-const getListCustomerPayment = async (page) => {
+const getListCustomerContainerOrder = async (page) => {
   try {
-    const res = await getListCustomerPaymentFromApi({customer_id: props.customerId, page})
+    const res = await getListCustomerContainerOrderFromApi({customer_id: props.customerId, page})
     pagination.value = res.pagination
-    listPayment.length = 0
+    listCustomerOrder.length = 0
     res.data.forEach(item => {
-      listPayment.push(item)
+      listCustomerOrder.push(item)
     })
   } catch (errors) {
     const error = errors.message
@@ -109,21 +109,21 @@ const getListCustomerPayment = async (page) => {
 }
 
 const handleBackPage = (page) => {
-  getListCustomerPayment(page)
+  getListCustomerContainerOrder(page)
 }
 const handleNextPage = (page) => {
-  getListCustomerPayment(page)
+  getListCustomerContainerOrder(page)
 }
-const handleCancelPayment = async (id) => {
+const handleCancelOrder = async (id) => {
   show.value = true
   modalId.value = id
 }
 
 const confirmCancel = async (id) => {
   try {
-    const res = await cancelPaymentFromApi({payment_id: id})
-    listPayment.length = 0
-    await getListCustomerPayment(pageCurrent.value)
+    const res = await cancelContainerOrderFromApi({container_order_id: id})
+    listCustomerOrder.length = 0
+    await getListCustomerContainerOrder(pageCurrent.value)
     show.value = false
   } catch (errors) {
     const error = errors.message
@@ -133,7 +133,7 @@ const confirmCancel = async (id) => {
   }
 }
 
-getListCustomerPayment()
+getListCustomerContainerOrder()
 </script>
 
 <style scoped>

@@ -46,6 +46,15 @@
       @onBack="handleBackPage"
       @onNext="handleNextPage"
     />
+    <ModalConfirm
+      v-model="show"
+      :modal-id="modalId"
+      title="Xóa đơn!"
+      @confirm="() => confirmCancel(modalId)"
+      button-value="Xóa"
+    >
+      <p>Bạn muốn xóa đơn hàng</p>
+    </ModalConfirm>
   </div>
 </template>
 
@@ -58,17 +67,18 @@ import {useStore} from "vuex"
 import {
   cancelOrderFromApi,
   getListCustomerOrderFromApi,
-  updateResolvedOrderFromApi,
 } from "@/api"
 import moment from "moment/moment";
-import ButtonEdit from "@/components/Buttons/ButtonEdit/ButtonEdit.vue";
 import ButtonRemove from "@/components/Buttons/ButtonRemove/ButtonRemove.vue";
+import ModalConfirm from "@/components/Modal/Modal/ModalConfirm.vue";
 
 const route = useRoute()
 const router = useRouter()
 const store = useStore()
 const toast = inject('$toast')
 const pagination = ref(null)
+const modalId = ref(null)
+const show = ref(false)
 const pageCurrent = computed(() => {
   if (!route.query.page) {
     return PAGE_DEFAULT
@@ -103,11 +113,17 @@ const handleBackPage = (page) => {
 const handleNextPage = (page) => {
   getListCustomerOrder(page)
 }
-const handleCancelOrder = async (id) => {
+const handleCancelOrder = async (orderId) => {
+  show.value = true
+  modalId.value = orderId
+}
+
+const confirmCancel = async (orderId) => {
   try {
-    const res = await cancelOrderFromApi(id)
+    const res = await cancelOrderFromApi(orderId)
     listOrder.length = 0
     await getListCustomerOrder(pageCurrent.value)
+    show.value = false
   } catch (errors) {
     const error = errors.message
     toast.error(error);
