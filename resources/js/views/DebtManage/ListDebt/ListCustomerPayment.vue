@@ -62,14 +62,8 @@ import {computed, inject, reactive, ref} from "vue"
 import {MODULE_STORE, PAGE_DEFAULT} from "@/const"
 import {useRoute, useRouter} from "vue-router"
 import {useStore} from "vuex"
-import {
-  cancelOrderFromApi,
-  cancelPaymentFromApi,
-  getListCustomerPaymentFromApi,
-  updateResolvedPaymentFromApi
-} from "@/api"
+import {cancelPaymentFromApi, getListCustomerPaymentFromApi} from "@/api"
 import moment from "moment/moment";
-import ButtonEdit from "@/components/Buttons/ButtonEdit/ButtonEdit.vue";
 import ButtonRemove from "@/components/Buttons/ButtonRemove/ButtonRemove.vue";
 import ModalConfirm from "@/components/Modal/Modal/ModalConfirm.vue";
 
@@ -124,7 +118,10 @@ const confirmCancel = async (id) => {
     const res = await cancelPaymentFromApi({payment_id: id})
     listPayment.length = 0
     await getListCustomerPayment(pageCurrent.value)
+    emit('updateListDebt')
+    emit('updateCustomerDebt')
     show.value = false
+    toast.success('Xóa thành công!', {duration: 3000});
   } catch (errors) {
     const error = errors.message
     toast.error(error);

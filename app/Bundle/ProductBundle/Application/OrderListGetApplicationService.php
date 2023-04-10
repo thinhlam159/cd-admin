@@ -108,7 +108,8 @@ class OrderListGetApplicationService
                     $orderProduct->getOrderProductCost(),
                     $productAttributeValue->getCode(),
                     $product->getName(),
-                    $product->getCode()
+                    $product->getCode(),
+                    $orderProduct->getNoteName()
                 );
             }
             $orderResults[] = new OrderResult(

@@ -123,7 +123,10 @@ const confirmCancel = async (id) => {
     const res = await cancelVatFromApi({vat_id:id})
     listOrder.length = 0
     await getListCustomerVatOrder(pageCurrent.value)
+    emit('updateListDebt')
+    emit('updateCustomerDebt')
     show.value = false
+    toast.success('Xóa thành công!', {duration: 3000});
   } catch (errors) {
     const error = errors.message
     toast.error(error);

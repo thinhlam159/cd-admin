@@ -117,22 +117,14 @@
           </tbody>
         </table>
       </div>
-
-<!--      <Pagination-->
-<!--        v-if="pagination"-->
-<!--        :pageCurrent="pagination.current_page"-->
-<!--        :totalPage="pagination.total"-->
-<!--        @onBack="handleBackPage"-->
-<!--        @onNext="handleNextPage"-->
-<!--      />-->
     </div>
   </div>
-    <QuotePriceModal
-      v-if="showModal"
-      @close="showModal = false"
-      @update="handleUpdatePriceSuccess"
-      :data="quotePriceData"
-    />
+  <QuotePriceModal
+    v-if="showModal"
+    @close="showModal = false"
+    @update="handleUpdatePriceSuccess"
+    :data="quotePriceData"
+  />
 </template>
 
 <script setup>

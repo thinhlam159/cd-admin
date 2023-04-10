@@ -150,7 +150,8 @@ class OrderPostApplicationService
                 $orderProductCommand->attributeDisplayIndex,
                 $orderProductCommand->weight,
                 $orderProductCost,
-                $orderProductCommand->actualSellingPrice
+                $orderProductCommand->actualSellingPrice,
+                $orderProductCommand->noteName
             );
 
             $newProductInventories[$productAttributeValueId]['count'] =

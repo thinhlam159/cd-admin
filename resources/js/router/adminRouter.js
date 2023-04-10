@@ -1,10 +1,7 @@
 import {auth, guest} from "./middlewares";
-import {ROUTER_PATH, TYPE_SCREEN, TYPE_USER} from "@/const";
-import Home from "@/views/Home";
+import {ROUTER_PATH, TYPE_USER} from "@/const";
 import UserManage from "@/views/UserManage";
-import ListUserManage from "@/views/ListUserManage";
-import AddUserManage from "@/views/AddUserManage";
-import EditUserManage from "@/views/EditUserManage";
+import ListUser from "@/views/UserManage/ListUser";
 import Login from "@/views/Login";
 import AdminLayout from "@/components/Layouts/AdminLayout";
 import CustomerManage from "@/views/CustomerManage";
@@ -35,6 +32,12 @@ import Overview from "@/views/Dashboard/Overview/Overview.vue";
 import AddCategory from "@/views/CategoryManage/AddCategory/AddCategory.vue";
 import EditCategory from "@/views/CategoryManage/EditCategory/EditCategory.vue";
 import EditProductPrice from "@/views/ProductManage/EditProduct/EditProductPrice.vue";
+import ExportGoodManage from "@/views/ExportGoodManage/ExportGoodManage.vue";
+import ListExportGood from "@/views/ExportGoodManage/ListExportGood";
+import CreateExportGood from "@/views/ExportGoodManage/CreateExport/CreateExportGood.vue";
+import AddUser from "@/views/UserManage/AddUser/AddUser.vue";
+import EditUser from "@/views/UserManage/EditUser/EditUser.vue";
+
 export default [
   // ROUTER_ADMIN
   {
@@ -77,15 +80,15 @@ export default [
         children: [
           {
             path: ROUTER_PATH.EMPTY,
-            component: ListUserManage,
+            component: ListUser,
           },
           {
             path: ROUTER_PATH.ADD,
-            component: AddUserManage,
+            component: AddUser,
           },
           {
             path: ROUTER_PATH.EDIT_ID,
-            component: EditUserManage,
+            component: EditUser,
           },
         ],
       },
@@ -208,6 +211,20 @@ export default [
           {
             path: ROUTER_PATH.LIST_CUSTOMER_DEBT_ID,
             component: ListCustomerDebt,
+          },
+        ]
+      },
+      {
+        path: ROUTER_PATH.EXPORT_GOOD_MANAGE,
+        component: ExportGoodManage,
+        children: [
+          {
+            path: ROUTER_PATH.EMPTY,
+            component: ListExportGood,
+          },
+          {
+            path: ROUTER_PATH.ADD,
+            component: CreateExportGood,
           },
         ]
       },

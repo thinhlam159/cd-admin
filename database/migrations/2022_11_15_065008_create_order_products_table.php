@@ -26,6 +26,7 @@ class CreateOrderProductsTable extends Migration
             $table->integer('cost');
             $table->integer('actual_selling_price');
             $table->string('coupon_id')->nullable();
+            $table->string('note_name')->nullable();
             $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
             $table->foreign('product_attribute_value_id')->references('id')->on('product_attribute_values')->onDelete('cascade');
             $table->foreign('product_attribute_price_id')->references('id')->on('product_attribute_prices')->onDelete('cascade');

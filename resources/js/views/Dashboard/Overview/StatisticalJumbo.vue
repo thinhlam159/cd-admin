@@ -1,7 +1,7 @@
 <template>
-  <div class="p-2 bg-gray-50">
-    <div>
-      <p class="text-xl">3. So luong jumbo ban ra theo khoảng thời gian</p>
+  <div class="p-2 bg-gray-50 flex items-end">
+    <div class="w-1/4">
+      <p class="text-xl">3. Số lượng jumbo bán ra theo khoảng thời gian</p>
       <div class="flex mt-1 justify-start items-center text-base">
         <span>Từ ngày: </span>
         <Datepicker
@@ -31,6 +31,14 @@
       </div>
       <p class="text-gray-700 text-lg mt-2">Tổng cộng: {{ totalRoll }} cây</p>
     </div>
+    <div class="p-3 mt-2 w-1/2">
+      <Bar
+        id="my-chart-id"
+        :options="chartOptions"
+        :data="chartData"
+        v-if="isLoaded"
+      />
+    </div>
   </div>
 </template>
 
@@ -44,6 +52,7 @@ import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, Li
 import { styleDatePicker } from '@/const'
 import { DatePicker as DP } from 'v-calendar';
 import moment from "moment";
+import {Bar} from "vue-chartjs";
 
 const toast = inject('$toast');
 const store = useStore();
@@ -53,7 +62,10 @@ const isLoaded = ref(false)
 const totalRoll = ref(0)
 const chartData = ref({
   labels: [],
-  datasets: [ { data: [] } ]
+  datasets: [{
+    label: 'Số lượng',
+    data: []
+  }]
 })
 const chartOptions = ref({
   responsive: true
@@ -94,6 +106,7 @@ const getProductSaleStatistical = async () => {
       totalRoll.value += item.count
     })
     chartData.value.datasets[0].data = [...parameterData]
+    console.log('jumbo: ' ,chartData.value.datasets[0].data)
     isLoaded.value = true
   } catch (errors) {
     const error = errors.message

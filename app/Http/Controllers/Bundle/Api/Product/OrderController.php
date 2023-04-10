@@ -7,6 +7,11 @@ use App\Bundle\Admin\Infrastructure\DealerRepository;
 use App\Bundle\Admin\Infrastructure\UserRepository;
 use App\Bundle\ProductBundle\Application\DeliveryStatusPutApplicationService;
 use App\Bundle\ProductBundle\Application\DeliveryStatusPutCommand;
+use App\Bundle\ProductBundle\Application\ExportGoodListGetApplicationService;
+use App\Bundle\ProductBundle\Application\ExportGoodListGetCommand;
+use App\Bundle\ProductBundle\Application\ExportGoodPostApplicationService;
+use App\Bundle\ProductBundle\Application\ExportGoodPostCommand;
+use App\Bundle\ProductBundle\Application\ExportGoodProductCommand;
 use App\Bundle\ProductBundle\Application\ImportGoodGetApplicationService;
 use App\Bundle\ProductBundle\Application\ImportGoodGetCommand;
 use App\Bundle\ProductBundle\Application\ImportGoodListGetApplicationService;
@@ -32,6 +37,7 @@ use App\Bundle\ProductBundle\Application\OrderStatusPutCommand;
 use App\Bundle\ProductBundle\Application\RestoreImportGoodPutApplicationService;
 use App\Bundle\ProductBundle\Application\RestoreImportGoodPutCommand;
 use App\Bundle\ProductBundle\Infrastructure\DebtHistoryRepository;
+use App\Bundle\ProductBundle\Infrastructure\ExportGoodRepository;
 use App\Bundle\ProductBundle\Infrastructure\ImportGoodRepository;
 use App\Bundle\ProductBundle\Infrastructure\OrderRepository;
 use App\Bundle\ProductBundle\Infrastructure\ProductAttributePriceRepository;
@@ -73,6 +79,7 @@ class OrderController extends BaseController
                 (int)$orderProduct['weight'],
                 $orderProduct['notice_price_type'],
                 $orderProduct['actual_selling_price'],
+                !empty($orderProduct['note_name']) ? $orderProduct['note_name'] : null,
             );
         }
         $command = new OrderPostCommand(
@@ -154,6 +161,7 @@ class OrderController extends BaseController
                     'product_attribute_value_code' => $orderProductResult->productAttributeValueCode,
                     'product_name' => $orderProductResult->productName,
                     'product_code' => $orderProductResult->productCode,
+                    'note_name' => $orderProductResult->productCode,
                 ];
             }
             $data[] = [
@@ -269,6 +277,7 @@ class OrderController extends BaseController
                 'product_attribute_value_code' => $orderProductResult->productAttributeValueCode,
                 'product_name' => $orderProductResult->productName,
                 'product_code' => $orderProductResult->productCode,
+                'note_name' => $orderProductResult->noteName,
             ];
         }
         $data = [
@@ -543,6 +552,106 @@ class OrderController extends BaseController
         return response()->json(['data' => $data], 200);
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \App\Bundle\Common\Domain\Model\RecordNotFoundException
+     */
+    public function createExportGood(Request $request)
+    {
+        $applicationService = new ExportGoodPostApplicationService(
+            new ExportGoodRepository(),
+            new ProductInventoryRepository(),
+            new ProductAttributeValueRepository()
+        );
+
+        $exportGoodProducts = $request->export_good_products;
+        $exportGoodProductCommands = [];
+        foreach ($exportGoodProducts as $exportGoodProduct) {
+            $exportGoodProductCommands[] = new ExportGoodProductCommand(
+                $exportGoodProduct['product_id'],
+                $exportGoodProduct['product_attribute_value_id'],
+                $exportGoodProduct['count'],
+            );
+        }
+        $command = new ExportGoodPostCommand(
+            Auth::id(),
+            $request->date,
+            $exportGoodProductCommands,
+        );
+
+        $result = $applicationService->handle($command);
+
+        $data[] = [
+            'export_good_id' => $result->exportGoodId,
+        ];
+
+        return response()->json(['data' => $data], 200);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \App\Bundle\Common\Domain\Model\RecordNotFoundException
+     */
+    public function getExportGoods(Request $request)
+    {
+        $applicationService = new ExportGoodListGetApplicationService(
+            new ExportGoodRepository(),
+            new ProductRepository(),
+            new ProductAttributeValueRepository(),
+            new UserRepository()
+        );
+
+        $command = new ExportGoodListGetCommand(
+            !empty($request->product_id) ? $request->product_id : null,
+            !empty($request->product_attribute_value_id) ? $request->product_attribute_value_id : null,
+            !empty($request->keyword) ? $request->keyword : null,
+            !empty($request->sort) ? $request->sort : null,
+            !empty($request->order) ? $request->order : null,
+            !empty($request->start_date) ? $request->start_date : null,
+            !empty($request->end_date) ? $request->end_date : null,
+        );
+        $result = $applicationService->handle($command);
+
+        $data = [];
+        foreach ($result->exportGoodResults as $exportGoodResult) {
+            $exportGoodProducts = [];
+            foreach ($exportGoodResult->exportGoodProductResults as $exportGoodProductResult) {
+                $exportGoodProducts[] = [
+                    'export_good_product_id' => $exportGoodProductResult->exportGoodProductId,
+                    'product_id' => $exportGoodProductResult->productId,
+                    'product_name' => $exportGoodProductResult->productName,
+                    'product_code' => $exportGoodProductResult->productCode,
+                    'product_attribute_value_id' => $exportGoodProductResult->productAttributeValueId,
+                    'product_attribute_value_name' => $exportGoodProductResult->productName,
+                    'product_attribute_value_code' => $exportGoodProductResult->productAttributeValueCode,
+                    'count' => $exportGoodProductResult->count,
+                    'measure_unit_type' => $exportGoodProductResult->measureUnitType,
+                ];
+            }
+            $data[] = [
+                'export_good_id' => $exportGoodResult->exportGoodId,
+                'user_id' => $exportGoodResult->userId,
+                'user_name' => $exportGoodResult->userName,
+                'export_good_date' => $exportGoodResult->exportGoodDate,
+                'export_good_products' => $exportGoodProducts
+            ];
+        }
+        $paginationResult = $result->paginationResult;
+
+        $response = [
+            'data' => $data,
+            'pagination' => [
+                'total_page' => $paginationResult->totalPage,
+                'per_page' => $paginationResult->perPage,
+                'current_page' => $paginationResult->currentPage,
+            ],
+        ];
+
+        return response()->json($response, 200);
+    }
+
     public function exportOrder(Request $request)
     {
         $applicationService = new OrderExportPostApplicationService(
@@ -664,12 +773,13 @@ class OrderController extends BaseController
             $key ++;
             $measure = $measureUnitType[$orderProduct->measureUnitType];
             $productCode = $orderProduct->productCode;
+            $noteName = $orderProduct->noteName;
             if ($orderProduct->measureUnitType === 'roll') {
                 $productCode = "$orderProduct->productCode $orderProduct->productAttributeValueCode$orderProduct->attributeDisplayIndex";
             }
             $template[] = [
                 0 => $key,
-                1 => $productCode,
+                1 => $productCode.$noteName,
                 2 => $measure,
                 3 => $orderProduct->weight,
                 4 => $orderProduct->productAttributePriceStandard,

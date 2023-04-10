@@ -48,6 +48,9 @@ export default {
     RESTORE_IMPORT_GOOD: 'admin/import-good/restore-import-good',
     DETAIL_IMPORT_GOOD: 'admin/import-good/detail-import-good',
 
+    LIST_EXPORT_GOOD: 'admin/export-good/export-goods',
+    CREATE_EXPORT_GOOD: 'admin/export-good/export-good',
+
     LIST_DEALER: 'admin/dealer/dealers',
 
     LIST_DEBT: 'admin/debt/list-debt',

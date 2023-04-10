@@ -32,32 +32,37 @@
       </p>
       <div class="border border-gray-300 rounded-sm w-full">
         <div class="flex text-md items-center bg-gray-100 border-b border-gray-300">
-          <span class="border-r border-gray-300 text-center py-2 w-[10%]">#</span>
-          <span class="border-r border-gray-300 text-center py-2 w-[25%]">Mã</span>
+          <span class="border-r border-gray-300 text-center py-2 w-[3%]">#</span>
+          <span class="border-r border-gray-300 text-center py-2 w-[20%]">Mã</span>
+          <span class="border-r border-gray-300 text-center py-2 w-[17%]">Ghi chú</span>
           <span class="border-r border-gray-300 text-center py-2 w-[10%]">Tên</span>
           <span class="border-r border-gray-300 text-center py-2 w-[15%]">Đơn giá</span>
           <span class="border-r border-gray-300 text-center py-2 w-[10%]">Số lượng</span>
-          <span class="border-r border-gray-300 text-center py-2 w-[20%]">Thành tiền</span>
+          <span class="border-r border-gray-300 text-center py-2 w-[15%]">Thành tiền</span>
           <span class="border-r border-gray-300 text-center py-2 w-[10%]">Xóa</span>
         </div>
         <div class="text-md min-h-[300px]">
           <form @submit.prevent="handleSubmit">
             <div class="border-b border-gray-300">
               <div v-for="(orderItem, index) in listOrderItem" :key="orderItem.key" class="flex items-center">
-                <div class="border-r border-gray-300 text-center py-2 w-[10%]">{{ index + 1 }}</div>
-                <div v-if="orderItem.measureUnitName === 'roll'" class="border-r border-gray-300 text-center py-2 w-[25%]">{{
+                <div class="border-r border-gray-300 text-center py-2 w-[3%]">{{ index + 1 }}</div>
+                <div v-if="orderItem.measureUnitName === 'roll'" class="border-r border-gray-300 text-center py-2 w-[20%]">{{
                     `${orderItem.productCode} ${orderItem.code} x ${orderItem.noticePriceType} x ${orderItem.price.toLocaleString('it-IT', {
                       style: 'currency',
                       currency: 'VND'
                     })}`
                   }}
                 </div>
-                <div v-else class="border-r border-gray-300 text-center py-2 w-[25%]">{{
+                <div v-else class="border-r border-gray-300 text-center py-2 w-[20%]">{{
                     `${orderItem.productCode} x ${orderItem.price.toLocaleString('it-IT', {
                       style: 'currency',
                       currency: 'VND'
                     })}`
                   }}
+                </div>
+                <div class="border-r border-gray-300 text-center py-2 w-[17%]">
+                  <input type="text" class="outline-none border-b border-gray-400 text-center px-2"
+                         v-model="orderItem.noteName" placeholder="tên ghi chú">
                 </div>
                 <div class="border-r border-gray-300 text-center py-2 w-[10%]">
                   <span v-if="orderItem.measureUnitName === 'roll'">{{ orderItem.code + orderItem.order }}</span>
@@ -82,7 +87,7 @@
                   <input type="number" class="outline-none border-b border-gray-400 w-1/2 text-center" min="0"
                          v-model="orderItem.weight">
                 </div>
-                <div class="border-r border-gray-300 text-center py-2 w-[20%]">{{
+                <div class="border-r border-gray-300 text-center py-2 w-[15%]">{{
                     (orderItem.standardPrice * orderItem.weight).toLocaleString('it-IT', {
                       style: 'currency',
                       currency: 'VND'
@@ -171,7 +176,8 @@ const createOrder = async () => {
         measure_unit_type: orderItem.measureUnitName,
         weight: orderItem.weight,
         notice_price_type: orderItem.noticePriceType,
-        actual_selling_price: orderItem.price
+        actual_selling_price: orderItem.price,
+        note_name: orderItem.noteName
       }
     })
     const year = picked.value.getFullYear()
@@ -300,6 +306,7 @@ const handleAddProductItem = (item) => {
       weight: 0,
       cost: 0,
       order: order,
+      noteName: '',
       key: makeItemKey(8)
     })
   }

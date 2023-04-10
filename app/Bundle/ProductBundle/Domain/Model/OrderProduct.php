@@ -60,6 +60,11 @@ final class OrderProduct
     private int $actualSellingPrice;
 
     /**
+     * @var string|null
+     */
+    private ?string $noteName;
+
+    /**
      * @param OrderProductId $orderProductId
      * @param OrderId $orderId
      * @param ProductId $productId
@@ -71,6 +76,7 @@ final class OrderProduct
      * @param int $weight
      * @param int $orderProductCost
      * @param int $actualSellingPrice
+     * @param string|null $noteName
      */
     public function __construct(
         OrderProductId $orderProductId,
@@ -83,7 +89,8 @@ final class OrderProduct
         int $attributeDisplayIndex,
         int $weight,
         int $orderProductCost,
-        int $actualSellingPrice
+        int $actualSellingPrice,
+        ?string $noteName
     )
     {
         $this->orderProductId = $orderProductId;
@@ -97,6 +104,7 @@ final class OrderProduct
         $this->weight = $weight;
         $this->orderProductCost = $orderProductCost;
         $this->actualSellingPrice = $actualSellingPrice;
+        $this->noteName = $noteName;
     }
 
     /**
@@ -185,5 +193,13 @@ final class OrderProduct
     public function getActualSellingPrice(): int
     {
         return $this->actualSellingPrice;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getNoteName(): ?string
+    {
+        return $this->noteName;
     }
 }

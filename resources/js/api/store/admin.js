@@ -91,3 +91,7 @@ export const getRevenuesFromApi = async (params) => api.get(apiConstants.ADMIN.S
 export const getPeriodRevenuesFromApi = async (params) => api.get(apiConstants.ADMIN.STATISTICAL_PERIOD_REVENUES, {params})
 export const getProductSaleStatisticalFromApi = async (params) => api.get(apiConstants.ADMIN.STATISTICAL_PRODUCT_SALE, {params})
 export const getCountCustomerOrderFromApi = async (params) => api.get(apiConstants.ADMIN.STATISTICAL_COUNT_ORDER, {params})
+
+// export good
+export const getListExportGoodFromApi = async (params) => api.get(`${apiConstants.ADMIN.LIST_EXPORT_GOOD}`, {params})
+export const createExportGoodFromApi = async (data) => api.post(`${apiConstants.ADMIN.CREATE_EXPORT_GOOD}`, data)

@@ -35,4 +35,10 @@ interface IProductInventoryRepository
      * @return bool
      */
     public function createMultiProductInventoryByImportGood(array $productInventoryImportGoods): bool;
+
+    /**
+     * @param ProductInventoryExportGood[] $productInventoryExportGoods
+     * @return bool
+     */
+    public function createMultiProductInventoryByExportGood(array $productInventoryExportGoods): bool;
 }

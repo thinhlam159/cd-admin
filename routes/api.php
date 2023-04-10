@@ -111,4 +111,7 @@ Route::group([
     Route::get('/statistical/period-revenues', [StatisticalController::class, 'getPeriodRevenues'])->middleware('auth:api');
     Route::get('/statistical/product-sale-statistical', [StatisticalController::class, 'getStatisticalProductSaleByCategory'])->middleware('auth:api');
     Route::get('/statistical/count-customer-order', [StatisticalController::class, 'getCustomerOrderAmount'])->middleware('auth:api');
+
+    Route::get('/export-good/export-goods', [OrderController::class, 'getExportGoods'])->middleware('auth:api');
+    Route::post('/export-good/export-good', [OrderController::class, 'createExportGood'])->middleware('auth:api');
 });

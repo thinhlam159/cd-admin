@@ -1,6 +1,6 @@
 <template>
   <div class="px-5 mt-10 min-h-[600px] bg-white">
-    <div class="w-[720px]">
+    <div class="w-[860px]">
       <div class="w-full py-6 py-auto text-xl">
         <span class="text-gray-500">Chi tiết đơn hàng</span>
       </div>
@@ -12,21 +12,21 @@
       <div class="w-full py-4 text-sm text-center">
         <div class="w-full flex border bg-gray-100">
           <div class="py-2 border-r inline-block w-[4%]"><span class="text-xs font-semibold">#</span></div>
-          <div class="py-2 border-r inline-block w-[22%]"><span class="text-xs font-semibold">Tên sản phẩm</span></div>
+          <div class="py-2 border-r inline-block w-[32%]"><span class="text-xs font-semibold">Tên sản phẩm</span></div>
           <div class="py-2 border-r inline-block w-[8%]"><span class="text-xs font-semibold">ĐVT</span></div>
-          <div class="py-2 border-r inline-block w-[20%]"><span class="text-xs font-semibold">Số lượng</span></div>
+          <div class="py-2 border-r inline-block w-[10%]"><span class="text-xs font-semibold">Số lượng</span></div>
           <div class="py-2 border-r inline-block w-[20%]"><span class="text-xs font-semibold">Đơn giá</span></div>
           <div class="py-2 inline-block w-[22%]"><span class="text-xs font-semibold">Thành tiền</span></div>
         </div>
         <div class="[&>div:nth-child(odd)]:bg-gray-50 border">
           <div v-for="(item, index) in orderProductResponse" class="w-full py-2 flex border-b border-gray-50">
             <div class="inline-block w-[4%]"><span>{{ ++index }}</span></div>
-            <div class="inline-block w-[22%]">
+            <div class="inline-block w-[32%]">
               <span v-if="item.notice_price_type !== 'default'">{{ item.product_name + ' ' + item.product_attribute_value_code + item.attribute_display_index }}</span>
-              <span v-else>{{ item.product_name }}</span>
+              <span v-else>{{ item.product_name + ' ' + item.note_name }}</span>
             </div>
             <div class="inline-block w-[8%]"><span>{{ t(`measure_unit_type.${item.measure_unit_type}`) }}</span></div>
-            <div class="inline-block w-[20%]"><span>{{ item.weight }}</span></div>
+            <div class="inline-block w-[10%]"><span>{{ item.weight }}</span></div>
             <div class="inline-block w-[20%]"><span>{{ item.price.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</span></div>
             <div class="inline-block w-[22%]"><span>{{ item.cost.toLocaleString('it-IT', {style : 'currency', currency : 'VND'}) }}</span></div>
           </div>

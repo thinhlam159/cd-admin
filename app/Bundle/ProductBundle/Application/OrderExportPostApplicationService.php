@@ -103,7 +103,8 @@ class OrderExportPostApplicationService
                 $productAttributeValue->getCode(),
                 $productAttributePrice->getNoticePriceType()->getValue(),
                 $productAttributePrice->getPrice(),
-                $productAttributePrice->getStandardPrice()
+                $productAttributePrice->getStandardPrice(),
+                $orderProduct->getNoteName()
             );
         }
         $orderDay = $order->getOrderDate()->getValue()->format(DateTimeConst::FORMAT_DAY);

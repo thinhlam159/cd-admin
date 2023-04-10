@@ -64,11 +64,7 @@ import {computed, inject, reactive, ref} from "vue"
 import {MODULE_STORE, PAGE_DEFAULT} from "@/const"
 import {useRoute, useRouter} from "vue-router"
 import {useStore} from "vuex"
-import {
-  cancelContainerOrderFromApi,
-  cancelOrderFromApi, getListCustomerContainerOrderFromApi,
-  getListCustomerOrderFromApi,
-} from "@/api"
+import {cancelContainerOrderFromApi, getListCustomerContainerOrderFromApi,} from "@/api"
 import moment from "moment/moment";
 import ButtonRemove from "@/components/Buttons/ButtonRemove/ButtonRemove.vue";
 import ModalConfirm from "@/components/Modal/Modal/ModalConfirm.vue";
@@ -124,7 +120,10 @@ const confirmCancel = async (id) => {
     const res = await cancelContainerOrderFromApi({container_order_id: id})
     listCustomerOrder.length = 0
     await getListCustomerContainerOrder(pageCurrent.value)
+    emit('updateListDebt')
+    emit('updateCustomerDebt')
     show.value = false
+    toast.success('Xóa thành công!', {duration: 3000});
   } catch (errors) {
     const error = errors.message
     toast.error(error);

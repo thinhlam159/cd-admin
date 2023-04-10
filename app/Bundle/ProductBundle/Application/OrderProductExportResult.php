@@ -85,6 +85,11 @@ class OrderProductExportResult
     public int $productAttributePriceStandard;
 
     /**
+     * @var string|null
+     */
+    public ?string $noteName;
+
+    /**
      * @param string $orderProductId
      * @param string $orderId
      * @param string $productId
@@ -101,8 +106,9 @@ class OrderProductExportResult
      * @param string $noticePriceType
      * @param int $productAttributePrice
      * @param int $productAttributePriceStandard
+     * @param string|null $noteName
      */
-    public function __construct(string $orderProductId, string $orderId, string $productId, string $productAttributeValueId, string $productAttributePriceId, int $count, string $measureUnitType, int $weight, int $attributeDisplayIndex, int $productOrderCost, string $productName, string $productCode, string $productAttributeValueCode, string $noticePriceType, int $productAttributePrice, int $productAttributePriceStandard)
+    public function __construct(string $orderProductId, string $orderId, string $productId, string $productAttributeValueId, string $productAttributePriceId, int $count, string $measureUnitType, int $weight, int $attributeDisplayIndex, int $productOrderCost, string $productName, string $productCode, string $productAttributeValueCode, string $noticePriceType, int $productAttributePrice, int $productAttributePriceStandard, ?string $noteName)
     {
         $this->orderProductId = $orderProductId;
         $this->orderId = $orderId;
@@ -120,5 +126,6 @@ class OrderProductExportResult
         $this->noticePriceType = $noticePriceType;
         $this->productAttributePrice = $productAttributePrice;
         $this->productAttributePriceStandard = $productAttributePriceStandard;
+        $this->noteName = $noteName;
     }
 }

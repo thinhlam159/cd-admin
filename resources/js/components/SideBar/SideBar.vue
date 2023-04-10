@@ -58,6 +58,12 @@ const list = ref([
     icon: "fa fa-lg fa-exchange",
   },
   {
+    id: 10,
+    title: 'Xuất hàng tạo thành phẩm',
+    link: `${ROUTER_PATH.ADMIN}/${ROUTER_PATH.EXPORT_GOOD_MANAGE}`,
+    icon: "fa fa-lg fa-exchange",
+  },
+  {
     id: 5,
     title: 'Báo giá',
     link: `${ROUTER_PATH.ADMIN}/${ROUTER_PATH.PRODUCT_MANAGE}/${ROUTER_PATH.PRICE_MANAGE}`,

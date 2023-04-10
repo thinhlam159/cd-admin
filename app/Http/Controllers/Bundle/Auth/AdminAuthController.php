@@ -39,7 +39,7 @@ class AdminAuthController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
-        $username = $request->get($this->username(), '');
+        $username = $request->get('email', '');
         $usernameField = 'email';
         $credentials = [
             $usernameField => $username,
@@ -135,7 +135,7 @@ class AdminAuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60,
+            'expires_in' => auth()->factory()->getTTL() * 60 * 24,
             'user' => auth()->user()
         ]);
     }

@@ -63,11 +63,11 @@ import moment from "moment/moment";
 const toast = inject('$toast');
 const store = useStore();
 const chartData = ref({
-  labels: [ 'January', 'February', 'March' ],
-  datasets: [ {
+  labels: ['January', 'February', 'March'],
+  datasets: [{
     label: 'Doanh thu ngày',
-    data: [40, 20, 12] }
-  ]
+    data: [40, 20, 12]
+  }]
 })
 const chartOptions = ref({
   responsive: true
@@ -97,6 +97,7 @@ const getRevenueByDay = async () => {
       chartData.value.labels.push(moment(item.date).format('DD/MM'))
       chartData.value.datasets[0].data.push(item.total)
     })
+    console.log('doanh thu: ',chartData.value.datasets[0].data)
     isLoaded.value = true
   } catch (errors) {
     const error = errors.message

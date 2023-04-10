@@ -24,7 +24,7 @@
                     name="price"
                     type="text"
                     v-model="item.price"
-                    :value="item.price"
+                    :value="formatter.format(item.price)"
                     placeholder="nhập giá"
                     :options="{ currency: 'VND', currencyDisplay: 'hidden' }"
                   />
@@ -43,14 +43,30 @@
           </div>
         </div>
       </div>
-      <div class="flex justify-between w-[650px] border border-gray-200 rounded-md p-5 bg-gray-50 ml-5">
-        <div class="w-full border border-gray-200 min-h-[342px] bg-white p-8">
-          <div class="mb-3">
-            <p class="text-lg font-semibold text-gray-500">Báo giá Nam Hương ngày {{ dateNow }}:</p>
+      <div class="w-full flex mt-5">
+        <div class="w-1/2">
+          <div class="flex justify-between border border-gray-200 rounded-md p-5 bg-gray-50 ml-5">
+            <div class="w-full border border-gray-200 min-h-[342px] bg-white p-8">
+              <div class="mb-3">
+                <p class="text-lg font-semibold text-gray-500">Báo giá Nam Hương ngày {{ dateNow }}:</p>
+              </div>
+              <ul class="w-full text-base">
+                <li v-for="(item, index) in listJumboNoticePrice" :key="index"><span>{{ item }}</span></li>
+              </ul>
+            </div>
           </div>
-          <ul class="w-full text-base">
-            <li v-for="(item, index) in listNoticePrice" :key="index"><span>{{ item }}</span></li>
-          </ul>
+        </div>
+        <div class="w-1/2">
+          <div class="flex justify-between border border-gray-200 rounded-md p-5 bg-gray-50 ml-5">
+            <div class="w-full border border-gray-200 min-h-[342px] bg-white p-8">
+              <div class="mb-3">
+                <p class="text-lg font-semibold text-gray-500">Báo giá Nam Hương ngày {{ dateNow }}:</p>
+              </div>
+              <ul class="w-full text-base">
+                <li v-for="(item, index) in listNoticePrice" :key="index"><span>{{ item }}</span></li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -77,6 +93,7 @@ const noticePriceItems = reactive([])
 const filterItems = reactive([])
 const noticePriceUpdateItems = reactive([])
 const { inputRef } = useCurrencyInput({currency: 'VND', currencyDisplay: 'hidden'})
+const listJumboNoticePrice = reactive([])
 const listNoticePrice = reactive([])
 const dateNow = moment().format('DD/MM/yyyy')
 
@@ -88,14 +105,17 @@ const getListProductPrice = async () => {
       noticePriceItems.push({
         productAttributeValueId: productPrice.product_attribute_value_id,
         noticePriceType: productPrice.notice_price_type,
-        price: formatter.format(productPrice.price),
+        price: productPrice.price,
         productId: productPrice.product_id,
         productName: productPrice.product_name,
         productCode: productPrice.product_code,
         productAttributePriceId: productPrice.product_attribute_price_id,
       })
       const price = formatNumber(productPrice.price.toString())
-      listNoticePrice.push(`${productPrice.product_name} x ${productPrice.notice_price_type} x ${price}đ`)
+      if (productPrice.notice_price_type !== 'default')
+        listJumboNoticePrice.push(`${productPrice.product_name} x ${productPrice.notice_price_type} x ${price}đ`)
+      else
+        listNoticePrice.push(`${productPrice.product_name} x ${price}đ`)
     })
     noticePriceItems.forEach((item) => {
       filterItems.push(item)

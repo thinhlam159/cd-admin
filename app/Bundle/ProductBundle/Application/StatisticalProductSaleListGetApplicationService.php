@@ -10,6 +10,7 @@ use App\Bundle\ProductBundle\Domain\Model\ICategoryRepository;
 use App\Bundle\ProductBundle\Domain\Model\IOrderRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductAttributeValueRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductRepository;
+use App\Bundle\ProductBundle\Domain\Model\MeasureUnitType;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValueId;
 use App\Bundle\ProductBundle\Domain\Model\ProductId;
 use App\Bundle\ProductBundle\Domain\Model\SettingDate;
@@ -82,54 +83,22 @@ class StatisticalProductSaleListGetApplicationService
         }
         $products = $this->productRepository->findByCategoryId($category->getCategoryId());
         $orders = $this->orderRepository->findAllByProductSale($criteria);
-        $orderResults = [];
         $productIds = [];
         foreach ($products as $product) {
+            $productAttributeValues = $this->productAttributeValueRepository->findByProductId($product->getProductId());
+            if (empty($productAttributeValues) || $productAttributeValues[0]->getMeasureUnitType()->getType() != MeasureUnitType::ROLL) continue;
             $productIds[] = $product->getProductId()->asString();
         }
         $numberOfProducts = [];
         foreach ($orders as $order) {
-            $customer = $this->customerRepository->findById($order->getCustomerId());
             $orderProducts = $this->orderRepository->findOrderProductsByOrderId($order->getOrderId());
-            $orderProductResults = [];
             foreach ($orderProducts as $orderProduct) {
                 if (!in_array($orderProduct->getProductId(), $productIds)) continue;
-                $orderProductResults[] = new OrderProductResult(
-                    $orderProduct->getOrderProductId()->asString(),
-                    $orderProduct->getOrderId()->asString(),
-                    $orderProduct->getProductId()->asString(),
-                    $orderProduct->getProductAttributeValueId()->asString(),
-                    '',
-                    $orderProduct->getCount(),
-                    '',
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    '',
-                    '',
-                    ''
-                );
                 $numberOfProducts[$orderProduct->getProductId()->asString()] =
                     !empty($numberOfProducts[$orderProduct->getProductId()->asString()])
                         ? $numberOfProducts[$orderProduct->getProductId()->asString()] + $orderProduct->getCount()
                         : $orderProduct->getCount();
             }
-            $orderResults[] = new OrderResult(
-                $order->getOrderId()->asString(),
-                $order->getCustomerId()->asString(),
-                $customer->getCustomerName(),
-                '',
-                '',
-                $order->getOrderDeliveryStatus(),
-                $order->getOrderPaymentStatus(),
-                $orderProductResults,
-                '',
-                $order->getOrderDate()->asString(),
-                0,
-                1
-            );
         }
         $statisticalProductSaleResults = [];
         foreach ($numberOfProducts as $productId => $numberOfProduct) {

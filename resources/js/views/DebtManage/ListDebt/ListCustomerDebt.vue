@@ -77,17 +77,17 @@
         </div>
         <div class="w-1/2">
           <div class="w-[90%] p-5 border border-gray-200">
-            <ListCustomerOrder :customer-id="customerId" />
+            <ListCustomerOrder :customer-id="customerId" @update-list-debt="getListCustomerDebt" @update-customer-debt="getCustomerCurrentDebt(customerId)"/>
           </div>
         </div>
         <div class="w-1/2">
           <div class="w-[90%] p-5 border border-gray-200">
-            <ListCustomerContainerOrder :customer-id="customerId" />
+            <ListCustomerContainerOrder :customer-id="customerId" @update-list-debt="getListCustomerDebt" @update-customer-debt="getCustomerCurrentDebt(customerId)"/>
           </div>
         </div>
         <div class="w-1/2">
           <div class="w-[90%] p-5 border border-gray-200">
-            <ListCustomerVAT :customer-id="customerId" />
+            <ListCustomerVAT :customer-id="customerId" @update-list-debt="getListCustomerDebt" @update-customer-debt="getCustomerCurrentDebt(customerId)"/>
           </div>
         </div>
       </div>
@@ -101,11 +101,7 @@ import {computed, inject, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {useStore} from "vuex";
 import {MODULE_STORE, PAGE_DEFAULT} from "@/const";
-import {
-  exportCustomerDebtHistoryFromApi,
-  getCustomerCurrentDebtFromApi,
-  getListCustomerDebtFromApi
-} from "@/api";
+import {exportCustomerDebtHistoryFromApi, getCustomerCurrentDebtFromApi, getListCustomerDebtFromApi} from "@/api";
 import ButtonEdit from "@/components/Buttons/ButtonEdit/ButtonEdit.vue";
 import moment from "moment/moment";
 import ListCustomerPayment from "@/views/DebtManage/ListDebt/ListCustomerPayment.vue";

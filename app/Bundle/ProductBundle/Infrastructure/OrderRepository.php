@@ -66,6 +66,7 @@ final class OrderRepository implements IOrderRepository
                 'cost' => $orderProduct->getOrderProductCost(),
                 'actual_selling_price' => $orderProduct->getActualSellingPrice(),
                 'measure_unit_type' => $orderProduct->getMeasureUnitType()->getType(),
+                'note_name' => $orderProduct->getNoteName(),
             ]);
             if (!$result) {
                 return false;
@@ -138,7 +139,8 @@ final class OrderRepository implements IOrderRepository
                 $orderProductEntity->attribute_display_index,
                 $orderProductEntity->weight,
                 $orderProductEntity->cost,
-                $orderProductEntity->actual_selling_price
+                $orderProductEntity->actual_selling_price,
+                $orderProductEntity->note_name
             );
         }
 

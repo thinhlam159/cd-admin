@@ -113,7 +113,8 @@ class OrderGetApplicationService
                 $orderProduct->getOrderProductCost(),
                 $productAttributeValue->getCode(),
                 $product->getName(),
-                $product->getCode()
+                $product->getCode(),
+                $orderProduct->getNoteName()
             );
         }
 

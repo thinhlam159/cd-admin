@@ -2,7 +2,7 @@
   <div class="modal-overlay" @click="$emit('close')"></div>
   <div class="modal-content">
     <button @click="$emit('close')">Close</button>
-    <div class="relative p-5 bg-white text-xl">
+    <div class="p-5 bg-white text-xl">
       <span>
         {{ `${data.name} ${data.code} x ${data.noticePriceType}` }}
       </span>
@@ -68,7 +68,7 @@ const updateValue = (e) => {
 }
 
 .modal-content {
-  position: absolute;
+  position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
