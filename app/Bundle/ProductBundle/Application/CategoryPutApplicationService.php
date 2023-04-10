@@ -2,9 +2,6 @@
 
 namespace App\Bundle\ProductBundle\Application;
 
-use App\Bundle\Admin\Domain\Model\Customer;
-use App\Bundle\Admin\Domain\Model\CustomerId;
-use App\Bundle\Admin\Domain\Model\ICustomerRepository;
 use App\Bundle\Common\Domain\Model\InvalidArgumentException;
 use App\Bundle\Common\Domain\Model\TransactionException;
 use App\Bundle\ProductBundle\Domain\Model\Category;
@@ -23,30 +20,36 @@ class CategoryPutApplicationService
         $this->categoryRepository = $categoryRepository;
     }
 
-    public function handle(CategoryPostCommand $command): CategoryPostResult
+    /**
+     * @param CategoryPutCommand $command
+     * @return CategoryPutResult
+     * @throws InvalidArgumentException
+     * @throws TransactionException
+     */
+    public function handle(CategoryPutCommand $command): CategoryPutResult
     {
-//        $existingEmail = $this->categoryRepository->checkExistingEmail($command->email);
-//        if ($existingEmail) {
-//            throw new InvalidArgumentException('Existing Email!');
-//        }
-        $categoryId = CategoryId::newId();
+        $categoryId = new CategoryId($command->categoryId);
+        $category = $this->categoryRepository->findById($categoryId);
+        if (!$category) {
+            throw new InvalidArgumentException('record not found!');
+        }
         $category = new Category(
             $categoryId,
             $command->name,
             $command->slug,
-            !is_null($command->parentId) ? new CategoryId($command->parentId) : CategoryId::newId(),
+            !empty($command->parentId) ? new CategoryId($command->parentId) : $categoryId
         );
 
         DB::beginTransaction();
         try {
-            $categoryId = $this->categoryRepository->create($category);
+            $categoryId = $this->categoryRepository->update($category);
             DB::commit();
         } catch (Exception $e) {
             DB::rollBack();
             Log::error($e);
-            throw new TransactionException('Add category fail!');
+            throw new TransactionException($e->getMessage());
         }
 
-        return new CategoryPostResult($categoryId->__toString());
+        return new CategoryPutResult($categoryId->asString());
     }
 }

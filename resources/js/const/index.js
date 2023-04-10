@@ -8,6 +8,14 @@ export const ROUTER_PATH = {
   RENTAL_PLAN_ID: "rental-plan/:id",
   EDIT_ID: "edit/:id",
   EMPTY_ID: ":id",
+  DETAIL: "detail",
+  DETAIL_ID: "detail/:id",
+
+  PAYMENT: 'payment',
+
+  //Debt
+  LIST_CUSTOMER_DEBT: 'list-customer-debt',
+  LIST_CUSTOMER_DEBT_ID: 'list-customer-debt/:id',
 
   // ROUTER_ADMIN
   ADMIN: "/admin",
@@ -22,6 +30,10 @@ export const ROUTER_PATH = {
   ADD_PRODUCT_ATTRIBUTE_VALUE: "add-attribute-value",
   ADD_PRODUCT_ATTRIBUTE_VALUE_ID: "add-attribute-value/:id",
   ORDER_MANAGE: "order-manage",
+  IMPORT_GOOD_MANAGE: "import-good-manage",
+  EXPORT_GOOD_MANAGE: "export-good-manage",
+  PRICE_MANAGE: "price-manage",
+  DEBT_MANAGE: "debt-manage",
 
   CONFIGURATION: "configuration",
   RESERVATIONS: "reservations",
@@ -86,6 +98,8 @@ export const MODULE_STORE = {
     NAME: "COMMON",
     GETTERS: {
       GET_IS_LOADING: "GET_IS_LOADING",
+      GET_BREADCRUMB_CURRENT: "GET_BREADCRUMB_CURRENT",
+      GET_BREADCRUMB_ITEMS: "GET_BREADCRUMB_ITEMS",
     },
     ACTIONS: {},
     MUTATIONS: {},
@@ -99,7 +113,10 @@ export const MODULE_STORE = {
     ACTIONS: {},
     MUTATIONS: {
       ADD_ORDER_DATA: 'ADD_ORDER_DATA',
-      REMOVE_ORDER_DATA_ITEM: 'REMOVE_ORDER_DATA_ITEM'
+      REMOVE_ORDER_DATA_ITEM: 'REMOVE_ORDER_DATA_ITEM',
+      UPDATE_ORDER_DATA_ITEM: 'UPDATE_ORDER_DATA_ITEM',
+      SORT_ORDER_DATA_ITEM: 'SORT_ORDER_DATA_ITEM',
+      ADD_PRODUCT_ATTRIBUTE_VALUE: 'ADD_PRODUCT_ATTRIBUTE_VALUE',
     },
   },
   PRODUCT: {
@@ -107,6 +124,19 @@ export const MODULE_STORE = {
     GETTERS: {},
     ACTIONS: {},
     MUTATIONS: {},
+  },
+  IMPORT_GOOD: {
+    NAME: "IMPORT_GOOD",
+    GETTERS: {
+      GET_IMPORT_GOOD_DATA: "GET_IMPORT_GOOD_DATA"
+    },
+    ACTIONS: {},
+    MUTATIONS: {
+      ADD_IMPORT_GOOD_DATA: 'ADD_IMPORT_GOOD_DATA',
+      REMOVE_IMPORT_GOOD_DATA_ITEM: 'REMOVE_IMPORT_GOOD_DATA_ITEM',
+      UPDATE_IMPORT_GOOD_DATA_ITEM: 'UPDATE_IMPORT_GOOD_DATA_ITEM',
+      CLEAR_IMPORT_GOOD_DATA_ITEM: 'CLEAR_IMPORT_GOOD_DATA_ITEM',
+    },
   },
 };
 
@@ -145,3 +175,25 @@ export const STATUS_CODE = {
   ValidationFailed: 422,
   InternalServerError: 500,
 };
+
+export const styleDatePicker = {
+  "--vdp-bg-color": "#ffffff",
+  "--vdp-text-color": "#e21818",
+  "--vdp-box-shadow": "0 4px 10px 0 rgba(128, 144, 160, 0.1), 0 0 1px 0 rgba(128, 144, 160, 0.81)",
+  "--vdp-border-radius": "10px",
+  "--vdp-heading-size": "2.5em",
+  "--vdp-heading-weight": "bold",
+  "--vdp-heading-hover-color": "#eeeeee",
+  "--vdp-arrow-color": "currentColor",
+  "--vdp-elem-color": "currentColor",
+  "--vdp-disabled-color": "#d5d9e0",
+  "--vdp-hover-color": "#ffffff",
+  "--vdp-hover-bg-color": "#0baf74",
+  "--vdp-selected-color": "#ffffff",
+  "--vdp-selected-bg-color": "#0baf74",
+  "--vdp-current-date-outline-color": "#888888",
+  "--vdp-current-date-font-weight": "bold",
+  "--vdp-elem-font-size": "1em",
+  "--vdp-elem-border-radius": "3px",
+  "--vdp-divider-color": "#ffffff"
+}

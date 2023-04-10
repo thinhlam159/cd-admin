@@ -4,13 +4,39 @@ namespace App\Bundle\ProductBundle\Application;
 
 class ProductResult
 {
+    /**
+     * @var string
+     */
     public string $productId;
+
+    /**
+     * @var string
+     */
     public string $name;
+
+    /**
+     * @var string
+     */
     public string $code;
+
+    /**
+     * @var string
+     */
     public string $description;
+
+    /**
+     * @var string
+     */
     public string $categoryId;
+
+    /**
+     * @var string
+     */
     public string $categoryName;
-    public string $imagePath;
+
+    /**
+     * @var ProductAttributeValueResult[]
+     */
     public array $productAttributeValueResults;
 
     /**
@@ -20,10 +46,9 @@ class ProductResult
      * @param string $description
      * @param string $categoryId
      * @param string $categoryName
-     * @param string $imagePath
      * @param ProductAttributeValueResult[] $productAttributeValueResults
      */
-    public function __construct(string $productId, string $name, string $code, string $description, string $categoryId, string $categoryName, string $imagePath, array $productAttributeValueResults)
+    public function __construct(string $productId, string $name, string $code, string $description, string $categoryId, string $categoryName, array $productAttributeValueResults)
     {
         $this->productId = $productId;
         $this->name = $name;
@@ -31,7 +56,6 @@ class ProductResult
         $this->description = $description;
         $this->categoryId = $categoryId;
         $this->categoryName = $categoryName;
-        $this->imagePath = $imagePath;
         $this->productAttributeValueResults = $productAttributeValueResults;
     }
 }

@@ -9,8 +9,10 @@ use App\Bundle\Common\Constants\MessageConst;
 use App\Bundle\Common\Domain\Model\InvalidArgumentException;
 use App\Bundle\Common\Domain\Model\TransactionException;
 use App\Bundle\ProductBundle\Domain\Model\IOrderRepository;
+use App\Bundle\ProductBundle\Domain\Model\IProductAttributePriceRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductAttributeValueRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductInventoryRepository;
+use App\Bundle\ProductBundle\Domain\Model\IProductRepository;
 use App\Bundle\ProductBundle\Domain\Model\OrderCriteria;
 use App\Bundle\ProductBundle\Domain\Model\OrderId;
 
@@ -37,30 +39,38 @@ class OrderGetApplicationService
     private IProductAttributeValueRepository $productAttributeValueRepository;
 
     /**
-     * @var IProductInventoryRepository
+     * @var IProductAttributePriceRepository
      */
-    private IProductInventoryRepository $productInventoryRepository;
+    private IProductAttributePriceRepository $productAttributePriceRepository;
+
+    /**
+     * @var IProductRepository
+     */
+    private IProductRepository $productRepository;
 
     /**
      * @param IOrderRepository $orderRepository
      * @param ICustomerRepository $customerRepository
      * @param IUserRepository $userRepository
      * @param IProductAttributeValueRepository $productAttributeValueRepository
-     * @param IProductInventoryRepository $productInventoryRepository
+     * @param IProductAttributePriceRepository $productAttributePriceRepository
+     * @param IProductRepository $productRepository
      */
     public function __construct(
-        IOrderRepository                 $orderRepository,
-        ICustomerRepository              $customerRepository,
-        IUserRepository                  $userRepository,
+        IOrderRepository $orderRepository,
+        ICustomerRepository $customerRepository,
+        IUserRepository $userRepository,
         IProductAttributeValueRepository $productAttributeValueRepository,
-        IProductInventoryRepository      $productInventoryRepository
+        IProductAttributePriceRepository $productAttributePriceRepository,
+        IProductRepository $productRepository
     )
     {
         $this->orderRepository = $orderRepository;
         $this->customerRepository = $customerRepository;
         $this->userRepository = $userRepository;
         $this->productAttributeValueRepository = $productAttributeValueRepository;
-        $this->productInventoryRepository = $productInventoryRepository;
+        $this->productAttributePriceRepository = $productAttributePriceRepository;
+        $this->productRepository = $productRepository;
     }
 
     /**
@@ -76,10 +86,18 @@ class OrderGetApplicationService
         if (!$order) {
             throw new InvalidArgumentException(MessageConst::NOT_FOUND['message']);
         }
+        $customer = $this->customerRepository->findById($order->getCustomerId());
+        $user = $this->userRepository->findById($order->getUserId());
+
 
         $orderProducts = $this->orderRepository->findOrderProductsByOrderId($order->getOrderId());
         $orderProductResults = [];
+        $totalCost = 0;
         foreach ($orderProducts as $orderProduct) {
+            $productAttributePrice = $this->productAttributePriceRepository->findById($orderProduct->getProductAttributePriceId());
+            $productAttributeValue = $this->productAttributeValueRepository->findById($orderProduct->getProductAttributeValueId());
+            $product = $this->productRepository->findById($orderProduct->getProductId());
+            $totalCost += $orderProduct->getOrderProductCost();
             $orderProductResults[] = new OrderProductResult(
                 $orderProduct->getOrderProductId()->asString(),
                 $orderProduct->getOrderId()->asString(),
@@ -87,17 +105,30 @@ class OrderGetApplicationService
                 $orderProduct->getProductAttributeValueId()->asString(),
                 $orderProduct->getProductAttributePriceId()->asString(),
                 $orderProduct->getCount(),
+                $productAttributeValue->getMeasureUnitType()->getValue(),
+                $orderProduct->getWeight(),
+                $orderProduct->getAttributeDisplayIndex(),
+                $productAttributePrice->getNoticePriceType()->getValue(),
+                $productAttributePrice->getStandardPrice(),
+                $orderProduct->getOrderProductCost(),
+                $productAttributeValue->getCode(),
+                $product->getName(),
+                $product->getCode(),
+                $orderProduct->getNoteName()
             );
         }
 
         return new OrderGetResult(
             $order->getOrderId()->asString(),
             $order->getCustomerId()->asString(),
+            $customer->getCustomerName(),
+            $user->getUserName(),
             $order->getUserId()->asString(),
             $order->getOrderDeliveryStatus()->getValue(),
             $order->getOrderPaymentStatus()->getValue(),
+            $order->getUpdatedAt()->asString(),
+            $totalCost,
             $orderProductResults,
-            $order->getUpdateAt()->asString(),
         );
     }
 }

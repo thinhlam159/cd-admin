@@ -1,5 +1,5 @@
 <template>
-  <button class="block bg-red-500 p-2 rounded" @click="handleClick">
+  <button class="block bg-red-500 p-2 rounded" @click.prevent="handleClick">
     <i class="fa fa-times text-white mr-1" aria-hidden="true"></i>
     <span class="text-white">
       {{ text || "No-data" }}

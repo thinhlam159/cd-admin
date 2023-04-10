@@ -1,194 +1,188 @@
 <template>
-    <!--  <FormUserManage />-->
-    <div class="w-full h-full relative">
-        <div class="w-[650px] pt-14 h-full absolute left-20">
-            <div class="w-full py-6 py-auto text-xl">
-                <span class="text-gray-500">Thêm sản mã cho sản phẩm</span>
-            </div>
-            <hr>
-
-            <div>
-                <div class="p-4 text-base text-gray-700">
-                    <span >Tên sản phẩm: {{product.name}}</span>
-                </div>
-                <div class="p-4 text-base text-gray-700">
-                    <span>Mã sản phẩm: {{product.code}}</span>
-                </div>
-            </div>
-            <hr>
-            <form @submit.prevent="handleSubmit(formData)">
-                <div class="py-2">
-                    <label for="code" class="block mb-1 font-bold text-sm">Mã loại sp</label>
-                    <input type="text" name="name" placeholder="Nhập mã loại sản phẩm" v-model="formData.code"
-                           class="w-full h-10 px-3 text-base text-gray-700 placeholder-gray-400 border border-gray-400"
-                    >
-                </div>
-                <div class="flex">
-                    <div class="w-[50%]">
-                        <label for="category" class="block mb-1 font-bold text-sm">Thuộc tính sản phẩm</label>
-                        <select name="category" class="p-3" v-model="formData.product_attribute_id">
-                            <option disabled value="" class="w-full h-10 px-3 text-base text-gray-700" selected>Chọn danh mục</option>
-                            <option v-for="(item, index) in productAttributes" :value="item.id" :key="index" class="w-full h-10 px-3 text-base text-gray-700">{{ item.name }}</option>
-                        </select>
-                    </div>
-                    <div class="w-[50%]">
-                        <label for="category" class="block mb-1 font-bold text-sm">Tên thuộc tính</label>
-                        <input type="text" name="name" placeholder="Tên thuộc tính" v-model="formData.value"
-                               class="w-full h-10 px-3 text-base text-gray-700 placeholder-gray-400 border border-gray-400"
-                        >
-                    </div>
-                </div>
-                <div class="py-2">
-                    <label for="price" class="block mb-1 font-bold text-sm">Giá thành</label>
-                    <input type="text" name="price" placeholder="Nhập giá sp" v-model="formData.price"
-                           class="w-full h-10 px-3 text-base text-gray-700 placeholder-gray-400 border border-gray-400"
-                    >
-                </div>
-                <div class="h-48 my-4">
-                    <img class="h-full w-auto .object-contain" id="blah" :src="imageUrl" alt="your image" />
-                </div>
-                <div>
-                    <input
-                        type="file"
-                        @change="onFileChanged"
-                        accept="image/*"
-                        ref="file"
-                    />
-                </div>
-                <div class="py-2">
-                    <label for="description" class="block mb-1 font-bold text-sm">Số lượng sản phẩm</label>
-                    <input name="price" placeholder="Số lượng sản phẩm ban đầu" v-model="formData.count"
-                           class="w-full h-10 px-3 text-base text-gray-700 placeholder-gray-400 border border-gray-400"
-                    />
-                </div>
-                <div class="py-2">
-                    <label for="description" class="block mb-1 font-bold text-sm">Đơn vị tính</label>
-                    <select name="category" class="p-3" v-model="formData.measure_unit_id">
-                        <option disabled value="" class="w-full h-10 px-3 text-base text-gray-700" selected>Chọn đơn vị tính</option>
-                        <option v-for="(item, index) in measures" :value="item.id" :key="index" class="w-full h-10 px-3 text-base text-gray-700">{{ item.name }}</option>
-                    </select>
-                </div>
-                <div>
-                    <input class="w-25 h-10 mt-5 px-3 text-base text-gray-700 placeholder-gray-400 bg-green-400 cursor-pointer" type="submit" value="Thêm mã sản phẩm">
-                </div>
-            </form>
+  <!--  <FormUserManage />-->
+  <div class="w-full">
+    <div class="w-[650px] mt-5 ml-5 bg-white border-t-[2px] border-[#e7eaec]">
+      <div class="py-4 px-3 border-b border-[#e7eaec] text-md text-gray-700">
+        <span class="text-gray-500">Thêm sản mã cho sản phẩm</span>
+      </div>
+      <div class="px-4">
+        <div class="py-4 text-lg text-gray-700">
+          <span>Tên sản phẩm: {{ product.name }}</span>
         </div>
+        <form @submit.prevent="handleSubmit(formData)">
+          <div class="py-1">
+            <label for="code" class="block py-2 font-bold text-lg">
+              <span>Mã loại sp</span>
+              <span class="text-xs text-gray-400 ml-1 font-extralight">(Tối thiểu 1 ký tự)</span>
+              <span v-if="errors.code" class="ml-1 text-red-500">*</span>
+            </label>
+            <input type="text" name="name" placeholder="Nhập mã loại sản phẩm" v-model="formData.code" @input="validInputCode(formData.code)"
+                   class="w-full h-10 px-3 text-base text-gray-700 placeholder-gray-400 border border-gray-400 focus:border-[#8ddd8d] outline-none"
+            >
+          </div>
+          <div class="py-1">
+            <label for="description" class="block py-2 font-bold text-lg">
+              <span>Số lượng sản phẩm</span>
+              <span class="text-xs text-gray-400 ml-1 font-extralight">(Tối thiểu 1 sản phẩm)</span>
+              <span v-if="errors.count" class="ml-1 text-red-500">*</span>
+            </label>
+            <input name="price" placeholder="Số lượng sản phẩm ban đầu" v-model="formData.count" @input="validInputCount(formData.count)"
+                   class="w-full h-10 px-3 text-base text-gray-700 placeholder-gray-400 border border-gray-400 focus:border-[#8ddd8d] outline-none"
+            />
+          </div>
+          <div class="flex justify-end mt-3 py-3 border-t border-[#e7eaec] items-center">
+            <input class="p-2 text-base font-bold text-white bg-[#1ab394] hover:bg-[#18a689] cursor-pointer rounded-md"
+                   type="submit" value="Tạo sản phẩm">
+          </div>
+        </form>
+      </div>
     </div>
+  </div>
 </template>
 
-<script>
-// import FormUserManage from "@/components/FormUserManage";
-import {ref} from "vue";
+<script setup>
+import {inject, reactive, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {useStore} from "vuex";
 import {MODULE_STORE, ROUTER_PATH} from "@/const";
 import {
-    createProductAttributeValueFromApi,
-    createProductFromApi,
-    getListMeasureUnitFromApi,
-    getListProductAttributeFromApi,
-    getProductDetailFromApi
+  createProductAttributeValueFromApi,
+  getListMeasureUnitFromApi,
+  getListProductAttributeFromApi,
+  getProductDetailFromApi
 } from "@/api";
 import logoTimeSharing from "@/assets/images/default-thumbnail.jpg";
+import Breadcrumb from "@/components/Breadcrumb/Breadcrumb.vue";
+import * as Yup from "yup";
 
-export default {
-    name: "AddProductAttributeValue",
-    components: {  },
-    setup() {
-        const router = useRouter()
-        const route = useRoute()
-        const store = useStore()
-        const formData = ref({})
-        const imageUrl = ref(logoTimeSharing)
-        const imageBuffer = ref(null)
-        const file = ref(null)
-        const product = ref({})
-        const productId = ref(route.params.id)
-        const measures = ref([])
-        const productAttributes = ref([])
+const router = useRouter()
+const route = useRoute()
+const store = useStore()
+const toast = inject('$toast')
+const formData = ref({})
+const imageUrl = ref(logoTimeSharing)
+const imageBuffer = ref(null)
+const file = ref(null)
+const product = ref({})
+const productId = ref(route.params.id)
+const measures = ref([])
+const productAttributes = ref([])
+const errors = reactive({})
 
-        const handleSubmit = async (data) => {
-            try {
-                const bodyFormData = new FormData()
-                bodyFormData.append('product_id', productId.value);
-                bodyFormData.append('product_attribute_id', data.product_attribute_id);
-                bodyFormData.append('measure_unit_id', data.measure_unit_id);
-                bodyFormData.append('value', data.value);
-                bodyFormData.append('code', data.code);
-                bodyFormData.append('price', data.price);
-                bodyFormData.append('count', data.count);
-                bodyFormData.append('file', file.value.files[0]);
-                console.log(file.value.files[0])
-                const res = await createProductAttributeValueFromApi(bodyFormData)
-                router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.PRODUCT_MANAGE}`)
-            } catch (errors) {
-                const error = errors.message;
-                // this.$toast.error(error);
-            } finally {
-                store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
-            }
-        }
+const schema = Yup.object().shape({
+  code: Yup.string().required(),
+  count: Yup.number().required().min(1).typeError("Tối thiểu 1 sản phẩm"),
+})
+const codeSchema = Yup.object().shape({
+  code: Yup.string().required()
+})
+const countSchema = Yup.object().shape({
+  count: Yup.number().required().min(1).typeError("Tối thiểu 1 sản phẩm"),
+})
 
-        const getProduct = async (id) => {
-            try {
-                const res = await getProductDetailFromApi(id)
-                product.value = {
-                    ...res.data
-                }
-            } catch (errors) {
-                const error = errors.message;
-            }
-        }
-
-        const getProductAttributes = async (page) => {
-            try {
-                const res = await getListProductAttributeFromApi(page)
-                productAttributes.value = res.data
-            } catch (errors) {
-                const error = errors.message;
-            }
-        }
-
-        const getMeasureUnits = async (page) => {
-            try {
-                const res = await getListMeasureUnitFromApi(page)
-                console.log(res.data)
-                measures.value = res.data
-            } catch (errors) {
-                const error = errors.message;
-            }
-        }
-
-        const onFileChanged = () => {
-            let image = file.value.files[0];
-            imageUrl.value = URL.createObjectURL(image)
-            createImage(image)
-        }
-
-        const createImage = (file) => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                imageBuffer.value = e.target.result
-            }
-            reader.readAsDataURL(file)
-        }
-
-        getProduct(productId.value)
-        getProductAttributes('')
-        getMeasureUnits('')
-
-        return {
-            formData,
-            handleSubmit,
-            onFileChanged,
-            imageUrl,
-            file,
-            product,
-            productAttributes,
-            measures
-        }
+const handleSubmit = async (data) => {
+  try {
+    await schema.validate(
+      { code: data.code, count: data.count },
+      { abortEarly: false }
+    )
+    const bodyFormData = new FormData()
+    bodyFormData.append('product_id', productId.value);
+    bodyFormData.append('product_attribute_id', productAttributes.value[0].id);
+    bodyFormData.append('measure_unit_type', product.value.measure_unit_type);
+    bodyFormData.append('value', data.code);
+    bodyFormData.append('code', data.code);
+    bodyFormData.append('price', product.value.price);
+    bodyFormData.append('count', data.count);
+    bodyFormData.append('notice_price_type', product.value.notice_price_type);
+    const res = await createProductAttributeValueFromApi(bodyFormData)
+    await router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.PRODUCT_MANAGE}`)
+    toast.success('Thêm mã sản phẩm thành công', {duration: 3000});
+  } catch (validationErrors) {
+    if (validationErrors.hasOwnProperty('inner')) {
+      validationErrors.inner.forEach((error) => {
+        errors[error.path] = error.message;
+      });
     }
-};
+    console.log(errors[0])
+    toast.error(errors.message);
+  } finally {
+    store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
+  }
+}
+
+const getProduct = async (id) => {
+  try {
+    const res = await getProductDetailFromApi(id)
+    product.value = {
+      ...res.data
+    }
+  } catch (errors) {
+    const error = errors.message;
+  }
+}
+
+const getProductAttributes = async (page) => {
+  try {
+    const res = await getListProductAttributeFromApi(page)
+    productAttributes.value = res.data
+  } catch (errors) {
+    const error = errors.message;
+  }
+}
+
+const getMeasureUnits = async (page) => {
+  try {
+    const res = await getListMeasureUnitFromApi(page)
+    measures.value = res.data
+  } catch (errors) {
+    const error = errors.message;
+  }
+}
+
+const validInputCode = async (code) => {
+  try {
+    await codeSchema.validate(
+      { code: code },
+      { abortEarly: false }
+    )
+    delete errors['code'];
+  } catch (validationErrors) {
+    validationErrors.inner.forEach((error) => {
+      errors[error.path] = error.message;
+    });
+  }
+}
+
+const validInputCount = async (count) => {
+  try {
+    await countSchema.validate(
+      { count: count },
+      { abortEarly: false }
+    )
+    delete errors['count'];
+  } catch (validationErrors) {
+    validationErrors.inner.forEach((error) => {
+      errors[error.path] = error.message;
+    });
+  }
+}
+
+store.state[MODULE_STORE.COMMON.NAME].breadcrumbCurrent = 'Tạo mã sản phẩm'
+store.state[MODULE_STORE.COMMON.NAME].breadcrumbItems = [
+  {
+    label: 'Trang chủ',
+    link: '/dashboard'
+  },
+  {
+    label: 'Sản phẩm',
+    link: '/product-manage'
+  }
+]
+
+getProduct(productId.value)
+getProductAttributes('')
+getMeasureUnits('')
 </script>
 
 <style scoped></style>

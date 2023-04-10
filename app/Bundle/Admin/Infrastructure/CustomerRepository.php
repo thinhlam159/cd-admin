@@ -7,6 +7,7 @@ use App\Bundle\Admin\Domain\Model\CustomerId;
 use App\Bundle\Admin\Domain\Model\ICustomerRepository;
 use App\Bundle\Common\Constants\PaginationConst;
 use App\Bundle\Common\Domain\Model\Pagination;
+use App\Bundle\ProductBundle\Domain\Model\CustomerCriteria;
 use App\Models\Customer as ModelCustomer;
 use Exception;
 use InvalidArgumentException;
@@ -20,6 +21,7 @@ class CustomerRepository implements ICustomerRepository
             'email' => $customer->getEmail(),
             'name' => $customer->getCustomerName(),
             'password' => $customer->getPassword(),
+            'address' => $customer->getAddress(),
             'phone' => $customer->getPhone(),
             'is_active' => $customer->getIsActive(),
         ]);
@@ -34,9 +36,14 @@ class CustomerRepository implements ICustomerRepository
     /**
      * @inheritDoc
      */
-    public function findAll(): array
+    public function findAll(CustomerCriteria $criteria): array
     {
-        $entities = ModelCustomer::paginate(PaginationConst::PAGINATE_ROW);
+        $keyword = $criteria->getKeyword();
+        $conditions = [];
+        if ($criteria->getKeyword()) {
+            $conditions[] = ['name', 'like', "%$keyword%"];
+        }
+        $entities = ModelCustomer::where($conditions)->paginate(PaginationConst::PAGINATE_ROW);
 
         /** @var \App\Bundle\Admin\Domain\Model\User[] $result */
         $customers = [];
@@ -47,6 +54,7 @@ class CustomerRepository implements ICustomerRepository
                 $entity->email
             );
             $customer->setPhone($entity->phone);
+            $customer->setAddress($entity->address);
             $customer->setIsActive($entity->is_active);
 
             $customers[] = $customer;
@@ -77,6 +85,7 @@ class CustomerRepository implements ICustomerRepository
             $entity->email,
         );
         $customer->setPhone($entity->phone);
+        $customer->setAddress($entity->address);
         $customer->setIsActive($entity->is_active);
 
         return $customer;
@@ -92,6 +101,7 @@ class CustomerRepository implements ICustomerRepository
         $data = [
             'name' => $customer->getCustomerName(),
             'phone' => $customer->getPhone(),
+            'address' => $customer->getAddress(),
             'is_active' => $customer->getIsActive(),
         ];
 
@@ -120,9 +130,7 @@ class CustomerRepository implements ICustomerRepository
     }
 
     /**
-     * @param string $email
-     * @param CustomerId|null $customerId
-     * @return bool
+     * @inheritDoc
      */
     public function checkExistingEmail(string $email, ?CustomerId $customerId = null): bool
     {
@@ -136,5 +144,61 @@ class CustomerRepository implements ICustomerRepository
         }
 
         return !$entities->contains(ModelCustomer::find($customerId->__toString()));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function findAllByKeyword(string $keyword): array
+    {
+        $entities = ModelCustomer::where([['name', 'like', "%$keyword%"]])->get();
+
+        /** @var \App\Bundle\Admin\Domain\Model\User[] $result */
+        $customers = [];
+        foreach ($entities as $entity) {
+            $customer = new Customer(
+                new CustomerId($entity->id),
+                $entity->name,
+                $entity->email
+            );
+            $customer->setPhone($entity->phone);
+            $customer->setAddress($entity->phone);
+            $customer->setIsActive($entity->is_active);
+
+            $customers[] = $customer;
+        }
+
+        return $customers;
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function findAllNotPaginate(CustomerCriteria $criteria): array
+    {
+        $keyword = $criteria->getKeyword();
+        $conditions = [['is_active', '=', true]];
+        if ($criteria->getKeyword()) {
+            $conditions[] = ['name', 'like', "%$keyword%"];
+        }
+        $entities = ModelCustomer::where($conditions)->get();
+
+        /** @var \App\Bundle\Admin\Domain\Model\User[] $result */
+        $customers = [];
+        foreach ($entities as $entity) {
+            $customer = new Customer(
+                new CustomerId($entity->id),
+                $entity->name,
+                $entity->email
+            );
+            $customer->setPhone($entity->phone);
+            $customer->setAddress($entity->address);
+            $customer->setIsActive($entity->is_active);
+
+            $customers[] = $customer;
+        }
+
+        return $customers;
     }
 }

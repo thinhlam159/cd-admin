@@ -23,13 +23,22 @@ final class NoticePriceType
 
     /** @var array<int,string> */
     private const VALUES = [
-        self::DEFAULT => '',
+        self::DEFAULT => 'default',
         self::KG298 => '298kg',
         self::KG273 => '273kg',
         self::KG248 => '248kg',
         self::KG224 => '224kg',
         self::KG214 => '214kg',
-        self::KG190 => '290kg',
+        self::KG190 => '190kg',
+    ];
+    private const AMOUNT_VALUES = [
+        self::DEFAULT => 1,
+        self::KG298 => 298,
+        self::KG273 => 273,
+        self::KG248 => 248,
+        self::KG224 => 224,
+        self::KG214 => 214,
+        self::KG190 => 190,
     ];
     private int $type;
 
@@ -92,5 +101,13 @@ final class NoticePriceType
     public function getValue(): string
     {
         return self::VALUES[$this->type];
+    }
+
+    /**
+     * @return int
+     */
+    public function getAmountValue(): int
+    {
+        return self::AMOUNT_VALUES[$this->type];
     }
 }

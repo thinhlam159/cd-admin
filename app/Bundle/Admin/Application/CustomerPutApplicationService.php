@@ -41,10 +41,10 @@ final class CustomerPutApplicationService
             throw new RecordNotFoundException(MessageConst::NOT_FOUND['message']);
         }
 
-        $existingEmail = $this->customerRepository->checkExistingEmail($command->email, $customerId);
-        if ($existingEmail) {
-            throw new RecordNotFoundException(MessageConst::EXISTING_EMAIL['message']);
-        }
+//        $existingEmail = $this->customerRepository->checkExistingEmail($command->email, $customerId);
+//        if ($existingEmail) {
+//            throw new RecordNotFoundException(MessageConst::EXISTING_EMAIL['message']);
+//        }
 
         $customer= new Customer(
             $customerId,
@@ -52,6 +52,7 @@ final class CustomerPutApplicationService
             $command->email,
         );
         $customer->setPhone($command->phone);
+        $customer->setAddress($command->address);
         $customer->setIsActive($command->isActive);
 
         DB::beginTransaction();

@@ -1,209 +1,369 @@
 <template>
-  <div class="w-full h-full relative">
-    <div class="w-full pt-14 h-full absolute left-20">
-      <div class="w-full py-6 py-auto text-xl">
-        <span class="text-gray-500">Thêm sản phẩm</span>
-        <hr>
-      </div>
-      <form @submit.prevent="handleSubmit(formData)">
-        <div class="mr-4 w-[14%] mb-5">
-          <label for="customer" class="block mb-1 font-bold text-sm">Khách hàng</label>
-          <select name="customer" class="p-3 w-full" v-model="formData.customerId">
-            <option v-for="item in customers" :value="item.customer_id"
-                    class="w-full h-10 px-3 text-base text-gray-700">{{ item.customer_name }}
-            </option>
-          </select>
-        </div>
-        <hr>
-        <div class="mt-5 py-3 flex">
-          <div class="mr-4 w-[14%]">
-            <span>Danh mục</span>
-          </div>
-          <div class="mr-4 w-[14%]">
-            <span>Sản phẩm</span>
-          </div>
-          <div class="mr-4 w-[14%]">
-            <span>Mã sản phẩm</span>
-          </div>
-          <div class="mr-4 w-[14%]">
-            <span>Báo giá</span>
-          </div>
-          <div class="mr-4 w-[14%]">
-            <span>Số lượng</span>
-          </div>
-          <div class="mr-4 w-[14%]">
-            <span>Thành tiền</span>
-          </div>
-          <div class="mr-4 w-[5%]">
-            <span>Xóa sp</span>
-          </div>
-        </div>
-<!--        <div class="h-48 my-4">-->
-<!--          <img class="h-full w-auto .object-contain" id="blah" :src="imageUrl" alt="your image" />-->
-<!--        </div>-->
-<!--        <div>-->
-<!--          <input-->
-<!--            type="file"-->
-<!--            @change="onFileChanged"-->
-<!--            accept="image/*"-->
-<!--            ref="file"-->
-<!--          />-->
-<!--        </div>-->
-<!--        <div>-->
-<!--          <label for="description" class="block mb-1 font-bold text-sm">Mô tả</label>-->
-<!--          <textarea name="price" placeholder="Nhập giá sp" v-model="formData.description"-->
-<!--                    class="w-full h-10 px-3 text-base text-gray-700 placeholder-gray-400 border border-gray-400"-->
-<!--          ></textarea>-->
-<!--        </div>-->
-        <input-item v-for="(item, index) in listInputItem" key="index"
-                    :categories="categories"
-                    :customers="customers"
-                    :products="products"
-                    @handle-remove-input-item="handleRemoveInputItem(item, index)"
-                    :index="index"
-        />
-
-        <div class="ml-2 my-4">
-          <ButtonAddNew @clickBtn="handleAddToOrder" :text="' '"/>
-        </div>
-        <div class="pr-4">
-          <input class="w-25 h-10 mt-5 px-3 text-base text-gray-700 placeholder-gray-400 bg-green-400 cursor-pointer" type="submit" value="Tạo đơn">
-        </div>
-      </form>
+  <div class="mx-5 min-h-[600px] bg-white mt-10">
+    <div class="py-3 text-lg px-5 border-[#e7eaec] border-b-[2px]">
+      <p class="text-gray-500 font-semibold">Tạo đơn hàng</p>
     </div>
+    <div class="pl-5 pt-3 mt-3">
+      <div class="w-[330px]">
+        <div class="w-full">
+          <p class="text-gray-400 text-base">
+            Khách hàng
+            <span v-if="customerError" class="ml-1 text-red-500 text-sm">(Chọn khách hàng)</span>
+          </p>
+          <div class="flex items-end w-full">
+            <SelectBoxWithSearch :options="customers" @option-selected="handleSelectCustomer"/>
+<!--            <span class="ml-5 text-sm">{{ selectedCustomer ? selectedCustomer.customer_name : ''}}</span>-->
+          </div>
+        </div>
+        <div class="w-full mt-3">
+          <p class="text-gray-400 text-base">Ngày tạo đơn</p>
+          <Datepicker class="p-2 border border-gray-200 w-full h-[40px] text-base outline-none" v-model="picked" :style="styleDatePicker"  inputFormat="dd/MM/yyyy" :locale="vi" />
+        </div>
+      </div>
+    </div>
+    <div class="px-5 pt-3 mt-3">
+      <p class="text-gray-400 text-base">Chọn sản phẩm</p>
+      <AddOrderItemBlock @addProductItem="handleAddProductItem"/>
+    </div>
+    <div class="px-5 pt-3 mt-3 mb-10">
+      <p class="text-gray-400 text-base">
+        Đơn hàng
+        <span v-if="listOrderError" class="ml-1 text-red-500 text-sm">(Đơn hàng không hợp lệ)</span>
+      </p>
+      <div class="border border-gray-300 rounded-sm w-full">
+        <div class="flex text-md items-center bg-gray-100 border-b border-gray-300">
+          <span class="border-r border-gray-300 text-center py-2 w-[3%]">#</span>
+          <span class="border-r border-gray-300 text-center py-2 w-[20%]">Mã</span>
+          <span class="border-r border-gray-300 text-center py-2 w-[17%]">Ghi chú</span>
+          <span class="border-r border-gray-300 text-center py-2 w-[10%]">Tên</span>
+          <span class="border-r border-gray-300 text-center py-2 w-[15%]">Đơn giá</span>
+          <span class="border-r border-gray-300 text-center py-2 w-[10%]">Số lượng</span>
+          <span class="border-r border-gray-300 text-center py-2 w-[15%]">Thành tiền</span>
+          <span class="border-r border-gray-300 text-center py-2 w-[10%]">Xóa</span>
+        </div>
+        <div class="text-md min-h-[300px]">
+          <form @submit.prevent="handleSubmit">
+            <div class="border-b border-gray-300">
+              <div v-for="(orderItem, index) in listOrderItem" :key="orderItem.key" class="flex items-center">
+                <div class="border-r border-gray-300 text-center py-2 w-[3%]">{{ index + 1 }}</div>
+                <div v-if="orderItem.measureUnitName === 'roll'" class="border-r border-gray-300 text-center py-2 w-[20%]">{{
+                    `${orderItem.productCode} ${orderItem.code} x ${orderItem.noticePriceType} x ${orderItem.price.toLocaleString('it-IT', {
+                      style: 'currency',
+                      currency: 'VND'
+                    })}`
+                  }}
+                </div>
+                <div v-else class="border-r border-gray-300 text-center py-2 w-[20%]">{{
+                    `${orderItem.productCode} x ${orderItem.price.toLocaleString('it-IT', {
+                      style: 'currency',
+                      currency: 'VND'
+                    })}`
+                  }}
+                </div>
+                <div class="border-r border-gray-300 text-center py-2 w-[17%]">
+                  <input type="text" class="outline-none border-b border-gray-400 text-center px-2"
+                         v-model="orderItem.noteName" placeholder="tên ghi chú">
+                </div>
+                <div class="border-r border-gray-300 text-center py-2 w-[10%]">
+                  <span v-if="orderItem.measureUnitName === 'roll'">{{ orderItem.code + orderItem.order }}</span>
+                  <span v-else>{{ orderItem.code}}</span>
+                </div>
+                <div class="border-r border-gray-300 text-center py-2 w-[15%]">
+                  <div class="flex">
+                    <CurrencyInput
+                      name="price"
+                      type="text"
+                      v-model="orderItem.price"
+                      :value="orderItem.price"
+                      placeholder="nhập giá"
+                      :options="{ currency: 'VND', currencyDisplay: 'hidden' }"
+                    />
+                    <div class="text-center">
+                      <span>đ</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="border-r border-gray-300 text-center py-2 w-[10%]">
+                  <input type="number" class="outline-none border-b border-gray-400 w-1/2 text-center" min="0"
+                         v-model="orderItem.weight">
+                </div>
+                <div class="border-r border-gray-300 text-center py-2 w-[15%]">{{
+                    (orderItem.standardPrice * orderItem.weight).toLocaleString('it-IT', {
+                      style: 'currency',
+                      currency: 'VND'
+                    })
+                  }}
+                </div>
+                <div class="flex justify-center items-center border-r border-gray-300 py-2 w-[10%]">
+                  <ButtonRemove @clickBtn="handleRemoveOrderItem(index)" text='Xóa'/>
+                </div>
+              </div>
+            </div>
+            <div class="mt-2">
+              <button type="submit" class="border-gray-400 border hover:bg-[#d6d5d5] p-2 rounded-md">Tạo đơn</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <ModalConfirm
+      v-model="show"
+      :modal-id="modalId"
+      title="Tạo mới đơn!"
+      @confirm="() => createOrder()"
+      button-value="Tạo"
+    >
+      <p>Tạo đơn hàng ?</p>
+    </ModalConfirm>
   </div>
 </template>
 
-<script>
+<script setup>
 import {useRouter} from "vue-router";
 import {useStore} from "vuex";
-import {ref} from "vue";
-import logoTimeSharing from "@/assets/images/default-thumbnail.jpg";
+import {ref, inject, reactive} from "vue";
 import {
   createOrderFromApi,
-  createProductFromApi,
-  getListCategoryFromApi,
-  getListCustomerFromApi,
+  getListCategoryFromApi, getListCustomerAllFromApi,
   getListProductFromApi
 } from "@/api";
-import {MODULE_STORE, ROUTER_PATH} from "@/const";
-import InputItem from "@/views/OrderManage/CreateOrder/InputItem";
-import ButtonAddNew from "@/components/Buttons/ButtonAddNew";
+import {MODULE_STORE, ROUTER_PATH, styleDatePicker} from "@/const";
+import SelectBoxWithSearch from "@/components/MultiSelect/SelectBoxWithSearch.vue";
+import AddOrderItemBlock from "@/views/OrderManage/CreateOrder/AddOrderItemBlock.vue";
+import ButtonRemove from "@/components/Buttons/ButtonRemove/ButtonRemove.vue";
+import Datepicker from 'vue3-datepicker'
+import * as Yup from "yup";
+import { vi } from 'date-fns/locale'
+import CurrencyInput from "@/components/CurrencyInput";
+import ModalConfirm from "@/components/Modal/Modal/ModalConfirm.vue";
 
-export default {
-  name: "CreateOrder",
-  components: { InputItem, ButtonAddNew },
-  setup() {
-    const router = useRouter()
-    const store = useStore()
-    const formData = ref({})
-    const file = ref(null)
-    const categories = ref({})
-    const customers = ref({})
-    const products = ref({})
-    const productsByCategory = ref({})
-    const productSelected = ref({})
-    const productAttributeValues = ref({})
-    const productAttributeValuesByProduct = ref({})
-    const listInputItem = ref([
-      {}
-    ])
+const router = useRouter()
+const store = useStore()
+const toast = inject('$toast')
+const formData = ref({})
+const categories = ref({})
+const customers = ref([])
+const products = ref({})
+const productsByCategory = ref({})
+const productSelected = ref({})
+const productAttributeValuesByProduct = ref({})
+const selectedCustomer = ref(null)
+const customerError = ref(false)
+const listOrderItem = reactive([])
+const picked = ref(new Date())
+const errors = reactive({})
+const listOrderError = ref(false)
+const modalId = ref(null)
+const show = ref(false)
 
-    const handleSubmit = async (data) => {
-      try {
-        const orderPostData = [...store.state[MODULE_STORE.ORDER.NAME].orderPostData]
-        const bodyFormData = new FormData()
-        bodyFormData.append('customer_id', data.customerId);
-        // bodyFormData.append('order_products', orderPostData);
-        const postData = {
-          customer_id: data.customerId,
-          order_products: orderPostData
-        }
-        const res = await createOrderFromApi(postData)
-        // router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.PRODUCT_MANAGE}`)
-      } catch (errors) {
-        const error = errors.message;
-        // this.$toast.error(error);
-      } finally {
-        store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
+const schema = Yup.object().shape({
+  weight: Yup.number().min(1).typeError("Tối thiểu 1 đơn vị"),
+})
+const customerSchema = Yup.object().shape({
+  customer: Yup.string().required(),
+})
+const orderItemsSchema = Yup.array().of(schema)
+
+const createOrder = async () => {
+  try {
+    const orderPostData = listOrderItem.map(orderItem => {
+      return {
+        product_id: orderItem.productId,
+        product_attribute_value_id: orderItem.productAttributeValueId,
+        product_attribute_price_id: orderItem.productAttributePriceId,
+        attribute_display_index: orderItem.order,
+        count: 1,
+        measure_unit_type: orderItem.measureUnitName,
+        weight: orderItem.weight,
+        notice_price_type: orderItem.noticePriceType,
+        actual_selling_price: orderItem.price,
+        note_name: orderItem.noteName
       }
+    })
+    const year = picked.value.getFullYear()
+    const month = ('0' + (picked.value.getMonth() + 1)).slice(-2)
+    const day = ('0' + picked.value.getDate()).slice(-2)
+    const date = `${year}-${month}-${day}`
+    const postData = {
+      customer_id: selectedCustomer.value.customer_id,
+      order_products: orderPostData,
+      date: date
     }
-
-    const getListCategory = async () => {
-      try {
-        const res = await getListCategoryFromApi()
-        categories.value = res.data.reduce( (option, data) => {
-          return [
-            ...option,
-            {
-              name: data.name,
-              id: data.category_id
-            }
-          ]
-        }, [])
-        formData.value.category = res.data[0].category_id
-      } catch (errors) {
-        // const error = errors.message;
-        // console.log(error)
-      }
-    }
-
-    const getListProduct = async () => {
-      const res = await getListProductFromApi();
-      products.value = res.data
-    }
-    const getListCustomer = async () => {
-      const res = await getListCustomerFromApi();
-      customers.value = {
-        ...res.data
-      }
-    }
-    const handleOnChangeCategorySelect = () => {
-      productsByCategory.value = products.value.filter((product) => {
-        return product.category_id === formData.value.category
+    const res = await createOrderFromApi(postData)
+    await router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.ORDER_MANAGE}`)
+    toast.success('Tạo đơn hàng thành công', {duration: 3500})
+  } catch (validationErrors) {
+    if (validationErrors.hasOwnProperty('inner')) {
+      validationErrors.inner.forEach((error) => {
+        errors[error.path] = error.message
       })
+      listOrderError.value = true
     }
-    const handleOnChangeProductSelect = () => {
-      productSelected.value = products.value.filter((product) => {
-        return product.product_id === formData.value.product
-      })[0]
-
-      productAttributeValuesByProduct.value = productSelected.value.product_attribute_values
-    }
-    const handleAddToOrder = () => {
-      listInputItem.value.push({})
-    }
-    const handleRemoveInputItem = (item, index) => {
-      console.log('remove item:' + index)
-      if (listInputItem.value[index] === item) {
-        listInputItem.value.splice(index, 1)
-      } else {
-        let found = listInputItem.value.indexOf(item)
-        listInputItem.value.splice(found, 1)
-      }
-      store.commit(`${MODULE_STORE.ORDER.NAME}/${MODULE_STORE.ORDER.MUTATIONS.REMOVE_ORDER_DATA_ITEM}`, index)
-    }
-
-    getListCategory()
-    getListCustomer()
-    getListProduct()
-
-    return {
-      formData,
-      categories,
-      customers,
-      products,
-      productAttributeValuesByProduct,
-      productsByCategory,
-      listInputItem,
-      handleSubmit,
-      handleOnChangeCategorySelect,
-      handleOnChangeProductSelect,
-      handleAddToOrder,
-      handleRemoveInputItem
-    }
+    toast.error(validationErrors.message);
+  } finally {
+    store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
   }
 }
+const handleSubmit = async () => {
+  if (selectedCustomer.value === null) {
+    customerError.value = true
+    return
+  }
+  if (listOrderItem.length === 0) {
+    listOrderError.value = true
+    return
+  }
+  await customerSchema.validate({customer: selectedCustomer.value.customer_id})
+  await orderItemsSchema.validate(listOrderItem, {abortEarly: false})
+  show.value = true
+}
+
+const getListCategory = async () => {
+  try {
+    const res = await getListCategoryFromApi()
+    categories.value = res.data.reduce( (option, data) => {
+      return [
+        ...option,
+        {
+          name: data.name,
+          id: data.category_id
+        }
+      ]
+    }, [])
+    formData.value.category = res.data[0].category_id
+    store.state[MODULE_STORE.ORDER.NAME].categories = res.data
+  } catch (errors) {
+    const error = errors.message;
+    toast.error(error)
+  }
+}
+
+const getListProduct = async () => {
+  try {
+    const res = await getListProductFromApi();
+    const data = res.data
+    products.value = res.data
+    store.state[MODULE_STORE.ORDER.NAME].products = res.data
+    data.forEach(product => {
+      product.product_attribute_values.forEach(attributeValue => {
+        const payload = {
+          productAttributeValueId: attributeValue.product_attribute_value_id,
+          code: attributeValue.code,
+          measureUnitName: attributeValue.measure_unit_name,
+          monetaryUnitName: attributeValue.monetary_unit_name,
+          noticePriceType: attributeValue.notice_price_type,
+          price: attributeValue.price,
+          standardPrice: attributeValue.standard_price,
+          productId: product.product_id,
+          productName: product.name,
+          productCode: product.code,
+          productAttributePriceId: product.product_attribute_price_id,
+        }
+        store.commit(`${MODULE_STORE.ORDER.NAME}/${MODULE_STORE.ORDER.MUTATIONS.ADD_PRODUCT_ATTRIBUTE_VALUE}`, payload)
+      })
+    })
+  } catch (errors) {
+    toast.error(errors.message)
+  }
+}
+const getListCustomer = async () => {
+  const res = await getListCustomerAllFromApi();
+  customers.value = [
+    ...res.data.map(item => {
+      return {
+        ...item,
+        text: item.customer_name
+      }
+    })
+  ]
+  store.state[MODULE_STORE.ORDER.NAME].customers = res.data
+  console.log(res)
+}
+const handleOnChangeCategorySelect = () => {
+  productsByCategory.value = products.value.filter((product) => {
+    return product.category_id === formData.value.category
+  })
+}
+const handleOnChangeProductSelect = () => {
+  productSelected.value = products.value.filter((product) => {
+    return product.product_id === formData.value.product
+  })[0]
+
+  productAttributeValuesByProduct.value = productSelected.value.product_attribute_values
+}
+const handleSelectCustomer = (selectedItem) => {
+  customerError.value = false
+  selectedCustomer.value = {...selectedItem}
+}
+const handleAddProductItem = (item) => {
+  const listProductAttributeValue = [...store.state[MODULE_STORE.ORDER.NAME].productAttributeValues]
+  const itemOrder = listProductAttributeValue.find(i => i.productAttributeValueId === item.id)
+  for(let i = 0; i < item.amount; i++) {
+    const lastItemOfSameAttributeValue = listOrderItem.slice().reverse().find(i => i.productAttributeValueId === item.id)
+    const order = lastItemOfSameAttributeValue ? lastItemOfSameAttributeValue.order + 1 : 1
+    listOrderItem.push({
+      ...itemOrder,
+      weight: 0,
+      cost: 0,
+      order: order,
+      noteName: '',
+      key: makeItemKey(8)
+    })
+  }
+  listOrderItem.sort((a, b) => {
+    if (a.productAttributeValueId === b.productAttributeValueId) {
+      return a.order - b.order;
+    }
+    return a.productAttributeValueId.localeCompare(b.productAttributeValueId);
+  })
+}
+const handleRemoveOrderItem = (index) => {
+  const removeItem = listOrderItem[index]
+  listOrderItem.splice(index, 1)
+  let order = 0
+  const newListOrderItem = listOrderItem.map((item) => {
+    if(item.productAttributeValueId !== removeItem.productAttributeValueId) return item
+    return {
+      ...item,
+      order: ++order
+    }
+  })
+  listOrderItem.length = 0
+  newListOrderItem.forEach(item => listOrderItem.push(item))
+  listOrderItem.sort((a, b) => {
+    if (a.productAttributeValueId === b.productAttributeValueId) {
+      return a.order - b.order;
+    }
+    return a.productAttributeValueId.localeCompare(b.productAttributeValueId);
+  })
+}
+const makeItemKey = (length) => {
+  let result = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const charactersLength = characters.length;
+  let counter = 0;
+  while (counter < length) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    counter += 1;
+  }
+  return result;
+}
+
+store.state[MODULE_STORE.COMMON.NAME].breadcrumbCurrent = 'Tạo đơn'
+store.state[MODULE_STORE.COMMON.NAME].breadcrumbItems = [
+  {
+    label: 'Trang chủ',
+    link: '/dashboard'
+  },
+  {
+    label: 'Đơn hàng',
+    link: '/order-manage'
+  },
+]
+
+getListCategory()
+getListCustomer()
+getListProduct()
 </script>
 
 <style scoped>

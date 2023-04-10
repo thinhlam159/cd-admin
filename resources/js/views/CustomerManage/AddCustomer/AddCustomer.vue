@@ -1,145 +1,158 @@
 <template>
-<!--  <FormUserManage />-->
-    <div class="w-full h-full relative">
-        <div class="w-[650px] pt-14 h-full absolute left-20">
-            <div class="w-full py-6 py-auto text-xl">
-                <span class="text-gray-500">Thêm khách hàng</span>
-            </div>
-            <FormKit type="form" @submit="handleSubmit(formData)" :actions="false" submit-label="Register" :form-class="hide">
-                <FormKit
-                    type="text"
-                    label="Tên"
-                    name="name"
-                    placeholder="Nhập tên"
-                    validation="required"
-                    :classes="{
-                      outer: 'mb-5',
-                      label: 'block mb-1 font-bold text-sm',
-                      inner: 'max-w-md border border-gray-400 rounded-lg mb-1 overflow-hidden focus-within:border-blue-500',
-                      input: 'w-full h-10 px-3 border-none text-base text-gray-700 placeholder-gray-400',
-                      help: 'text-xs text-gray-500'
-                    }"
-                    v-model="formData.name"
-                />
-                <FormKit
-                    type="text"
-                    label="Email"
-                    name="email"
-                    placeholder="email@domain.com"
-                    validation="required|email"
-                    :classes="{
-                      outer: 'mb-5',
-                      label: 'block mb-1 font-bold text-sm',
-                      inner: 'max-w-md border border-gray-400 rounded-lg mb-1 overflow-hidden focus-within:border-blue-500',
-                      input: 'w-full h-10 px-3 border-none text-base text-gray-700 placeholder-gray-400',
-                      help: 'text-xs text-gray-500'
-                    }"
-                    v-model="formData.email"
-                />
-                <FormKit
-                    type="text"
-                    label="Mật khẩu"
-                    name="password"
-                    placeholder="password"
-                    validation="required"
-                    disabled={true}
-                    :classes="{
-                      outer: 'mb-5',
-                      label: 'block mb-1 font-bold text-sm',
-                      inner: 'max-w-md border border-gray-400 rounded-lg mb-1 overflow-hidden focus-within:border-blue-500',
-                      input: 'w-full h-10 px-3 border-none text-base text-gray-700 placeholder-gray-400',
-                      help: 'text-xs text-gray-500'
-                    }"
-                    v-model="formData.password"
-                />
-                <FormKit
-                    type="text"
-                    label="Số điện thoại"
-                    name="email"
-                    placeholder="0000.000.000"
-                    validation="number"
-                    :classes="{
-                      outer: 'mb-5',
-                      label: 'block mb-1 font-bold text-sm',
-                      inner: 'max-w-md border border-gray-400 rounded-lg mb-1 overflow-hidden focus-within:border-blue-500',
-                      input: 'w-full h-10 px-3 border-none text-base text-gray-700 placeholder-gray-400',
-                      help: 'text-xs text-gray-500'
-                    }"
-                    v-model="formData.phone"
-                />
-                <FormKit
-                    v-model="formData.status"
-                    type="checkbox"
-                    label="Kích hoạt"
-                    name="status"
-                    validation="accepted"
-                    :classes="{
-                      outer: 'mb-0 mt-8',
-                      label: 'font-bold text-sm',
-                      input: 'bg-gray-400 border-gray-50 text-base text-gray-50 rounded-md',
-                      inner: 'inline mr-5'
-                    }"
-                />
-                <FormKit
-                    type="submit"
-                    label="Cập nhật"
-                    :classes="{
-                      outer: 'mb-0 mt-8',
-                      label: 'block mb-1 font-bold text-sm text-white',
-                      input: 'bg-gray-400 h-10 px-3 border-gray-50 text-base text-gray-50 rounded-md',
-                    }"
-                />
-            </FormKit>
+  <div class="p-5 mt-8 mx-5 bg-white">
+    <div class="w-[650px] mt-5 ml-5 bg-white border border-t-[2px] border-[#e7eaec]">
+      <div class="py-4 px-3 border-b border-[#e7eaec] text-md text-gray-700">
+        Thêm khách hàng
+      </div>
+      <form @submit.prevent="handleSubmit" class="p-3">
+        <div class="py-1">
+          <label for="name" class="block py-2 font-bold text-lg">
+            <span>Tên khách hàng</span>
+            <span v-if="errors.name" class="ml-1 text-red-500">*</span>
+          </label>
+          <input type="text" name="name" placeholder="Nhập tên" v-model="formData.name" @input="onInputName"
+                 class="w-full h-10 px-3 text-base text-gray-700 placeholder-gray-400 border border-gray-400 focus:border-[#8ddd8d] outline-none"
+                 :class="!!errors['name'] ? 'border-red-500 border' : ''"
+          >
         </div>
+        <div class="py-1 hidden">
+          <label for="email" class="block py-2 font-bold text-lg">
+            <span>Email</span>
+            <span class="text-xs text-gray-400 ml-1 font-extralight">(Tối thiểu 3 ký tự)</span>
+            <span v-if="errors.email" class="ml-1 text-red-500">*</span>
+          </label>
+          <input type="text" name="email" placeholder="Nhập email" v-model="formData.email" @input="validInputEmail"
+                 class="w-full h-10 px-3 text-base text-gray-700 placeholder-gray-400 border border-gray-400 focus:border-[#8ddd8d] outline-none"
+          >
+        </div>
+        <div class="py-1 hidden">
+          <label for="password" class="block py-2 font-bold text-lg">
+            <span>Mật khẩu</span>
+            <span class="text-xs text-gray-400 ml-1 font-extralight">(Tối thiểu 1000đ)</span>
+            <span v-if="errors.password" class="ml-1 text-red-500">*</span>
+          </label>
+          <input type="number" name="password" placeholder="Nhập mật khẩu" v-model="formData.password" @input="validInputPassword"
+                 class="w-full h-10 px-3 text-base text-gray-700 placeholder-gray-400 border border-gray-400 focus:border-[#8ddd8d] outline-none"
+                 disabled
+          >
+        </div>
+        <div class="py-1">
+          <label for="address" class="block py-2 font-bold text-lg">
+            <span>Địa chỉ</span>
+            <span class="text-xs text-gray-400 ml-1 font-extralight"></span>
+            <span v-if="errors.address" class="ml-1 text-red-500">*</span>
+          </label>
+          <input type="text" name="address" placeholder="Nhập địa chỉ" v-model="formData.address"
+                 class="w-full h-10 px-3 text-base text-gray-700 placeholder-gray-400 border border-gray-400 focus:border-[#8ddd8d] outline-none"
+                 :class="!!errors['address'] ? 'border-red-500 border' : ''"
+          >
+        </div>
+        <div class="py-1">
+          <label for="phone" class="block py-2 font-bold text-lg">
+            <span>Số điện thoại</span>
+            <span class="text-xs text-gray-400 ml-1 font-extralight"></span>
+            <span v-if="errors.phone" class="ml-1 text-red-500">*</span>
+          </label>
+          <input type="text" name="phone" placeholder="Nhập số điện thoại" v-model="formData.phone" @input="onInputPhone"
+                 class="w-full h-10 px-3 text-base text-gray-700 placeholder-gray-400 border border-gray-400 focus:border-[#8ddd8d] outline-none"
+                 :class="!!errors['phone'] ? 'border-red-500 border' : ''"
+          >
+        </div>
+        <div class="py-1 hidden">
+          <label for="status" class="block py-2 font-bold text-lg">
+            <span>Trạng thái</span>
+            <span class="text-xs text-gray-400 ml-1 font-extralight">(Tối thiểu 1000đ)</span>
+            <span v-if="errors.status" class="ml-1 text-red-500">*</span>
+          </label>
+          <input type="checkbox" name="status" v-model="formData.status"
+                 class="w-full h-10 px-3 text-base text-gray-700 placeholder-gray-400 border border-gray-400 focus:border-[#8ddd8d] outline-none"
+          >
+        </div>
+        <div class="flex justify-end border-t border-[#e7eaec] mt-5 p-3">
+          <input class="mt-3 p-2 text-base font-bold text-white bg-[#1ab394] hover:bg-[#18a689] cursor-pointer rounded-md"
+                 type="submit" value="Thêm khách hàng">
+        </div>
+      </form>
     </div>
+  </div>
 </template>
 
-<script>
-// import FormUserManage from "@/components/FormUserManage";
-import {ref} from "vue";
+<script setup>
+import {inject, reactive} from "vue";
 import {useRouter} from "vue-router";
 import {useStore} from "vuex";
 import {MODULE_STORE, ROUTER_PATH} from "@/const";
-import {createCustomerFromApi, createUserFromApi} from "@/api";
+import {createCustomerFromApi} from "@/api";
+import * as Yup from "yup";
 
-export default {
-  name: "AddCustomer",
-  components: {  },
-  setup() {
-      const router = useRouter()
-      const store = useStore()
-      const formData = ref({
-          name: '',
-          email: '',
-          password: '123132',
-          phone: '',
-          status: true
+const router = useRouter()
+const store = useStore()
+const toast = inject("$toast");
+const formData = reactive({
+  name: '',
+  email: 'thinhlv@gmail.com',
+  password: '123456',
+  address: '',
+  phone: '',
+  status: true
+})
+const errors = reactive({})
+
+const nameSchema = Yup.object().shape({
+  name: Yup.string().required().min(3, 'Tối thiểu 3 ký tự')
+})
+const phoneSchema = Yup.object().shape({
+  phone: Yup.string().min(10, 'Tối thiểu 10 số')
+})
+
+const handleSubmit = async () => {
+  try {
+    await nameSchema.validate({name: formData.name}, { abortEarly: false })
+    // await phoneSchema.validate({phone: formData.phone}, { abortEarly: false })
+    const res = await createCustomerFromApi({
+      customer_name: formData.name,
+      email: formData.email,
+      password: formData.password,
+      address: formData.address,
+      phone: formData.phone,
+      status: formData.status,
+    })
+    await router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.CUSTOMER_MANAGE}`)
+  } catch (validateErrors) {
+    if (validateErrors.hasOwnProperty('inner')) {
+      validateErrors.inner.forEach((e) => {
+        errors[e.path] = e.message
       })
-
-      const handleSubmit = async (data) => {
-          try {
-              const res = await createCustomerFromApi({
-                  customer_name: data.name,
-                  email: data.email,
-                  password: data.password,
-                  phone: data.phone,
-                  status: data.status,
-              })
-              router.push(`${ROUTER_PATH.ADMIN}/${ROUTER_PATH.CUSTOMER_MANAGE}`)
-          } catch (errors) {
-              const error = errors.message;
-              // this.$toast.error(error);
-          } finally {
-              store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
-          }
-      }
-
-      return {
-          formData,
-          handleSubmit
-      }
+      return
+    }
+    toast.error(validateErrors.message)
+  } finally {
+    store.state[MODULE_STORE.COMMON.NAME].isLoadingPage = false;
   }
-};
+}
+const onInputPhone = async (e) => {
+  const number = e.target.value;
+  const cleanValue = number.replace(/[^\d\s-]/g, '');
+  formData.phone = cleanValue.replace(/(\d{3})\s?-?(\d{3})\s?-?(\d{4})/, '$1 $2 $3')
+
+  delete errors['phone'];
+}
+
+const onInputName = async () => {
+  delete errors['name'];
+}
+
+store.state[MODULE_STORE.COMMON.NAME].breadcrumbCurrent = 'Thêm khách hàng'
+store.state[MODULE_STORE.COMMON.NAME].breadcrumbItems = [
+  {
+    label: 'Trang chủ',
+    link: '/dashboard'
+  },
+  {
+    label: 'Khách hàng',
+    link: '/customer_manage'
+  },
+]
 </script>
 
 <style scoped></style>

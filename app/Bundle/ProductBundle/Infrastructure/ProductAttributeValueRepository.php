@@ -3,6 +3,7 @@ namespace App\Bundle\ProductBundle\Infrastructure;
 
 use App\Bundle\ProductBundle\Domain\Model\IProductAttributeValueRepository;
 use App\Bundle\ProductBundle\Domain\Model\MeasureUnitId;
+use App\Bundle\ProductBundle\Domain\Model\MeasureUnitType;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributeId;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributePriceId;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValue;
@@ -22,9 +23,10 @@ final class ProductAttributeValueRepository implements IProductAttributeValueRep
             'id' => $productAttributeValue->getProductAttributeValueId()->asString(),
             'product_id' => $productAttributeValue->getProductId()->asString(),
             'product_attribute_id' => $productAttributeValue->getProductAttributeId()->asString(),
-            'measure_unit_id' => $productAttributeValue->getMeasureUnitId()->asString(),
             'value' => $productAttributeValue->getValue(),
             'code' => $productAttributeValue->getCode(),
+            'measure_unit_type' => $productAttributeValue->getMeasureUnitType()->getType(),
+            'is_original' => $productAttributeValue->isOriginal(),
         ]);
         if (!$result) {
             return null;
@@ -39,20 +41,19 @@ final class ProductAttributeValueRepository implements IProductAttributeValueRep
     public function findById(ProductAttributeValueId $productAttributeValueId): ?ProductAttributeValue
     {
         $entity = ModelProductAttributeValue::find($productAttributeValueId->asString());
-
         if (!$entity) {
             return null;
         }
 
         return new ProductAttributeValue(
             new ProductAttributeValueId($entity['id']),
-            new ProductId($entity['id']),
-            new ProductAttributeId($entity['id']),
-            new MeasureUnitId($entity['id']),
+            new ProductId($entity['product_id']),
+            new ProductAttributeId($entity['product_attribute_id']),
             $entity['value'],
             $entity['code'],
             null,
-            null,
+            MeasureUnitType::fromType($entity['measure_unit_type']),
+            $entity['is_original'],
         );
     }
 
@@ -61,7 +62,10 @@ final class ProductAttributeValueRepository implements IProductAttributeValueRep
      */
     public function findByProductId(ProductId $productId): array
     {
-        $entities = ModelProductAttributeValue::where('product_id', $productId->asString())->get();
+        $conditions = [
+            ['product_id', '=', $productId->asString(),],
+        ];
+        $entities = ModelProductAttributeValue::where($conditions)->get();
 
         $productAttributeValues = [];
         foreach ($entities as $entity) {
@@ -69,11 +73,11 @@ final class ProductAttributeValueRepository implements IProductAttributeValueRep
                 new ProductAttributeValueId($entity['id']),
                 new ProductId($entity['product_id']),
                 new ProductAttributeId($entity['product_attribute_id']),
-                new MeasureUnitId($entity['measure_unit_id']),
                 $entity['value'],
                 $entity['code'],
                 null,
-                null,
+                MeasureUnitType::fromType($entity['measure_unit_type']),
+                $entity['is_original'],
             );
 
             $productAttributeValues[] = $productAttributeValue;
@@ -117,7 +121,6 @@ final class ProductAttributeValueRepository implements IProductAttributeValueRep
         $productAttributeValues = [];
         foreach ($entities as $entity) {
             $productAttributePrices = $entity->productAttributePrices();
-
             $productAttributePriceId = $productAttributePrices->where('is_current', '=', 1)->first()->id;
             $productAttributeValues[] = new ProductAttributeValue(
                 new ProductAttributeValueId($entity['id']),
@@ -126,7 +129,52 @@ final class ProductAttributeValueRepository implements IProductAttributeValueRep
                 $entity['value'],
                 $entity['code'],
                 null,
-                null
+                MeasureUnitType::fromType($entity['measure_unit_type']),
+                $entity['is_original'],
+            );
+        }
+
+        return $productAttributeValues;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function checkExistingCode(ProductId $productId, string $code): bool
+    {
+        $entity = ModelProductAttributeValue::where([
+            ['product_id', '=', $productId->asString()],
+            ['code', '=', $code]
+        ])->first();
+
+        if (!$entity) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function findAllOriginal(): array
+    {
+        $entities = ModelProductAttributeValue::where('is_original', '=', true)->get();
+        if ($entities->isEmpty()) {
+            return [];
+        }
+
+        $productAttributeValues = [];
+        foreach ($entities as $entity) {
+            $productAttributeValues[] = new ProductAttributeValue(
+                new ProductAttributeValueId($entity['id']),
+                new ProductId($entity['product_id']),
+                new ProductAttributeId($entity['product_attribute_id']),
+                $entity['value'],
+                $entity['code'],
+                null,
+                MeasureUnitType::fromType($entity['measure_unit_type']),
+                $entity['is_original'],
             );
         }
 

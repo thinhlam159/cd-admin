@@ -18,4 +18,9 @@ class Order extends Model
     {
         return $this->hasMany('App\Models\OrderProduct');
     }
+
+    public function customer()
+    {
+        return $this->belongsTo('App\Models\Customer','customer_id', 'id');
+    }
 }

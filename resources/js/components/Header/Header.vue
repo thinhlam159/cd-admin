@@ -1,93 +1,59 @@
 <template>
-  <div class="flex w-full h-[50px] border border-solid border-[#dbdbdb] border-t-0 border-l-0 border-r-0 bg-white">
-    <div class="w-[14%] h-full">
-<!--      <div class="w-full h-full flex items-center">-->
-<!--        <img :src="logoTimeSharing" alt="logoTimeSharing" class="w-4/5 h-4/5 object-contain" />-->
-<!--      </div>-->
-        <div class="flex justify-center items-center py-3">
-            <div class="mr-2 flex items-center">
-                <i class="fa fa-lg fa-cogs"></i>
-            </div>
-            <span class="font-bold text-2xl">CD-admin</span>
+  <div class="h-[140px]">
+    <div class="h-[56px] flex justify-between w-full bg-[#f3f3f3] p-3 border-b border-[#e7eaec]">
+      <div class="flex h-full">
+        <div class="flex items-center bg-[#1ab394] hover:bg-[#18a689] rounded-md px-1 cursor-pointer mr-3">
+          <Hamburger />
         </div>
+        <div class="flex justify-center items-center">
+          <div class="mr-2 flex items-center">
+            <i class="fa fa-lg fa-cogs"></i>
+          </div>
+          <span class="font-bold text-2xl">CD-admin</span>
+        </div>
+      </div>
+      <div class="flex items-center justify-end  text-base">
+        <div class="cursor-pointer text-gray-400 hover:bg-gray-300 p-1 rounded-md mr-4">
+          <i class="fa fa-envelope text-current"></i>
+        </div>
+        <div class="cursor-pointer text-gray-400 hover:bg-gray-300 p-1 rounded-md mr-4">
+          <i class="fa fa-bell text-current"></i>
+        </div>
+        <div class="cursor-pointer text-gray-400 hover:bg-gray-300 p-1 rounded-md mr-4 font-semibold" @click="handleLogout">
+          <i class="fa fa-sign-out text-current"></i>
+          <span class="ml-2"></span>Đăng xuất
+        </div>
+      </div>
     </div>
-    <div class="w-[86%] flex items-center justify-end">
-      <div v-show="isShowHeader" class="w-full flex items-center">
-<!--        <div class="flex items-center mr-3">-->
-<!--          <FormKit-->
-<!--            type="text"-->
-<!--            :label="$t('header.space_id_search')"-->
-<!--            value=""-->
-<!--            placeholder="ID"-->
-<!--            wrapper-class="flex"-->
-<!--            label-class=""-->
-<!--            inner-class="mx-1 border border-solid  rounded border-[#4F4F4F]"-->
-<!--            input-class="w-[100px] h-6 px-2"-->
-<!--          />-->
-<!--          <button class="bg-[#ebeaea] hover:bg-[#d6d5d5] border border-solid rounded border-[#4F4F4F] px-1 h-6">-->
-<!--            {{ $t("header.search") }}-->
-<!--          </button>-->
-<!--        </div>-->
-<!--        <div class="flex items-center mr-3">-->
-<!--          <FormKit-->
-<!--            type="text"-->
-<!--            :label="$t('header.reservation_id_search')"-->
-<!--            value=""-->
-<!--            placeholder="ID"-->
-<!--            wrapper-class="flex"-->
-<!--            label-class=""-->
-<!--            inner-class="mx-1 border border-solid  rounded border-[#4F4F4F]"-->
-<!--            input-class="w-[100px] h-6 px-2"-->
-<!--          />-->
-<!--          <button class="bg-[#ebeaea] hover:bg-[#d6d5d5] border border-solid rounded border-[#4F4F4F] px-1 h-6">-->
-<!--            {{ $t("header.search") }}-->
-<!--          </button>-->
-<!--        </div>-->
-      </div>
-      <div class="cursor-pointer hover:bg-gray-300 p-1 rounded-md min-w-fit mr-4" @click="handleLogout">
-<!--        {{ $t("header.logout") }}-->
-        Đăng xuất
-      </div>
+    <div class="h-[84px] py-4 px-5 bg-white border-b border-[#e7eaec]">
+      <Breadcrumb />
     </div>
   </div>
 </template>
 
-<script>
+<script setup>
 import logoTimeSharing from "@/assets/images/time_sharing_logo.png";
 import { logout } from "@/api";
 import { removeToken } from "@/utils/authToken";
 import { TYPE_USER } from "@/const";
+import Hamburger from "@/components/icons/Hamburger.vue";
+import Breadcrumb from "@/components/Breadcrumb/Breadcrumb.vue";
 
-export default {
-  name: "Header",
+const props = defineProps({
+  isShowHeader: {
+    type: Boolean,
+    default: true,
+  },
+})
 
-  data() {
-    return {};
-  },
-  props: {
-    isShowHeader: {
-      type: Boolean,
-      default: true,
-    },
-  },
-  computed: {
-    logoTimeSharing() {
-      return logoTimeSharing;
-    },
-  },
-  mounted() {},
-
-  methods: {
-    async handleLogout() {
-        console.log(123)
-      try {
-        await logout();
-        removeToken(TYPE_USER.ADMIN);
-        window.location.reload();
-      } catch (error) {
-        console.log("error: ", error);
-      }
-    },
-  },
-};
+const handleLogout = async () => {
+  try {
+    await logout();
+    removeToken(TYPE_USER.ADMIN);
+    window.localStorage.removeItem('user_name')
+    window.location.reload();
+  } catch (error) {
+    console.log("error: ", error);
+  }
+}
 </script>

@@ -20,9 +20,14 @@ final class CustomerPutCommand
     public string $customerName;
 
     /**
-     * @var int
+     * @var string|null
      */
-    public int $phone;
+    public ?string $address;
+
+    /**
+     * @var string|null
+     */
+    public ?string $phone;
 
     /**
      * @var bool
@@ -30,22 +35,19 @@ final class CustomerPutCommand
     public bool $isActive;
 
     /**
-     * @param string $customerId customerId
-     * @param string $customerName customerName
-     * @param string $email email
-     * @param int $phone $phone
-     * @param bool $isActive $isActive
+     * @param string $customerId
+     * @param string $email
+     * @param string $customerName
+     * @param string|null $address
+     * @param string|null $phone
+     * @param bool $isActive
      */
-    public function __construct(
-        string $customerId,
-        string $customerName,
-        string $email,
-        int $phone,
-        bool $isActive
-    ){
+    public function __construct(string $customerId, string $email, string $customerName, ?string $address, ?string $phone, bool $isActive)
+    {
         $this->customerId = $customerId;
-        $this->customerName = $customerName;
         $this->email = $email;
+        $this->customerName = $customerName;
+        $this->address = $address;
         $this->phone = $phone;
         $this->isActive = $isActive;
     }

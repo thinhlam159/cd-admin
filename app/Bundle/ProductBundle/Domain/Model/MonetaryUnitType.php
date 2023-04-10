@@ -43,7 +43,7 @@ final class MonetaryUnitType
             }
         }
 
-        throw new InvalidArgumentException("[{$value}] 不正な値です。");
+        throw new InvalidArgumentException("[{$value}] Gía trị không hợp lệ");
     }
 
     /**
@@ -53,7 +53,7 @@ final class MonetaryUnitType
     public static function fromType(int $type): MonetaryUnitType
     {
         if (!isset(self::VALUES[$type])) {
-            throw new InvalidArgumentException("[{$type}] 不正な値です。");
+            throw new InvalidArgumentException("[{$type}] Type không hợp lệ");
         }
 
         return new MonetaryUnitType($type);

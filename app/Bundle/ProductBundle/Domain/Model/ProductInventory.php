@@ -24,6 +24,11 @@ final class ProductInventory
     private MeasureUnitType $measureUnitType;
 
     /**
+     * @var \App\Bundle\ProductBundle\Domain\Model\ProductInventoryUpdateType
+     */
+    private ProductInventoryUpdateType $updateType;
+
+    /**
      * @var bool
      */
     private bool $isCurrent;
@@ -33,6 +38,7 @@ final class ProductInventory
      * @param ProductAttributeValueId $productAttributeValueId
      * @param MeasureUnitType $measureUnitType
      * @param int $count
+     * @param ProductInventoryUpdateType $updateType
      * @param bool $isCurrent
      */
     public function __construct(
@@ -40,6 +46,7 @@ final class ProductInventory
         ProductAttributeValueId $productAttributeValueId,
         int $count,
         MeasureUnitType $measureUnitType,
+        ProductInventoryUpdateType $updateType,
         bool $isCurrent
     )
     {
@@ -47,6 +54,7 @@ final class ProductInventory
         $this->productAttributeValueId = $productAttributeValueId;
         $this->count = $count;
         $this->measureUnitType = $measureUnitType;
+        $this->updateType = $updateType;
         $this->isCurrent = $isCurrent;
     }
 
@@ -88,5 +96,13 @@ final class ProductInventory
     public function isCurrent(): bool
     {
         return $this->isCurrent;
+    }
+
+    /**
+     * @return ProductInventoryUpdateType
+     */
+    public function getUpdateType(): ProductInventoryUpdateType
+    {
+        return $this->updateType;
     }
 }

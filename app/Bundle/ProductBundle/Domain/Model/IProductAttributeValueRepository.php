@@ -6,10 +6,10 @@ use App\Bundle\Common\Domain\Model\Pagination;
 interface IProductAttributeValueRepository
 {
     /**
-     * @param ProductAttributeValue $productAttribute
+     * @param ProductAttributeValue $productAttributeValue
      * @return ProductAttributeValueId|null
      */
-    public function create(ProductAttributeValue $productAttribute): ?ProductAttributeValueId;
+    public function create(ProductAttributeValue $productAttributeValue): ?ProductAttributeValueId;
 
     /**
      * @param ProductAttributeValueId $productAttributeValueId
@@ -34,4 +34,17 @@ interface IProductAttributeValueRepository
      * @return ProductAttributeValue[]
      */
     public function findAll(ProductAttributeValueCriteria $productAttributeValueCriteria): array;
+
+    /**
+     * @param ProductId $productId
+     * @param string $code
+     * @return bool
+     */
+    public function checkExistingCode(ProductId $productId, string $code): bool;
+
+    /**
+     * @noparam
+     * @return ProductAttributeValue[]
+     */
+    public function findAllOriginal(): array;
 }

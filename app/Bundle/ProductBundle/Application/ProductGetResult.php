@@ -4,12 +4,33 @@ namespace App\Bundle\ProductBundle\Application;
 
 class ProductGetResult
 {
+    /**
+     * @var string
+     */
     public string $productId;
+    /**
+     * @var string
+     */
     public string $name;
+    /**
+     * @var string
+     */
     public string $code;
+    /**
+     * @var string
+     */
     public string $description;
+    /**
+     * @var string
+     */
     public string $categoryId;
+    /**
+     * @var string
+     */
     public string $categoryName;
+    /**
+     * @var ProductAttributeValueResult[]
+     */
     public array $productAttributeValueResults;
 
     /**

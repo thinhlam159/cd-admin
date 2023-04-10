@@ -2,10 +2,6 @@
 
 namespace App\Bundle\ProductBundle\Application;
 
-use App\Bundle\Admin\Domain\Model\Customer;
-use App\Bundle\Admin\Domain\Model\CustomerId;
-use App\Bundle\Admin\Domain\Model\ICustomerRepository;
-use App\Bundle\Common\Domain\Model\InvalidArgumentException;
 use App\Bundle\Common\Domain\Model\TransactionException;
 use App\Bundle\ProductBundle\Domain\Model\Category;
 use App\Bundle\ProductBundle\Domain\Model\CategoryId;

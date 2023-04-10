@@ -1,0 +1,10 @@
+{
+    "measure_unit_type" : {
+        "met": "mét",
+        "roll": "cuộn",
+        "tube": "ống",
+        "unit": "đơn vị",
+        "tree": "cây",
+        "kg": "kg"
+    }
+}

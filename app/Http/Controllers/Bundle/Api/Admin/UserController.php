@@ -13,9 +13,11 @@ use App\Bundle\Admin\Application\UserPostCommand;
 use App\Bundle\Admin\Application\UserPutApplicationService;
 use App\Bundle\Admin\Application\UserPutCommand;
 use App\Bundle\Admin\Infrastructure\UserRepository;
+use App\Exports\ExportFile;
 use App\Http\Controllers\Bundle\Api\Common\BaseController;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class UserController extends BaseController
 {
@@ -129,5 +131,11 @@ class UserController extends BaseController
         $result = $applicationService->handle($command);
 
         return response()->json(['data' => []], 200);
+    }
+
+    public function export()
+    {
+        return Excel::download(new ExportFile, 'users.xlsx');
+//        return (new ExportFile())->download('invoices.xlsx');
     }
 }

@@ -10,10 +10,17 @@ final class OrderCancelPostCommand
     public string $orderId;
 
     /**
-     * @param string $orderId
+     * @var string
      */
-    public function __construct(string $orderId)
+    public string $userId;
+
+    /**
+     * @param string $orderId
+     * @param string $userId
+     */
+    public function __construct(string $orderId, string $userId)
     {
         $this->orderId = $orderId;
+        $this->userId = $userId;
     }
 }

@@ -12,7 +12,7 @@ final class SettingDate
     private DateTime $value;
 
     /**
-     * @param \DateTime $dateTime dateTime
+     * @param DateTime|null $dateTime dateTime
      * @return self
      */
     public static function now(?DateTime $dateTime = null): self
@@ -83,16 +83,6 @@ final class SettingDate
     /**
      * @return string
      */
-    public function asDayJapanString(): string
-    {
-        $days = ['日', '月', '火', '水', '木', '金', '土'];
-
-        return $days[$this->value->format('w')];
-    }
-
-    /**
-     * @return string
-     */
     public function asHourMinuteString(): string
     {
         return $this->value->format(DateTimeConst::FORMAT_HI);
@@ -112,5 +102,25 @@ final class SettingDate
     public function __toString(): string
     {
         return $this->asString();
+    }
+
+    /**
+     * @return int
+     */
+    public function asTimeStamps(): int
+    {
+        return $this->value->format('U');
+    }
+
+    /**
+     * @param int $timeStamps
+     * @return SettingDate
+     */
+    public static function fromTimeStamps(int $timeStamps): SettingDate
+    {
+        $date = new DateTime();
+        $date->setTimestamp($timeStamps);
+
+        return new self($date);
     }
 }

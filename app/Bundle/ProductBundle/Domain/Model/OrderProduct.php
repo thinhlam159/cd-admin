@@ -2,9 +2,6 @@
 
 namespace App\Bundle\ProductBundle\Domain\Model;
 
-use App\Bundle\Admin\Domain\Model\CustomerId;
-use App\Bundle\Admin\Domain\Model\UserId;
-
 final class OrderProduct
 {
     /**
@@ -38,12 +35,48 @@ final class OrderProduct
     private int $count;
 
     /**
+     * @var MeasureUnitType
+     */
+    private MeasureUnitType $measureUnitType;
+
+    /**
+     * @var int
+     */
+    private int $attributeDisplayIndex;
+
+    /**
+     * @var int
+     */
+    private int $weight;
+
+    /**
+     * @var int
+     */
+    private int $orderProductCost;
+
+    /**
+     * @var int
+     */
+    private int $actualSellingPrice;
+
+    /**
+     * @var string|null
+     */
+    private ?string $noteName;
+
+    /**
      * @param OrderProductId $orderProductId
      * @param OrderId $orderId
      * @param ProductId $productId
      * @param ProductAttributeValueId $productAttributeValueId
      * @param ProductAttributePriceId $productAttributePriceId
      * @param int $count
+     * @param MeasureUnitType $measureUnitType
+     * @param int $attributeDisplayIndex
+     * @param int $weight
+     * @param int $orderProductCost
+     * @param int $actualSellingPrice
+     * @param string|null $noteName
      */
     public function __construct(
         OrderProductId $orderProductId,
@@ -51,7 +84,13 @@ final class OrderProduct
         ProductId $productId,
         ProductAttributeValueId $productAttributeValueId,
         ProductAttributePriceId $productAttributePriceId,
-        int $count
+        int $count,
+        MeasureUnitType $measureUnitType,
+        int $attributeDisplayIndex,
+        int $weight,
+        int $orderProductCost,
+        int $actualSellingPrice,
+        ?string $noteName
     )
     {
         $this->orderProductId = $orderProductId;
@@ -60,6 +99,12 @@ final class OrderProduct
         $this->productAttributeValueId = $productAttributeValueId;
         $this->productAttributePriceId = $productAttributePriceId;
         $this->count = $count;
+        $this->measureUnitType = $measureUnitType;
+        $this->attributeDisplayIndex = $attributeDisplayIndex;
+        $this->weight = $weight;
+        $this->orderProductCost = $orderProductCost;
+        $this->actualSellingPrice = $actualSellingPrice;
+        $this->noteName = $noteName;
     }
 
     /**
@@ -108,5 +153,53 @@ final class OrderProduct
     public function getCount(): int
     {
         return $this->count;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAttributeDisplayIndex(): int
+    {
+        return $this->attributeDisplayIndex;
+    }
+
+    /**
+     * @return int
+     */
+    public function getWeight(): int
+    {
+        return $this->weight;
+    }
+
+    /**
+     * @return MeasureUnitType
+     */
+    public function getMeasureUnitType(): MeasureUnitType
+    {
+        return $this->measureUnitType;
+    }
+
+    /**
+     * @return int
+     */
+    public function getOrderProductCost(): int
+    {
+        return $this->orderProductCost;
+    }
+
+    /**
+     * @return int
+     */
+    public function getActualSellingPrice(): int
+    {
+        return $this->actualSellingPrice;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getNoteName(): ?string
+    {
+        return $this->noteName;
     }
 }

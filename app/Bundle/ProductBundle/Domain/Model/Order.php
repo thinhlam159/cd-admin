@@ -33,9 +33,24 @@ final class Order
     private OrderPaymentStatus $orderPaymentStatus;
 
     /**
+     * @var OrderStatus
+     */
+    private OrderStatus $orderStatus;
+
+    /**
      * @var SettingDate|null
      */
-    private ?SettingDate $updateAt;
+    private ?SettingDate $updatedAt;
+
+    /**
+     * @var SettingDate|null
+     */
+    private ?SettingDate $createdAt;
+
+    /**
+     * @var SettingDate
+     */
+    private SettingDate $orderDate;
 
     /**
      * @param OrderId $orderId
@@ -43,13 +58,17 @@ final class Order
      * @param \App\Bundle\Admin\Domain\Model\UserId $userId
      * @param OrderDeliveryStatus $orderDeliveryStatus
      * @param OrderPaymentStatus $orderPaymentStatus
+     * @param OrderStatus $orderStatus
+     * @param SettingDate $orderDate
      */
     public function __construct(
         OrderId $orderId,
         CustomerId $customerId,
         UserId $userId,
         OrderDeliveryStatus $orderDeliveryStatus,
-        OrderPaymentStatus $orderPaymentStatus
+        OrderPaymentStatus $orderPaymentStatus,
+        OrderStatus $orderStatus,
+        SettingDate $orderDate
     )
     {
         $this->orderId = $orderId;
@@ -57,6 +76,8 @@ final class Order
         $this->userId = $userId;
         $this->orderDeliveryStatus = $orderDeliveryStatus;
         $this->orderPaymentStatus = $orderPaymentStatus;
+        $this->orderStatus = $orderStatus;
+        $this->orderDate = $orderDate;
     }
 
     /**
@@ -73,6 +94,14 @@ final class Order
     public function getCustomerId(): CustomerId
     {
         return $this->customerId;
+    }
+
+    /**
+     * @param UserId $userId
+     */
+    public function setUserId(UserId $userId): void
+    {
+        $this->userId = $userId;
     }
 
     /**
@@ -100,9 +129,17 @@ final class Order
     }
 
     /**
+     * @return OrderStatus
+     */
+    public function getOrderStatus(): OrderStatus
+    {
+        return $this->orderStatus;
+    }
+
+    /**
      * @return SettingDate|null
      */
-    public function getUpdateAt(): ?SettingDate
+    public function getUpdatedAt(): ?SettingDate
     {
         return $this->updateAt;
     }
@@ -110,9 +147,41 @@ final class Order
     /**
      * @param SettingDate|null $updateAt
      */
-    public function setUpdateAt(?SettingDate $updateAt): void
+    public function setUpdatedAt(?SettingDate $updateAt): void
     {
         $this->updateAt = $updateAt;
+    }
+
+    /**
+     * @return SettingDate|null
+     */
+    public function getCreatedAt(): ?SettingDate
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * @param SettingDate|null $createdAt
+     */
+    public function setCreatedAt(?SettingDate $createdAt): void
+    {
+        $this->createdAt = $createdAt;
+    }
+
+    /**
+     * @return SettingDate|null
+     */
+    public function getOrderDate(): ?SettingDate
+    {
+        return $this->orderDate;
+    }
+
+    /**
+     * @param SettingDate|null $orderDate
+     */
+    public function setOrderDate(?SettingDate $orderDate): void
+    {
+        $this->orderDate = $orderDate;
     }
 
     /**
@@ -152,9 +221,25 @@ final class Order
         }
     }
 
+    /**
+     * @return void
+     * @throws \App\Bundle\Common\Domain\Model\InvalidArgumentException
+     */
     public function updateCancelStatus(): void
     {
         $this->orderDeliveryStatus = OrderDeliveryStatus::fromStatus(OrderDeliveryStatus::RETURNED_GOODS);
         $this->orderPaymentStatus = OrderPaymentStatus::fromStatus(OrderPaymentStatus::CANCEL);
+        $this->orderStatus = OrderStatus::fromStatus(OrderStatus::CANCEL);
+    }
+
+    /**
+     * @return void
+     * @throws \App\Bundle\Common\Domain\Model\InvalidArgumentException
+     */
+    public function updateResolvedStatus(): void
+    {
+        $this->orderDeliveryStatus = OrderDeliveryStatus::fromStatus(OrderDeliveryStatus::RETURNED_GOODS);
+        $this->orderPaymentStatus = OrderPaymentStatus::fromStatus(OrderPaymentStatus::CANCEL);
+        $this->orderStatus = OrderStatus::fromStatus(OrderStatus::RESOLVED);
     }
 }

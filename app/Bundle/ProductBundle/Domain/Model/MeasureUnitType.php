@@ -12,10 +12,26 @@ final class MeasureUnitType
     /** @var int */
     public const MET = 2;
 
+    /** @var int */
+    public const ROLL = 3;
+
+    /** @var int */
+    public const UNIT = 4;
+
+    /** @var int */
+    public const TREE = 5;
+
+    /** @var int */
+    public const TUBE = 6;
+
     /** @var array<int,string> */
     private const VALUES = [
         self::KG => 'kg',
         self::MET => 'met',
+        self::ROLL => 'roll',
+        self::UNIT => 'unit',
+        self::TREE => 'tree',
+        self::TUBE => 'tube',
     ];
     private int $type;
 
@@ -48,7 +64,7 @@ final class MeasureUnitType
             }
         }
 
-        throw new InvalidArgumentException("[{$value}] 不正な値です。");
+        throw new InvalidArgumentException("[{$value}] Giá trị không hợp lệ");
     }
 
     /**
@@ -58,7 +74,7 @@ final class MeasureUnitType
     public static function fromType(int $type): MeasureUnitType
     {
         if (!isset(self::VALUES[$type])) {
-            throw new InvalidArgumentException("[{$type}] 不正な値です。");
+            throw new InvalidArgumentException("[{$type}] Loại không hợp lệ");
         }
 
         return new MeasureUnitType($type);

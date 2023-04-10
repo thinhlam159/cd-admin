@@ -11,6 +11,7 @@ use App\Bundle\ProductBundle\Application\CategoryListGetApplicationService;
 use App\Bundle\ProductBundle\Application\CategoryListGetCommand;
 use App\Bundle\ProductBundle\Application\CategoryPostApplicationService;
 use App\Bundle\ProductBundle\Application\CategoryPostCommand;
+use App\Bundle\ProductBundle\Application\CategoryPutApplicationService;
 use App\Bundle\ProductBundle\Application\CategoryPutCommand;
 use App\Bundle\ProductBundle\Infrastructure\CategoryRepository;
 use App\Http\Controllers\Bundle\Api\Common\BaseController;
@@ -27,8 +28,8 @@ class CategoryController extends BaseController
         $applicationService = new CategoryPostApplicationService($categoriesRepository);
 
         $command = new CategoryPostCommand(
-            $request->category_name,
-            $request->slug,
+            $request->name,
+            $request->name,
             !empty($request->parent_id) ? $request->parent_id : null,
         );
 
@@ -86,12 +87,12 @@ class CategoryController extends BaseController
         $category = $applicationService->handle($command);
         $data = [
             'category_id' => $category->categoryId,
-            'email' => $category->name,
+            'name' => $category->name,
             'slug' => $category->slug,
             'parent_id' => $category->parentId,
         ];
 
-        return response()->json($data, 200);
+        return response()->json(['data' => $data], 200);
     }
 
     /**
@@ -102,17 +103,17 @@ class CategoryController extends BaseController
      */
     public function updateCategory(Request $request) {
         $categoriesRepository = new CategoryRepository();
-        $applicationService = new CategoryGetApplicationService($categoriesRepository);
+        $applicationService = new CategoryPutApplicationService($categoriesRepository);
 
         $command = new CategoryPutCommand(
             $request->id,
-            $request->category_name,
-            $request->slug,
-            (int)$request->phone,
+            $request->name,
+            $request->name,
+            $request->parent_id,
         );
         $result = $applicationService->handle($command);
 
-        return response()->json(['customer_id' => $result->customerId], 200);
+        return response()->json(['category_id' => $result->categoryId], 200);
     }
 
     /**

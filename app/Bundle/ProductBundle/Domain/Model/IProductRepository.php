@@ -12,9 +12,10 @@ interface IProductRepository
     public function create(Product $category): ProductId;
 
     /**
+     * @param ProductCriteria $criteria
      * @return array{Product[], Pagination}
      */
-    public function findAll(): array;
+    public function findAll(ProductCriteria $criteria): array;
 
     /**
      * @param ProductId $productId
@@ -27,4 +28,10 @@ interface IProductRepository
      * @return ProductId
      */
     public function update(Product $product): ProductId;
+
+    /**
+     * @param CategoryId $categoryId
+     * @return Product[]
+     */
+    public function findByCategoryId(CategoryId $categoryId): array;
 }

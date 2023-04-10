@@ -9,6 +9,8 @@ use App\Bundle\ProductBundle\Application\MeasureUnitListGetCommand;
 use App\Bundle\ProductBundle\Application\ProductAttributeListGetApplicationService;
 use App\Bundle\ProductBundle\Application\ProductAttributeListGetCommand;
 use App\Bundle\ProductBundle\Application\ProductAttributePriceCommand;
+use App\Bundle\ProductBundle\Application\ProductAttributePriceListGetApplicationService;
+use App\Bundle\ProductBundle\Application\ProductAttributePriceListGetCommand;
 use App\Bundle\ProductBundle\Application\ProductAttributePriceListPutApplicationService;
 use App\Bundle\ProductBundle\Application\ProductAttributePriceListPutCommand;
 use App\Bundle\ProductBundle\Application\ProductAttributeValueListGetApplicationService;
@@ -21,6 +23,8 @@ use App\Bundle\ProductBundle\Application\ProductListGetApplicationService;
 use App\Bundle\ProductBundle\Application\ProductListGetCommand;
 use App\Bundle\ProductBundle\Application\ProductPostApplicationService;
 use App\Bundle\ProductBundle\Application\ProductPostCommand;
+use App\Bundle\ProductBundle\Application\ProductPriceAllListGetApplicationService;
+use App\Bundle\ProductBundle\Application\ProductPriceAllListGetCommand;
 use App\Bundle\ProductBundle\Application\ProductPutApplicationService;
 use App\Bundle\ProductBundle\Application\ProductPutCommand;
 use App\Bundle\ProductBundle\Infrastructure\CategoryRepository;
@@ -33,7 +37,6 @@ use App\Bundle\ProductBundle\Infrastructure\ProductInventoryRepository;
 use App\Bundle\ProductBundle\Infrastructure\ProductRepository;
 use App\Http\Controllers\Bundle\Api\Common\BaseController;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -46,26 +49,19 @@ class ProductController extends BaseController
     {
         $applicationService = new ProductPostApplicationService(
             new ProductRepository(),
-            new FeatureImagePathRepository(),
+            new ProductAttributeValueRepository(),
+            new ProductAttributePriceRepository(),
+            new ProductInventoryRepository()
         );
-
-        $file = $request->file('file');
-        if (!$file) {
-            throw new InvalidArgumentException();
-        }
-        $file->hashName();
-        $path = Storage::put('/public/'. Auth::id(), $file);
-        $url = Storage::url($path);
-
-        $isAvatar = true;
 
         $command = new ProductPostCommand(
             $request->name,
-            $request->code,
-            $request->description,
+            $request->name,
+            $request->name,
             $request->category_id,
-            $url,
-            $isAvatar
+            $request->price,
+            $request->measure_unit_type,
+            !empty($request->notice_price_type) ? $request->notice_price_type : 'default',
         );
 
         $result = $applicationService->handle($command);
@@ -92,7 +88,10 @@ class ProductController extends BaseController
             new MeasureUnitRepository(),
         );
 
-        $command = new ProductListGetCommand();
+        $command = new ProductListGetCommand(
+            !empty($request->category_ids) ? $request->category_ids : [],
+            !empty($request->keyword) ? $request->keyword : '',
+        );
         $result = $applicationService->handle($command);
         $productResults = $result->productResults;
         $paginationResult = $result->paginationResult;
@@ -100,6 +99,7 @@ class ProductController extends BaseController
         foreach ($productResults as $product) {
             $productAttributeValues = [];
             foreach ($product->productAttributeValueResults as $productAttributeValueResult) {
+                if ($productAttributeValueResult->isOriginal) continue;
                 $productAttributeValues[] = [
                     'product_attribute_value_id' => $productAttributeValueResult->productAttributeValueId,
                     'code' => $productAttributeValueResult->code,
@@ -111,6 +111,8 @@ class ProductController extends BaseController
                     'notice_price_type' => $productAttributeValueResult->noticePriceType,
                     'monetary_unit_name' => $productAttributeValueResult->monetaryUnit,
                     'product_attribute_price_id' => $productAttributeValueResult->productAttributePriceId,
+                    'standard_price' => $productAttributeValueResult->standardPrice,
+                    'is_original' => $productAttributeValueResult->isOriginal,
                 ];
             }
             $data[] = [
@@ -120,14 +122,18 @@ class ProductController extends BaseController
                 'description' => $product->description,
                 'category_id' => $product->categoryId,
                 'category_name' => $product->categoryName,
-                'image_path' => url($product->imagePath),
-                'product_attribute_values' => $productAttributeValues
+                'price' => $product->productAttributeValueResults[0]->price,
+                'notice_price_type' => $product->productAttributeValueResults[0]->noticePriceType,
+                'standard_price' => $product->productAttributeValueResults[0]->standardPrice,
+                'original_product_attribute_value_id' => $product->productAttributeValueResults[0]->productAttributeValueId,
+                'original_product_attribute_price_id' => $product->productAttributeValueResults[0]->productAttributePriceId,
+                'product_attribute_values' => $productAttributeValues,
             ];
         }
         $response = [
             'data' => $data,
             'pagination' => [
-                'total' => $paginationResult->totalPage,
+                'total_page' => $paginationResult->totalPage,
                 'per_page' => $paginationResult->perPage,
                 'current_page' => $paginationResult->currentPage,
             ],
@@ -156,6 +162,7 @@ class ProductController extends BaseController
         $product = $applicationService->handle($command);
         $productAttributeValues = [];
         foreach ($product->productAttributeValueResults as $productAttributeValueResult) {
+            if ($productAttributeValueResult->isOriginal) continue;
             $productAttributeValues[] = [
                 'product_attribute_value_id' => $productAttributeValueResult->productAttributeValueId,
                 'product_attribute_name' => $productAttributeValueResult->productAttributeName,
@@ -164,6 +171,7 @@ class ProductController extends BaseController
                 'product_inventory_count' => $productAttributeValueResult->productInventoryCount,
                 'measure_unit' => $productAttributeValueResult->measureUnit,
                 'price' => $productAttributeValueResult->price,
+                'notice_price_type' => $productAttributeValueResult->noticePriceType,
                 'monetary_unit' => $productAttributeValueResult->monetaryUnit,
             ];
         }
@@ -174,6 +182,12 @@ class ProductController extends BaseController
             'description' => $product->description,
             'category_id' => $product->categoryId,
             'category_name' => $product->categoryName,
+            'price' => $product->productAttributeValueResults[0]->price,
+            'notice_price_type' => $product->productAttributeValueResults[0]->noticePriceType,
+            'standard_price' => $product->productAttributeValueResults[0]->standardPrice,
+            'measure_unit_type' => $product->productAttributeValueResults[0]->measureUnit,
+            'original_product_attribute_value_id' => $product->productAttributeValueResults[0]->productAttributeValueId,
+            'original_product_attribute_price_id' => $product->productAttributeValueResults[0]->productAttributePriceId,
             'product_attribute_values' => $productAttributeValues
         ];
 
@@ -273,27 +287,19 @@ class ProductController extends BaseController
     {
         $applicationService = new ProductAttributeValuePostApplicationService(
             new ProductAttributeValueRepository(),
-            new FeatureImagePathRepository(),
             new ProductAttributePriceRepository(),
             new ProductInventoryRepository()
         );
-        $file = $request->file('file');
-        if (!$file) {
-            throw new InvalidArgumentException();
-        }
-        $file->hashName();
-        $path = Storage::put('/public/'. Auth::id(), $file);
-        $url = Storage::url($path);
 
         $command = new ProductAttributeValuePostCommand(
             $request->product_id,
             $request->product_attribute_id,
-            $request->measure_unit_id,
+            $request->measure_unit_type,
             $request->value,
             $request->code,
-            $url,
             (int)$request->price,
             (int)$request->count,
+            $request->notice_price_type,
         );
 
         $result = $applicationService->handle($command);
@@ -348,6 +354,7 @@ class ProductController extends BaseController
 
         $data = [];
         foreach ($result->productAttributeValueResults as $productAttributeValueResult) {
+            if ($productAttributeValueResult->isOriginal) continue;
             $data[] = [
                 'id' => $productAttributeValueResult->productAttributeValueId,
                 'product_id' => $productAttributeValueResult->productId,
@@ -376,17 +383,17 @@ class ProductController extends BaseController
         $applicationService = new ProductAttributePriceListPutApplicationService(
             new ProductAttributeValueRepository(),
             new ProductAttributePriceRepository(),
-            new ProductInventoryRepository(),
-            new ProductAttributeRepository(),
+            new ProductRepository()
         );
         $productAttributeValuePriceCommands = [];
         $productAttributeValuePrices = !empty($request->product_attribute_value_price) ? $request->product_attribute_value_price : [];
         foreach ($productAttributeValuePrices as $productAttributeValuePrice) {
             $productAttributeValuePriceCommands[] = new ProductAttributePriceCommand(
-                $productAttributeValuePrice->product_attribute_price_id,
-                $productAttributeValuePrice->product_attribute_value_id,
-                $productAttributeValuePrice->price,
-                $productAttributeValuePrice->notice_price_type,
+                $productAttributeValuePrice['product_attribute_price_id'],
+                $productAttributeValuePrice['product_attribute_value_id'],
+                $productAttributeValuePrice['price'],
+                $productAttributeValuePrice['notice_price_type'],
+                $productAttributeValuePrice['product_id'],
             );
         }
         $command = new ProductAttributePriceListPutCommand(
@@ -395,5 +402,65 @@ class ProductController extends BaseController
         $result = $applicationService->handle($command);
 
         return response()->json(['data' => []], 200);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws InvalidArgumentException
+     * @throws \App\Bundle\Common\Domain\Model\TransactionException
+     */
+    public function getProductAttributePrices(Request $request) {
+        $applicationService = new ProductAttributePriceListGetApplicationService(
+            new ProductAttributePriceRepository(),
+        );
+        $command = new ProductAttributePriceListGetCommand();
+        $result = $applicationService->handle($command);
+        $data = [];
+        foreach ($result->productAttributePriceResults as $productAttributePriceResult) {
+            $data[] = [
+                'product_attribute_price_id' => $productAttributePriceResult->productAttributePriceId,
+                'product_attribute_value_id' => $productAttributePriceResult->productAttributeValueId,
+                'price' => $productAttributePriceResult->price,
+                'monetary_unit' => $productAttributePriceResult->monetaryUnitType,
+                'notice_price_type' => $productAttributePriceResult->noticePriceType,
+                'standard_price' => $productAttributePriceResult->standardPrice,
+                'is_current' => $productAttributePriceResult->isCurrent,
+            ];
+        }
+
+        return response()->json(['data' => $data], 200);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws InvalidArgumentException
+     * @throws \App\Bundle\Common\Domain\Model\TransactionException
+     */
+    public function getProductAttributePrices2(Request $request) {
+        $applicationService = new ProductPriceAllListGetApplicationService(
+            new ProductAttributePriceRepository(),
+            new ProductAttributeValueRepository(),
+            new ProductRepository()
+        );
+        $command = new ProductPriceAllListGetCommand();
+        $result = $applicationService->handle($command);
+        $data = [];
+        foreach ($result->productPriceResults as $productPriceResult) {
+            $data[] = [
+                'product_id' => $productPriceResult->productId,
+                'product_name' => $productPriceResult->name,
+                'product_code' => $productPriceResult->code,
+                'product_attribute_price_id' => $productPriceResult->productAttributePriceId,
+                'product_attribute_value_id' => $productPriceResult->productAttributeValueId,
+                'price' => $productPriceResult->price,
+                'monetary_unit' => $productPriceResult->monetaryUnitType,
+                'notice_price_type' => $productPriceResult->noticePriceType,
+                'is_current' => $productPriceResult->isCurrent,
+            ];
+        }
+
+        return response()->json(['data' => $data], 200);
     }
 }

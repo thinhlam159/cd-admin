@@ -2,16 +2,15 @@
 
 namespace App\Bundle\ProductBundle\Application;
 
+use App\Bundle\Common\Constants\MessageConst;
 use App\Bundle\Common\Domain\Model\InvalidArgumentException;
 use App\Bundle\Common\Domain\Model\TransactionException;
-use App\Bundle\ProductBundle\Domain\Model\FeatureImagePath;
-use App\Bundle\ProductBundle\Domain\Model\FeatureImagePathId;
-use App\Bundle\ProductBundle\Domain\Model\IFeatureImagePathRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductAttributePriceRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductAttributeValueRepository;
 use App\Bundle\ProductBundle\Domain\Model\IProductInventoryRepository;
-use App\Bundle\ProductBundle\Domain\Model\MeasureUnitId;
+use App\Bundle\ProductBundle\Domain\Model\MeasureUnitType;
 use App\Bundle\ProductBundle\Domain\Model\MonetaryUnitType;
+use App\Bundle\ProductBundle\Domain\Model\NoticePriceType;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributeId;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributePrice;
 use App\Bundle\ProductBundle\Domain\Model\ProductAttributePriceId;
@@ -20,6 +19,7 @@ use App\Bundle\ProductBundle\Domain\Model\ProductAttributeValueId;
 use App\Bundle\ProductBundle\Domain\Model\ProductId;
 use App\Bundle\ProductBundle\Domain\Model\ProductInventory;
 use App\Bundle\ProductBundle\Domain\Model\ProductInventoryId;
+use App\Bundle\ProductBundle\Domain\Model\ProductInventoryUpdateType;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -30,11 +30,6 @@ class ProductAttributeValuePostApplicationService
      * @var IProductAttributeValueRepository
      */
     private IProductAttributeValueRepository $productAttributeValueRepository;
-
-    /**
-     * @var IFeatureImagePathRepository
-     */
-    private IFeatureImagePathRepository $featureImagePathRepository;
 
     /**
      * @var IProductAttributePriceRepository
@@ -48,19 +43,16 @@ class ProductAttributeValuePostApplicationService
 
     /**
      * @param IProductAttributeValueRepository $productAttributeValueRepository
-     * @param IFeatureImagePathRepository $featureImagePathRepository
      * @param IProductAttributePriceRepository $productAttributePriceRepository
      * @param IProductInventoryRepository $productInventoryRepository
      */
     public function __construct(
         IProductAttributeValueRepository $productAttributeValueRepository,
-        IFeatureImagePathRepository $featureImagePathRepository,
         IProductAttributePriceRepository $productAttributePriceRepository,
         IProductInventoryRepository $productInventoryRepository
     )
     {
         $this->productAttributeValueRepository = $productAttributeValueRepository;
-        $this->featureImagePathRepository = $featureImagePathRepository;
         $this->productAttributePriceRepository = $productAttributePriceRepository;
         $this->productInventoryRepository = $productInventoryRepository;
     }
@@ -73,39 +65,32 @@ class ProductAttributeValuePostApplicationService
      */
     public function handle(ProductAttributeValuePostCommand $command): ProductAttributeValuePostResult
     {
-//        $existingEmail = $this->categoryRepository->checkExistingEmail($command->email);
-//        if ($existingEmail) {
-//            throw new InvalidArgumentException('Existing Email!');
-//        }
         $productAttributeValueId = ProductAttributeValueId::newId();
         $productId = new ProductId($command->productId);
         $productAttributeId = new ProductAttributeId($command->productAttributeId);
-        $measureUnitId = new MeasureUnitId($command->measureUnitId);
+
+        $existingCode = $this->productAttributeValueRepository->checkExistingCode($productId, $command->code);
+        if ($existingCode) {
+            throw new InvalidArgumentException(MessageConst::EXISTING_PRODUCT_CODE['message']);
+        }
 
         $productAttributeValue = new ProductAttributeValue(
             $productAttributeValueId,
             $productId,
             $productAttributeId,
-            $measureUnitId,
             $command->value,
             $command->code,
             null,
-            null
-        );
-
-        $featureImagePathId = FeatureImagePathId::newId();
-        $featureImagePath = new FeatureImagePath(
-            $featureImagePathId,
-            $productId,
-            $productAttributeValueId,
-            false,
-            $command->featureImagePath
+            MeasureUnitType::fromValue($command->measureUnitType),
+            false
         );
 
         $productInventory = new ProductInventory(
             ProductInventoryId::newId(),
             $productAttributeValueId,
             $command->count,
+            MeasureUnitType::fromValue($command->measureUnitType),
+            ProductInventoryUpdateType::fromType(ProductInventoryUpdateType::INITIALIZATION),
             true
         );
 
@@ -114,16 +99,16 @@ class ProductAttributeValuePostApplicationService
             $productAttributeValueId,
             $command->price,
             MonetaryUnitType::fromType(MonetaryUnitType::VND),
+            NoticePriceType::fromValue($command->noticePriceType),
             true
         );
 
         DB::beginTransaction();
         try {
             $productAttributeValueId = $this->productAttributeValueRepository->create($productAttributeValue);
-            $featureImagePathId = $this->featureImagePathRepository->create($featureImagePath);
             $productInventoryId = $this->productInventoryRepository->create($productInventory);
             $productAttributePriceId = $this->productAttributePriceRepository->create($productAttributePrice);
-            if (!$productAttributeValueId || !$featureImagePathId || !$productInventoryId || !$productAttributePriceId) {
+            if (!$productAttributeValueId || !$productInventoryId || !$productAttributePriceId) {
                 throw new Exception();
             }
 
@@ -131,7 +116,7 @@ class ProductAttributeValuePostApplicationService
         } catch (Exception $e) {
             DB::rollBack();
             Log::error($e);
-            throw new TransactionException('Add product fail!');
+            throw new TransactionException($e->getMessage());
         }
 
         return new ProductAttributeValuePostResult($productAttributeValueId->__toString());
